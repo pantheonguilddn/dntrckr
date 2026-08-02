@@ -84,6 +84,16 @@
             vertical-align: middle;
         }
 
+        /* Uniform Character Columns */
+        .char-col {
+            width: 105px;
+            min-width: 105px;
+            max-width: 105px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         /* Super Headers */
         .roster-cho { background-color: #b4a7d6; color: black; font-size: 1.1rem; }
         .roster-cheean { background-color: #ffd966; color: black; font-size: 1.1rem; }
@@ -170,7 +180,6 @@
             padding-top: 20px;
             text-align: center;
         }
-
 
         /* Toolbar and modal controls */
         .control-actions {
@@ -548,28 +557,19 @@
         <button class="btn btn-archive" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
     </div>
 
-
+    <!-- Cloud Setup Modal -->
     <div class="modal-overlay hidden" id="cloud-modal" role="dialog" aria-modal="true" aria-labelledby="cloud-modal-title">
         <div class="modal-card">
             <h3 id="cloud-modal-title">☁️ JSONBin Cloud Setup</h3>
             <div class="modal-note">
-                The Bin ID and key are saved only in this browser's local storage. They are not written into this HTML file, so the tracker can be published on GitHub without committing the key.
+                Your Bin ID and API Key are saved safely in your browser's local memory.
             </div>
             <div class="modal-grid">
                 <label for="cloud-bin-id">Bin ID</label>
                 <input id="cloud-bin-id" autocomplete="off" placeholder="Example: 66abc123...">
 
-                <label for="cloud-key-type">Key type</label>
-                <select id="cloud-key-type">
-                    <option value="access">Access Key (recommended)</option>
-                    <option value="master">Master Key</option>
-                </select>
-
-                <label for="cloud-api-key">API key</label>
-                <input id="cloud-api-key" type="password" autocomplete="new-password" placeholder="Paste your JSONBin key">
-            </div>
-            <div class="modal-note">
-                Recommended Access Key permissions: <b>Read</b>, <b>Update</b>, and optionally <b>Create</b>. Leave Delete disabled. Use the same Bin ID and key on each PC.
+                <label for="cloud-api-key">Master Key</label>
+                <input id="cloud-api-key" type="password" autocomplete="new-password" placeholder="Paste your JSONBin Master Key">
             </div>
             <div class="modal-actions">
                 <button class="btn btn-cloud" type="button" onclick="saveCloudSettings(true)">Save & Connect</button>
@@ -581,6 +581,7 @@
         </div>
     </div>
 
+    <!-- Loot Weights Modal -->
     <div class="modal-overlay hidden" id="weights-modal" role="dialog" aria-modal="true" aria-labelledby="weights-modal-title">
         <div class="modal-card">
             <h3 id="weights-modal-title">🎁 Loot Gravity Weights</h3>
@@ -596,6 +597,7 @@
         </div>
     </div>
 
+    <!-- Roster Registration Modal -->
     <div class="modal-overlay hidden" id="roster-modal" role="dialog" aria-modal="true" aria-labelledby="roster-modal-title">
         <div class="modal-card registration-card">
             <h3 id="roster-modal-title">🧾 Roster Registration</h3>
@@ -638,7 +640,6 @@
             </div>
         </div>
     </div>
-
 
     <script>
         // ==========================================
@@ -683,7 +684,6 @@
         let characters = flattenRosters(DEFAULT_ROSTERS);
         let weeklyTaskNames = [];
         let autoSyncTimer;
-        let periodicSyncTimer;
         let syncInProgress = false;
         let syncRequestedWhileBusy = false;
         const deviceId = getOrCreateDeviceId();
@@ -820,7 +820,6 @@
                 if (Object.keys(normalizedTasks).length) normalized.cells[charName] = normalizedTasks;
             }
 
-            // Migrate records created by the older board/exclusions format.
             const migrationTime = normalized.updatedAt || 1;
             for (const [charName, taskMap] of Object.entries(safeObject(source.board))) {
                 for (const taskName of Object.keys(safeObject(taskMap))) {
@@ -869,11 +868,10 @@
                 const config = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{}');
                 return {
                     binId: String(config.binId || '').trim(),
-                    apiKey: String(config.apiKey || '').trim(),
-                    keyType: config.keyType === 'master' ? 'master' : 'access'
+                    apiKey: String(config.apiKey || '').trim()
                 };
             } catch (error) {
-                return { binId: '', apiKey: '', keyType: 'access' };
+                return { binId: '', apiKey: '' };
             }
         }
 
@@ -883,9 +881,7 @@
         }
 
         function authHeaders(config = getCloudConfig()) {
-            return {
-                [config.keyType === 'master' ? 'X-Master-Key' : 'X-Access-Key']: config.apiKey
-            };
+            return { 'X-Master-Key': config.apiKey };
         }
 
         function compareCellRecords(a, b) {
@@ -985,53 +981,18 @@
             }
         }
 
-        function hasLocalChangesNotInRemote(localRecord, remoteRecord) {
-            const local = normalizeData(localRecord);
-            const remote = normalizeData(remoteRecord);
-
-            for (const [charName, taskMap] of Object.entries(local.cells)) {
-                for (const [taskName, localCell] of Object.entries(taskMap)) {
-                    const remoteCell = remote.cells?.[charName]?.[taskName];
-                    const winner = compareCellRecords(localCell, remoteCell);
-                    if (winner.updatedAt === localCell.updatedAt &&
-                        winner.deviceId === localCell.deviceId &&
-                        (!remoteCell || remoteCell.updatedAt !== localCell.updatedAt || remoteCell.state !== localCell.state || remoteCell.deviceId !== localCell.deviceId)) {
-                        return true;
-                    }
-                }
-            }
-
-            for (const [key, archive] of Object.entries(local.weeklyArchive)) {
-                const remoteArchive = remote.weeklyArchive[key];
-                if (!remoteArchive || (Number(archive.createdAt) || 0) > (Number(remoteArchive.createdAt) || 0)) return true;
-            }
-
-            for (const [taskName, timestamp] of Object.entries(local.settings.lootWeightUpdatedAt)) {
-                if ((Number(timestamp) || 0) > (Number(remote.settings.lootWeightUpdatedAt[taskName]) || 0)) return true;
-            }
-
-            const localRosterTime = Number(local.settings.rosterUpdatedAt) || 0;
-            const remoteRosterTime = Number(remote.settings.rosterUpdatedAt) || 0;
-            if (localRosterTime > remoteRosterTime) return true;
-            if (localRosterTime === remoteRosterTime &&
-                String(local.settings.rosterUpdatedBy || '') > String(remote.settings.rosterUpdatedBy || '') &&
-                JSON.stringify(local.settings.rosters) !== JSON.stringify(remote.settings.rosters)) return true;
-
-            return local.lastDailyReset > remote.lastDailyReset || local.lastWeeklyReset > remote.lastWeeklyReset;
-        }
-
         // ==========================================
         // 🕒 TIME MATH (MANILA UTC+8)
         // ==========================================
         function getTargetResetTimeUTC(isWeekly) {
             const now = new Date();
             const reset = new Date();
-            reset.setUTCHours(1, 0, 0, 0); // 9:00 AM Manila = 1:00 AM UTC
+            reset.setUTCHours(1, 0, 0, 0); 
 
             if (now.getTime() < reset.getTime()) reset.setUTCDate(reset.getUTCDate() - 1);
 
             if (isWeekly) {
-                let diff = reset.getUTCDay() - 6; // Most recent Saturday
+                let diff = reset.getUTCDay() - 6; 
                 if (diff < 0) diff += 7;
                 reset.setUTCDate(reset.getUTCDate() - diff);
             }
@@ -1044,7 +1005,7 @@
         async function fetchRemoteRecord(config = getCloudConfig()) {
             const response = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, {
                 method: 'GET',
-                headers: { ...authHeaders(config), 'X-Bin-Meta': 'false' },
+                headers: { ...authHeaders(config) },
                 cache: 'no-store'
             });
             const payload = await response.json().catch(() => ({}));
@@ -1062,35 +1023,7 @@
                 setStatus('⚪ Local mode — click Cloud Setup');
                 return;
             }
-
             await forceSync(false);
-            clearInterval(periodicSyncTimer);
-            periodicSyncTimer = setInterval(() => refreshFromCloud(), 30000);
-        }
-
-        async function refreshFromCloud() {
-            if (!hasCloudConfig() || syncInProgress) return;
-            syncInProgress = true;
-            const config = getCloudConfig();
-            let shouldUploadAfterRefresh = false;
-            try {
-                const remoteRecord = await fetchRemoteRecord(config);
-                shouldUploadAfterRefresh = hasLocalChangesNotInRemote(cloudData, remoteRecord);
-                cloudData = mergeData(cloudData, remoteRecord);
-                shouldUploadAfterRefresh = checkAutoResets() || shouldUploadAfterRefresh;
-                persistLocalData();
-                refreshTrackerUI();
-                setStatus(shouldUploadAfterRefresh ? '🟡 Local changes queued for cloud...' : '🟢 Database Refreshed');
-            } catch (error) {
-                console.error('Cloud refresh failed:', error);
-                setStatus(`🔴 Refresh Failed: ${error.message}`);
-            } finally {
-                syncInProgress = false;
-                if (syncRequestedWhileBusy || shouldUploadAfterRefresh) {
-                    syncRequestedWhileBusy = false;
-                    setTimeout(() => forceSync(false), 150);
-                }
-            }
         }
 
         async function forceSync(showSuccess = false) {
@@ -1120,7 +1053,6 @@
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Bin-Versioning': 'true',
                         ...authHeaders(config)
                     },
                     body: JSON.stringify(cloudData)
@@ -1215,7 +1147,7 @@
                 characterHeader.textContent = char.name;
                 characterHeader.style.backgroundColor = char.color;
                 characterHeader.style.color = getContrastText(char.color);
-                characterHeader.className = 'bold';
+                characterHeader.className = 'bold char-col';
                 headerRow.appendChild(characterHeader);
 
                 const rateHeader = document.createElement('th');
@@ -1223,6 +1155,7 @@
                 rateHeader.style.backgroundColor = '#ffe599';
                 rateHeader.style.color = '#000';
                 rateHeader.textContent = '0%';
+                rateHeader.className = 'char-col';
                 footerRow.appendChild(rateHeader);
             });
 
@@ -1234,7 +1167,7 @@
 
                 characters.forEach(char => {
                     const cell = document.createElement('td');
-                    cell.className = 'interactive-cell generated-character-cell';
+                    cell.className = 'interactive-cell generated-character-cell char-col';
                     cell.dataset.char = char.name;
                     cell.dataset.task = taskName;
                     cell.dataset.isWeekly = row.classList.contains('is-weekly');
@@ -1447,7 +1380,6 @@
                 });
             });
 
-            // Preserve old tracker history. Old data did not record completed or N/A counts.
             const legacyMissed = safeObject(cloudData.history?.[charName]?.missed);
             for (const [taskName, countValue] of Object.entries(legacyMissed)) {
                 if (!stats[taskName]) stats[taskName] = { missed: 0, completed: 0, excluded: 0, opportunities: 0, legacyMissed: 0 };
@@ -1838,7 +1770,6 @@
             const config = getCloudConfig();
             document.getElementById('cloud-bin-id').value = config.binId;
             document.getElementById('cloud-api-key').value = config.apiKey;
-            document.getElementById('cloud-key-type').value = config.keyType;
         }
 
         function showCloudMessage(message, isError = false) {
@@ -1851,31 +1782,27 @@
         function saveCloudSettings(connectAfterSave = false) {
             const config = {
                 binId: document.getElementById('cloud-bin-id').value.trim(),
-                apiKey: document.getElementById('cloud-api-key').value.trim(),
-                keyType: document.getElementById('cloud-key-type').value === 'master' ? 'master' : 'access'
+                apiKey: document.getElementById('cloud-api-key').value.trim()
             };
             if (!config.binId || !config.apiKey) {
-                showCloudMessage('Enter both the Bin ID and API key.', true);
+                showCloudMessage('Enter both the Bin ID and Master API key.', true);
                 return;
             }
             localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(config));
             showCloudMessage('Saved on this PC. Connecting to JSONBin...');
-            clearInterval(periodicSyncTimer);
-            periodicSyncTimer = setInterval(() => refreshFromCloud(), 30000);
             if (connectAfterSave) forceSync(true);
         }
 
         async function createNewCloudBin() {
             const apiKey = document.getElementById('cloud-api-key').value.trim();
-            const keyType = document.getElementById('cloud-key-type').value === 'master' ? 'master' : 'access';
             if (!apiKey) {
-                showCloudMessage('Paste an API key first. The key needs Create permission for this button.', true);
+                showCloudMessage('Paste a Master API key first.', true);
                 return;
             }
 
             showCloudMessage('Creating a private JSONBin record...');
             try {
-                const config = { binId: '', apiKey, keyType };
+                const config = { binId: '', apiKey };
                 const response = await fetch(`${JSONBIN_ROOT}/b`, {
                     method: 'POST',
                     headers: {
@@ -1892,7 +1819,7 @@
                 if (!binId) throw new Error('JSONBin did not return a Bin ID.');
 
                 document.getElementById('cloud-bin-id').value = binId;
-                localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId, apiKey, keyType }));
+                localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId, apiKey }));
                 showCloudMessage(`Private Bin created. Bin ID: ${binId}`);
                 await forceSync(true);
             } catch (error) {
@@ -1902,9 +1829,8 @@
         }
 
         function clearCloudSettings() {
-            if (!confirm('Remove the JSONBin Bin ID and API key from this PC? Local tracker data will remain.')) return;
+            if (!confirm('Remove the JSONBin Bin ID and Master API key from this PC? Local tracker data will remain.')) return;
             localStorage.removeItem(CLOUD_CONFIG_KEY);
-            clearInterval(periodicSyncTimer);
             loadCloudForm();
             setStatus('⚪ Local mode — cloud settings cleared');
             showCloudMessage('Cloud settings removed from this PC.');
