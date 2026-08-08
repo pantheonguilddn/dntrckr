@@ -43,28 +43,43 @@
             margin-right: 15px;
         }
 
-        /* Table Styling */
+        /* Responsive Table Wrapper */
+        .table-responsive {
+            width: 100%;
+            max-width: 1600px;
+            overflow-x: auto;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            background-color: #ffffff;
+            border-radius: 4px;
+        }
+
+        /* STRICT EQUAL-WIDTH TABLE STYLING */
         table {
             border-collapse: collapse;
-            background-color: #ffffff;
+            width: 100%;
             color: #000000;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            width: max-content;
-            margin-bottom: 40px;
+            table-layout: fixed; /* Forces browser to respect exact colgroup widths */
         }
 
         th, td {
             border: 1px solid #444;
-            padding: 6px 10px;
-            font-size: 14px;
+            padding: 6px 8px;
+            font-size: clamp(0.75rem, 0.9vw, 0.9rem);
             text-align: center;
             vertical-align: middle;
             position: relative;
         }
 
         /* Specific Cell Alignments */
-        .task-name { text-align: left; white-space: nowrap; font-weight: 500; }
-        .text-center { text-align: center; }
+        .task-name { 
+            text-align: left; 
+            white-space: nowrap; 
+            font-weight: 500; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        
         .bold { font-weight: bold; }
         
         /* Column Category Styles */
@@ -73,7 +88,6 @@
         .bg-dark { background-color: #434343 !important; color: #ffffff !important; font-weight: bold; }
 
         .tracker-title {
-            min-width: 430px;
             padding: 16px 12px;
             border: 1px solid #444 !important;
             background-color: #434343 !important;
@@ -84,18 +98,12 @@
             vertical-align: middle;
         }
 
-        /* Uniform Character Columns */
+        /* Perfect Equal Character Columns */
         .char-col {
-            width: 105px;
-            min-width: 105px;
-            max-width: 105px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
-        /* Disabled / N/A cells */
-        .bg-disabled { background-color: #434343; }
         
         /* Cycle States */
         td.interactive-cell { cursor: context-menu; }
@@ -124,7 +132,7 @@
             position: absolute;
             top: 2px;
             left: 4px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             pointer-events: none;
         }
 
@@ -139,17 +147,18 @@
             position: absolute;
             top: 2px;
             left: 4px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             pointer-events: none;
         }
 
         /* Checkbox Styling */
         input[type="checkbox"] {
-            transform: scale(1.4);
+            transform: scale(1.25);
             cursor: pointer;
             accent-color: #333;
             position: relative;
             z-index: 1;
+            margin: 0;
         }
 
         /* Analytics Section Bottom */
@@ -475,9 +484,7 @@
             .roster-editor-head { grid-template-columns: 1fr 58px; }
             .dungeon-editor-head { grid-template-columns: 1fr 100px 58px; row-gap: 10px;}
             .roster-editor-head .btn, .dungeon-editor-head .btn { width: 100%; grid-column: 1 / -1; }
-            .tracker-title { min-width: 280px; }
         }
-
     </style>
 </head>
 <body>
@@ -488,32 +495,43 @@
             <span class="sync-status" id="sync-status">🟢 Loading Database...</span>
         </div>
         <div class="control-actions">
+            <!-- Roster Filter Dropdown -->
+            <select id="roster-filter" class="btn" style="background-color: #393946; color: white; border: 1px solid #555; cursor: pointer;" onchange="applyRosterFilter()">
+                <option value="all">👁️ Show All Rosters</option>
+            </select>
+
             <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Now</button>
             <button class="btn btn-cloud" type="button" onclick="openCloudModal()">Cloud Setup</button>
             <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button>
             <button class="btn btn-roster" type="button" onclick="openRegistrationPage()">Roster Registration</button>
             <button class="btn btn-weights" type="button" onclick="openWeightsModal()">Loot Weights</button>
-            <span style="font-size: 0.9rem; color: #bdf2fc;">💡 Right-click cycles: 🎯 Material Bounty ➔ 🔄 Reset Bounty ➔ N/A ➔ Open.</span>
+            <span style="font-size: 0.9rem; color: #bdf2fc; width: 100%; text-align: right; display: block; margin-top: 5px;">💡 Checkmarking a marked dungeon auto-claims an open bounty.</span>
         </div>
     </div>
 
-    <table id="dn-tracker">
-        <thead>
-            <tr id="roster-row">
-                <th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>
-            </tr>
-            <tr id="header-row">
-            </tr>
-        </thead>
-        <tbody id="tracker-body">
-            <!-- JS dynamically injects registered categories and tasks here -->
-        </tbody>
-        <tfoot>
-            <tr id="footer-row">
-                <th colspan="3" class="bg-dark">Weekly Completion Rate</th>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="table-responsive">
+        <!-- Rigid equal-width table framework -->
+        <table id="dn-tracker">
+            <colgroup id="table-colgroup">
+                <!-- Javascript will inject perfect column ratios here -->
+            </colgroup>
+            <thead>
+                <tr id="roster-row">
+                    <th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>
+                </tr>
+                <tr id="header-row">
+                </tr>
+            </thead>
+            <tbody id="tracker-body">
+                <!-- JS dynamically injects registered categories and tasks here -->
+            </tbody>
+            <tfoot>
+                <tr id="footer-row">
+                    <th colspan="3" class="bg-dark">Weekly Completion Rate</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
     <h2 style="border-bottom: 2px solid #444; padding-bottom: 10px; width: 100%; max-width: 1600px;">📊 Roster Analytics</h2>
     <div class="analytics-container" id="analytics-grid">
@@ -664,7 +682,7 @@
         // ==========================================
         // ☁️ APP / CLOUD CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 7;
+        const APP_SCHEMA_VERSION = 8;
         const MAX_ARCHIVE_WEEKS = 12;
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v3';
@@ -704,6 +722,7 @@
         let autoSyncTimer;
         let syncInProgress = false;
         let syncRequestedWhileBusy = false;
+        let activeRosterFilter = 'all'; 
         const deviceId = getOrCreateDeviceId();
 
         let cloudData = createEmptyData();
@@ -808,9 +827,45 @@
             })));
         }
 
+        function updateFilterDropdown() {
+            const filter = document.getElementById('roster-filter');
+            if (!filter) return;
+            const currentVal = filter.value;
+            let options = `<option value="all">👁️ Show All Rosters</option>`;
+            
+            cloudData.settings.rosters.forEach(r => {
+                if (r.characters.length > 0) {
+                    options += `<option value="${escapeHTML(r.id)}">👁️ Only ${escapeHTML(r.name)}</option>`;
+                }
+            });
+            filter.innerHTML = options;
+            
+            // Validate that the currently selected roster still exists
+            if (currentVal !== 'all' && !cloudData.settings.rosters.some(r => r.id === currentVal)) {
+                filter.value = 'all';
+                activeRosterFilter = 'all';
+            } else {
+                filter.value = currentVal;
+                activeRosterFilter = currentVal;
+            }
+        }
+
+        function applyRosterFilter() {
+            activeRosterFilter = document.getElementById('roster-filter').value;
+            refreshTrackerUI();
+        }
+
         function syncDataStructures() {
             cloudData.settings.rosters = normalizeRosters(cloudData.settings.rosters);
-            characters = flattenRosters(cloudData.settings.rosters);
+            
+            updateFilterDropdown();
+            
+            // Filter the characters list if the user selected a specific roster
+            const visibleRosters = activeRosterFilter === 'all' 
+                ? cloudData.settings.rosters 
+                : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
+                
+            characters = flattenRosters(visibleRosters);
             
             cloudData.settings.categories = normalizeCategories(cloudData.settings.categories);
             weeklyTaskNames = [];
@@ -1107,18 +1162,41 @@
         }
 
         function buildTrackerTable() {
+            const table = document.getElementById('dn-tracker');
+            const colgroup = document.getElementById('table-colgroup');
             const rosterRow = document.getElementById('roster-row');
             const headerRow = document.getElementById('header-row');
             const footerRow = document.getElementById('footer-row');
             const tbody = document.getElementById('tracker-body');
-            if (!rosterRow || !headerRow || !footerRow || !tbody) return;
+            
+            if (!table || !colgroup || !rosterRow || !headerRow || !footerRow || !tbody) return;
 
+            // 1. Enforce mathematical equality with strict column mapping
+            // Leaving width empty for character columns forces CSS Grid to evenly distribute the remaining space across all of them
+            colgroup.innerHTML = `
+                <col style="width: 80px;">  <!-- Group -->
+                <col style="width: 150px;"> <!-- Category -->
+                <col style="width: 210px;"> <!-- Task Name -->
+            `;
+            
+            characters.forEach(() => {
+                colgroup.innerHTML += `<col>`; 
+            });
+
+            // 2. Allow CSS table-layout to size the whole width perfectly to the 100% of the screen
+            table.style.width = '100%';
+
+            // 3. Render table data
             rosterRow.innerHTML = '<th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>';
             headerRow.innerHTML = '';
             footerRow.innerHTML = '<th colspan="3" class="bg-dark">Weekly Completion Rate</th>';
             tbody.innerHTML = '';
 
-            cloudData.settings.rosters.forEach(roster => {
+            const visibleRosters = activeRosterFilter === 'all' 
+                ? cloudData.settings.rosters 
+                : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
+
+            visibleRosters.forEach(roster => {
                 if (!roster.characters.length) return;
                 const ownerHeader = document.createElement('th');
                 ownerHeader.colSpan = roster.characters.length;
@@ -1133,6 +1211,7 @@
             characters.forEach(char => {
                 const characterHeader = document.createElement('th');
                 characterHeader.textContent = char.name;
+                characterHeader.title = char.name; // Tooltip fallback
                 characterHeader.style.backgroundColor = char.color;
                 characterHeader.style.color = getContrastText(char.color);
                 characterHeader.className = 'bold char-col';
@@ -1186,6 +1265,7 @@
                         const tdTask = document.createElement('td');
                         tdTask.className = 'task-name';
                         tdTask.textContent = taskName;
+                        tdTask.title = taskName; // Tooltip fallback
                         tr.appendChild(tdTask);
                         
                         characters.forEach(char => {
@@ -1225,8 +1305,30 @@
 
         function handleCheck(event) {
             const checkbox = event.target;
-            setCellState(checkbox.dataset.char, checkbox.dataset.task, checkbox.checked ? 'done' : 'open');
-            applyBoardState();
+            const charName = checkbox.dataset.char;
+            const taskName = checkbox.dataset.task;
+            const isChecked = checkbox.checked;
+            const previousState = getCellState(charName, taskName);
+            
+            setCellState(charName, taskName, isChecked ? 'done' : 'open');
+
+            // --- AUTO-BOUNTY CLAIM LOGIC ---
+            // If the user just completed a run that was tagged as a Bounty (🎯 or 🔄)
+            if (isChecked && (previousState === 'marked' || previousState === 'reset')) {
+                // Find all tasks inside the category containing 'Bounty'
+                const bountyCat = getCategories().find(c => c.name.toLowerCase().includes('bounty'));
+                if (bountyCat && Array.isArray(bountyCat.tasks)) {
+                    for (const bTask of bountyCat.tasks) {
+                        // Scan top to bottom, check off the first open slot, then stop
+                        if (getCellState(charName, bTask) === 'open') {
+                            setCellState(charName, bTask, 'done');
+                            break; 
+                        }
+                    }
+                }
+            }
+
+            applyBoardState(); // Re-render to clear the target indicator and update the bounty slot
             triggerAutoSync();
         }
 
