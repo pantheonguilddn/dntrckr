@@ -93,32 +93,17 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-
-        /* Super Headers */
-        .roster-cho { background-color: #b4a7d6; color: black; font-size: 1.1rem; }
-        .roster-cheean { background-color: #ffd966; color: black; font-size: 1.1rem; }
-        .roster-bio { background-color: #9fc5e8; color: black; font-size: 1.1rem; }
-
-        /* Row Background Colors (Matches Spreadsheet) */
-        .row-white { background-color: #ffffff; color: #000; }
-        .row-green { background-color: #b6d7a8; color: #000; }
-        .row-blue { background-color: #a4c2f4; color: #000; }
-        .row-purple { background-color: #b4a7d6; color: #000; }
-        .row-pink { background-color: #d5a6bd; color: #000; }
-        .row-orange-light { background-color: #f8cbad; color: #000; }
-        .row-orange-dark { background-color: #dd7e6b; color: #000; }
-        .row-teal { background-color: #a2c4c9; color: #000; }
         
         /* Disabled / N/A cells */
         .bg-disabled { background-color: #434343; }
         
-        /* Exclusion System Styling */
+        /* Cycle States */
         td.interactive-cell { cursor: context-menu; }
         td.interactive-cell:hover { background-color: rgba(0,0,0,0.05); }
         
         td.excluded {
             background: repeating-linear-gradient(45deg, #434343, #434343 10px, #4f4f4f 10px, #4f4f4f 20px) !important;
-            color: #888;
+            color: #888 !important;
         }
         td.excluded input { display: none; }
         td.excluded::after {
@@ -128,11 +113,43 @@
             font-size: 0.9rem;
         }
 
+        /* Target Material Bounty Highlight */
+        td.marked {
+            background-color: #ffe599 !important;
+            border: 2px solid #e69138 !important;
+            box-shadow: inset 0 0 8px rgba(230, 145, 56, 0.4);
+        }
+        td.marked::before {
+            content: "🎯";
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        /* Target Reset Bounty Highlight */
+        td.reset {
+            background-color: #d9d2e9 !important;
+            border: 2px solid #8e7cc3 !important;
+            box-shadow: inset 0 0 8px rgba(142, 124, 195, 0.4);
+        }
+        td.reset::before {
+            content: "🔄";
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
         /* Checkbox Styling */
         input[type="checkbox"] {
             transform: scale(1.4);
             cursor: pointer;
             accent-color: #333;
+            position: relative;
+            z-index: 1;
         }
 
         /* Analytics Section Bottom */
@@ -196,6 +213,8 @@
         .btn-weights:hover { background-color: #775992; }
         .btn-roster { background-color: #b1784c; color: #fff; }
         .btn-roster:hover { background-color: #96643f; }
+        .btn-dungeon { background-color: #6a8c6a; color: #fff; }
+        .btn-dungeon:hover { background-color: #557555; }
         .btn-secondary { background-color: #555; color: #fff; }
         .btn-secondary:hover { background-color: #666; }
         .btn-danger { background-color: #9b4545; color: #fff; }
@@ -388,8 +407,13 @@
             padding: 10px;
             border-bottom: 1px solid #41414d;
         }
+        
+        .dungeon-editor-head {
+            grid-template-columns: minmax(160px, 1fr) 110px 62px auto auto;
+        }
 
-        .roster-editor-head input[type="color"] {
+        .roster-editor-head input[type="color"],
+        .dungeon-editor-head input[type="color"] {
             width: 54px;
             height: 38px;
             padding: 2px;
@@ -449,7 +473,8 @@
             .weight-label { display: none; }
             .registration-layout { grid-template-columns: 1fr; }
             .roster-editor-head { grid-template-columns: 1fr 58px; }
-            .roster-editor-head .btn { width: 100%; }
+            .dungeon-editor-head { grid-template-columns: 1fr 100px 58px; row-gap: 10px;}
+            .roster-editor-head .btn, .dungeon-editor-head .btn { width: 100%; grid-column: 1 / -1; }
             .tracker-title { min-width: 280px; }
         }
 
@@ -465,9 +490,10 @@
         <div class="control-actions">
             <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Now</button>
             <button class="btn btn-cloud" type="button" onclick="openCloudModal()">Cloud Setup</button>
+            <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button>
             <button class="btn btn-roster" type="button" onclick="openRegistrationPage()">Roster Registration</button>
             <button class="btn btn-weights" type="button" onclick="openWeightsModal()">Loot Weights</button>
-            <span style="font-size: 0.9rem; color: #bdf2fc;">💡 Right-click a checkbox to mark it N/A.</span>
+            <span style="font-size: 0.9rem; color: #bdf2fc;">💡 Right-click cycles: 🎯 Material Bounty ➔ 🔄 Reset Bounty ➔ N/A ➔ Open.</span>
         </div>
     </div>
 
@@ -475,84 +501,27 @@
         <thead>
             <tr id="roster-row">
                 <th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>
-                <!-- JS injects roster groups here -->
             </tr>
             <tr id="header-row">
-                <!-- JS injects characters here -->
             </tr>
         </thead>
         <tbody id="tracker-body">
-            <!-- DAILIES -->
-            <tr class="row-white task-row is-daily" data-disabled="">
-                <td class="col-group">Dailies</td>
-                <td colspan="2" class="col-category task-name text-center bold">Lucky Zone</td>
-            </tr>
-
-            <!-- WEEKLIES: MOUNTS -->
-            <tr class="row-green task-row is-weekly" data-disabled="">
-                <td rowspan="19" class="col-group">Weeklies</td>
-                <td rowspan="3" class="col-category">Mounts and Special Skills</td>
-                <td class="task-name">Lower Nests (Hell)</td>
-            </tr>
-            <tr class="row-green task-row is-weekly" data-disabled="">
-                <td class="task-name">4-Man Challenge Nests</td>
-            </tr>
-            <tr class="row-green task-row is-weekly" data-disabled="">
-                <td class="task-name">Apocalypse Challenge</td>
-            </tr>
-
-            <!-- WEEKLIES: ESSENCE -->
-            <tr class="row-blue task-row is-weekly" data-disabled="">
-                <td rowspan="7" class="col-category">Essence of Life</td>
-                <td class="task-name">Sea Dragon Core</td>
-            </tr>
-            <tr class="row-purple task-row is-weekly" data-disabled=""><td class="task-name">Green Dragon (Normal)</td></tr>
-            <tr class="row-purple task-row is-weekly" data-disabled=""><td class="task-name">Green Dragon (Classic)</td></tr>
-            <tr class="row-pink task-row is-weekly" data-disabled=""><td class="task-name">Desert Dragon Memoria I</td></tr>
-            <tr class="row-pink task-row is-weekly" data-disabled=""><td class="task-name">Desert Dragon Memoria II</td></tr>
-            <tr class="row-pink task-row is-weekly" data-disabled=""><td class="task-name">Desert Dragon Memoria III</td></tr>
-            <tr class="row-pink task-row is-weekly" data-disabled=""><td class="task-name">Desert Dragon Memoria IV</td></tr>
-
-            <!-- WEEKLIES: LV60 NESTS -->
-            <tr class="row-orange-light task-row is-weekly" data-disabled="">
-                <td rowspan="3" class="col-category">Lv60 Nests</td>
-                <td class="task-name">Typhoon Kim Nest (Normal)</td>
-            </tr>
-            <tr class="row-orange-light task-row is-weekly" data-disabled=""><td class="task-name">Typhoon Kim Nest (Hell)</td></tr>
-            <tr class="row-orange-dark task-row is-weekly" data-disabled=""><td class="task-name">Professor K Nest (Hell)</td></tr>
-
-            <!-- WEEKLIES: RAIDS -->
-            <tr class="row-purple task-row is-weekly" data-disabled="">
-                <td rowspan="3" class="col-category">Raids</td>
-                <td class="task-name">Green Dragon (Hardcore)</td>
-            </tr>
-            <tr class="row-pink task-row is-weekly" data-disabled=""><td class="task-name">Desert Dragon (Classic)</td></tr>
-            <tr class="row-pink task-row is-weekly" data-disabled=""><td class="task-name">Desert Dragon (Hardcore)</td></tr>
-
-            <!-- WEEKLIES: SPECIAL DUNGEONS -->
-            <tr class="row-teal task-row is-weekly" data-disabled="">
-                <td rowspan="3" class="col-category">Special Dungeons</td>
-                <td class="task-name">Abyssal Mire</td>
-            </tr>
-            <tr class="row-teal task-row is-weekly" data-disabled=""><td class="task-name">Dark Banquet (Lv 50)</td></tr>
-            <tr class="row-teal task-row is-weekly" data-disabled=""><td class="task-name">Dragon Fellowship</td></tr>
+            <!-- JS dynamically injects registered categories and tasks here -->
         </tbody>
         <tfoot>
             <tr id="footer-row">
                 <th colspan="3" class="bg-dark">Weekly Completion Rate</th>
-                <!-- JS injects rates here -->
             </tr>
         </tfoot>
     </table>
 
     <h2 style="border-bottom: 2px solid #444; padding-bottom: 10px; width: 100%; max-width: 1600px;">📊 Roster Analytics</h2>
     <div class="analytics-container" id="analytics-grid">
-        <!-- JS Injects Analytics Cards Here -->
     </div>
 
     <!-- Manual Overrides for Edge Cases -->
     <div class="dev-controls">
-        <span style="color: #666; font-size: 0.8rem; display: block; margin-bottom: 10px;">System Auto-Resets at 9AM MNL. Use these only if necessary.</span>
+        <span style="color: #666; font-size: 0.8rem; display: block; margin-bottom: 10px;">System Auto-Resets Weeklies at 9AM MNL.</span>
         <button class="btn" style="background-color: #555; color: white;" onclick="manualDailyReset()">Force Daily Reset</button>
         <button class="btn btn-archive" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
     </div>
@@ -602,7 +571,7 @@
         <div class="modal-card registration-card">
             <h3 id="roster-modal-title">🧾 Roster Registration</h3>
             <div class="modal-note">
-                Register a character under an existing owner or create a new owner group with its own color. Changes are shared through the same JSONBin cloud record. Removing a character hides it from the tracker but keeps its historical analytics.
+                Register a character under an existing owner or create a new owner group with its own color. Removing a character hides it from the tracker but keeps its historical analytics.
             </div>
             <div class="registration-layout">
                 <section class="registration-panel">
@@ -640,12 +609,62 @@
             </div>
         </div>
     </div>
+    
+    <!-- Dungeon Registration Modal -->
+    <div class="modal-overlay hidden" id="dungeon-modal" role="dialog" aria-modal="true" aria-labelledby="dungeon-modal-title">
+        <div class="modal-card registration-card">
+            <h3 id="dungeon-modal-title">🏰 Dungeon Registration</h3>
+            <div class="modal-note">
+                Add new daily or weekly tasks, organize them into categories, and assign colors. Removing a task hides it from the board but retains its historical analytics.
+            </div>
+            <div class="registration-layout">
+                <section class="registration-panel">
+                    <h4>Add a Task</h4>
+                    <div class="registration-form">
+                        <label for="reg-dungeon-cat-select">Category</label>
+                        <select id="reg-dungeon-cat-select" onchange="handleDungeonCatChange()"></select>
+
+                        <div id="reg-dungeon-new-cat-fields">
+                            <label for="reg-dungeon-cat-name">New category name</label>
+                            <input id="reg-dungeon-cat-name" maxlength="30" placeholder="Example: Special Raids">
+                            
+                            <label for="reg-dungeon-cat-group">Reset group</label>
+                            <select id="reg-dungeon-cat-group" style="background-color: #17171d; color: #fff;">
+                                <option value="Weeklies">Weeklies</option>
+                                <option value="Dailies">Dailies</option>
+                            </select>
+                        </div>
+
+                        <label for="reg-dungeon-color">Category color</label>
+                        <div class="registration-color-row">
+                            <input id="reg-dungeon-color" type="color" value="#ffffff">
+                            <span id="reg-dungeon-color-note" style="color:#aaa;font-size:0.82rem;">Used for the category row background.</span>
+                        </div>
+
+                        <label for="reg-dungeon-task-name">Task name</label>
+                        <input id="reg-dungeon-task-name" maxlength="40" placeholder="Exact task name" onkeydown="if(event.key==='Enter') registerDungeonTask()">
+
+                        <button class="btn btn-dungeon" type="button" onclick="registerDungeonTask()">Register Task</button>
+                    </div>
+                </section>
+
+                <section class="registration-panel">
+                    <h4>Manage Existing Categories</h4>
+                    <div id="dungeon-management-list" class="roster-management-list"></div>
+                </section>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Tasks Now</button>
+                <button class="btn btn-secondary" type="button" onclick="closeDungeonPage()">Close</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ==========================================
         // ☁️ APP / CLOUD CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 4;
+        const APP_SCHEMA_VERSION = 7;
         const MAX_ARCHIVE_WEEKS = 12;
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v3';
@@ -654,31 +673,30 @@
         const JSONBIN_ROOT = 'https://api.jsonbin.io/v3';
 
         const DEFAULT_LOOT_WEIGHTS = {
-            'Lower Nests (Hell)': 2,
-            '4-Man Challenge Nests': 3,
-            'Apocalypse Challenge': 3,
-            'Sea Dragon Core': 3,
-            'Green Dragon (Normal)': 2,
-            'Green Dragon (Classic)': 3,
-            'Desert Dragon Memoria I': 2,
-            'Desert Dragon Memoria II': 2,
-            'Desert Dragon Memoria III': 3,
-            'Desert Dragon Memoria IV': 3,
-            'Typhoon Kim Nest (Normal)': 2,
-            'Typhoon Kim Nest (Hell)': 3,
-            'Professor K Nest (Hell)': 4,
-            'Green Dragon (Hardcore)': 5,
-            'Desert Dragon (Classic)': 5,
-            'Desert Dragon (Hardcore)': 5,
-            'Abyssal Mire': 4,
-            'Dark Banquet (Lv 50)': 4,
-            'Dragon Fellowship': 4
+            'Bounty Claim 1': 5, 'Bounty Claim 2': 5, 'Bounty Claim 3': 5, 
+            'Bounty Claim 4': 5, 'Bounty Claim 5': 5, 'Bounty Claim 6': 5,
+            'Lower Nests (Hell)': 2, '4-Man Challenge Nests': 3, 'Apocalypse Challenge': 3,
+            'Sea Dragon Core': 3, 'Green Dragon (Normal)': 2, 'Green Dragon (Classic)': 3,
+            'Desert Dragon Memoria I': 2, 'Desert Dragon Memoria II': 2, 'Desert Dragon Memoria III': 3, 'Desert Dragon Memoria IV': 3,
+            'Typhoon Kim Nest (Normal)': 2, 'Typhoon Kim Nest (Hell)': 3, 'Professor K Nest (Hell)': 4,
+            'Green Dragon (Hardcore)': 5, 'Desert Dragon (Classic)': 5, 'Desert Dragon (Hardcore)': 5,
+            'Abyssal Mire': 4, 'Dark Banquet (Lv 50)': 4, 'Dragon Fellowship': 4
         };
 
         const DEFAULT_ROSTERS = [
             { id: 'cho', name: 'Cho', color: '#b4a7d6', characters: ['Rhaeala', 'Mysteln', 'Vulcureon', 'Vaelyth', 'Diabolina'] },
             { id: 'cheean', name: 'Cheean', color: '#ffd966', characters: ['iD0ntHeal', 'CheanPT', 'xNocturne', 'RinPT', 'RANKET'] },
             { id: 'bio', name: 'Bio', color: '#9fc5e8', characters: ['Biofrost', 'iTwoeye', 'Lunaprix', 'xAv3n', 'OnatGaminG'] }
+        ];
+
+        const DEFAULT_CATEGORIES = [
+            { id: 'cat-daily', group: 'Dailies', name: 'Lucky Zone', color: '#ffffff', tasks: ['Lucky Zone'] },
+            { id: 'cat-bounty', group: 'Weeklies', name: 'Bounty Board (Unique+)', color: '#ffd966', tasks: ['Bounty Claim 1', 'Bounty Claim 2', 'Bounty Claim 3', 'Bounty Claim 4', 'Bounty Claim 5', 'Bounty Claim 6'] },
+            { id: 'cat-mounts', group: 'Weeklies', name: 'Mounts & Special Skills', color: '#b6d7a8', tasks: ['Lower Nests (Hell)', '4-Man Challenge Nests', 'Apocalypse Challenge'] },
+            { id: 'cat-essence', group: 'Weeklies', name: 'Essence of Life', color: '#a4c2f4', tasks: ['Sea Dragon Core', 'Green Dragon (Normal)', 'Green Dragon (Classic)', 'Desert Dragon Memoria I', 'Desert Dragon Memoria II', 'Desert Dragon Memoria III', 'Desert Dragon Memoria IV'] },
+            { id: 'cat-lv60', group: 'Weeklies', name: 'Lv60 Nests', color: '#f8cbad', tasks: ['Typhoon Kim Nest (Normal)', 'Typhoon Kim Nest (Hell)', 'Professor K Nest (Hell)'] },
+            { id: 'cat-raids', group: 'Weeklies', name: 'Raids', color: '#b4a7d6', tasks: ['Green Dragon (Hardcore)', 'Desert Dragon (Classic)', 'Desert Dragon (Hardcore)'] },
+            { id: 'cat-special', group: 'Weeklies', name: 'Special Dungeons', color: '#a2c4c9', tasks: ['Abyssal Mire', 'Dark Banquet (Lv 50)', 'Dragon Fellowship'] }
         ];
 
         let characters = flattenRosters(DEFAULT_ROSTERS);
@@ -701,7 +719,10 @@
                     lootWeightUpdatedAt: {},
                     rosters: cloneRosters(DEFAULT_ROSTERS),
                     rosterUpdatedAt: 0,
-                    rosterUpdatedBy: ''
+                    rosterUpdatedBy: '',
+                    categories: cloneCategories(DEFAULT_CATEGORIES),
+                    categoriesUpdatedAt: 0,
+                    categoriesUpdatedBy: ''
                 },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
@@ -715,6 +736,16 @@
                 name: String(roster.name || ''),
                 color: String(roster.color || '#7aa2f7'),
                 characters: Array.isArray(roster.characters) ? [...roster.characters] : []
+            }));
+        }
+        
+        function cloneCategories(categories) {
+            return (Array.isArray(categories) ? categories : []).map(cat => ({
+                id: String(cat.id || ''),
+                group: String(cat.group || 'Weeklies'),
+                name: String(cat.name || ''),
+                color: String(cat.color || '#ffffff'),
+                tasks: Array.isArray(cat.tasks) ? [...cat.tasks] : []
             }));
         }
 
@@ -742,27 +773,50 @@
                     rosterCharacters.push(characterName);
                 }
 
-                return {
-                    id,
-                    name: rawName.slice(0, 30),
-                    color: normalizeColor(roster?.color),
-                    characters: rosterCharacters
-                };
+                return { id, name: rawName.slice(0, 30), color: normalizeColor(roster?.color), characters: rosterCharacters };
+            });
+        }
+        
+        function normalizeCategories(value) {
+            const source = Array.isArray(value) && value.length > 0 ? value : DEFAULT_CATEGORIES;
+            const seenTasks = new Set();
+            const seenIds = new Set();
+            return source.map((cat, index) => {
+                const rawName = String(cat?.name || '').trim() || `Category ${index + 1}`;
+                let id = String(cat?.id || '').trim().replace(/[^a-zA-Z0-9_-]/g, '');
+                if (!id || seenIds.has(id)) id = `cat-${index + 1}-${Math.random().toString(36).slice(2, 7)}`;
+                seenIds.add(id);
+
+                const group = (cat?.group === 'Dailies') ? 'Dailies' : 'Weeklies';
+                const catTasks = [];
+                
+                for (const rawTask of Array.isArray(cat?.tasks) ? cat.tasks : []) {
+                    const taskName = String(rawTask || '').trim();
+                    const key = taskName.toLocaleLowerCase();
+                    if (!taskName || seenTasks.has(key)) continue;
+                    seenTasks.add(key);
+                    catTasks.push(taskName);
+                }
+
+                return { id, group, name: rawName.slice(0, 30), color: normalizeColor(cat?.color, '#ffffff'), tasks: catTasks };
             });
         }
 
         function flattenRosters(rosters) {
             return normalizeRosters(rosters).flatMap(roster => roster.characters.map(name => ({
-                name,
-                color: roster.color,
-                rosterId: roster.id,
-                rosterName: roster.name
+                name, color: roster.color, rosterId: roster.id, rosterName: roster.name
             })));
         }
 
-        function syncCharactersFromData() {
+        function syncDataStructures() {
             cloudData.settings.rosters = normalizeRosters(cloudData.settings.rosters);
             characters = flattenRosters(cloudData.settings.rosters);
+            
+            cloudData.settings.categories = normalizeCategories(cloudData.settings.categories);
+            weeklyTaskNames = [];
+            cloudData.settings.categories.forEach(cat => {
+                if (cat.group === 'Weeklies') weeklyTaskNames.push(...cat.tasks);
+            });
         }
 
         function getOrCreateDeviceId() {
@@ -780,12 +834,8 @@
 
         function normalizeCellRecord(value) {
             if (!value || typeof value !== 'object') return null;
-            const state = ['open', 'done', 'excluded'].includes(value.state) ? value.state : 'open';
-            return {
-                state,
-                updatedAt: Number(value.updatedAt) || 0,
-                deviceId: String(value.deviceId || '')
-            };
+            const state = ['open', 'done', 'excluded', 'marked', 'reset'].includes(value.state) ? value.state : 'open';
+            return { state, updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
         }
 
         function normalizeData(record) {
@@ -799,16 +849,16 @@
             normalized.updatedAt = Number(source.updatedAt) || 0;
 
             const sourceSettings = safeObject(source.settings);
-            normalized.settings.lootWeights = {
-                ...DEFAULT_LOOT_WEIGHTS,
-                ...safeObject(sourceSettings.lootWeights)
-            };
+            normalized.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sourceSettings.lootWeights) };
             normalized.settings.lootWeightUpdatedAt = safeObject(sourceSettings.lootWeightUpdatedAt);
-            normalized.settings.rosters = Array.isArray(sourceSettings.rosters)
-                ? normalizeRosters(sourceSettings.rosters)
-                : cloneRosters(DEFAULT_ROSTERS);
+            
+            normalized.settings.rosters = Array.isArray(sourceSettings.rosters) ? normalizeRosters(sourceSettings.rosters) : cloneRosters(DEFAULT_ROSTERS);
             normalized.settings.rosterUpdatedAt = Number(sourceSettings.rosterUpdatedAt) || 0;
             normalized.settings.rosterUpdatedBy = String(sourceSettings.rosterUpdatedBy || '');
+            
+            normalized.settings.categories = Array.isArray(sourceSettings.categories) ? normalizeCategories(sourceSettings.categories) : cloneCategories(DEFAULT_CATEGORIES);
+            normalized.settings.categoriesUpdatedAt = Number(sourceSettings.categoriesUpdatedAt) || 0;
+            normalized.settings.categoriesUpdatedBy = String(sourceSettings.categoriesUpdatedBy || '');
 
             const sourceCells = safeObject(source.cells);
             for (const [charName, taskMap] of Object.entries(sourceCells)) {
@@ -818,24 +868,6 @@
                     if (normalizedCell) normalizedTasks[taskName] = normalizedCell;
                 }
                 if (Object.keys(normalizedTasks).length) normalized.cells[charName] = normalizedTasks;
-            }
-
-            const migrationTime = normalized.updatedAt || 1;
-            for (const [charName, taskMap] of Object.entries(safeObject(source.board))) {
-                for (const taskName of Object.keys(safeObject(taskMap))) {
-                    ensureCellMap(normalized, charName);
-                    normalized.cells[charName][taskName] = {
-                        state: 'done', updatedAt: migrationTime, deviceId: 'legacy'
-                    };
-                }
-            }
-            for (const [charName, taskMap] of Object.entries(safeObject(source.exclusions))) {
-                for (const taskName of Object.keys(safeObject(taskMap))) {
-                    ensureCellMap(normalized, charName);
-                    normalized.cells[charName][taskName] = {
-                        state: 'excluded', updatedAt: migrationTime + 1, deviceId: 'legacy'
-                    };
-                }
             }
 
             trimWeeklyArchive(normalized);
@@ -852,7 +884,6 @@
                 const raw = localStorage.getItem(LOCAL_DATA_KEY) || localStorage.getItem(LEGACY_LOCAL_DATA_KEY);
                 return raw ? normalizeData(JSON.parse(raw)) : createEmptyData();
             } catch (error) {
-                console.warn('Could not read local tracker data:', error);
                 return createEmptyData();
             }
         }
@@ -866,10 +897,7 @@
         function getCloudConfig() {
             try {
                 const config = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{}');
-                return {
-                    binId: String(config.binId || '').trim(),
-                    apiKey: String(config.apiKey || '').trim()
-                };
+                return { binId: String(config.binId || '').trim(), apiKey: String(config.apiKey || '').trim() };
             } catch (error) {
                 return { binId: '', apiKey: '' };
             }
@@ -891,30 +919,12 @@
             return left.deviceId >= right.deviceId ? left : right;
         }
 
-        function mergeLegacyHistory(localHistory, remoteHistory) {
-            const merged = {};
-            const names = new Set([...Object.keys(safeObject(localHistory)), ...Object.keys(safeObject(remoteHistory))]);
-            names.forEach(name => {
-                const local = safeObject(localHistory[name]);
-                const remote = safeObject(remoteHistory[name]);
-                const localRates = Array.isArray(local.rates) ? local.rates : [];
-                const remoteRates = Array.isArray(remote.rates) ? remote.rates : [];
-                const rates = remoteRates.length >= localRates.length ? remoteRates.slice(-5) : localRates.slice(-5);
-                const missed = {};
-                const tasks = new Set([...Object.keys(safeObject(local.missed)), ...Object.keys(safeObject(remote.missed))]);
-                tasks.forEach(task => {
-                    missed[task] = Math.max(Number(local.missed?.[task]) || 0, Number(remote.missed?.[task]) || 0);
-                });
-                merged[name] = { ...remote, ...local, rates, missed };
-            });
-            return merged;
-        }
-
         function mergeData(localRecord, remoteRecord) {
             const local = normalizeData(localRecord);
             const remote = normalizeData(remoteRecord);
             const merged = createEmptyData();
-            merged.history = mergeLegacyHistory(local.history, remote.history);
+            
+            merged.history = local.history;
             merged.lastDailyReset = Math.max(local.lastDailyReset, remote.lastDailyReset);
             merged.lastWeeklyReset = Math.max(local.lastWeeklyReset, remote.lastWeeklyReset);
             merged.updatedAt = Math.max(local.updatedAt, remote.updatedAt);
@@ -940,11 +950,7 @@
                 }
             }
 
-            const allWeightTasks = new Set([
-                ...Object.keys(DEFAULT_LOOT_WEIGHTS),
-                ...Object.keys(local.settings.lootWeights),
-                ...Object.keys(remote.settings.lootWeights)
-            ]);
+            const allWeightTasks = new Set([...Object.keys(DEFAULT_LOOT_WEIGHTS), ...Object.keys(local.settings.lootWeights), ...Object.keys(remote.settings.lootWeights)]);
             allWeightTasks.forEach(taskName => {
                 const localTime = Number(local.settings.lootWeightUpdatedAt[taskName]) || 0;
                 const remoteTime = Number(remote.settings.lootWeightUpdatedAt[taskName]) || 0;
@@ -961,20 +967,28 @@
             const remoteRosterTime = Number(remote.settings.rosterUpdatedAt) || 0;
             const localRosterDevice = String(local.settings.rosterUpdatedBy || '');
             const remoteRosterDevice = String(remote.settings.rosterUpdatedBy || '');
-            const localRosterWins = localRosterTime > remoteRosterTime ||
-                (localRosterTime === remoteRosterTime && localRosterDevice >= remoteRosterDevice);
+            const localRosterWins = localRosterTime > remoteRosterTime || (localRosterTime === remoteRosterTime && localRosterDevice >= remoteRosterDevice);
             const rosterSource = localRosterWins ? local.settings : remote.settings;
             merged.settings.rosters = cloneRosters(rosterSource.rosters);
             merged.settings.rosterUpdatedAt = Number(rosterSource.rosterUpdatedAt) || 0;
             merged.settings.rosterUpdatedBy = String(rosterSource.rosterUpdatedBy || '');
+            
+            const localCatTime = Number(local.settings.categoriesUpdatedAt) || 0;
+            const remoteCatTime = Number(remote.settings.categoriesUpdatedAt) || 0;
+            const localCatDevice = String(local.settings.categoriesUpdatedBy || '');
+            const remoteCatDevice = String(remote.settings.categoriesUpdatedBy || '');
+            const localCatWins = localCatTime > remoteCatTime || (localCatTime === remoteCatTime && localCatDevice >= remoteCatDevice);
+            const catSource = localCatWins ? local.settings : remote.settings;
+            merged.settings.categories = cloneCategories(catSource.categories);
+            merged.settings.categoriesUpdatedAt = Number(catSource.categoriesUpdatedAt) || 0;
+            merged.settings.categoriesUpdatedBy = String(catSource.categoriesUpdatedBy || '');
 
             trimWeeklyArchive(merged);
             return merged;
         }
 
         function trimWeeklyArchive(data = cloudData) {
-            const entries = Object.entries(safeObject(data.weeklyArchive))
-                .sort((a, b) => Number(a[0]) - Number(b[0]));
+            const entries = Object.entries(safeObject(data.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
             while (entries.length > MAX_ARCHIVE_WEEKS) {
                 const [oldestKey] = entries.shift();
                 delete data.weeklyArchive[oldestKey];
@@ -988,9 +1002,7 @@
             const now = new Date();
             const reset = new Date();
             reset.setUTCHours(1, 0, 0, 0); 
-
             if (now.getTime() < reset.getTime()) reset.setUTCDate(reset.getUTCDate() - 1);
-
             if (isWeekly) {
                 let diff = reset.getUTCDay() - 6; 
                 if (diff < 0) diff += 7;
@@ -1004,9 +1016,7 @@
         // ==========================================
         async function fetchRemoteRecord(config = getCloudConfig()) {
             const response = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, {
-                method: 'GET',
-                headers: { ...authHeaders(config) },
-                cache: 'no-store'
+                method: 'GET', headers: { ...authHeaders(config) }, cache: 'no-store'
             });
             const payload = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(payload.message || `JSONBin read failed (${response.status})`);
@@ -1015,10 +1025,9 @@
 
         async function loadLiveTracker() {
             cloudData = loadLocalData();
-            syncCharactersFromData();
+            syncDataStructures();
             checkAutoResets();
             refreshTrackerUI();
-
             if (!hasCloudConfig()) {
                 setStatus('⚪ Local mode — click Cloud Setup');
                 return;
@@ -1033,16 +1042,10 @@
                 if (showSuccess) openCloudModal();
                 return;
             }
-
-            if (syncInProgress) {
-                syncRequestedWhileBusy = true;
-                return;
-            }
-
+            if (syncInProgress) { syncRequestedWhileBusy = true; return; }
             syncInProgress = true;
             setStatus('🟡 Merging Cloud Data...');
             const config = getCloudConfig();
-
             try {
                 const remoteRecord = await fetchRemoteRecord(config);
                 cloudData = mergeData(cloudData, remoteRecord);
@@ -1050,11 +1053,7 @@
                 persistLocalData();
 
                 const response = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...authHeaders(config)
-                    },
+                    method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders(config) },
                     body: JSON.stringify(cloudData)
                 });
                 const payload = await response.json().catch(() => ({}));
@@ -1065,22 +1064,15 @@
                 refreshTrackerUI();
                 setStatus(showSuccess ? '🟢 Cloud Sync Complete' : '🟢 Database Synced');
             } catch (error) {
-                console.error('Cloud sync failed:', error);
                 persistLocalData();
                 setStatus(`🔴 Sync Failed: ${error.message}`);
             } finally {
                 syncInProgress = false;
-                if (syncRequestedWhileBusy) {
-                    syncRequestedWhileBusy = false;
-                    setTimeout(() => forceSync(false), 150);
-                }
+                if (syncRequestedWhileBusy) { syncRequestedWhileBusy = false; setTimeout(() => forceSync(false), 150); }
             }
         }
 
-        function setStatus(message) {
-            document.getElementById('sync-status').textContent = message;
-        }
-
+        function setStatus(message) { document.getElementById('sync-status').textContent = message; }
         function triggerAutoSync() {
             persistLocalData();
             setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally');
@@ -1092,30 +1084,24 @@
         // 🏗️ DYNAMIC TABLE BUILDER
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            weeklyTaskNames = Array.from(document.querySelectorAll('.task-row.is-weekly .task-name'))
-                .map(element => element.textContent.trim());
             loadCloudForm();
             window.addEventListener('hashchange', handlePageRoute);
             loadLiveTracker().then(handlePageRoute);
         });
 
-        function rateElementId(characterName) {
-            return `rate-${encodeURIComponent(characterName)}`;
-        }
-
+        function rateElementId(characterName) { return `rate-${encodeURIComponent(characterName)}`; }
         function getContrastText(hexColor) {
             const color = normalizeColor(hexColor).slice(1);
-            const red = parseInt(color.slice(0, 2), 16);
-            const green = parseInt(color.slice(2, 4), 16);
-            const blue = parseInt(color.slice(4, 6), 16);
-            return ((red * 299 + green * 587 + blue * 114) / 1000) >= 150 ? '#000' : '#fff';
+            const r = parseInt(color.slice(0, 2), 16), g = parseInt(color.slice(2, 4), 16), b = parseInt(color.slice(4, 6), 16);
+            return ((r * 299 + g * 587 + b * 114) / 1000) >= 150 ? '#000' : '#fff';
         }
 
         function refreshTrackerUI() {
-            syncCharactersFromData();
+            syncDataStructures();
             buildTrackerTable();
             buildLootWeightEditor();
             renderRosterRegistration();
+            renderDungeonRegistration();
             applyBoardState();
             renderAnalytics();
         }
@@ -1124,11 +1110,13 @@
             const rosterRow = document.getElementById('roster-row');
             const headerRow = document.getElementById('header-row');
             const footerRow = document.getElementById('footer-row');
-            if (!rosterRow || !headerRow || !footerRow) return;
+            const tbody = document.getElementById('tracker-body');
+            if (!rosterRow || !headerRow || !footerRow || !tbody) return;
 
             rosterRow.innerHTML = '<th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>';
             headerRow.innerHTML = '';
             footerRow.innerHTML = '<th colspan="3" class="bg-dark">Weekly Completion Rate</th>';
+            tbody.innerHTML = '';
 
             cloudData.settings.rosters.forEach(roster => {
                 if (!roster.characters.length) return;
@@ -1158,44 +1146,77 @@
                 rateHeader.className = 'char-col';
                 footerRow.appendChild(rateHeader);
             });
-
-            document.querySelectorAll('.generated-character-cell').forEach(cell => cell.remove());
-            document.querySelectorAll('.task-row').forEach(row => {
-                const taskElement = row.querySelector('.task-name');
-                if (!taskElement) return;
-                const taskName = taskElement.textContent.trim();
-
-                characters.forEach(char => {
-                    const cell = document.createElement('td');
-                    cell.className = 'interactive-cell generated-character-cell char-col';
-                    cell.dataset.char = char.name;
-                    cell.dataset.task = taskName;
-                    cell.dataset.isWeekly = row.classList.contains('is-weekly');
-                    cell.addEventListener('contextmenu', handleRightClick);
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.dataset.char = char.name;
-                    checkbox.dataset.task = taskName;
-                    checkbox.setAttribute('aria-label', `${char.name}: ${taskName}`);
-                    checkbox.addEventListener('change', handleCheck);
-                    cell.appendChild(checkbox);
-                    row.appendChild(cell);
-                });
+            
+            const grouped = {};
+            cloudData.settings.categories.forEach(cat => {
+                if(cat.tasks.length === 0) return;
+                if (!grouped[cat.group]) grouped[cat.group] = { totalTasks: 0, categories: [] };
+                grouped[cat.group].categories.push(cat);
+                grouped[cat.group].totalTasks += cat.tasks.length;
             });
+            
+            for (const [groupName, groupData] of Object.entries(grouped)) {
+                let isFirstInGroup = true;
+                groupData.categories.forEach(cat => {
+                    let isFirstInCat = true;
+                    cat.tasks.forEach(taskName => {
+                        const tr = document.createElement('tr');
+                        tr.className = `task-row ${groupName === 'Dailies' ? 'is-daily' : 'is-weekly'}`;
+                        tr.style.backgroundColor = cat.color;
+                        tr.style.color = getContrastText(cat.color);
+                        
+                        if (isFirstInGroup) {
+                            const tdGroup = document.createElement('td');
+                            tdGroup.rowSpan = groupData.totalTasks;
+                            tdGroup.className = 'col-group';
+                            tdGroup.textContent = groupName;
+                            tr.appendChild(tdGroup);
+                            isFirstInGroup = false;
+                        }
+                        
+                        if (isFirstInCat) {
+                            const tdCat = document.createElement('td');
+                            tdCat.rowSpan = cat.tasks.length;
+                            tdCat.className = 'col-category';
+                            tdCat.textContent = cat.name;
+                            tr.appendChild(tdCat);
+                            isFirstInCat = false;
+                        }
+                        
+                        const tdTask = document.createElement('td');
+                        tdTask.className = 'task-name';
+                        tdTask.textContent = taskName;
+                        tr.appendChild(tdTask);
+                        
+                        characters.forEach(char => {
+                            const td = document.createElement('td');
+                            td.className = 'interactive-cell char-col';
+                            td.dataset.char = char.name;
+                            td.dataset.task = taskName;
+                            td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false';
+                            td.addEventListener('contextmenu', handleRightClick);
+                            
+                            const cb = document.createElement('input');
+                            cb.type = 'checkbox';
+                            cb.dataset.char = char.name;
+                            cb.dataset.task = taskName;
+                            cb.addEventListener('change', handleCheck);
+                            
+                            td.appendChild(cb);
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                });
+            }
         }
 
         // ==========================================
         // ⚙️ CELL INTERACTION & COMPLETION MATH
         // ==========================================
-        function getCellRecord(charName, taskName) {
-            return cloudData.cells?.[charName]?.[taskName] || { state: 'open', updatedAt: 0, deviceId: '' };
-        }
-
-        function getCellState(charName, taskName) {
-            return getCellRecord(charName, taskName).state || 'open';
-        }
-
+        function getCellRecord(charName, taskName) { return cloudData.cells?.[charName]?.[taskName] || { state: 'open', updatedAt: 0, deviceId: '' }; }
+        function getCellState(charName, taskName) { return getCellRecord(charName, taskName).state || 'open'; }
+        
         function setCellState(charName, taskName, state, updatedAt = Date.now()) {
             ensureCellMap(cloudData, charName);
             cloudData.cells[charName][taskName] = { state, updatedAt, deviceId };
@@ -1205,7 +1226,7 @@
         function handleCheck(event) {
             const checkbox = event.target;
             setCellState(checkbox.dataset.char, checkbox.dataset.task, checkbox.checked ? 'done' : 'open');
-            updateRates();
+            applyBoardState();
             triggerAutoSync();
         }
 
@@ -1213,7 +1234,14 @@
             event.preventDefault();
             const cell = event.currentTarget;
             const currentState = getCellState(cell.dataset.char, cell.dataset.task);
-            setCellState(cell.dataset.char, cell.dataset.task, currentState === 'excluded' ? 'open' : 'excluded');
+            
+            let nextState = 'open';
+            if (currentState === 'open' || currentState === 'done') nextState = 'marked';
+            else if (currentState === 'marked') nextState = 'reset';
+            else if (currentState === 'reset') nextState = 'excluded';
+            else nextState = 'open';
+            
+            setCellState(cell.dataset.char, cell.dataset.task, nextState);
             applyBoardState();
             triggerAutoSync();
         }
@@ -1222,7 +1250,12 @@
             document.querySelectorAll('td.interactive-cell').forEach(cell => {
                 const state = getCellState(cell.dataset.char, cell.dataset.task);
                 const checkbox = cell.querySelector('input[type="checkbox"]');
-                cell.classList.toggle('excluded', state === 'excluded');
+                
+                cell.classList.remove('excluded', 'marked', 'reset');
+                if (state === 'excluded') cell.classList.add('excluded');
+                else if (state === 'marked') cell.classList.add('marked');
+                else if (state === 'reset') cell.classList.add('reset');
+                
                 if (checkbox) checkbox.checked = state === 'done';
             });
             updateRates();
@@ -1231,9 +1264,7 @@
         function updateRates() {
             characters.forEach(char => {
                 const weeklyCells = document.querySelectorAll(`td[data-char="${CSS.escape(char.name)}"][data-is-weekly="true"]`);
-                let totalCountable = 0;
-                let totalCompleted = 0;
-
+                let totalCountable = 0, totalCompleted = 0;
                 weeklyCells.forEach(cell => {
                     const state = getCellState(char.name, cell.dataset.task);
                     if (state !== 'excluded') {
@@ -1241,7 +1272,6 @@
                         if (state === 'done') totalCompleted++;
                     }
                 });
-
                 const rate = totalCountable ? Math.round((totalCompleted / totalCountable) * 100) : 0;
                 const rateElement = document.getElementById(rateElementId(char.name));
                 if (rateElement) rateElement.textContent = `${rate}%`;
@@ -1261,13 +1291,11 @@
                 cloudData.lastDailyReset = currentDailyTarget;
                 changed = true;
             }
-
             if (cloudData.lastWeeklyReset < currentWeeklyTarget) {
                 executeWeeklyReset(currentWeeklyTarget);
                 cloudData.lastWeeklyReset = currentWeeklyTarget;
                 changed = true;
             }
-
             if (changed) persistLocalData();
             return changed;
         }
@@ -1295,34 +1323,26 @@
         function executeWeeklyReset(resetKey = getTargetResetTimeUTC(true)) {
             const archiveKey = String(resetKey);
             if (!cloudData.weeklyArchive[archiveKey]) {
-                const rates = {};
-                const states = {};
+                const rates = {}, states = {};
                 characters.forEach(char => {
                     rates[char.name] = parseInt(document.getElementById(rateElementId(char.name))?.textContent, 10) || 0;
-                    states[char.name] = weeklyTaskNames
-                        .map(taskName => stateToArchiveCode(getCellState(char.name, taskName)))
-                        .join('');
+                    states[char.name] = weeklyTaskNames.map(taskName => stateToArchiveCode(getCellState(char.name, taskName))).join('');
                 });
-
-                cloudData.weeklyArchive[archiveKey] = {
-                    createdAt: Date.now(),
-                    taskOrder: [...weeklyTaskNames],
-                    rates,
-                    states
-                };
+                cloudData.weeklyArchive[archiveKey] = { createdAt: Date.now(), taskOrder: [...weeklyTaskNames], rates, states };
                 trimWeeklyArchive();
             }
 
             const timestamp = Date.now();
             getAllKnownCharacterNames().forEach(characterName => {
                 weeklyTaskNames.forEach(taskName => {
-                    if (getCellState(characterName, taskName) === 'done') setCellState(characterName, taskName, 'open', timestamp);
+                    const state = getCellState(characterName, taskName);
+                    if (state === 'done' || state === 'marked' || state === 'reset') setCellState(characterName, taskName, 'open', timestamp);
                 });
             });
         }
 
         function manualDailyReset() {
-            if (confirm('Force Daily Reset? This will wipe completed Lucky Zone checks for everyone.')) {
+            if (confirm('Force Daily Reset?')) {
                 executeDailyReset();
                 cloudData.lastDailyReset = getTargetResetTimeUTC(false);
                 applyBoardState();
@@ -1331,7 +1351,7 @@
         }
 
         function manualWeeklyReset() {
-            if (confirm('Force Weekly Archive? This will archive current results and wipe completed weekly checks. N/A settings remain.')) {
+            if (confirm('Force Weekly Archive? This will archive current results and wipe completed weekly checks.')) {
                 const resetKey = Math.max(Date.now(), getTargetResetTimeUTC(true));
                 executeWeeklyReset(resetKey);
                 cloudData.lastWeeklyReset = resetKey;
@@ -1344,28 +1364,15 @@
         // ==========================================
         // 📊 SMART LOOT-WEIGHTED ANALYTICS
         // ==========================================
-        function clampWeight(value) {
-            const number = Math.round(Number(value) || 1);
-            return Math.min(5, Math.max(1, number));
-        }
-
-        function getLootWeight(taskName) {
-            return clampWeight(cloudData.settings?.lootWeights?.[taskName] ?? DEFAULT_LOOT_WEIGHTS[taskName] ?? 3);
-        }
-
-        function lootWeightLabel(weight) {
-            return ['Minor', 'Low', 'Medium', 'High', 'Critical'][clampWeight(weight) - 1];
-        }
+        function clampWeight(value) { return Math.min(5, Math.max(1, Math.round(Number(value) || 1))); }
+        function getLootWeight(taskName) { return clampWeight(cloudData.settings?.lootWeights?.[taskName] ?? DEFAULT_LOOT_WEIGHTS[taskName] ?? 3); }
+        function lootWeightLabel(weight) { return ['Minor', 'Low', 'Medium', 'High', 'Critical'][clampWeight(weight) - 1]; }
 
         function getCharacterTaskStats(charName) {
             const stats = {};
-            weeklyTaskNames.forEach(taskName => {
-                stats[taskName] = { missed: 0, completed: 0, excluded: 0, opportunities: 0, legacyMissed: 0 };
-            });
+            weeklyTaskNames.forEach(taskName => { stats[taskName] = { missed: 0, completed: 0, excluded: 0, opportunities: 0, legacyMissed: 0 }; });
 
-            const archives = Object.entries(safeObject(cloudData.weeklyArchive))
-                .sort((a, b) => Number(a[0]) - Number(b[0]));
-
+            const archives = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
             archives.forEach(([, archive]) => {
                 const taskOrder = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
                 const stateString = String(archive.states?.[charName] || '');
@@ -1387,7 +1394,6 @@
                 stats[taskName].missed += count;
                 stats[taskName].legacyMissed += count;
             }
-
             return stats;
         }
 
@@ -1400,24 +1406,14 @@
             const naRate = stat.opportunities ? stat.excluded / stat.opportunities : 0;
             const naPenalty = 1 - (0.65 * naRate);
             const score = weight * (0.55 * missRate + 0.30 * missVolume + 0.15 * historyConfidence) * naPenalty * 20;
-            return {
-                taskName,
-                ...stat,
-                weight,
-                eligible,
-                missRate,
-                naRate,
-                score: Math.max(0, Math.round(score))
-            };
+            return { taskName, ...stat, weight, eligible, missRate, naRate, score: Math.max(0, Math.round(score)) };
         }
 
         function getRateHistory(charName) {
-            const legacyRates = Array.isArray(cloudData.history?.[charName]?.rates)
-                ? cloudData.history[charName].rates : [];
+            const legacyRates = Array.isArray(cloudData.history?.[charName]?.rates) ? cloudData.history[charName].rates : [];
             const archiveRates = Object.entries(safeObject(cloudData.weeklyArchive))
                 .sort((a, b) => Number(a[0]) - Number(b[0]))
-                .map(([, archive]) => Number(archive.rates?.[charName]))
-                .filter(Number.isFinite);
+                .map(([, archive]) => Number(archive.rates?.[charName])).filter(Number.isFinite);
             return [...legacyRates, ...archiveRates].slice(-5);
         }
 
@@ -1439,15 +1435,13 @@
                 const priorities = Object.entries(getCharacterTaskStats(char.name))
                     .map(([taskName, stat]) => calculatePriority(taskName, stat))
                     .filter(item => item.missed > 0)
-                    .sort((a, b) => b.score - a.score || b.weight - a.weight || b.missed - a.missed)
-                    .slice(0, 3);
+                    .sort((a, b) => b.score - a.score || b.weight - a.weight || b.missed - a.missed).slice(0, 3);
 
                 const priorityHTML = priorities.length
                     ? priorities.map(item => {
                         const denominator = item.eligible || item.missed;
                         const legacyNote = item.legacyMissed ? ` • ${item.legacyMissed} legacy` : '';
-                        return `
-                            <div class="missed-item priority-item" title="Priority combines loot weight, miss rate, miss volume, history confidence, and an N/A penalty.">
+                        return `<div class="missed-item priority-item">
                                 <div class="priority-main">
                                     <div class="priority-task">${escapeHTML(item.taskName)}</div>
                                     <div class="priority-meta">${item.missed}/${denominator} eligible missed • ${item.excluded} N/A • Loot ${item.weight}/5 ${lootWeightLabel(item.weight)}${legacyNote}</div>
@@ -1457,25 +1451,15 @@
                     }).join('')
                     : '<div class="missed-item" style="color:#b5e5c5;">No historical loot priorities yet.</div>';
 
-                card.innerHTML = `
-                    <div class="card-header">${escapeHTML(char.name)}</div>
-                    <div class="history-trend">
-                        <div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Completion Trend</div>
-                        ${trendHTML}
-                    </div>
-                    <div class="missed-dungeons">
-                        <div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>
-                        <div class="analytics-help">High-value repeated misses rise; frequently N/A'd dungeons fall in priority.</div>
-                        ${priorityHTML}
-                    </div>`;
+                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}</div>
+                    <div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Completion Trend</div>${trendHTML}</div>
+                    <div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${priorityHTML}</div>`;
                 container.appendChild(card);
             });
         }
 
         function escapeHTML(value) {
-            return String(value).replace(/[&<>'"]/g, character => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-            })[character]);
+            return String(value).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]);
         }
 
         // ==========================================
@@ -1486,17 +1470,13 @@
             if (!editor) return;
             editor.innerHTML = weeklyTaskNames.map(taskName => {
                 const selectedWeight = getLootWeight(taskName);
-                const options = [1, 2, 3, 4, 5]
-                    .map(weight => `<option value="${weight}" ${weight === selectedWeight ? 'selected' : ''}>${weight}</option>`)
-                    .join('');
-                return `
-                    <div class="weight-row">
+                const options = [1, 2, 3, 4, 5].map(w => `<option value="${w}" ${w === selectedWeight ? 'selected' : ''}>${w}</option>`).join('');
+                return `<div class="weight-row">
                         <div>${escapeHTML(taskName)}</div>
                         <select data-weight-task="${escapeHTML(taskName)}">${options}</select>
                         <div class="weight-label" data-weight-label="${escapeHTML(taskName)}">${lootWeightLabel(selectedWeight)}</div>
                     </div>`;
             }).join('');
-
             editor.querySelectorAll('select[data-weight-task]').forEach(select => {
                 select.addEventListener('change', () => {
                     const taskName = select.dataset.weightTask;
@@ -1530,41 +1510,18 @@
             triggerAutoSync();
         }
 
-        function openWeightsModal() {
-            buildLootWeightEditor();
-            openModal('weights-modal');
-        }
+        function openWeightsModal() { buildLootWeightEditor(); openModal('weights-modal'); }
 
         // ==========================================
-        // 🧾 ROSTER REGISTRATION & MANAGEMENT
+        // 🧾 ROSTER REGISTRATION
         // ==========================================
-        function getRosters() {
-            return cloudData.settings.rosters;
-        }
-
-        function findRoster(rosterId) {
-            return getRosters().find(roster => roster.id === rosterId);
-        }
-
-        function createRosterId(ownerName) {
-            const slug = String(ownerName || 'roster').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'roster';
-            return `${slug}-${Date.now().toString(36)}`;
-        }
-
+        function getRosters() { return cloudData.settings.rosters; }
+        function findRoster(rosterId) { return getRosters().find(r => r.id === rosterId); }
+        function createRosterId(ownerName) { return `${String(ownerName || 'roster').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'roster'}-${Date.now().toString(36)}`; }
         function touchRosterSettings() {
             cloudData.settings.rosterUpdatedAt = Date.now();
             cloudData.settings.rosterUpdatedBy = deviceId;
             cloudData.updatedAt = Math.max(cloudData.updatedAt || 0, cloudData.settings.rosterUpdatedAt);
-        }
-
-        function characterNameExists(characterName) {
-            const key = String(characterName || '').trim().toLocaleLowerCase();
-            return getRosters().some(roster => roster.characters.some(name => name.toLocaleLowerCase() === key));
-        }
-
-        function ownerNameExists(ownerName, exceptRosterId = '') {
-            const key = String(ownerName || '').trim().toLocaleLowerCase();
-            return getRosters().some(roster => roster.id !== exceptRosterId && roster.name.toLocaleLowerCase() === key);
         }
 
         function renderRosterRegistration() {
@@ -1573,65 +1530,45 @@
             if (!select || !list) return;
 
             const previousSelection = select.value;
-            select.innerHTML = '<option value="__new__">＋ Create a new owner group</option>' + getRosters()
-                .map(roster => `<option value="${escapeHTML(roster.id)}">${escapeHTML(roster.name)} (${roster.characters.length})</option>`)
-                .join('');
-
-            select.value = getRosters().some(roster => roster.id === previousSelection) ? previousSelection : '__new__';
+            select.innerHTML = '<option value="__new__">＋ Create a new owner group</option>' + getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
+            select.value = getRosters().some(r => r.id === previousSelection) ? previousSelection : '__new__';
             handleRegistrationRosterChange(false);
 
             list.innerHTML = getRosters().length ? getRosters().map(roster => {
-                const characterChips = roster.characters.length
-                    ? roster.characters.map(characterName => `
-                        <span class="character-chip">
-                            ${escapeHTML(characterName)}
-                            <button type="button" class="remove-character-button" data-roster-id="${escapeHTML(roster.id)}" data-character-name="${escapeHTML(characterName)}" title="Remove ${escapeHTML(characterName)}">×</button>
-                        </span>`).join('')
-                    : '<div class="empty-roster-note">No characters yet. Add one using the registration form.</div>';
-
-                return `
-                    <div class="roster-editor-card" data-roster-card="${escapeHTML(roster.id)}">
+                const characterChips = roster.characters.length ? roster.characters.map(char => `<span class="character-chip">${escapeHTML(char)}<button type="button" class="remove-character-button" data-roster-id="${escapeHTML(roster.id)}" data-character-name="${escapeHTML(char)}" title="Remove">×</button></span>`).join('') : '<div class="empty-roster-note">No characters yet.</div>';
+                return `<div class="roster-editor-card">
                         <div class="roster-editor-head" style="border-top:4px solid ${normalizeColor(roster.color)};">
-                            <input class="roster-name-input" data-roster-name="${escapeHTML(roster.id)}" maxlength="30" value="${escapeHTML(roster.name)}" aria-label="Owner name">
-                            <input type="color" data-roster-color="${escapeHTML(roster.id)}" value="${normalizeColor(roster.color)}" aria-label="${escapeHTML(roster.name)} color">
+                            <input class="roster-name-input" data-roster-name="${escapeHTML(roster.id)}" maxlength="30" value="${escapeHTML(roster.name)}">
+                            <input type="color" data-roster-color="${escapeHTML(roster.id)}" value="${normalizeColor(roster.color)}">
                             <button class="btn btn-roster save-roster-button" type="button" data-roster-id="${escapeHTML(roster.id)}">Save</button>
-                            <button class="btn btn-danger delete-roster-button" type="button" data-roster-id="${escapeHTML(roster.id)}">Remove Group</button>
+                            <button class="btn btn-danger delete-roster-button" type="button" data-roster-id="${escapeHTML(roster.id)}">Remove</button>
                         </div>
                         <div class="character-chip-list">${characterChips}</div>
                     </div>`;
-            }).join('') : '<div class="empty-roster-note">No owner groups exist yet. Create the first one using the form.</div>';
+            }).join('') : '<div class="empty-roster-note">No owner groups exist yet.</div>';
 
-            list.querySelectorAll('.save-roster-button').forEach(button => {
-                button.addEventListener('click', () => saveRosterGroup(button.dataset.rosterId));
-            });
-            list.querySelectorAll('.delete-roster-button').forEach(button => {
-                button.addEventListener('click', () => removeRosterGroup(button.dataset.rosterId));
-            });
-            list.querySelectorAll('.remove-character-button').forEach(button => {
-                button.addEventListener('click', () => removeCharacterFromRoster(button.dataset.rosterId, button.dataset.characterName));
-            });
+            list.querySelectorAll('.save-roster-button').forEach(btn => btn.addEventListener('click', () => saveRosterGroup(btn.dataset.rosterId)));
+            list.querySelectorAll('.delete-roster-button').forEach(btn => btn.addEventListener('click', () => removeRosterGroup(btn.dataset.rosterId)));
+            list.querySelectorAll('.remove-character-button').forEach(btn => btn.addEventListener('click', () => removeCharacterFromRoster(btn.dataset.rosterId, btn.dataset.characterName)));
         }
 
         function handleRegistrationRosterChange(resetInputs = true) {
             const select = document.getElementById('registration-roster-select');
-            const newOwnerFields = document.getElementById('registration-new-owner-fields');
+            const newFields = document.getElementById('registration-new-owner-fields');
             const ownerInput = document.getElementById('registration-owner-name');
             const colorInput = document.getElementById('registration-color');
-            const colorNote = document.getElementById('registration-color-note');
-            if (!select || !newOwnerFields || !ownerInput || !colorInput) return;
+            if (!select || !newFields || !ownerInput || !colorInput) return;
 
             const isNew = select.value === '__new__';
-            newOwnerFields.style.display = isNew ? 'grid' : 'none';
+            newFields.style.display = isNew ? 'grid' : 'none';
             if (isNew) {
                 if (resetInputs) ownerInput.value = '';
                 colorInput.disabled = false;
                 if (resetInputs) colorInput.value = '#7aa2f7';
-                if (colorNote) colorNote.textContent = 'Choose a color for the new owner and all of their characters.';
             } else {
                 const roster = findRoster(select.value);
                 if (roster) colorInput.value = normalizeColor(roster.color);
                 colorInput.disabled = true;
-                if (colorNote) colorNote.textContent = 'This character will use the existing owner group color. Use Manage Existing Rosters to change it.';
             }
         }
 
@@ -1640,46 +1577,23 @@
             const ownerInput = document.getElementById('registration-owner-name');
             const colorInput = document.getElementById('registration-color');
             const characterInput = document.getElementById('registration-character-name');
-            const characterName = characterInput.value.trim();
+            const charName = characterInput.value.trim();
 
-            if (!characterName) {
-                alert('Enter the character name.');
-                characterInput.focus();
-                return;
-            }
-            if (characterNameExists(characterName)) {
-                alert('That character name is already registered. Character names must be unique across all owner groups.');
-                return;
-            }
+            if (!charName) { alert('Enter character name.'); return; }
+            if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === charName.toLowerCase()))) { alert('Character name already registered.'); return; }
 
             let roster;
             if (select.value === '__new__') {
                 const ownerName = ownerInput.value.trim();
-                if (!ownerName) {
-                    alert('Enter the new owner name.');
-                    ownerInput.focus();
-                    return;
-                }
-                if (ownerNameExists(ownerName)) {
-                    alert('That owner group already exists. Select it from the list instead.');
-                    return;
-                }
-                roster = {
-                    id: createRosterId(ownerName),
-                    name: ownerName.slice(0, 30),
-                    color: normalizeColor(colorInput.value),
-                    characters: []
-                };
+                if (!ownerName) { alert('Enter owner name.'); return; }
+                roster = { id: createRosterId(ownerName), name: ownerName.slice(0, 30), color: normalizeColor(colorInput.value), characters: [] };
                 getRosters().push(roster);
             } else {
                 roster = findRoster(select.value);
-                if (!roster) {
-                    alert('The selected owner group no longer exists. Refresh the page and try again.');
-                    return;
-                }
+                if (!roster) return;
             }
 
-            roster.characters.push(characterName.slice(0, 40));
+            roster.characters.push(charName.slice(0, 40));
             touchRosterSettings();
             characterInput.value = '';
             refreshTrackerUI();
@@ -1693,39 +1607,17 @@
             const nameInput = document.querySelector(`[data-roster-name="${CSS.escape(rosterId)}"]`);
             const colorInput = document.querySelector(`[data-roster-color="${CSS.escape(rosterId)}"]`);
             if (!roster || !nameInput || !colorInput) return;
-
-            const ownerName = nameInput.value.trim();
-            if (!ownerName) {
-                alert('Owner name cannot be empty.');
-                return;
-            }
-            if (ownerNameExists(ownerName, rosterId)) {
-                alert('Another owner group already uses that name.');
-                return;
-            }
-
-            roster.name = ownerName.slice(0, 30);
+            roster.name = nameInput.value.trim().slice(0, 30) || roster.name;
             roster.color = normalizeColor(colorInput.value, roster.color);
             touchRosterSettings();
             refreshTrackerUI();
             triggerAutoSync();
         }
 
-        function clearCurrentStatesForCharacter(characterName) {
-            const timestamp = Date.now();
-            const allTasks = Array.from(document.querySelectorAll('.task-row .task-name')).map(element => element.textContent.trim());
-            allTasks.forEach(taskName => {
-                if (getCellState(characterName, taskName) !== 'open') setCellState(characterName, taskName, 'open', timestamp);
-            });
-        }
-
-        function removeCharacterFromRoster(rosterId, characterName) {
+        function removeCharacterFromRoster(rosterId, charName) {
             const roster = findRoster(rosterId);
-            if (!roster || !roster.characters.includes(characterName)) return;
-            if (!confirm(`Remove ${characterName} from ${roster.name}? Historical archives and analytics will be kept.`)) return;
-
-            clearCurrentStatesForCharacter(characterName);
-            roster.characters = roster.characters.filter(name => name !== characterName);
+            if (!roster || !confirm(`Remove ${charName}?`)) return;
+            roster.characters = roster.characters.filter(n => n !== charName);
             touchRosterSettings();
             refreshTrackerUI();
             triggerAutoSync();
@@ -1733,39 +1625,159 @@
 
         function removeRosterGroup(rosterId) {
             const roster = findRoster(rosterId);
-            if (!roster) return;
-            if (!confirm(`Remove the owner group “${roster.name}” and hide all ${roster.characters.length} character(s)? Historical archives will be kept.`)) return;
-
-            roster.characters.forEach(clearCurrentStatesForCharacter);
-            cloudData.settings.rosters = getRosters().filter(item => item.id !== rosterId);
+            if (!roster || !confirm(`Remove group ${roster.name}?`)) return;
+            cloudData.settings.rosters = getRosters().filter(r => r.id !== rosterId);
             touchRosterSettings();
             refreshTrackerUI();
             triggerAutoSync();
         }
-
-        function openRegistrationPage() {
-            renderRosterRegistration();
-            if (location.hash !== '#registration') history.pushState(null, '', '#registration');
-            openModal('roster-modal');
+        
+        // ==========================================
+        // 🏰 DUNGEON REGISTRATION
+        // ==========================================
+        function getCategories() { return cloudData.settings.categories; }
+        function findCategory(catId) { return getCategories().find(c => c.id === catId); }
+        function createCategoryId() { return `cat-${Date.now().toString(36)}`; }
+        function touchCategorySettings() {
+            cloudData.settings.categoriesUpdatedAt = Date.now();
+            cloudData.settings.categoriesUpdatedBy = deviceId;
+            cloudData.updatedAt = Math.max(cloudData.updatedAt || 0, cloudData.settings.categoriesUpdatedAt);
         }
 
-        function closeRegistrationPage() {
-            closeModal('roster-modal');
-            if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search);
+        function renderDungeonRegistration() {
+            const select = document.getElementById('reg-dungeon-cat-select');
+            const list = document.getElementById('dungeon-management-list');
+            if (!select || !list) return;
+
+            const prevSelect = select.value;
+            select.innerHTML = '<option value="__new__">＋ Create new category</option>' + getCategories().map(c => `<option value="${escapeHTML(c.id)}">[${escapeHTML(c.group)}] ${escapeHTML(c.name)}</option>`).join('');
+            select.value = getCategories().some(c => c.id === prevSelect) ? prevSelect : '__new__';
+            handleDungeonCatChange(false);
+
+            list.innerHTML = getCategories().length ? getCategories().map(cat => {
+                const taskChips = cat.tasks.length ? cat.tasks.map(t => `<span class="character-chip">${escapeHTML(t)}<button type="button" class="remove-task-button" data-cat-id="${escapeHTML(cat.id)}" data-task-name="${escapeHTML(t)}" title="Remove">×</button></span>`).join('') : '<div class="empty-roster-note">No tasks yet.</div>';
+                return `<div class="roster-editor-card">
+                        <div class="roster-editor-head dungeon-editor-head" style="border-top:4px solid ${normalizeColor(cat.color, '#fff')};">
+                            <input class="roster-name-input" data-cat-name="${escapeHTML(cat.id)}" maxlength="30" value="${escapeHTML(cat.name)}">
+                            <select data-cat-group="${escapeHTML(cat.id)}" style="background-color:#17171d;color:#fff;">
+                                <option value="Weeklies" ${cat.group==='Weeklies'?'selected':''}>Weeklies</option>
+                                <option value="Dailies" ${cat.group==='Dailies'?'selected':''}>Dailies</option>
+                            </select>
+                            <input type="color" data-cat-color="${escapeHTML(cat.id)}" value="${normalizeColor(cat.color, '#ffffff')}">
+                            <button class="btn btn-dungeon save-cat-button" type="button" data-cat-id="${escapeHTML(cat.id)}">Save</button>
+                            <button class="btn btn-danger delete-cat-button" type="button" data-cat-id="${escapeHTML(cat.id)}">Remove</button>
+                        </div>
+                        <div class="character-chip-list">${taskChips}</div>
+                    </div>`;
+            }).join('') : '<div class="empty-roster-note">No categories exist yet.</div>';
+
+            list.querySelectorAll('.save-cat-button').forEach(btn => btn.addEventListener('click', () => saveCategoryGroup(btn.dataset.catId)));
+            list.querySelectorAll('.delete-cat-button').forEach(btn => btn.addEventListener('click', () => removeCategoryGroup(btn.dataset.catId)));
+            list.querySelectorAll('.remove-task-button').forEach(btn => btn.addEventListener('click', () => removeTaskFromCategory(btn.dataset.catId, btn.dataset.taskName)));
         }
 
-        function handlePageRoute() {
-            if (location.hash === '#registration') {
-                renderRosterRegistration();
-                openModal('roster-modal');
+        function handleDungeonCatChange(resetInputs = true) {
+            const select = document.getElementById('reg-dungeon-cat-select');
+            const newFields = document.getElementById('reg-dungeon-new-cat-fields');
+            const nameInput = document.getElementById('reg-dungeon-cat-name');
+            const colorInput = document.getElementById('reg-dungeon-color');
+            const groupSelect = document.getElementById('reg-dungeon-cat-group');
+            if (!select || !newFields || !nameInput || !colorInput) return;
+
+            const isNew = select.value === '__new__';
+            newFields.style.display = isNew ? 'grid' : 'none';
+            if (isNew) {
+                if (resetInputs) nameInput.value = '';
+                colorInput.disabled = false;
+                if (resetInputs) colorInput.value = '#ffffff';
             } else {
-                closeModal('roster-modal');
+                const cat = findCategory(select.value);
+                if (cat) {
+                    colorInput.value = normalizeColor(cat.color, '#ffffff');
+                    groupSelect.value = cat.group;
+                }
+                colorInput.disabled = true;
             }
         }
 
+        function registerDungeonTask() {
+            const select = document.getElementById('reg-dungeon-cat-select');
+            const nameInput = document.getElementById('reg-dungeon-cat-name');
+            const colorInput = document.getElementById('reg-dungeon-color');
+            const groupSelect = document.getElementById('reg-dungeon-cat-group');
+            const taskInput = document.getElementById('reg-dungeon-task-name');
+            const taskName = taskInput.value.trim();
+
+            if (!taskName) { alert('Enter task name.'); return; }
+            if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === taskName.toLowerCase()))) { alert('Task name already exists.'); return; }
+
+            let cat;
+            if (select.value === '__new__') {
+                const catName = nameInput.value.trim();
+                if (!catName) { alert('Enter category name.'); return; }
+                cat = { id: createCategoryId(), group: groupSelect.value, name: catName.slice(0, 30), color: normalizeColor(colorInput.value, '#ffffff'), tasks: [] };
+                getCategories().push(cat);
+            } else {
+                cat = findCategory(select.value);
+                if (!cat) return;
+            }
+
+            cat.tasks.push(taskName.slice(0, 40));
+            touchCategorySettings();
+            taskInput.value = '';
+            refreshTrackerUI();
+            document.getElementById('reg-dungeon-cat-select').value = cat.id;
+            handleDungeonCatChange(false);
+            triggerAutoSync();
+        }
+        
+        function saveCategoryGroup(catId) {
+            const cat = findCategory(catId);
+            const nameInput = document.querySelector(`[data-cat-name="${CSS.escape(catId)}"]`);
+            const colorInput = document.querySelector(`[data-cat-color="${CSS.escape(catId)}"]`);
+            const groupInput = document.querySelector(`[data-cat-group="${CSS.escape(catId)}"]`);
+            if (!cat || !nameInput || !colorInput || !groupInput) return;
+            cat.name = nameInput.value.trim().slice(0, 30) || cat.name;
+            cat.color = normalizeColor(colorInput.value, '#ffffff');
+            cat.group = groupInput.value;
+            touchCategorySettings();
+            refreshTrackerUI();
+            triggerAutoSync();
+        }
+
+        function removeTaskFromCategory(catId, taskName) {
+            const cat = findCategory(catId);
+            if (!cat || !confirm(`Remove ${taskName}?`)) return;
+            cat.tasks = cat.tasks.filter(t => t !== taskName);
+            touchCategorySettings();
+            refreshTrackerUI();
+            triggerAutoSync();
+        }
+
+        function removeCategoryGroup(catId) {
+            const cat = findCategory(catId);
+            if (!cat || !confirm(`Remove category ${cat.name}?`)) return;
+            cloudData.settings.categories = getCategories().filter(c => c.id !== catId);
+            touchCategorySettings();
+            refreshTrackerUI();
+            triggerAutoSync();
+        }
+
         // ==========================================
-        // ☁️ CLOUD SETTINGS UI
+        // 🖼️ MODAL CONTROLS
         // ==========================================
+        function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
+        function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
+        function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
+        
+        function handlePageRoute() {
+            closeModal('roster-modal');
+            closeModal('dungeon-modal');
+            if (location.hash === '#registration') { renderRosterRegistration(); openModal('roster-modal'); }
+            if (location.hash === '#dungeons') { renderDungeonRegistration(); openModal('dungeon-modal'); }
+        }
+
         function loadCloudForm() {
             const config = getCloudConfig();
             document.getElementById('cloud-bin-id').value = config.binId;
@@ -1773,21 +1785,15 @@
         }
 
         function showCloudMessage(message, isError = false) {
-            const element = document.getElementById('cloud-modal-message');
-            element.style.display = 'block';
-            element.style.borderLeftColor = isError ? '#c45858' : '#4f7cac';
-            element.textContent = message;
+            const el = document.getElementById('cloud-modal-message');
+            el.style.display = 'block';
+            el.style.borderLeftColor = isError ? '#c45858' : '#4f7cac';
+            el.textContent = message;
         }
 
         function saveCloudSettings(connectAfterSave = false) {
-            const config = {
-                binId: document.getElementById('cloud-bin-id').value.trim(),
-                apiKey: document.getElementById('cloud-api-key').value.trim()
-            };
-            if (!config.binId || !config.apiKey) {
-                showCloudMessage('Enter both the Bin ID and Master API key.', true);
-                return;
-            }
+            const config = { binId: document.getElementById('cloud-bin-id').value.trim(), apiKey: document.getElementById('cloud-api-key').value.trim() };
+            if (!config.binId || !config.apiKey) { showCloudMessage('Enter both the Bin ID and Master API key.', true); return; }
             localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(config));
             showCloudMessage('Saved on this PC. Connecting to JSONBin...');
             if (connectAfterSave) forceSync(true);
@@ -1795,67 +1801,38 @@
 
         async function createNewCloudBin() {
             const apiKey = document.getElementById('cloud-api-key').value.trim();
-            if (!apiKey) {
-                showCloudMessage('Paste a Master API key first.', true);
-                return;
-            }
-
+            if (!apiKey) { showCloudMessage('Paste a Master API key first.', true); return; }
             showCloudMessage('Creating a private JSONBin record...');
             try {
                 const config = { binId: '', apiKey };
                 const response = await fetch(`${JSONBIN_ROOT}/b`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Bin-Private': 'true',
-                        'X-Bin-Name': 'Pantheon DN Tracker',
-                        ...authHeaders(config)
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders(config) },
                     body: JSON.stringify(cloudData)
                 });
                 const payload = await response.json().catch(() => ({}));
                 if (!response.ok) throw new Error(payload.message || `JSONBin create failed (${response.status})`);
                 const binId = payload.metadata?.id;
-                if (!binId) throw new Error('JSONBin did not return a Bin ID.');
-
                 document.getElementById('cloud-bin-id').value = binId;
                 localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId, apiKey }));
                 showCloudMessage(`Private Bin created. Bin ID: ${binId}`);
                 await forceSync(true);
-            } catch (error) {
-                console.error(error);
-                showCloudMessage(error.message, true);
-            }
+            } catch (error) { showCloudMessage(error.message, true); }
         }
 
         function clearCloudSettings() {
-            if (!confirm('Remove the JSONBin Bin ID and Master API key from this PC? Local tracker data will remain.')) return;
+            if (!confirm('Remove cloud settings from this PC?')) return;
             localStorage.removeItem(CLOUD_CONFIG_KEY);
             loadCloudForm();
             setStatus('⚪ Local mode — cloud settings cleared');
             showCloudMessage('Cloud settings removed from this PC.');
         }
 
-        function openCloudModal() {
-            loadCloudForm();
-            document.getElementById('cloud-modal-message').style.display = 'none';
-            openModal('cloud-modal');
-        }
-
-        function openModal(id) {
-            document.getElementById(id)?.classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id)?.classList.add('hidden');
-        }
-
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') {
-                closeModal('cloud-modal');
-                closeModal('weights-modal');
-                closeRegistrationPage();
-            }
+        function openCloudModal() { loadCloudForm(); document.getElementById('cloud-modal-message').style.display = 'none'; openModal('cloud-modal'); }
+        function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeRegistrationPage(); closeDungeonPage(); }
         });
     </script>
 </body>
