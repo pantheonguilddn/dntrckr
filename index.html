@@ -572,7 +572,7 @@
             <div class="scholar-grid">
                 <!-- Cheean Column -->
                 <div class="registration-panel">
-                    <h4 style="margin-bottom: 12px;">Cheean & iD0ntHeal's Ledger</h4>
+                    <h4 style="margin-bottom: 12px;">Cheean's Ledger</h4>
                     <div class="scholar-balance-card">
                         <div style="color:#d29034; margin-bottom: 8px; font-weight: bold;">Current Owed Balance</div>
                         <div style="font-size:1.15rem; margin-bottom:4px;">💰 Gold: <span class="scholar-val" id="bal-gold-cheean">0.00</span></div>
@@ -652,6 +652,49 @@
                     </div>
 
                     <div class="scholar-history-list" id="scholar-history-bio"></div>
+                </div>
+                
+                <!-- iD0ntHeal Column -->
+                <div class="registration-panel">
+                    <h4 style="margin-bottom: 2px;">iD0ntHeal's Ledger</h4>
+                    <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 12px;">(Under Cheean's Jurisdiction)</div>
+                    <div class="scholar-balance-card">
+                        <div style="color:#d29034; margin-bottom: 8px; font-weight: bold;">Current Owed Balance</div>
+                        <div style="font-size:1.15rem; margin-bottom:4px;">💰 Gold: <span class="scholar-val" id="bal-gold-idontheal">0.00</span></div>
+                        <div style="font-size:1.15rem; margin-bottom:4px;">💎 Diamonds: <span class="scholar-val" id="bal-dia-idontheal">0.0</span></div>
+                        <div style="font-size:1.15rem;">💧 EoL: <span class="scholar-val" id="bal-eol-idontheal">0.0</span></div>
+                    </div>
+                    
+                    <div class="registration-form">
+                        <div class="scholar-input-row">
+                            <div>
+                                <label>Action Type</label>
+                                <select id="scholar-type-idontheal">
+                                    <option value="income">Income (Total Yield)</option>
+                                    <option value="deposit">Deposit (Stashed to Guild)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Gold Amount</label>
+                                <input type="number" id="scholar-gold-idontheal" placeholder="0" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="scholar-input-row">
+                            <div>
+                                <label>Diamonds</label>
+                                <input type="number" id="scholar-dia-idontheal" placeholder="0" min="0" step="1">
+                            </div>
+                            <div>
+                                <label>Essence of Life</label>
+                                <input type="number" id="scholar-eol-idontheal" placeholder="0" min="0" step="1">
+                            </div>
+                        </div>
+                        <label>Note (Optional)</label>
+                        <input id="scholar-note-idontheal" maxlength="50" placeholder="e.g. Daily LZ">
+                        <button class="btn btn-estate" type="button" onclick="submitScholarLog('idontheal')">Submit Log</button>
+                    </div>
+
+                    <div class="scholar-history-list" id="scholar-history-idontheal"></div>
                 </div>
             </div>
             
@@ -852,7 +895,7 @@
                 cells: {},
                 history: {},
                 weeklyArchive: {},
-                scholarship: { cheean: { logs: {} }, bio: { logs: {} } },
+                scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
                 settings: {
                     lootWeights: { ...DEFAULT_LOOT_WEIGHTS },
                     lootWeightUpdatedAt: {},
@@ -1036,8 +1079,10 @@
             normalized.scholarship = safeObject(source.scholarship);
             if (!normalized.scholarship.cheean) normalized.scholarship.cheean = { logs: {} };
             if (!normalized.scholarship.bio) normalized.scholarship.bio = { logs: {} };
+            if (!normalized.scholarship.idontheal) normalized.scholarship.idontheal = { logs: {} };
             normalized.scholarship.cheean.logs = safeObject(normalized.scholarship.cheean.logs);
             normalized.scholarship.bio.logs = safeObject(normalized.scholarship.bio.logs);
+            normalized.scholarship.idontheal.logs = safeObject(normalized.scholarship.idontheal.logs);
 
             // Version 9 Migration: Setup Kruknaks separated rosters
             if (normalized.schemaVersion < 9) {
@@ -1186,7 +1231,7 @@
             merged.settings.categoriesUpdatedBy = String(catSource.categoriesUpdatedBy || '');
 
             // Scholarship Logs Merge
-            ['cheean', 'bio'].forEach(player => {
+            ['cheean', 'bio', 'idontheal'].forEach(player => {
                 const localLogs = local.scholarship?.[player]?.logs || {};
                 const remoteLogs = remote.scholarship?.[player]?.logs || {};
                 merged.scholarship[player].logs = { ...remoteLogs, ...localLogs };
@@ -1750,7 +1795,7 @@
         }
 
         function renderScholarLedger() {
-            ['cheean', 'bio'].forEach(player => {
+            ['cheean', 'bio', 'idontheal'].forEach(player => {
                 const logsObj = cloudData.scholarship[player].logs || {};
                 const logs = Object.entries(logsObj)
                     .map(([id, data]) => ({ id, ...data }))
