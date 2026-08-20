@@ -36,6 +36,8 @@
 
         .btn-sync { background-color: #4CAF50; color: white; }
         .btn-sync:hover { background-color: #45a049; }
+        .btn-estate { background-color: #d29034; color: white; }
+        .btn-estate:hover { background-color: #b87c2b; }
 
         .sync-status {
             font-size: 0.9rem;
@@ -59,7 +61,7 @@
             border-collapse: collapse;
             width: 100%;
             color: #000000;
-            table-layout: fixed; /* Forces browser to respect exact colgroup widths */
+            table-layout: fixed;
         }
 
         th, td {
@@ -98,14 +100,12 @@
             vertical-align: middle;
         }
 
-        /* Perfect Equal Character Columns */
         .char-col {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
         
-        /* Cycle States */
         td.interactive-cell { cursor: context-menu; }
         td.interactive-cell:hover { background-color: rgba(0,0,0,0.05); }
         
@@ -121,7 +121,6 @@
             font-size: 0.9rem;
         }
 
-        /* Target Material Bounty Highlight */
         td.marked {
             background-color: #ffe599 !important;
             border: 2px solid #e69138 !important;
@@ -136,7 +135,6 @@
             pointer-events: none;
         }
 
-        /* Target Reset Bounty Highlight */
         td.reset {
             background-color: #d9d2e9 !important;
             border: 2px solid #8e7cc3 !important;
@@ -151,7 +149,6 @@
             pointer-events: none;
         }
 
-        /* Checkbox Styling */
         input[type="checkbox"] {
             transform: scale(1.25);
             cursor: pointer;
@@ -254,6 +251,8 @@
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
         }
 
+        .modal-card.wide-modal { width: min(1100px, 97vw); }
+
         .modal-card h3 { margin-top: 0; }
         .modal-grid {
             display: grid;
@@ -333,15 +332,6 @@
             font-weight: bold;
             text-align: center;
         }
-
-        .analytics-help {
-            margin-bottom: 8px;
-            color: #888;
-            font-size: 0.75rem;
-            line-height: 1.35;
-        }
-
-        .registration-card { width: min(1050px, 97vw); }
 
         .registration-layout {
             display: grid;
@@ -462,15 +452,48 @@
             line-height: 22px;
         }
 
-        .empty-roster-note {
-            padding: 12px;
-            color: #888;
-            font-size: 0.85rem;
+        /* Estate Ledger Specifics */
+        .scholar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            align-items: start;
         }
+        .scholar-balance-card {
+            background: #393946;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #d29034;
+            margin-bottom: 15px;
+        }
+        .scholar-val { font-weight: bold; color: #fff; display: inline-block; min-width: 60px; text-align: right; }
+        .scholar-history-list {
+            max-height: 250px;
+            overflow-y: auto;
+            background: #17171d;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 15px;
+        }
+        .scholar-log-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 6px 0;
+            border-bottom: 1px solid #333;
+        }
+        .scholar-log-income { color: #b6d7a8; font-weight: bold; }
+        .scholar-log-deposit { color: #ea9999; font-weight: bold; }
+        .scholar-log-date { color: #888; font-size: 0.75rem; min-width: 100px; }
+        .scholar-log-msg { flex-grow: 1; padding-left: 10px; }
+        .scholar-del-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
+        .scholar-del-btn:hover { color: #ff3333; }
+        .scholar-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 
         @media (max-width: 900px) {
             .controls { align-items: flex-start; gap: 12px; }
-            .control-actions { max-width: 420px; }
+            .control-actions { max-width: 500px; }
         }
 
         @media (max-width: 650px) {
@@ -495,11 +518,10 @@
             <span class="sync-status" id="sync-status">🟢 Loading Database...</span>
         </div>
         <div class="control-actions">
-            <!-- Roster Filter Dropdown -->
             <select id="roster-filter" class="btn" style="background-color: #393946; color: white; border: 1px solid #555; cursor: pointer;" onchange="applyRosterFilter()">
                 <option value="all">👁️ Show All Rosters</option>
             </select>
-
+            <button class="btn btn-estate" type="button" onclick="openScholarModal()">💰 Shared Salary</button>
             <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Now</button>
             <button class="btn btn-cloud" type="button" onclick="openCloudModal()">Cloud Setup</button>
             <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button>
@@ -510,11 +532,8 @@
     </div>
 
     <div class="table-responsive">
-        <!-- Rigid equal-width table framework -->
         <table id="dn-tracker">
-            <colgroup id="table-colgroup">
-                <!-- Javascript will inject perfect column ratios here -->
-            </colgroup>
+            <colgroup id="table-colgroup"></colgroup>
             <thead>
                 <tr id="roster-row">
                     <th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>
@@ -523,7 +542,6 @@
                 </tr>
             </thead>
             <tbody id="tracker-body">
-                <!-- JS dynamically injects registered categories and tasks here -->
             </tbody>
             <tfoot>
                 <tr id="footer-row">
@@ -537,11 +555,110 @@
     <div class="analytics-container" id="analytics-grid">
     </div>
 
-    <!-- Manual Overrides for Edge Cases -->
     <div class="dev-controls">
         <span style="color: #666; font-size: 0.8rem; display: block; margin-bottom: 10px;">System Auto-Resets Weeklies at 9AM MNL.</span>
         <button class="btn" style="background-color: #555; color: white;" onclick="manualDailyReset()">Force Daily Reset</button>
         <button class="btn btn-archive" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
+    </div>
+
+    <!-- Scholarship Estate Modal -->
+    <div class="modal-overlay hidden" id="scholar-modal" role="dialog" aria-modal="true" aria-labelledby="scholar-modal-title">
+        <div class="modal-card wide-modal">
+            <h3 id="scholar-modal-title">💰 Shared Salary Ledger</h3>
+            <div class="modal-note">
+                💡 <b>Income</b> automatically adds exactly <b>50%</b> of the logged amount to the owed balance. Decimal balances (e.g., 0.5 Diamonds) stay in the ledger safely until your next run makes it whole. When you actually transfer items to the guild storage, log a <b>Deposit</b> to deduct it from your balance.
+            </div>
+            
+            <div class="scholar-grid">
+                <!-- Cheean Column -->
+                <div class="registration-panel">
+                    <h4 style="margin-bottom: 12px;">Cheean & iD0ntHeal's Ledger</h4>
+                    <div class="scholar-balance-card">
+                        <div style="color:#d29034; margin-bottom: 8px; font-weight: bold;">Current Owed Balance</div>
+                        <div style="font-size:1.15rem; margin-bottom:4px;">💰 Gold: <span class="scholar-val" id="bal-gold-cheean">0.00</span></div>
+                        <div style="font-size:1.15rem; margin-bottom:4px;">💎 Diamonds: <span class="scholar-val" id="bal-dia-cheean">0.0</span></div>
+                        <div style="font-size:1.15rem;">💧 EoL: <span class="scholar-val" id="bal-eol-cheean">0.0</span></div>
+                    </div>
+                    
+                    <div class="registration-form">
+                        <div class="scholar-input-row">
+                            <div>
+                                <label>Action Type</label>
+                                <select id="scholar-type-cheean">
+                                    <option value="income">Income (Total Yield)</option>
+                                    <option value="deposit">Deposit (Stashed to Guild)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Gold Amount</label>
+                                <input type="number" id="scholar-gold-cheean" placeholder="0" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="scholar-input-row">
+                            <div>
+                                <label>Diamonds</label>
+                                <input type="number" id="scholar-dia-cheean" placeholder="0" min="0" step="1">
+                            </div>
+                            <div>
+                                <label>Essence of Life</label>
+                                <input type="number" id="scholar-eol-cheean" placeholder="0" min="0" step="1">
+                            </div>
+                        </div>
+                        <label>Note (Optional)</label>
+                        <input id="scholar-note-cheean" maxlength="50" placeholder="e.g. Daily LZ, Nest TH Sales">
+                        <button class="btn btn-estate" type="button" onclick="submitScholarLog('cheean')">Submit Log</button>
+                    </div>
+
+                    <div class="scholar-history-list" id="scholar-history-cheean"></div>
+                </div>
+
+                <!-- Bio Column -->
+                <div class="registration-panel">
+                    <h4 style="margin-bottom: 12px;">Biofrost's Ledger</h4>
+                    <div class="scholar-balance-card">
+                        <div style="color:#d29034; margin-bottom: 8px; font-weight: bold;">Current Owed Balance</div>
+                        <div style="font-size:1.15rem; margin-bottom:4px;">💰 Gold: <span class="scholar-val" id="bal-gold-bio">0.00</span></div>
+                        <div style="font-size:1.15rem; margin-bottom:4px;">💎 Diamonds: <span class="scholar-val" id="bal-dia-bio">0.0</span></div>
+                        <div style="font-size:1.15rem;">💧 EoL: <span class="scholar-val" id="bal-eol-bio">0.0</span></div>
+                    </div>
+                    
+                    <div class="registration-form">
+                        <div class="scholar-input-row">
+                            <div>
+                                <label>Action Type</label>
+                                <select id="scholar-type-bio">
+                                    <option value="income">Income (Total Yield)</option>
+                                    <option value="deposit">Deposit (Stashed to Guild)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Gold Amount</label>
+                                <input type="number" id="scholar-gold-bio" placeholder="0" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="scholar-input-row">
+                            <div>
+                                <label>Diamonds</label>
+                                <input type="number" id="scholar-dia-bio" placeholder="0" min="0" step="1">
+                            </div>
+                            <div>
+                                <label>Essence of Life</label>
+                                <input type="number" id="scholar-eol-bio" placeholder="0" min="0" step="1">
+                            </div>
+                        </div>
+                        <label>Note (Optional)</label>
+                        <input id="scholar-note-bio" maxlength="50" placeholder="e.g. DDN Salary">
+                        <button class="btn btn-estate" type="button" onclick="submitScholarLog('bio')">Submit Log</button>
+                    </div>
+
+                    <div class="scholar-history-list" id="scholar-history-bio"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions" style="margin-top:20px; justify-content: flex-end;">
+                <button class="btn btn-secondary" type="button" onclick="closeModal('scholar-modal')">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- Cloud Setup Modal -->
@@ -682,7 +799,7 @@
         // ==========================================
         // ☁️ APP / CLOUD CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 8;
+        const APP_SCHEMA_VERSION = 9; // Upgraded to v9 for Scholarship feature
         const MAX_ARCHIVE_WEEKS = 12;
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v3';
@@ -704,7 +821,9 @@
         const DEFAULT_ROSTERS = [
             { id: 'cho', name: 'Cho', color: '#b4a7d6', characters: ['Rhaeala', 'Mysteln', 'Vulcureon', 'Vaelyth', 'Diabolina'] },
             { id: 'cheean', name: 'Cheean', color: '#ffd966', characters: ['iD0ntHeal', 'CheanPT', 'xNocturne', 'RinPT', 'RANKET'] },
-            { id: 'bio', name: 'Bio', color: '#9fc5e8', characters: ['Biofrost', 'iTwoeye', 'Lunaprix', 'xAv3n', 'OnatGaminG'] }
+            { id: 'bio', name: 'Bio', color: '#9fc5e8', characters: ['Biofrost', 'iTwoeye', 'Lunaprix'] },
+            { id: 'kruk-cheean', name: 'Cheean (Kruk)', color: '#e69138', characters: ['Kruknaks', 'xAv3n'] },
+            { id: 'kruk-bio', name: 'Bio (Kruk)', color: '#e69138', characters: ['Enodia', 'OnatGaminG', 'Gabkulit'] }
         ];
 
         const DEFAULT_CATEGORIES = [
@@ -733,6 +852,7 @@
                 cells: {},
                 history: {},
                 weeklyArchive: {},
+                scholarship: { cheean: { logs: {} }, bio: { logs: {} } },
                 settings: {
                     lootWeights: { ...DEFAULT_LOOT_WEIGHTS },
                     lootWeightUpdatedAt: {},
@@ -840,7 +960,6 @@
             });
             filter.innerHTML = options;
             
-            // Validate that the currently selected roster still exists
             if (currentVal !== 'all' && !cloudData.settings.rosters.some(r => r.id === currentVal)) {
                 filter.value = 'all';
                 activeRosterFilter = 'all';
@@ -857,10 +976,8 @@
 
         function syncDataStructures() {
             cloudData.settings.rosters = normalizeRosters(cloudData.settings.rosters);
-            
             updateFilterDropdown();
             
-            // Filter the characters list if the user selected a specific roster
             const visibleRosters = activeRosterFilter === 'all' 
                 ? cloudData.settings.rosters 
                 : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
@@ -896,7 +1013,7 @@
         function normalizeData(record) {
             const source = safeObject(record);
             const normalized = createEmptyData();
-            normalized.schemaVersion = APP_SCHEMA_VERSION;
+            normalized.schemaVersion = Number(source.schemaVersion) || 1;
             normalized.history = safeObject(source.history);
             normalized.weeklyArchive = safeObject(source.weeklyArchive);
             normalized.lastDailyReset = Number(source.lastDailyReset) || normalized.lastDailyReset;
@@ -914,6 +1031,36 @@
             normalized.settings.categories = Array.isArray(sourceSettings.categories) ? normalizeCategories(sourceSettings.categories) : cloneCategories(DEFAULT_CATEGORIES);
             normalized.settings.categoriesUpdatedAt = Number(sourceSettings.categoriesUpdatedAt) || 0;
             normalized.settings.categoriesUpdatedBy = String(sourceSettings.categoriesUpdatedBy || '');
+
+            // Scholarship Data
+            normalized.scholarship = safeObject(source.scholarship);
+            if (!normalized.scholarship.cheean) normalized.scholarship.cheean = { logs: {} };
+            if (!normalized.scholarship.bio) normalized.scholarship.bio = { logs: {} };
+            normalized.scholarship.cheean.logs = safeObject(normalized.scholarship.cheean.logs);
+            normalized.scholarship.bio.logs = safeObject(normalized.scholarship.bio.logs);
+
+            // Version 9 Migration: Setup Kruknaks separated rosters
+            if (normalized.schemaVersion < 9) {
+                let rCheeanKruk = normalized.settings.rosters.find(r => r.id === 'kruk-cheean');
+                if(!rCheeanKruk) { rCheeanKruk = { id: 'kruk-cheean', name: 'Cheean (Kruk)', color: '#e69138', characters: [] }; normalized.settings.rosters.push(rCheeanKruk); }
+                
+                let rBioKruk = normalized.settings.rosters.find(r => r.id === 'kruk-bio');
+                if(!rBioKruk) { rBioKruk = { id: 'kruk-bio', name: 'Bio (Kruk)', color: '#e69138', characters: [] }; normalized.settings.rosters.push(rBioKruk); }
+
+                const krukCheeanChars = ['kruknaks', 'xav3n'];
+                const krukBioChars = ['enodia', 'onatgaming', 'gabkulit'];
+
+                normalized.settings.rosters.forEach(r => {
+                    r.characters = r.characters.filter(c => {
+                        const lc = c.toLowerCase();
+                        return !(krukCheeanChars.includes(lc) || krukBioChars.includes(lc));
+                    });
+                });
+                rCheeanKruk.characters = ['Kruknaks', 'xAv3n'];
+                rBioKruk.characters = ['Enodia', 'OnatGaminG', 'Gabkulit'];
+                
+                normalized.schemaVersion = 9;
+            }
 
             const sourceCells = safeObject(source.cells);
             for (const [charName, taskMap] of Object.entries(sourceCells)) {
@@ -1038,6 +1185,13 @@
             merged.settings.categoriesUpdatedAt = Number(catSource.categoriesUpdatedAt) || 0;
             merged.settings.categoriesUpdatedBy = String(catSource.categoriesUpdatedBy || '');
 
+            // Scholarship Logs Merge
+            ['cheean', 'bio'].forEach(player => {
+                const localLogs = local.scholarship?.[player]?.logs || {};
+                const remoteLogs = remote.scholarship?.[player]?.logs || {};
+                merged.scholarship[player].logs = { ...remoteLogs, ...localLogs };
+            });
+
             trimWeeklyArchive(merged);
             return merged;
         }
@@ -1157,6 +1311,7 @@
             buildLootWeightEditor();
             renderRosterRegistration();
             renderDungeonRegistration();
+            renderScholarLedger();
             applyBoardState();
             renderAnalytics();
         }
@@ -1171,22 +1326,18 @@
             
             if (!table || !colgroup || !rosterRow || !headerRow || !footerRow || !tbody) return;
 
-            // 1. Enforce mathematical equality with strict column mapping
-            // Leaving width empty for character columns forces CSS Grid to evenly distribute the remaining space across all of them
             colgroup.innerHTML = `
-                <col style="width: 80px;">  <!-- Group -->
-                <col style="width: 150px;"> <!-- Category -->
-                <col style="width: 210px;"> <!-- Task Name -->
+                <col style="width: 80px;">  
+                <col style="width: 150px;"> 
+                <col style="width: 210px;"> 
             `;
             
             characters.forEach(() => {
                 colgroup.innerHTML += `<col>`; 
             });
 
-            // 2. Allow CSS table-layout to size the whole width perfectly to the 100% of the screen
             table.style.width = '100%';
 
-            // 3. Render table data
             rosterRow.innerHTML = '<th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>';
             headerRow.innerHTML = '';
             footerRow.innerHTML = '<th colspan="3" class="bg-dark">Weekly Completion Rate</th>';
@@ -1211,7 +1362,7 @@
             characters.forEach(char => {
                 const characterHeader = document.createElement('th');
                 characterHeader.textContent = char.name;
-                characterHeader.title = char.name; // Tooltip fallback
+                characterHeader.title = char.name;
                 characterHeader.style.backgroundColor = char.color;
                 characterHeader.style.color = getContrastText(char.color);
                 characterHeader.className = 'bold char-col';
@@ -1265,7 +1416,7 @@
                         const tdTask = document.createElement('td');
                         tdTask.className = 'task-name';
                         tdTask.textContent = taskName;
-                        tdTask.title = taskName; // Tooltip fallback
+                        tdTask.title = taskName;
                         tr.appendChild(tdTask);
                         
                         characters.forEach(char => {
@@ -1312,14 +1463,10 @@
             
             setCellState(charName, taskName, isChecked ? 'done' : 'open');
 
-            // --- AUTO-BOUNTY CLAIM LOGIC ---
-            // If the user just completed a run that was tagged as a Bounty (🎯 or 🔄)
             if (isChecked && (previousState === 'marked' || previousState === 'reset')) {
-                // Find all tasks inside the category containing 'Bounty'
                 const bountyCat = getCategories().find(c => c.name.toLowerCase().includes('bounty'));
                 if (bountyCat && Array.isArray(bountyCat.tasks)) {
                     for (const bTask of bountyCat.tasks) {
-                        // Scan top to bottom, check off the first open slot, then stop
                         if (getCellState(charName, bTask) === 'open') {
                             setCellState(charName, bTask, 'done');
                             break; 
@@ -1328,7 +1475,7 @@
                 }
             }
 
-            applyBoardState(); // Re-render to clear the target indicator and update the bounty slot
+            applyBoardState();
             triggerAutoSync();
         }
 
@@ -1562,6 +1709,99 @@
 
         function escapeHTML(value) {
             return String(value).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]);
+        }
+
+        // ==========================================
+        // 💰 SCHOLARSHIP ESTATE LEDGER
+        // ==========================================
+        function openScholarModal() { 
+            renderScholarLedger();
+            openModal('scholar-modal'); 
+        }
+        
+        function submitScholarLog(player) {
+            const type = document.getElementById(`scholar-type-${player}`).value;
+            const gold = parseFloat(document.getElementById(`scholar-gold-${player}`).value) || 0;
+            const dia = parseFloat(document.getElementById(`scholar-dia-${player}`).value) || 0;
+            const eol = parseFloat(document.getElementById(`scholar-eol-${player}`).value) || 0;
+            const note = document.getElementById(`scholar-note-${player}`).value.trim();
+
+            if (gold === 0 && dia === 0 && eol === 0) return;
+
+            const logId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            cloudData.scholarship[player].logs[logId] = {
+                timestamp: Date.now(),
+                type, gold, dia, eol, note
+            };
+            cloudData.updatedAt = Date.now();
+            
+            ['gold', 'dia', 'eol', 'note'].forEach(f => document.getElementById(`scholar-${f}-${player}`).value = '');
+            
+            renderScholarLedger();
+            triggerAutoSync();
+        }
+
+        function deleteScholarLog(player, logId) {
+            if (!confirm('Remove this log entry?')) return;
+            delete cloudData.scholarship[player].logs[logId];
+            cloudData.updatedAt = Date.now();
+            renderScholarLedger();
+            triggerAutoSync();
+        }
+
+        function renderScholarLedger() {
+            ['cheean', 'bio'].forEach(player => {
+                const logsObj = cloudData.scholarship[player].logs || {};
+                const logs = Object.entries(logsObj)
+                    .map(([id, data]) => ({ id, ...data }))
+                    .sort((a, b) => b.timestamp - a.timestamp);
+
+                let balGold = 0, balDia = 0, balEol = 0;
+                
+                logs.forEach(l => {
+                    if (l.type === 'income') {
+                        balGold += (l.gold / 2);
+                        balDia += (l.dia / 2);
+                        balEol += (l.eol / 2);
+                    } else {
+                        balGold -= l.gold;
+                        balDia -= l.dia;
+                        balEol -= l.eol;
+                    }
+                });
+
+                document.getElementById(`bal-gold-${player}`).textContent = balGold.toFixed(2);
+                document.getElementById(`bal-dia-${player}`).textContent = balDia.toFixed(1);
+                document.getElementById(`bal-eol-${player}`).textContent = balEol.toFixed(1);
+
+                const historyContainer = document.getElementById(`scholar-history-${player}`);
+                if (logs.length === 0) {
+                    historyContainer.innerHTML = '<div style="color:#888; font-size:0.85rem; padding:10px;">No logs recorded yet.</div>';
+                } else {
+                    historyContainer.innerHTML = logs.map(l => {
+                        const isInc = l.type === 'income';
+                        const sign = isInc ? '+' : '-';
+                        const cls = isInc ? 'scholar-log-income' : 'scholar-log-deposit';
+                        const date = new Date(l.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        const values = [];
+                        if(l.gold) values.push(`${sign}${(isInc ? l.gold/2 : l.gold).toFixed(2)}g`);
+                        if(l.dia) values.push(`${sign}${(isInc ? l.dia/2 : l.dia).toFixed(1)} Dia`);
+                        if(l.eol) values.push(`${sign}${(isInc ? l.eol/2 : l.eol).toFixed(1)} EoL`);
+                        
+                        let noteHTML = l.note ? `<br><span style="color:#aaa; font-weight:normal; font-size:0.75rem;">${escapeHTML(l.note)}</span>` : '';
+                        
+                        return `
+                        <div class="scholar-log-item">
+                            <div class="scholar-log-date">${date}</div>
+                            <div class="scholar-log-msg ${cls}">
+                                ${values.join(', ')}
+                                ${noteHTML}
+                            </div>
+                            <button class="scholar-del-btn" onclick="deleteScholarLog('${player}', '${l.id}')" title="Delete Log">×</button>
+                        </div>`;
+                    }).join('');
+                }
+            });
         }
 
         // ==========================================
@@ -1868,14 +2108,15 @@
         // ==========================================
         // 🖼️ MODAL CONTROLS
         // ==========================================
-        function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
-        function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
+        function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
             closeModal('roster-modal');
             closeModal('dungeon-modal');
+            closeModal('scholar-modal');
             if (location.hash === '#registration') { renderRosterRegistration(); openModal('roster-modal'); }
             if (location.hash === '#dungeons') { renderDungeonRegistration(); openModal('dungeon-modal'); }
         }
@@ -1934,7 +2175,13 @@
         function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeRegistrationPage(); closeDungeonPage(); }
+            if (e.key === 'Escape') { 
+                closeModal('cloud-modal'); 
+                closeModal('weights-modal'); 
+                closeModal('scholar-modal'); 
+                closeRegistrationPage(); 
+                closeDungeonPage(); 
+            }
         });
     </script>
 </body>
