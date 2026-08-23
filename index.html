@@ -831,7 +831,7 @@
         // ==========================================
         // ☁️ APP / CLOUD CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 9; // Upgraded to v9 for Scholarship feature
+        const APP_SCHEMA_VERSION = 9; 
         const MAX_ARCHIVE_WEEKS = 12;
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v3';
@@ -1064,16 +1064,18 @@
             normalized.settings.categoriesUpdatedAt = Number(sourceSettings.categoriesUpdatedAt) || 0;
             normalized.settings.categoriesUpdatedBy = String(sourceSettings.categoriesUpdatedBy || '');
 
-            // Scholarship Data
-            normalized.scholarship = safeObject(source.scholarship);
-            if (!normalized.scholarship.cheean) normalized.scholarship.cheean = { logs: {} };
-            if (!normalized.scholarship.bio) normalized.scholarship.bio = { logs: {} };
-            if (!normalized.scholarship.idontheal) normalized.scholarship.idontheal = { logs: {} };
-            normalized.scholarship.cheean.logs = safeObject(normalized.scholarship.cheean.logs);
-            normalized.scholarship.bio.logs = safeObject(normalized.scholarship.bio.logs);
-            normalized.scholarship.idontheal.logs = safeObject(normalized.scholarship.idontheal.logs);
+            // Robust deep clone of Scholarship Data to prevent reference bugs across instances
+            normalized.scholarship = JSON.parse(JSON.stringify(safeObject(source.scholarship)));
+            
+            // Ensure core ledgers always exist
+            ['cheean', 'bio', 'idontheal'].forEach(p => {
+                if (!normalized.scholarship[p]) normalized.scholarship[p] = { logs: {} };
+                if (typeof normalized.scholarship[p].logs !== 'object' || Array.isArray(normalized.scholarship[p].logs)) {
+                    normalized.scholarship[p].logs = {};
+                }
+            });
 
-            // Version 9 Migration: Setup Kruknaks separated rosters
+            // Version 9 Migration
             if (normalized.schemaVersion < 9) {
                 let rCheeanKruk = normalized.settings.rosters.find(r => r.id === 'kruk-cheean');
                 if(!rCheeanKruk) { rCheeanKruk = { id: 'kruk-cheean', name: 'Cheean (Kruk)', color: '#e69138', characters: [] }; normalized.settings.rosters.push(rCheeanKruk); }
@@ -1219,11 +1221,40 @@
             merged.settings.categoriesUpdatedAt = Number(catSource.categoriesUpdatedAt) || 0;
             merged.settings.categoriesUpdatedBy = String(catSource.categoriesUpdatedBy || '');
 
-            // Scholarship Logs Merge
-            ['cheean', 'bio', 'idontheal'].forEach(player => {
-                const localLogs = local.scholarship?.[player]?.logs || {};
-                const remoteLogs = remote.scholarship?.[player]?.logs || {};
-                merged.scholarship[player].logs = { ...remoteLogs, ...localLogs };
+            // Scholarship Logs Merge - Completely rewritten for robust sync!
+            const allScholarshipPlayers = new Set([
+                ...Object.keys(safeObject(local.scholarship)),
+                ...Object.keys(safeObject(remote.scholarship))
+            ]);
+
+            allScholarshipPlayers.forEach(player => {
+                if (!merged.scholarship[player]) {
+                    merged.scholarship[player] = { logs: {} };
+                }
+
+                const localLogs = local.scholarship[player]?.logs || {};
+                const remoteLogs = remote.scholarship[player]?.logs || {};
+                const mergedLogs = {};
+
+                const allLogKeys = new Set([...Object.keys(localLogs), ...Object.keys(remoteLogs)]);
+                
+                allLogKeys.forEach(id => {
+                    const lLog = localLogs[id];
+                    const rLog = remoteLogs[id];
+                    
+                    if (lLog && rLog) {
+                        mergedLogs[id] = { ...rLog, ...lLog };
+                        // Tombstone Verification: If a log is EVER deleted by anyone, lock it as deleted.
+                        if (lLog.deleted || rLog.deleted) {
+                            mergedLogs[id].deleted = true;
+                        }
+                    } else {
+                        // Inherit the log if only one person has it
+                        mergedLogs[id] = lLog || rLog;
+                    }
+                });
+
+                merged.scholarship[player].logs = mergedLogs;
             });
 
             trimWeeklyArchive(merged);
@@ -1756,7 +1787,7 @@
         function submitScholarLog(player) {
             const type = document.getElementById(`scholar-type-${player}`).value;
             
-            // Safe DOM queries since idontheal intentionally lacks some inputs
+            // Safe DOM queries
             const goldEl = document.getElementById(`scholar-gold-${player}`);
             const diaEl = document.getElementById(`scholar-dia-${player}`);
             const eolEl = document.getElementById(`scholar-eol-${player}`);
@@ -1776,34 +1807,37 @@
             };
             cloudData.updatedAt = Date.now();
             
-            // Safely clear inputs
             ['gold', 'dia', 'eol', 'note'].forEach(f => {
                 const el = document.getElementById(`scholar-${f}-${player}`);
                 if (el) el.value = '';
             });
             
             renderScholarLedger();
-            triggerAutoSync();
+            
+            // IMMEDIATE SYNC: Log submissions are financial data, don't wait for the 1.5s timer incase tab is closed
+            persistLocalData();
+            forceSync(false);
         }
 
         function deleteScholarLog(player, logId) {
             if (!confirm('Remove this log entry?')) return;
             
-            // Use a tombstone method (deleted: true) instead of completely removing the key.
-            // This prevents the cloud sync from re-adding the log during a merge.
             if (cloudData.scholarship[player].logs[logId]) {
                 cloudData.scholarship[player].logs[logId].deleted = true;
                 cloudData.updatedAt = Date.now();
                 renderScholarLedger();
-                triggerAutoSync();
+                
+                // IMMEDIATE SYNC
+                persistLocalData();
+                forceSync(false);
             }
         }
 
         function renderScholarLedger() {
             ['cheean', 'bio', 'idontheal'].forEach(player => {
-                const logsObj = cloudData.scholarship[player].logs || {};
+                const logsObj = cloudData.scholarship[player]?.logs || {};
                 const logs = Object.entries(logsObj)
-                    .filter(([id, data]) => !data.deleted) // Hide the tombstoned/deleted logs
+                    .filter(([id, data]) => !data.deleted) // Hide tombstoned logs
                     .map(([id, data]) => ({ id, ...data }))
                     .sort((a, b) => b.timestamp - a.timestamp);
 
