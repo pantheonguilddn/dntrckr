@@ -1143,7 +1143,7 @@
 
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
         function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
-        function closeDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
         function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
