@@ -56,7 +56,6 @@
             border-radius: 4px;
         }
 
-        /* STRICT EQUAL-WIDTH TABLE STYLING */
         table {
             border-collapse: collapse;
             width: 100%;
@@ -73,18 +72,8 @@
             position: relative;
         }
 
-        /* Specific Cell Alignments */
-        .task-name { 
-            text-align: left; 
-            white-space: nowrap; 
-            font-weight: 500; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-        }
-        
+        .task-name { text-align: left; white-space: nowrap; font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
         .bold { font-weight: bold; }
-        
-        /* Column Category Styles */
         .col-group { background-color: #888888 !important; color: #ffffff !important; font-weight: bold; text-align: center; }
         .col-category { background-color: #ffffff !important; color: #000000 !important; text-align: center; }
         .bg-dark { background-color: #434343 !important; color: #ffffff !important; font-weight: bold; }
@@ -100,11 +89,7 @@
             vertical-align: middle;
         }
 
-        .char-col {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .char-col { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
         td.interactive-cell { cursor: context-menu; }
         td.interactive-cell:hover { background-color: rgba(0,0,0,0.05); }
@@ -113,52 +98,33 @@
             background: repeating-linear-gradient(45deg, #434343, #434343 10px, #4f4f4f 10px, #4f4f4f 20px) !important;
             color: #888 !important;
         }
-        td.excluded input { display: none; }
-        td.excluded::after {
-            content: "N/A";
-            font-weight: bold;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
+        td.excluded input[type="checkbox"], td.excluded .bounty-input { display: none; }
+        td.excluded::after { content: "N/A"; font-weight: bold; color: #aaa; font-size: 0.9rem; }
 
-        td.marked {
-            background-color: #ffe599 !important;
-            border: 2px solid #e69138 !important;
-            box-shadow: inset 0 0 8px rgba(230, 145, 56, 0.4);
-        }
-        td.marked::before {
-            content: "🎯";
-            position: absolute;
-            top: 2px;
-            left: 4px;
-            font-size: 0.85rem;
-            pointer-events: none;
-        }
+        td.marked { background-color: #ffe599 !important; border: 2px solid #e69138 !important; box-shadow: inset 0 0 8px rgba(230, 145, 56, 0.4); }
+        td.marked::before { content: "🎯"; position: absolute; top: 2px; left: 4px; font-size: 0.85rem; pointer-events: none; }
+        
+        td.reset { background-color: #d9d2e9 !important; border: 2px solid #8e7cc3 !important; box-shadow: inset 0 0 8px rgba(142, 124, 195, 0.4); }
+        td.reset::before { content: "🔄"; position: absolute; top: 2px; left: 4px; font-size: 0.85rem; pointer-events: none; }
 
-        td.reset {
-            background-color: #d9d2e9 !important;
-            border: 2px solid #8e7cc3 !important;
-            box-shadow: inset 0 0 8px rgba(142, 124, 195, 0.4);
-        }
-        td.reset::before {
-            content: "🔄";
-            position: absolute;
-            top: 2px;
-            left: 4px;
-            font-size: 0.85rem;
-            pointer-events: none;
-        }
+        input[type="checkbox"] { transform: scale(1.25); cursor: pointer; accent-color: #333; position: relative; z-index: 1; margin: 0; }
 
-        input[type="checkbox"] {
-            transform: scale(1.25);
-            cursor: pointer;
-            accent-color: #333;
-            position: relative;
-            z-index: 1;
-            margin: 0;
+        .bounty-input {
+            width: 90%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0,0,0,0.3);
+            color: #000;
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 4px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
+        .bounty-input:focus { outline: none; border-bottom: 1px solid #000; background: rgba(255,255,255,0.3); }
 
-        /* Analytics Section Bottom */
+        /* Analytics Section */
         .analytics-container {
             width: 100%;
             max-width: 1600px;
@@ -166,348 +132,73 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 50px;
+            transition: all 0.3s ease;
         }
 
-        .char-card {
-            background-color: #2b2b36;
-            border-radius: 8px;
-            padding: 20px;
-            border-top: 5px solid #444;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .card-header {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #444;
-            padding-bottom: 10px;
-            color: #fff;
-        }
-
+        .char-card { background-color: #2b2b36; border-radius: 8px; padding: 20px; border-top: 5px solid #444; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px; color: #fff; }
         .history-trend, .missed-dungeons { margin-bottom: 15px; }
-        .missed-item {
-            display: flex;
-            justify-content: space-between;
-            background: #3a3a48;
-            padding: 6px 10px;
-            margin-bottom: 5px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        .missed-count { font-weight: bold; color: #ff8080; }
-
-        .dev-controls {
-            margin-top: 30px;
-            border-top: 1px solid #444;
-            padding-top: 20px;
-            text-align: center;
-        }
-
-        /* Toolbar and modal controls */
-        .control-actions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-cloud { background-color: #4f7cac; color: #fff; }
-        .btn-cloud:hover { background-color: #416b96; }
-        .btn-weights { background-color: #8d6cab; color: #fff; }
-        .btn-weights:hover { background-color: #775992; }
-        .btn-roster { background-color: #b1784c; color: #fff; }
-        .btn-roster:hover { background-color: #96643f; }
-        .btn-dungeon { background-color: #6a8c6a; color: #fff; }
-        .btn-dungeon:hover { background-color: #557555; }
-        .btn-secondary { background-color: #555; color: #fff; }
-        .btn-secondary:hover { background-color: #666; }
-        .btn-danger { background-color: #9b4545; color: #fff; }
-        .btn-danger:hover { background-color: #833939; }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.72);
-        }
-
-        .modal-overlay.hidden { display: none; }
-
-        .modal-card {
-            width: min(720px, 95vw);
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 22px;
-            border: 1px solid #555;
-            border-radius: 10px;
-            background: #292934;
-            color: #fff;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
-        }
-
-        .modal-card.wide-modal { width: min(1100px, 97vw); }
-
-        .modal-card h3 { margin-top: 0; }
-        .modal-grid {
-            display: grid;
-            grid-template-columns: 160px 1fr;
-            gap: 10px 12px;
-            align-items: center;
-        }
-
-        .modal-grid input,
-        .modal-grid select {
-            box-sizing: border-box;
-            width: 100%;
-            padding: 9px 10px;
-            border: 1px solid #666;
-            border-radius: 5px;
-            background: #17171d;
-            color: #fff;
-        }
-
-        .modal-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 18px;
-        }
-
-        .modal-note {
-            margin: 12px 0;
-            padding: 10px 12px;
-            border-left: 4px solid #4f7cac;
-            background: #20202a;
-            color: #cfcfda;
-            font-size: 0.9rem;
-            line-height: 1.45;
-        }
-
-        .weight-row {
-            display: grid;
-            grid-template-columns: minmax(230px, 1fr) 90px 110px;
-            gap: 10px;
-            align-items: center;
-            padding: 7px 0;
-            border-bottom: 1px solid #3f3f4c;
-        }
-
-        .weight-row select {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #666;
-            border-radius: 4px;
-            background: #17171d;
-            color: #fff;
-        }
-
-        .weight-label { color: #bdbdca; font-size: 0.82rem; text-align: right; }
-
-        .priority-item {
-            align-items: center;
-            gap: 12px;
-        }
-
-        .priority-main { min-width: 0; }
-        .priority-task { font-weight: 600; color: #fff; }
-        .priority-meta {
-            margin-top: 3px;
-            color: #aaa;
-            font-size: 0.76rem;
-            line-height: 1.3;
-        }
-
-        .priority-score {
-            min-width: 46px;
-            padding: 5px 7px;
-            border-radius: 5px;
-            background: #262630;
-            color: #ffd27d;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .registration-layout {
-            display: grid;
-            grid-template-columns: minmax(280px, 0.85fr) minmax(420px, 1.45fr);
-            gap: 20px;
-            align-items: start;
-        }
-
-        .registration-panel {
-            padding: 16px;
-            border: 1px solid #464653;
-            border-radius: 8px;
-            background: #202029;
-        }
-
-        .registration-panel h4 { margin: 0 0 12px; }
-
-        .registration-form {
-            display: grid;
-            gap: 10px;
-        }
-
-        .registration-form label {
-            color: #c8c8d3;
-            font-size: 0.82rem;
-            font-weight: 600;
-        }
-
-        .registration-form input,
-        .registration-form select,
-        .roster-name-input {
-            box-sizing: border-box;
-            width: 100%;
-            padding: 9px 10px;
-            border: 1px solid #666;
-            border-radius: 5px;
-            background: #17171d;
-            color: #fff;
-        }
-
-        .registration-color-row {
-            display: grid;
-            grid-template-columns: 64px 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .registration-color-row input[type="color"] {
-            width: 64px;
-            height: 42px;
-            padding: 3px;
-            cursor: pointer;
-        }
-
-        .roster-management-list {
-            display: grid;
-            gap: 12px;
-        }
-
-        .roster-editor-card {
-            overflow: hidden;
-            border: 1px solid #4c4c59;
-            border-radius: 8px;
-            background: #292934;
-        }
-
-        .roster-editor-head {
-            display: grid;
-            grid-template-columns: minmax(160px, 1fr) 62px auto auto;
-            gap: 8px;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #41414d;
-        }
+        .missed-item { display: flex; justify-content: space-between; background: #3a3a48; padding: 6px 10px; margin-bottom: 5px; border-radius: 4px; font-size: 0.9rem; }
         
-        .dungeon-editor-head {
-            grid-template-columns: minmax(160px, 1fr) 110px 62px auto auto;
-        }
+        .dev-controls { margin-top: 30px; border-top: 1px solid #444; padding-top: 20px; text-align: center; }
 
-        .roster-editor-head input[type="color"],
-        .dungeon-editor-head input[type="color"] {
-            width: 54px;
-            height: 38px;
-            padding: 2px;
-            border: 1px solid #666;
-            border-radius: 5px;
-            background: #17171d;
-            cursor: pointer;
-        }
+        /* Toolbar */
+        .control-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
+        .btn-cloud { background-color: #4f7cac; color: #fff; } .btn-cloud:hover { background-color: #416b96; }
+        .btn-weights { background-color: #8d6cab; color: #fff; } .btn-weights:hover { background-color: #775992; }
+        .btn-roster { background-color: #b1784c; color: #fff; } .btn-roster:hover { background-color: #96643f; }
+        .btn-dungeon { background-color: #6a8c6a; color: #fff; } .btn-dungeon:hover { background-color: #557555; }
+        .btn-secondary { background-color: #555; color: #fff; } .btn-secondary:hover { background-color: #666; }
+        .btn-danger { background-color: #9b4545; color: #fff; } .btn-danger:hover { background-color: #833939; }
 
-        .character-chip-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 12px;
-        }
-
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, 0.72); }
+        .modal-overlay.hidden { display: none; }
+        .modal-card { width: min(720px, 95vw); max-height: 90vh; overflow-y: auto; padding: 22px; border: 1px solid #555; border-radius: 10px; background: #292934; color: #fff; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55); }
+        .modal-card.wide-modal { width: min(1100px, 97vw); }
+        .modal-card h3 { margin-top: 0; }
+        
+        .registration-layout { display: grid; grid-template-columns: minmax(260px, 0.85fr) minmax(360px, 1.45fr); gap: 20px; align-items: start; }
+        .registration-panel { padding: 16px; border: 1px solid #464653; border-radius: 8px; background: #202029; }
+        .registration-form { display: grid; gap: 10px; }
+        .registration-form input, .registration-form select { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px solid #666; border-radius: 5px; background: #17171d; color: #fff; }
+        
+        /* Pastel Palette */
+        .pastel-palette { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+        .swatch { width: 32px; height: 32px; border-radius: 4px; border: 2px solid #292934; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .swatch:hover { transform: scale(1.1); }
+        .swatch.active { border-color: #fff; box-shadow: 0 0 0 2px #fff; }
+        
+        .roster-editor-card { overflow: hidden; border: 1px solid #4c4c59; border-radius: 8px; background: #292934; margin-bottom: 12px; }
+        .roster-editor-head { display: grid; grid-template-columns: minmax(160px, 1fr) 62px auto auto; gap: 8px; align-items: center; padding: 10px; border-bottom: 1px solid #41414d; }
+        .dungeon-editor-head { grid-template-columns: minmax(160px, 1fr) 110px 50px auto auto; }
+        
+        .character-chip-list { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; min-height: 40px; }
         .character-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 6px 8px 6px 10px;
-            border-radius: 999px;
-            background: #393946;
-            color: #fff;
-            font-size: 0.85rem;
+            display: inline-flex; align-items: center; gap: 7px; padding: 6px 8px 6px 10px;
+            border-radius: 999px; background: #393946; color: #fff; font-size: 0.85rem;
+            cursor: grab; border: 1px solid transparent; transition: background 0.2s;
         }
+        .character-chip:active { cursor: grabbing; }
+        .character-chip.dragging { opacity: 0.4; border: 1px dashed #fff; }
+        .character-chip.drag-over { border-left: 3px solid #4CAF50; }
+        .character-chip button { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: #7a3f46; color: #fff; cursor: pointer; line-height: 22px; }
 
-        .character-chip button {
-            width: 22px;
-            height: 22px;
-            padding: 0;
-            border: 0;
-            border-radius: 50%;
-            background: #7a3f46;
-            color: #fff;
-            cursor: pointer;
-            line-height: 22px;
-        }
-
-        /* Estate Ledger Specifics */
-        .scholar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            align-items: start;
-        }
-        .scholar-balance-card {
-            background: #393946;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 5px solid #d29034;
-            margin-bottom: 15px;
-        }
+        .modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+        .modal-note { margin: 12px 0; padding: 10px 12px; border-left: 4px solid #4f7cac; background: #20202a; color: #cfcfda; font-size: 0.9rem; line-height: 1.45; }
+        
+        /* Estate Ledger */
+        .scholar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+        .scholar-balance-card { background: #393946; padding: 15px; border-radius: 8px; border-left: 5px solid #d29034; margin-bottom: 15px; }
         .scholar-val { font-weight: bold; color: #fff; display: inline-block; min-width: 60px; text-align: right; }
-        .scholar-history-list {
-            max-height: 250px;
-            overflow-y: auto;
-            background: #17171d;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 15px;
-        }
-        .scholar-log-item {
-            display: flex;
-            align-items: center;
-            font-size: 0.85rem;
-            padding: 6px 0;
-            border-bottom: 1px solid #333;
-        }
+        .scholar-history-list { max-height: 250px; overflow-y: auto; background: #17171d; border: 1px solid #444; border-radius: 5px; padding: 10px; margin-top: 15px; }
+        .scholar-log-item { display: flex; align-items: center; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px solid #333; }
         .scholar-log-income { color: #b6d7a8; font-weight: bold; }
         .scholar-log-deposit { color: #ea9999; font-weight: bold; }
         .scholar-log-date { color: #888; font-size: 0.75rem; min-width: 100px; }
         .scholar-log-msg { flex-grow: 1; padding-left: 10px; }
         .scholar-del-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
-        .scholar-del-btn:hover { color: #ff3333; }
         .scholar-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-
-        @media (max-width: 900px) {
-            .controls { align-items: flex-start; gap: 12px; }
-            .control-actions { max-width: 500px; }
-        }
-
-        @media (max-width: 650px) {
-            body { margin: 10px; align-items: flex-start; }
-            .controls { flex-direction: column; }
-            .control-actions { justify-content: flex-start; }
-            .modal-grid { grid-template-columns: 1fr; }
-            .weight-row { grid-template-columns: 1fr 80px; }
-            .weight-label { display: none; }
-            .registration-layout { grid-template-columns: 1fr; }
-            .roster-editor-head { grid-template-columns: 1fr 58px; }
-            .dungeon-editor-head { grid-template-columns: 1fr 100px 58px; row-gap: 10px;}
-            .roster-editor-head .btn, .dungeon-editor-head .btn { width: 100%; grid-column: 1 / -1; }
-        }
     </style>
 </head>
 <body>
@@ -527,7 +218,6 @@
             <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button>
             <button class="btn btn-roster" type="button" onclick="openRegistrationPage()">Roster Registration</button>
             <button class="btn btn-weights" type="button" onclick="openWeightsModal()">Loot Weights</button>
-            <span style="font-size: 0.9rem; color: #bdf2fc; width: 100%; text-align: right; display: block; margin-top: 5px;">💡 Checkmarking a marked dungeon auto-claims an open bounty.</span>
         </div>
     </div>
 
@@ -551,24 +241,27 @@
         </table>
     </div>
 
-    <h2 style="border-bottom: 2px solid #444; padding-bottom: 10px; width: 100%; max-width: 1600px;">📊 Roster Analytics</h2>
+    <div style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
+        <h2 style="margin: 0;">📊 Roster Analytics</h2>
+        <button id="toggle-analytics-btn" class="btn btn-secondary" onclick="toggleAnalytics()">👁️ Hide Analytics</button>
+    </div>
+    
     <div class="analytics-container" id="analytics-grid">
     </div>
 
     <div class="dev-controls">
         <span style="color: #666; font-size: 0.8rem; display: block; margin-bottom: 10px;">System Auto-Resets Weeklies at 9AM MNL.</span>
         <button class="btn" style="background-color: #555; color: white;" onclick="manualDailyReset()">Force Daily Reset</button>
-        <button class="btn btn-archive" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
+        <button class="btn btn-danger" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
     </div>
 
     <!-- Scholarship Estate Modal -->
-    <div class="modal-overlay hidden" id="scholar-modal" role="dialog" aria-modal="true" aria-labelledby="scholar-modal-title">
+    <div class="modal-overlay hidden" id="scholar-modal" role="dialog">
         <div class="modal-card wide-modal">
             <h3 id="scholar-modal-title">💰 Shared Salary Ledger</h3>
             <div class="modal-note">
-                💡 <b>Income</b> automatically adds exactly <b>50%</b> of the logged amount to the owed balance. Decimal balances (e.g., 0.5 Diamonds) stay in the ledger safely until your next run makes it whole. When you actually transfer items to the guild storage, log a <b>Deposit</b> to deduct it from your balance.
+                💡 <b>Income</b> automatically adds exactly <b>50%</b> of the logged amount to the owed balance. Decimal balances stay safely until your next run makes it whole. When you transfer items to the guild storage, log a <b>Deposit</b> to deduct it from your balance.
             </div>
-            
             <div class="scholar-grid">
                 <!-- Cheean Column -->
                 <div class="registration-panel">
@@ -579,36 +272,18 @@
                         <div style="font-size:1.15rem; margin-bottom:4px;">💎 Diamonds: <span class="scholar-val" id="bal-dia-cheean">0.0</span></div>
                         <div style="font-size:1.15rem;">💧 EoL: <span class="scholar-val" id="bal-eol-cheean">0.0</span></div>
                     </div>
-                    
                     <div class="registration-form">
                         <div class="scholar-input-row">
-                            <div>
-                                <label>Action Type</label>
-                                <select id="scholar-type-cheean">
-                                    <option value="income">Income (Total Yield)</option>
-                                    <option value="deposit">Deposit (Stashed to Guild)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Gold Amount</label>
-                                <input type="number" id="scholar-gold-cheean" placeholder="0" min="0" step="0.01">
-                            </div>
+                            <div><label>Action Type</label><select id="scholar-type-cheean"><option value="income">Income</option><option value="deposit">Deposit</option></select></div>
+                            <div><label>Gold Amount</label><input type="number" id="scholar-gold-cheean" placeholder="0" min="0" step="0.01"></div>
                         </div>
                         <div class="scholar-input-row">
-                            <div>
-                                <label>Diamonds</label>
-                                <input type="number" id="scholar-dia-cheean" placeholder="0" min="0" step="1">
-                            </div>
-                            <div>
-                                <label>Essence of Life</label>
-                                <input type="number" id="scholar-eol-cheean" placeholder="0" min="0" step="1">
-                            </div>
+                            <div><label>Diamonds</label><input type="number" id="scholar-dia-cheean" placeholder="0" min="0" step="1"></div>
+                            <div><label>Essence of Life</label><input type="number" id="scholar-eol-cheean" placeholder="0" min="0" step="1"></div>
                         </div>
-                        <label>Note (Optional)</label>
-                        <input id="scholar-note-cheean" maxlength="50" placeholder="e.g. Daily LZ, Nest TH Sales">
+                        <label>Note (Optional)</label><input id="scholar-note-cheean" maxlength="50" placeholder="e.g. Daily LZ">
                         <button class="btn btn-estate" type="button" onclick="submitScholarLog('cheean')">Submit Log</button>
                     </div>
-
                     <div class="scholar-history-list" id="scholar-history-cheean"></div>
                 </div>
 
@@ -621,36 +296,18 @@
                         <div style="font-size:1.15rem; margin-bottom:4px;">💎 Diamonds: <span class="scholar-val" id="bal-dia-bio">0.0</span></div>
                         <div style="font-size:1.15rem;">💧 EoL: <span class="scholar-val" id="bal-eol-bio">0.0</span></div>
                     </div>
-                    
                     <div class="registration-form">
                         <div class="scholar-input-row">
-                            <div>
-                                <label>Action Type</label>
-                                <select id="scholar-type-bio">
-                                    <option value="income">Income (Total Yield)</option>
-                                    <option value="deposit">Deposit (Stashed to Guild)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Gold Amount</label>
-                                <input type="number" id="scholar-gold-bio" placeholder="0" min="0" step="0.01">
-                            </div>
+                            <div><label>Action Type</label><select id="scholar-type-bio"><option value="income">Income</option><option value="deposit">Deposit</option></select></div>
+                            <div><label>Gold Amount</label><input type="number" id="scholar-gold-bio" placeholder="0" min="0" step="0.01"></div>
                         </div>
                         <div class="scholar-input-row">
-                            <div>
-                                <label>Diamonds</label>
-                                <input type="number" id="scholar-dia-bio" placeholder="0" min="0" step="1">
-                            </div>
-                            <div>
-                                <label>Essence of Life</label>
-                                <input type="number" id="scholar-eol-bio" placeholder="0" min="0" step="1">
-                            </div>
+                            <div><label>Diamonds</label><input type="number" id="scholar-dia-bio" placeholder="0" min="0" step="1"></div>
+                            <div><label>Essence of Life</label><input type="number" id="scholar-eol-bio" placeholder="0" min="0" step="1"></div>
                         </div>
-                        <label>Note (Optional)</label>
-                        <input id="scholar-note-bio" maxlength="50" placeholder="e.g. DDN Salary">
+                        <label>Note (Optional)</label><input id="scholar-note-bio" maxlength="50" placeholder="e.g. DDN Salary">
                         <button class="btn btn-estate" type="button" onclick="submitScholarLog('bio')">Submit Log</button>
                     </div>
-
                     <div class="scholar-history-list" id="scholar-history-bio"></div>
                 </div>
 
@@ -662,50 +319,29 @@
                         <div style="color:#d29034; margin-bottom: 8px; font-weight: bold;">Current Owed Balance</div>
                         <div style="font-size:1.15rem; margin-bottom:4px;">💰 Gold: <span class="scholar-val" id="bal-gold-idontheal">0.00</span></div>
                     </div>
-                    
                     <div class="registration-form">
                         <div class="scholar-input-row">
-                            <div>
-                                <label>Action Type</label>
-                                <select id="scholar-type-idontheal">
-                                    <option value="income">Income (Total Yield)</option>
-                                    <option value="deposit">Deposit (Stashed to Guild)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Gold Amount</label>
-                                <input type="number" id="scholar-gold-idontheal" placeholder="0" min="0" step="0.01">
-                            </div>
+                            <div><label>Action Type</label><select id="scholar-type-idontheal"><option value="income">Income</option><option value="deposit">Deposit</option></select></div>
+                            <div><label>Gold Amount</label><input type="number" id="scholar-gold-idontheal" placeholder="0" min="0" step="0.01"></div>
                         </div>
-                        <!-- Diamonds and EoL omitted intentionally for iD0ntHeal -->
-                        <label>Note (Optional)</label>
-                        <input id="scholar-note-idontheal" maxlength="50" placeholder="e.g. Daily LZ">
+                        <label>Note (Optional)</label><input id="scholar-note-idontheal" maxlength="50" placeholder="e.g. Daily LZ">
                         <button class="btn btn-estate" type="button" onclick="submitScholarLog('idontheal')">Submit Log</button>
                     </div>
-
                     <div class="scholar-history-list" id="scholar-history-idontheal"></div>
                 </div>
             </div>
-            
-            <div class="modal-actions" style="margin-top:20px; justify-content: flex-end;">
-                <button class="btn btn-secondary" type="button" onclick="closeModal('scholar-modal')">Close</button>
-            </div>
+            <div class="modal-actions" style="margin-top:20px; justify-content: flex-end;"><button class="btn btn-secondary" type="button" onclick="closeModal('scholar-modal')">Close</button></div>
         </div>
     </div>
 
     <!-- Cloud Setup Modal -->
-    <div class="modal-overlay hidden" id="cloud-modal" role="dialog" aria-modal="true" aria-labelledby="cloud-modal-title">
+    <div class="modal-overlay hidden" id="cloud-modal" role="dialog">
         <div class="modal-card">
-            <h3 id="cloud-modal-title">☁️ JSONBin Cloud Setup</h3>
-            <div class="modal-note">
-                Your Bin ID and API Key are saved safely in your browser's local memory.
-            </div>
+            <h3>☁️ JSONBin Cloud Setup</h3>
+            <div class="modal-note">Your Bin ID and API Key are saved safely in your browser's local memory.</div>
             <div class="modal-grid">
-                <label for="cloud-bin-id">Bin ID</label>
-                <input id="cloud-bin-id" autocomplete="off" placeholder="Example: 66abc123...">
-
-                <label for="cloud-api-key">Master Key</label>
-                <input id="cloud-api-key" type="password" autocomplete="new-password" placeholder="Paste your JSONBin Master Key">
+                <label for="cloud-bin-id">Bin ID</label><input id="cloud-bin-id" autocomplete="off" placeholder="Example: 66abc123...">
+                <label for="cloud-api-key">Master Key</label><input id="cloud-api-key" type="password" autocomplete="new-password" placeholder="Paste your JSONBin Master Key">
             </div>
             <div class="modal-actions">
                 <button class="btn btn-cloud" type="button" onclick="saveCloudSettings(true)">Save & Connect</button>
@@ -718,12 +354,10 @@
     </div>
 
     <!-- Loot Weights Modal -->
-    <div class="modal-overlay hidden" id="weights-modal" role="dialog" aria-modal="true" aria-labelledby="weights-modal-title">
+    <div class="modal-overlay hidden" id="weights-modal" role="dialog">
         <div class="modal-card">
-            <h3 id="weights-modal-title">🎁 Loot Gravity Weights</h3>
-            <div class="modal-note">
-                Weight 5 means missing the dungeon's loot is critical; weight 1 means minor. Priority also considers missed rate, number of misses, and historical N/A rate. Frequently N/A'd dungeons are automatically deprioritized instead of being counted as misses.
-            </div>
+            <h3>🎁 Loot Gravity Weights</h3>
+            <div class="modal-note">Weight 5 means missing the dungeon's loot is critical; weight 1 means minor. Priority also considers missed rate, number of misses, and historical N/A rate.</div>
             <div id="weight-editor"></div>
             <div class="modal-actions">
                 <button class="btn btn-weights" type="button" onclick="saveLootWeights()">Save Weights</button>
@@ -734,37 +368,26 @@
     </div>
 
     <!-- Roster Registration Modal -->
-    <div class="modal-overlay hidden" id="roster-modal" role="dialog" aria-modal="true" aria-labelledby="roster-modal-title">
-        <div class="modal-card registration-card">
-            <h3 id="roster-modal-title">🧾 Roster Registration</h3>
-            <div class="modal-note">
-                Register a character under an existing owner or create a new owner group with its own color. Removing a character hides it from the tracker but keeps its historical analytics.
-            </div>
+    <div class="modal-overlay hidden" id="roster-modal" role="dialog">
+        <div class="modal-card wide-modal">
+            <h3>🧾 Roster Registration</h3>
+            <div class="modal-note">Drag and drop chips to reorder them. Removing a character hides it from the tracker but keeps its historical analytics.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
                     <h4>Add a Character</h4>
                     <div class="registration-form">
-                        <label for="registration-roster-select">Owner / character bunch</label>
-                        <select id="registration-roster-select" onchange="handleRegistrationRosterChange()"></select>
-
+                        <label>Owner / character bunch</label><select id="registration-roster-select" onchange="handleRegistrationRosterChange()"></select>
                         <div id="registration-new-owner-fields">
-                            <label for="registration-owner-name">New owner name</label>
-                            <input id="registration-owner-name" maxlength="30" placeholder="Example: New Member">
+                            <label>New owner name</label><input id="registration-owner-name" maxlength="30" placeholder="Example: New Member">
                         </div>
-
-                        <label for="registration-color">Bunch color</label>
+                        <label>Bunch color</label>
                         <div class="registration-color-row">
-                            <input id="registration-color" type="color" value="#7aa2f7" aria-label="Roster color">
-                            <span id="registration-color-note" style="color:#aaa;font-size:0.82rem;">Used for the owner and all character headers.</span>
+                            <input id="registration-color" type="color" value="#7aa2f7"><span style="color:#aaa;font-size:0.82rem;">Used for headers.</span>
                         </div>
-
-                        <label for="registration-character-name">Character name</label>
-                        <input id="registration-character-name" maxlength="40" placeholder="Exact in-game name" onkeydown="if(event.key==='Enter') registerCharacter()">
-
+                        <label>Character name</label><input id="registration-character-name" maxlength="40" placeholder="Exact in-game name" onkeydown="if(event.key==='Enter') registerCharacter()">
                         <button class="btn btn-roster" type="button" onclick="registerCharacter()">Register Character</button>
                     </div>
                 </section>
-
                 <section class="registration-panel">
                     <h4>Manage Existing Rosters</h4>
                     <div id="roster-management-list" class="roster-management-list"></div>
@@ -778,43 +401,26 @@
     </div>
     
     <!-- Dungeon Registration Modal -->
-    <div class="modal-overlay hidden" id="dungeon-modal" role="dialog" aria-modal="true" aria-labelledby="dungeon-modal-title">
-        <div class="modal-card registration-card">
-            <h3 id="dungeon-modal-title">🏰 Dungeon Registration</h3>
-            <div class="modal-note">
-                Add new daily or weekly tasks, organize them into categories, and assign colors. Removing a task hides it from the board but retains its historical analytics.
-            </div>
+    <div class="modal-overlay hidden" id="dungeon-modal" role="dialog">
+        <div class="modal-card wide-modal">
+            <h3>🏰 Dungeon Registration</h3>
+            <div class="modal-note">Organize tasks and assign faded pastel colors. Drag and drop tasks within a category to reorder them.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
                     <h4>Add a Task</h4>
                     <div class="registration-form">
-                        <label for="reg-dungeon-cat-select">Category</label>
-                        <select id="reg-dungeon-cat-select" onchange="handleDungeonCatChange()"></select>
-
+                        <label>Category</label><select id="reg-dungeon-cat-select" onchange="handleDungeonCatChange()"></select>
                         <div id="reg-dungeon-new-cat-fields">
-                            <label for="reg-dungeon-cat-name">New category name</label>
-                            <input id="reg-dungeon-cat-name" maxlength="30" placeholder="Example: Special Raids">
-                            
-                            <label for="reg-dungeon-cat-group">Reset group</label>
-                            <select id="reg-dungeon-cat-group" style="background-color: #17171d; color: #fff;">
-                                <option value="Weeklies">Weeklies</option>
-                                <option value="Dailies">Dailies</option>
-                            </select>
+                            <label>New category name</label><input id="reg-dungeon-cat-name" maxlength="30" placeholder="Example: Special Raids">
+                            <label>Reset group</label><select id="reg-dungeon-cat-group"><option value="Weeklies">Weeklies</option><option value="Dailies">Dailies</option></select>
                         </div>
-
-                        <label for="reg-dungeon-color">Category color</label>
-                        <div class="registration-color-row">
-                            <input id="reg-dungeon-color" type="color" value="#ffffff">
-                            <span id="reg-dungeon-color-note" style="color:#aaa;font-size:0.82rem;">Used for the category row background.</span>
-                        </div>
-
-                        <label for="reg-dungeon-task-name">Task name</label>
-                        <input id="reg-dungeon-task-name" maxlength="40" placeholder="Exact task name" onkeydown="if(event.key==='Enter') registerDungeonTask()">
-
+                        <label>Category color</label>
+                        <div id="reg-dungeon-palette" class="pastel-palette"></div>
+                        <input type="hidden" id="reg-dungeon-color" value="#ffffff">
+                        <label>Task name</label><input id="reg-dungeon-task-name" maxlength="40" placeholder="Exact task name" onkeydown="if(event.key==='Enter') registerDungeonTask()">
                         <button class="btn btn-dungeon" type="button" onclick="registerDungeonTask()">Register Task</button>
                     </div>
                 </section>
-
                 <section class="registration-panel">
                     <h4>Manage Existing Categories</h4>
                     <div id="dungeon-management-list" class="roster-management-list"></div>
@@ -829,15 +435,17 @@
 
     <script>
         // ==========================================
-        // ☁️ APP / CLOUD CONFIGURATION
+        // ☁️ APP CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 9; 
+        const APP_SCHEMA_VERSION = 10; 
         const MAX_ARCHIVE_WEEKS = 12;
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v3';
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
         const JSONBIN_ROOT = 'https://api.jsonbin.io/v3';
+
+        const PASTEL_COLORS = ['#ffffff', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#c9daf8', '#cfe2f3', '#d9d2e9', '#ead1dc', '#f8cbad', '#b5e5c5', '#a4c2f4', '#b4a7d6', '#a2c4c9'];
 
         const DEFAULT_LOOT_WEIGHTS = {
             'Bounty Claim 1': 5, 'Bounty Claim 2': 5, 'Bounty Claim 3': 5, 
@@ -860,12 +468,12 @@
 
         const DEFAULT_CATEGORIES = [
             { id: 'cat-daily', group: 'Dailies', name: 'Lucky Zone', color: '#ffffff', tasks: ['Lucky Zone'] },
-            { id: 'cat-bounty', group: 'Weeklies', name: 'Bounty Board (Unique+)', color: '#ffd966', tasks: ['Bounty Claim 1', 'Bounty Claim 2', 'Bounty Claim 3', 'Bounty Claim 4', 'Bounty Claim 5', 'Bounty Claim 6'] },
-            { id: 'cat-mounts', group: 'Weeklies', name: 'Mounts & Special Skills', color: '#b6d7a8', tasks: ['Lower Nests (Hell)', '4-Man Challenge Nests', 'Apocalypse Challenge'] },
-            { id: 'cat-essence', group: 'Weeklies', name: 'Essence of Life', color: '#a4c2f4', tasks: ['Sea Dragon Core', 'Green Dragon (Normal)', 'Green Dragon (Classic)', 'Desert Dragon Memoria I', 'Desert Dragon Memoria II', 'Desert Dragon Memoria III', 'Desert Dragon Memoria IV'] },
+            { id: 'cat-bounty', group: 'Weeklies', name: 'Bounty Board (Unique+)', color: '#fff2cc', tasks: ['Bounty Claim 1', 'Bounty Claim 2', 'Bounty Claim 3', 'Bounty Claim 4', 'Bounty Claim 5', 'Bounty Claim 6'] },
+            { id: 'cat-mounts', group: 'Weeklies', name: 'Mounts & Special Skills', color: '#d9ead3', tasks: ['Lower Nests (Hell)', '4-Man Challenge Nests', 'Apocalypse Challenge'] },
+            { id: 'cat-essence', group: 'Weeklies', name: 'Essence of Life', color: '#c9daf8', tasks: ['Sea Dragon Core', 'Green Dragon (Normal)', 'Green Dragon (Classic)', 'Desert Dragon Memoria I', 'Desert Dragon Memoria II', 'Desert Dragon Memoria III', 'Desert Dragon Memoria IV'] },
             { id: 'cat-lv60', group: 'Weeklies', name: 'Lv60 Nests', color: '#f8cbad', tasks: ['Typhoon Kim Nest (Normal)', 'Typhoon Kim Nest (Hell)', 'Professor K Nest (Hell)'] },
-            { id: 'cat-raids', group: 'Weeklies', name: 'Raids', color: '#b4a7d6', tasks: ['Green Dragon (Hardcore)', 'Desert Dragon (Classic)', 'Desert Dragon (Hardcore)'] },
-            { id: 'cat-special', group: 'Weeklies', name: 'Special Dungeons', color: '#a2c4c9', tasks: ['Abyssal Mire', 'Dark Banquet (Lv 50)', 'Dragon Fellowship'] }
+            { id: 'cat-raids', group: 'Weeklies', name: 'Raids', color: '#d9d2e9', tasks: ['Green Dragon (Hardcore)', 'Desert Dragon (Classic)', 'Desert Dragon (Hardcore)'] },
+            { id: 'cat-special', group: 'Weeklies', name: 'Special Dungeons', color: '#d0e0e3', tasks: ['Abyssal Mire', 'Dark Banquet (Lv 50)', 'Dragon Fellowship'] }
         ];
 
         let characters = flattenRosters(DEFAULT_ROSTERS);
@@ -874,6 +482,7 @@
         let syncInProgress = false;
         let syncRequestedWhileBusy = false;
         let activeRosterFilter = 'all'; 
+        let isAnalyticsVisible = true;
         const deviceId = getOrCreateDeviceId();
 
         let cloudData = createEmptyData();
@@ -885,276 +494,135 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: {
-                    lootWeights: { ...DEFAULT_LOOT_WEIGHTS },
-                    lootWeightUpdatedAt: {},
-                    rosters: cloneRosters(DEFAULT_ROSTERS),
-                    rosterUpdatedAt: 0,
-                    rosterUpdatedBy: '',
-                    categories: cloneCategories(DEFAULT_CATEGORIES),
-                    categoriesUpdatedAt: 0,
-                    categoriesUpdatedBy: ''
-                },
+                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '' },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
             };
         }
 
-        function cloneRosters(rosters) {
-            return (Array.isArray(rosters) ? rosters : []).map(roster => ({
-                id: String(roster.id || ''),
-                name: String(roster.name || ''),
-                color: String(roster.color || '#7aa2f7'),
-                characters: Array.isArray(roster.characters) ? [...roster.characters] : []
-            }));
-        }
-        
-        function cloneCategories(categories) {
-            return (Array.isArray(categories) ? categories : []).map(cat => ({
-                id: String(cat.id || ''),
-                group: String(cat.group || 'Weeklies'),
-                name: String(cat.name || ''),
-                color: String(cat.color || '#ffffff'),
-                tasks: Array.isArray(cat.tasks) ? [...cat.tasks] : []
-            }));
-        }
-
-        function normalizeColor(value, fallback = '#7aa2f7') {
-            const color = String(value || '').trim();
-            return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback;
-        }
+        function cloneRosters(rosters) { return (Array.isArray(rosters) ? rosters : []).map(r => ({ id: String(r.id || ''), name: String(r.name || ''), color: String(r.color || '#7aa2f7'), characters: Array.isArray(r.characters) ? [...r.characters] : [] })); }
+        function cloneCategories(categories) { return (Array.isArray(categories) ? categories : []).map(c => ({ id: String(c.id || ''), group: String(c.group || 'Weeklies'), name: String(c.name || ''), color: String(c.color || '#ffffff'), tasks: Array.isArray(c.tasks) ? [...c.tasks] : [] })); }
+        function normalizeColor(value, fallback = '#7aa2f7') { const color = String(value || '').trim(); return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback; }
 
         function normalizeRosters(value) {
             const source = Array.isArray(value) ? value : DEFAULT_ROSTERS;
             const seenCharacters = new Set();
-            const seenIds = new Set();
             return source.map((roster, index) => {
-                const rawName = String(roster?.name || '').trim() || `Roster ${index + 1}`;
-                let id = String(roster?.id || '').trim().replace(/[^a-zA-Z0-9_-]/g, '');
-                if (!id || seenIds.has(id)) id = `roster-${index + 1}-${Math.random().toString(36).slice(2, 7)}`;
-                seenIds.add(id);
-
+                const id = String(roster?.id || `roster-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '');
                 const rosterCharacters = [];
-                for (const rawCharacter of Array.isArray(roster?.characters) ? roster.characters : []) {
-                    const characterName = String(rawCharacter || '').trim();
-                    const key = characterName.toLocaleLowerCase();
-                    if (!characterName || seenCharacters.has(key)) continue;
-                    seenCharacters.add(key);
-                    rosterCharacters.push(characterName);
+                for (const char of Array.isArray(roster?.characters) ? roster.characters : []) {
+                    const cleanChar = String(char || '').trim();
+                    if (!cleanChar || seenCharacters.has(cleanChar.toLowerCase())) continue;
+                    seenCharacters.add(cleanChar.toLowerCase());
+                    rosterCharacters.push(cleanChar);
                 }
-
-                return { id, name: rawName.slice(0, 30), color: normalizeColor(roster?.color), characters: rosterCharacters };
+                return { id, name: String(roster?.name || `Roster ${index + 1}`).slice(0, 30), color: normalizeColor(roster?.color), characters: rosterCharacters };
             });
         }
         
         function normalizeCategories(value) {
             const source = Array.isArray(value) && value.length > 0 ? value : DEFAULT_CATEGORIES;
             const seenTasks = new Set();
-            const seenIds = new Set();
             return source.map((cat, index) => {
-                const rawName = String(cat?.name || '').trim() || `Category ${index + 1}`;
-                let id = String(cat?.id || '').trim().replace(/[^a-zA-Z0-9_-]/g, '');
-                if (!id || seenIds.has(id)) id = `cat-${index + 1}-${Math.random().toString(36).slice(2, 7)}`;
-                seenIds.add(id);
-
-                const group = (cat?.group === 'Dailies') ? 'Dailies' : 'Weeklies';
+                const id = String(cat?.id || `cat-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '');
                 const catTasks = [];
-                
-                for (const rawTask of Array.isArray(cat?.tasks) ? cat.tasks : []) {
-                    const taskName = String(rawTask || '').trim();
-                    const key = taskName.toLocaleLowerCase();
-                    if (!taskName || seenTasks.has(key)) continue;
-                    seenTasks.add(key);
-                    catTasks.push(taskName);
+                for (const task of Array.isArray(cat?.tasks) ? cat.tasks : []) {
+                    const cleanTask = String(task || '').trim();
+                    if (!cleanTask || seenTasks.has(cleanTask.toLowerCase())) continue;
+                    seenTasks.add(cleanTask.toLowerCase());
+                    catTasks.push(cleanTask);
                 }
-
-                return { id, group, name: rawName.slice(0, 30), color: normalizeColor(cat?.color, '#ffffff'), tasks: catTasks };
+                return { id, group: cat?.group === 'Dailies' ? 'Dailies' : 'Weeklies', name: String(cat?.name || `Category ${index + 1}`).slice(0, 30), color: normalizeColor(cat?.color, '#ffffff'), tasks: catTasks };
             });
         }
 
-        function flattenRosters(rosters) {
-            return normalizeRosters(rosters).flatMap(roster => roster.characters.map(name => ({
-                name, color: roster.color, rosterId: roster.id, rosterName: roster.name
-            })));
-        }
+        function flattenRosters(rosters) { return normalizeRosters(rosters).flatMap(r => r.characters.map(name => ({ name, color: r.color, rosterId: r.id, rosterName: r.name }))); }
 
         function updateFilterDropdown() {
             const filter = document.getElementById('roster-filter');
             if (!filter) return;
             const currentVal = filter.value;
             let options = `<option value="all">👁️ Show All Rosters</option>`;
-            
-            cloudData.settings.rosters.forEach(r => {
-                if (r.characters.length > 0) {
-                    options += `<option value="${escapeHTML(r.id)}">👁️ Only ${escapeHTML(r.name)}</option>`;
-                }
-            });
+            cloudData.settings.rosters.forEach(r => { if (r.characters.length > 0) options += `<option value="${escapeHTML(r.id)}">👁️ Only ${escapeHTML(r.name)}</option>`; });
             filter.innerHTML = options;
-            
-            if (currentVal !== 'all' && !cloudData.settings.rosters.some(r => r.id === currentVal)) {
-                filter.value = 'all';
-                activeRosterFilter = 'all';
-            } else {
-                filter.value = currentVal;
-                activeRosterFilter = currentVal;
-            }
+            filter.value = cloudData.settings.rosters.some(r => r.id === currentVal) ? currentVal : 'all';
+            activeRosterFilter = filter.value;
         }
 
-        function applyRosterFilter() {
-            activeRosterFilter = document.getElementById('roster-filter').value;
-            refreshTrackerUI();
-        }
+        function applyRosterFilter() { activeRosterFilter = document.getElementById('roster-filter').value; refreshTrackerUI(); }
 
         function syncDataStructures() {
             cloudData.settings.rosters = normalizeRosters(cloudData.settings.rosters);
             updateFilterDropdown();
-            
-            const visibleRosters = activeRosterFilter === 'all' 
-                ? cloudData.settings.rosters 
-                : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
-                
+            const visibleRosters = activeRosterFilter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
             characters = flattenRosters(visibleRosters);
-            
             cloudData.settings.categories = normalizeCategories(cloudData.settings.categories);
             weeklyTaskNames = [];
-            cloudData.settings.categories.forEach(cat => {
-                if (cat.group === 'Weeklies') weeklyTaskNames.push(...cat.tasks);
-            });
+            cloudData.settings.categories.forEach(c => { if (c.group === 'Weeklies') weeklyTaskNames.push(...c.tasks); });
         }
 
         function getOrCreateDeviceId() {
             let id = localStorage.getItem(DEVICE_ID_KEY);
-            if (!id) {
-                id = (crypto.randomUUID ? crypto.randomUUID() : `device-${Date.now()}-${Math.random().toString(16).slice(2)}`);
-                localStorage.setItem(DEVICE_ID_KEY, id);
-            }
+            if (!id) { id = `device-${Date.now()}-${Math.random().toString(36)}`; localStorage.setItem(DEVICE_ID_KEY, id); }
             return id;
         }
 
-        function safeObject(value) {
-            return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-        }
+        function safeObject(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
 
         function normalizeCellRecord(value) {
             if (!value || typeof value !== 'object') return null;
             const state = ['open', 'done', 'excluded', 'marked', 'reset'].includes(value.state) ? value.state : 'open';
-            return { state, updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
+            return { state, note: String(value.note || '').slice(0, 20), updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
         }
 
         function normalizeData(record) {
             const source = safeObject(record);
-            const normalized = createEmptyData();
-            normalized.schemaVersion = Number(source.schemaVersion) || 1;
-            normalized.history = safeObject(source.history);
-            normalized.weeklyArchive = safeObject(source.weeklyArchive);
-            normalized.lastDailyReset = Number(source.lastDailyReset) || normalized.lastDailyReset;
-            normalized.lastWeeklyReset = Number(source.lastWeeklyReset) || normalized.lastWeeklyReset;
-            normalized.updatedAt = Number(source.updatedAt) || 0;
+            const norm = createEmptyData();
+            norm.schemaVersion = 10;
+            norm.history = safeObject(source.history);
+            norm.weeklyArchive = safeObject(source.weeklyArchive);
+            norm.lastDailyReset = Number(source.lastDailyReset) || norm.lastDailyReset;
+            norm.lastWeeklyReset = Number(source.lastWeeklyReset) || norm.lastWeeklyReset;
+            norm.updatedAt = Number(source.updatedAt) || 0;
 
-            const sourceSettings = safeObject(source.settings);
-            normalized.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sourceSettings.lootWeights) };
-            normalized.settings.lootWeightUpdatedAt = safeObject(sourceSettings.lootWeightUpdatedAt);
-            
-            normalized.settings.rosters = Array.isArray(sourceSettings.rosters) ? normalizeRosters(sourceSettings.rosters) : cloneRosters(DEFAULT_ROSTERS);
-            normalized.settings.rosterUpdatedAt = Number(sourceSettings.rosterUpdatedAt) || 0;
-            normalized.settings.rosterUpdatedBy = String(sourceSettings.rosterUpdatedBy || '');
-            
-            normalized.settings.categories = Array.isArray(sourceSettings.categories) ? normalizeCategories(sourceSettings.categories) : cloneCategories(DEFAULT_CATEGORIES);
-            normalized.settings.categoriesUpdatedAt = Number(sourceSettings.categoriesUpdatedAt) || 0;
-            normalized.settings.categoriesUpdatedBy = String(sourceSettings.categoriesUpdatedBy || '');
+            const sets = safeObject(source.settings);
+            norm.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sets.lootWeights) };
+            norm.settings.lootWeightUpdatedAt = safeObject(sets.lootWeightUpdatedAt);
+            norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : cloneRosters(DEFAULT_ROSTERS);
+            norm.settings.rosterUpdatedAt = Number(sets.rosterUpdatedAt) || 0;
+            norm.settings.rosterUpdatedBy = String(sets.rosterUpdatedBy || '');
+            norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : cloneCategories(DEFAULT_CATEGORIES);
+            norm.settings.categoriesUpdatedAt = Number(sets.categoriesUpdatedAt) || 0;
+            norm.settings.categoriesUpdatedBy = String(sets.categoriesUpdatedBy || '');
 
-            // Robust deep clone of Scholarship Data to prevent reference bugs across instances
-            normalized.scholarship = JSON.parse(JSON.stringify(safeObject(source.scholarship)));
-            
-            // Ensure core ledgers always exist
-            ['cheean', 'bio', 'idontheal'].forEach(p => {
-                if (!normalized.scholarship[p]) normalized.scholarship[p] = { logs: {} };
-                if (typeof normalized.scholarship[p].logs !== 'object' || Array.isArray(normalized.scholarship[p].logs)) {
-                    normalized.scholarship[p].logs = {};
-                }
-            });
+            norm.scholarship = JSON.parse(JSON.stringify(safeObject(source.scholarship)));
+            ['cheean', 'bio', 'idontheal'].forEach(p => { if (!norm.scholarship[p]) norm.scholarship[p] = { logs: {} }; });
 
-            // Version 9 Migration
-            if (normalized.schemaVersion < 9) {
-                let rCheeanKruk = normalized.settings.rosters.find(r => r.id === 'kruk-cheean');
-                if(!rCheeanKruk) { rCheeanKruk = { id: 'kruk-cheean', name: 'Cheean (Kruk)', color: '#e69138', characters: [] }; normalized.settings.rosters.push(rCheeanKruk); }
-                
-                let rBioKruk = normalized.settings.rosters.find(r => r.id === 'kruk-bio');
-                if(!rBioKruk) { rBioKruk = { id: 'kruk-bio', name: 'Bio (Kruk)', color: '#e69138', characters: [] }; normalized.settings.rosters.push(rBioKruk); }
-
-                const krukCheeanChars = ['kruknaks', 'xav3n'];
-                const krukBioChars = ['enodia', 'onatgaming', 'gabkulit'];
-
-                normalized.settings.rosters.forEach(r => {
-                    r.characters = r.characters.filter(c => {
-                        const lc = c.toLowerCase();
-                        return !(krukCheeanChars.includes(lc) || krukBioChars.includes(lc));
-                    });
-                });
-                rCheeanKruk.characters = ['Kruknaks', 'xAv3n'];
-                rBioKruk.characters = ['Enodia', 'OnatGaminG', 'Gabkulit'];
-                
-                normalized.schemaVersion = 9;
-            }
-
-            const sourceCells = safeObject(source.cells);
-            for (const [charName, taskMap] of Object.entries(sourceCells)) {
-                const normalizedTasks = {};
+            for (const [charName, taskMap] of Object.entries(safeObject(source.cells))) {
+                const normTasks = {};
                 for (const [taskName, cell] of Object.entries(safeObject(taskMap))) {
-                    const normalizedCell = normalizeCellRecord(cell);
-                    if (normalizedCell) normalizedTasks[taskName] = normalizedCell;
+                    const normCell = normalizeCellRecord(cell);
+                    if (normCell) normTasks[taskName] = normCell;
                 }
-                if (Object.keys(normalizedTasks).length) normalized.cells[charName] = normalizedTasks;
+                if (Object.keys(normTasks).length) norm.cells[charName] = normTasks;
             }
-
-            trimWeeklyArchive(normalized);
-            return normalized;
+            trimWeeklyArchive(norm);
+            return norm;
         }
 
-        function ensureCellMap(data, charName) {
-            if (!data.cells[charName]) data.cells[charName] = {};
-            return data.cells[charName];
-        }
-
-        function loadLocalData() {
-            try {
-                const raw = localStorage.getItem(LOCAL_DATA_KEY) || localStorage.getItem(LEGACY_LOCAL_DATA_KEY);
-                return raw ? normalizeData(JSON.parse(raw)) : createEmptyData();
-            } catch (error) {
-                return createEmptyData();
-            }
-        }
-
-        function persistLocalData() {
-            cloudData.schemaVersion = APP_SCHEMA_VERSION;
-            cloudData.updatedAt = Date.now();
-            localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(cloudData));
-        }
-
-        function getCloudConfig() {
-            try {
-                const config = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{}');
-                return { binId: String(config.binId || '').trim(), apiKey: String(config.apiKey || '').trim() };
-            } catch (error) {
-                return { binId: '', apiKey: '' };
-            }
-        }
-
-        function hasCloudConfig() {
-            const config = getCloudConfig();
-            return Boolean(config.binId && config.apiKey);
-        }
-
-        function authHeaders(config = getCloudConfig()) {
-            return { 'X-Master-Key': config.apiKey };
-        }
+        function ensureCellMap(data, charName) { if (!data.cells[charName]) data.cells[charName] = {}; return data.cells[charName]; }
+        function loadLocalData() { try { const raw = localStorage.getItem(LOCAL_DATA_KEY) || localStorage.getItem(LEGACY_LOCAL_DATA_KEY); return raw ? normalizeData(JSON.parse(raw)) : createEmptyData(); } catch (e) { return createEmptyData(); } }
+        function persistLocalData() { cloudData.schemaVersion = APP_SCHEMA_VERSION; cloudData.updatedAt = Date.now(); localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(cloudData)); }
+        function getCloudConfig() { try { const c = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{}'); return { binId: String(c.binId || '').trim(), apiKey: String(c.apiKey || '').trim() }; } catch (e) { return { binId: '', apiKey: '' }; } }
+        function hasCloudConfig() { const c = getCloudConfig(); return Boolean(c.binId && c.apiKey); }
+        function authHeaders(config = getCloudConfig()) { return { 'X-Master-Key': config.apiKey }; }
 
         function compareCellRecords(a, b) {
-            const left = normalizeCellRecord(a) || { state: 'open', updatedAt: 0, deviceId: '' };
-            const right = normalizeCellRecord(b) || { state: 'open', updatedAt: 0, deviceId: '' };
-            if (left.updatedAt !== right.updatedAt) return left.updatedAt > right.updatedAt ? left : right;
-            return left.deviceId >= right.deviceId ? left : right;
+            const l = normalizeCellRecord(a) || { state: 'open', note: '', updatedAt: 0, deviceId: '' };
+            const r = normalizeCellRecord(b) || { state: 'open', note: '', updatedAt: 0, deviceId: '' };
+            if (l.updatedAt !== r.updatedAt) return l.updatedAt > r.updatedAt ? l : r;
+            return l.deviceId >= r.deviceId ? l : r;
         }
 
         function mergeData(localRecord, remoteRecord) {
@@ -1167,94 +635,39 @@
             merged.lastWeeklyReset = Math.max(local.lastWeeklyReset, remote.lastWeeklyReset);
             merged.updatedAt = Math.max(local.updatedAt, remote.updatedAt);
 
-            const charNames = new Set([...Object.keys(local.cells), ...Object.keys(remote.cells)]);
-            charNames.forEach(charName => {
-                const localTasks = safeObject(local.cells[charName]);
-                const remoteTasks = safeObject(remote.cells[charName]);
-                const taskNames = new Set([...Object.keys(localTasks), ...Object.keys(remoteTasks)]);
-                taskNames.forEach(taskName => {
-                    ensureCellMap(merged, charName);
-                    merged.cells[charName][taskName] = compareCellRecords(localTasks[taskName], remoteTasks[taskName]);
+            new Set([...Object.keys(local.cells), ...Object.keys(remote.cells)]).forEach(char => {
+                new Set([...Object.keys(safeObject(local.cells[char])), ...Object.keys(safeObject(remote.cells[char]))]).forEach(task => {
+                    ensureCellMap(merged, char);
+                    merged.cells[char][task] = compareCellRecords(local.cells[char]?.[task], remote.cells[char]?.[task]);
                 });
             });
 
             merged.weeklyArchive = { ...remote.weeklyArchive, ...local.weeklyArchive };
-            for (const key of Object.keys(merged.weeklyArchive)) {
-                const localArchive = local.weeklyArchive[key];
-                const remoteArchive = remote.weeklyArchive[key];
-                if (localArchive && remoteArchive) {
-                    merged.weeklyArchive[key] = (Number(localArchive.createdAt) || 0) >= (Number(remoteArchive.createdAt) || 0)
-                        ? localArchive : remoteArchive;
-                }
-            }
-
-            const allWeightTasks = new Set([...Object.keys(DEFAULT_LOOT_WEIGHTS), ...Object.keys(local.settings.lootWeights), ...Object.keys(remote.settings.lootWeights)]);
-            allWeightTasks.forEach(taskName => {
-                const localTime = Number(local.settings.lootWeightUpdatedAt[taskName]) || 0;
-                const remoteTime = Number(remote.settings.lootWeightUpdatedAt[taskName]) || 0;
-                if (localTime >= remoteTime) {
-                    merged.settings.lootWeights[taskName] = clampWeight(local.settings.lootWeights[taskName]);
-                    merged.settings.lootWeightUpdatedAt[taskName] = localTime;
-                } else {
-                    merged.settings.lootWeights[taskName] = clampWeight(remote.settings.lootWeights[taskName]);
-                    merged.settings.lootWeightUpdatedAt[taskName] = remoteTime;
-                }
+            Object.keys(merged.weeklyArchive).forEach(k => {
+                if (local.weeklyArchive[k] && remote.weeklyArchive[k]) merged.weeklyArchive[k] = (Number(local.weeklyArchive[k].createdAt)||0) >= (Number(remote.weeklyArchive[k].createdAt)||0) ? local.weeklyArchive[k] : remote.weeklyArchive[k];
             });
 
-            const localRosterTime = Number(local.settings.rosterUpdatedAt) || 0;
-            const remoteRosterTime = Number(remote.settings.rosterUpdatedAt) || 0;
-            const localRosterDevice = String(local.settings.rosterUpdatedBy || '');
-            const remoteRosterDevice = String(remote.settings.rosterUpdatedBy || '');
-            const localRosterWins = localRosterTime > remoteRosterTime || (localRosterTime === remoteRosterTime && localRosterDevice >= remoteRosterDevice);
-            const rosterSource = localRosterWins ? local.settings : remote.settings;
-            merged.settings.rosters = cloneRosters(rosterSource.rosters);
-            merged.settings.rosterUpdatedAt = Number(rosterSource.rosterUpdatedAt) || 0;
-            merged.settings.rosterUpdatedBy = String(rosterSource.rosterUpdatedBy || '');
+            new Set([...Object.keys(DEFAULT_LOOT_WEIGHTS), ...Object.keys(local.settings.lootWeights), ...Object.keys(remote.settings.lootWeights)]).forEach(t => {
+                const lt = Number(local.settings.lootWeightUpdatedAt[t]) || 0, rt = Number(remote.settings.lootWeightUpdatedAt[t]) || 0;
+                merged.settings.lootWeights[t] = clampWeight((lt >= rt ? local : remote).settings.lootWeights[t]);
+                merged.settings.lootWeightUpdatedAt[t] = Math.max(lt, rt);
+            });
+
+            const lrTime = Number(local.settings.rosterUpdatedAt) || 0, rrTime = Number(remote.settings.rosterUpdatedAt) || 0;
+            const rSrc = (lrTime > rrTime || (lrTime === rrTime && String(local.settings.rosterUpdatedBy) >= String(remote.settings.rosterUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.rosters = cloneRosters(rSrc.rosters);
+            merged.settings.rosterUpdatedAt = rSrc.rosterUpdatedAt; merged.settings.rosterUpdatedBy = rSrc.rosterUpdatedBy;
             
-            const localCatTime = Number(local.settings.categoriesUpdatedAt) || 0;
-            const remoteCatTime = Number(remote.settings.categoriesUpdatedAt) || 0;
-            const localCatDevice = String(local.settings.categoriesUpdatedBy || '');
-            const remoteCatDevice = String(remote.settings.categoriesUpdatedBy || '');
-            const localCatWins = localCatTime > remoteCatTime || (localCatTime === remoteCatTime && localCatDevice >= remoteCatDevice);
-            const catSource = localCatWins ? local.settings : remote.settings;
-            merged.settings.categories = cloneCategories(catSource.categories);
-            merged.settings.categoriesUpdatedAt = Number(catSource.categoriesUpdatedAt) || 0;
-            merged.settings.categoriesUpdatedBy = String(catSource.categoriesUpdatedBy || '');
+            const lcTime = Number(local.settings.categoriesUpdatedAt) || 0, rcTime = Number(remote.settings.categoriesUpdatedAt) || 0;
+            const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.categories = cloneCategories(cSrc.categories);
+            merged.settings.categoriesUpdatedAt = cSrc.categoriesUpdatedAt; merged.settings.categoriesUpdatedBy = cSrc.categoriesUpdatedBy;
 
-            // Scholarship Logs Merge - Completely rewritten for robust sync!
-            const allScholarshipPlayers = new Set([
-                ...Object.keys(safeObject(local.scholarship)),
-                ...Object.keys(safeObject(remote.scholarship))
-            ]);
-
-            allScholarshipPlayers.forEach(player => {
-                if (!merged.scholarship[player]) {
-                    merged.scholarship[player] = { logs: {} };
-                }
-
-                const localLogs = local.scholarship[player]?.logs || {};
-                const remoteLogs = remote.scholarship[player]?.logs || {};
-                const mergedLogs = {};
-
-                const allLogKeys = new Set([...Object.keys(localLogs), ...Object.keys(remoteLogs)]);
-                
-                allLogKeys.forEach(id => {
-                    const lLog = localLogs[id];
-                    const rLog = remoteLogs[id];
-                    
-                    if (lLog && rLog) {
-                        mergedLogs[id] = { ...rLog, ...lLog };
-                        // Tombstone Verification: If a log is EVER deleted by anyone, lock it as deleted.
-                        if (lLog.deleted || rLog.deleted) {
-                            mergedLogs[id].deleted = true;
-                        }
-                    } else {
-                        // Inherit the log if only one person has it
-                        mergedLogs[id] = lLog || rLog;
-                    }
+            ['cheean', 'bio', 'idontheal'].forEach(p => {
+                const lL = local.scholarship[p]?.logs || {}, rL = remote.scholarship[p]?.logs || {};
+                new Set([...Object.keys(lL), ...Object.keys(rL)]).forEach(id => {
+                    merged.scholarship[p].logs[id] = (lL[id] && rL[id]) ? { ...rL[id], ...lL[id], deleted: lL[id].deleted || rL[id].deleted } : (lL[id] || rL[id]);
                 });
-
-                merged.scholarship[player].logs = mergedLogs;
             });
 
             trimWeeklyArchive(merged);
@@ -1262,39 +675,22 @@
         }
 
         function trimWeeklyArchive(data = cloudData) {
-            const entries = Object.entries(safeObject(data.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
-            while (entries.length > MAX_ARCHIVE_WEEKS) {
-                const [oldestKey] = entries.shift();
-                delete data.weeklyArchive[oldestKey];
-            }
+            const e = Object.entries(safeObject(data.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
+            while (e.length > MAX_ARCHIVE_WEEKS) delete data.weeklyArchive[e.shift()[0]];
         }
 
-        // ==========================================
-        // 🕒 TIME MATH (MANILA UTC+8)
-        // ==========================================
         function getTargetResetTimeUTC(isWeekly) {
-            const now = new Date();
-            const reset = new Date();
-            reset.setUTCHours(1, 0, 0, 0); 
-            if (now.getTime() < reset.getTime()) reset.setUTCDate(reset.getUTCDate() - 1);
-            if (isWeekly) {
-                let diff = reset.getUTCDay() - 6; 
-                if (diff < 0) diff += 7;
-                reset.setUTCDate(reset.getUTCDate() - diff);
-            }
+            const reset = new Date(); reset.setUTCHours(1, 0, 0, 0); 
+            if (new Date().getTime() < reset.getTime()) reset.setUTCDate(reset.getUTCDate() - 1);
+            if (isWeekly) reset.setUTCDate(reset.getUTCDate() - ((reset.getUTCDay() + 1) % 7));
             return reset.getTime();
         }
 
-        // ==========================================
-        // 🌐 DATABASE & MULTI-PC SYNC
-        // ==========================================
         async function fetchRemoteRecord(config = getCloudConfig()) {
-            const response = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, {
-                method: 'GET', headers: { ...authHeaders(config) }, cache: 'no-store'
-            });
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(payload.message || `JSONBin read failed (${response.status})`);
-            return payload.record || payload;
+            const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, { method: 'GET', headers: authHeaders(config), cache: 'no-store' });
+            const p = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(p.message || `Read failed (${res.status})`);
+            return p.record || p;
         }
 
         async function loadLiveTracker() {
@@ -1302,72 +698,46 @@
             syncDataStructures();
             checkAutoResets();
             refreshTrackerUI();
-            if (!hasCloudConfig()) {
-                setStatus('⚪ Local mode — click Cloud Setup');
-                return;
-            }
+            if (!hasCloudConfig()) return setStatus('⚪ Local mode — click Cloud Setup');
             await forceSync(false);
         }
 
         async function forceSync(showSuccess = false) {
-            if (!hasCloudConfig()) {
-                persistLocalData();
-                setStatus('⚪ Saved locally — cloud not configured');
-                if (showSuccess) openCloudModal();
-                return;
-            }
+            if (!hasCloudConfig()) { persistLocalData(); setStatus('⚪ Saved locally'); if(showSuccess)openCloudModal(); return; }
             if (syncInProgress) { syncRequestedWhileBusy = true; return; }
-            syncInProgress = true;
-            setStatus('🟡 Merging Cloud Data...');
+            syncInProgress = true; setStatus('🟡 Merging Cloud Data...');
             const config = getCloudConfig();
             try {
-                const remoteRecord = await fetchRemoteRecord(config);
-                cloudData = mergeData(cloudData, remoteRecord);
-                checkAutoResets();
-                persistLocalData();
-
-                const response = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, {
-                    method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders(config) },
-                    body: JSON.stringify(cloudData)
-                });
-                const payload = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(payload.message || `JSONBin update failed (${response.status})`);
-
-                cloudData = mergeData(cloudData, payload.record || cloudData);
-                persistLocalData();
-                refreshTrackerUI();
+                cloudData = mergeData(cloudData, await fetchRemoteRecord(config));
+                checkAutoResets(); persistLocalData();
+                const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...authHeaders(config) }, body: JSON.stringify(cloudData) });
+                if (!res.ok) throw new Error(`Update failed (${res.status})`);
+                cloudData = mergeData(cloudData, (await res.json()).record || cloudData);
+                persistLocalData(); refreshTrackerUI();
                 setStatus(showSuccess ? '🟢 Cloud Sync Complete' : '🟢 Database Synced');
-            } catch (error) {
-                persistLocalData();
-                setStatus(`🔴 Sync Failed: ${error.message}`);
-            } finally {
-                syncInProgress = false;
-                if (syncRequestedWhileBusy) { syncRequestedWhileBusy = false; setTimeout(() => forceSync(false), 150); }
-            }
+            } catch (err) { persistLocalData(); setStatus(`🔴 Sync Failed: ${err.message}`); } 
+            finally { syncInProgress = false; if (syncRequestedWhileBusy) { syncRequestedWhileBusy = false; setTimeout(() => forceSync(false), 150); } }
         }
 
-        function setStatus(message) { document.getElementById('sync-status').textContent = message; }
-        function triggerAutoSync() {
-            persistLocalData();
-            setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally');
-            clearTimeout(autoSyncTimer);
-            autoSyncTimer = setTimeout(() => forceSync(false), 1500);
-        }
+        function setStatus(msg) { document.getElementById('sync-status').textContent = msg; }
+        function triggerAutoSync() { persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
 
-        // ==========================================
-        // 🏗️ DYNAMIC TABLE BUILDER
-        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             loadCloudForm();
             window.addEventListener('hashchange', handlePageRoute);
             loadLiveTracker().then(handlePageRoute);
         });
 
-        function rateElementId(characterName) { return `rate-${encodeURIComponent(characterName)}`; }
-        function getContrastText(hexColor) {
-            const color = normalizeColor(hexColor).slice(1);
-            const r = parseInt(color.slice(0, 2), 16), g = parseInt(color.slice(2, 4), 16), b = parseInt(color.slice(4, 6), 16);
-            return ((r * 299 + g * 587 + b * 114) / 1000) >= 150 ? '#000' : '#fff';
+        function rateElementId(charName) { return `rate-${encodeURIComponent(charName)}`; }
+        function getContrastText(hex) {
+            const c = normalizeColor(hex).slice(1);
+            return ((parseInt(c.slice(0, 2), 16) * 299 + parseInt(c.slice(2, 4), 16) * 587 + parseInt(c.slice(4, 6), 16) * 114) / 1000) >= 150 ? '#000' : '#fff';
+        }
+
+        function toggleAnalytics() {
+            isAnalyticsVisible = !isAnalyticsVisible;
+            document.getElementById('analytics-grid').style.display = isAnalyticsVisible ? 'grid' : 'none';
+            document.getElementById('toggle-analytics-btn').textContent = isAnalyticsVisible ? '👁️ Hide Analytics' : '👁️ Show Analytics';
         }
 
         function refreshTrackerUI() {
@@ -1388,117 +758,70 @@
             const headerRow = document.getElementById('header-row');
             const footerRow = document.getElementById('footer-row');
             const tbody = document.getElementById('tracker-body');
-            
-            if (!table || !colgroup || !rosterRow || !headerRow || !footerRow || !tbody) return;
+            if (!table) return;
 
-            colgroup.innerHTML = `
-                <col style="width: 80px;">  
-                <col style="width: 150px;"> 
-                <col style="width: 210px;"> 
-            `;
-            
-            characters.forEach(() => {
-                colgroup.innerHTML += `<col>`; 
-            });
-
-            table.style.width = '100%';
-
+            colgroup.innerHTML = `<col style="width: 80px;"><col style="width: 150px;"><col style="width: 210px;">` + characters.map(() => `<col>`).join('');
             rosterRow.innerHTML = '<th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>';
             headerRow.innerHTML = '';
             footerRow.innerHTML = '<th colspan="3" class="bg-dark">Weekly Completion Rate</th>';
             tbody.innerHTML = '';
 
-            const visibleRosters = activeRosterFilter === 'all' 
-                ? cloudData.settings.rosters 
-                : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
-
+            const visibleRosters = activeRosterFilter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
             visibleRosters.forEach(roster => {
                 if (!roster.characters.length) return;
-                const ownerHeader = document.createElement('th');
-                ownerHeader.colSpan = roster.characters.length;
-                ownerHeader.textContent = roster.name;
-                ownerHeader.style.backgroundColor = roster.color;
-                ownerHeader.style.color = getContrastText(roster.color);
-                ownerHeader.style.fontSize = '1.1rem';
-                ownerHeader.className = 'bold';
-                rosterRow.appendChild(ownerHeader);
+                const th = document.createElement('th'); th.colSpan = roster.characters.length; th.textContent = roster.name;
+                th.style.background = roster.color; th.style.color = getContrastText(roster.color); th.className = 'bold';
+                rosterRow.appendChild(th);
             });
 
             characters.forEach(char => {
-                const characterHeader = document.createElement('th');
-                characterHeader.textContent = char.name;
-                characterHeader.title = char.name;
-                characterHeader.style.backgroundColor = char.color;
-                characterHeader.style.color = getContrastText(char.color);
-                characterHeader.className = 'bold char-col';
-                headerRow.appendChild(characterHeader);
-
-                const rateHeader = document.createElement('th');
-                rateHeader.id = rateElementId(char.name);
-                rateHeader.style.backgroundColor = '#ffe599';
-                rateHeader.style.color = '#000';
-                rateHeader.textContent = '0%';
-                rateHeader.className = 'char-col';
-                footerRow.appendChild(rateHeader);
+                const th = document.createElement('th'); th.textContent = char.name; th.title = char.name;
+                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = 'bold char-col';
+                headerRow.appendChild(th);
+                const rateTh = document.createElement('th'); rateTh.id = rateElementId(char.name);
+                rateTh.style.background = '#ffe599'; rateTh.style.color = '#000'; rateTh.textContent = '0%'; rateTh.className = 'char-col';
+                footerRow.appendChild(rateTh);
             });
             
             const grouped = {};
             cloudData.settings.categories.forEach(cat => {
                 if(cat.tasks.length === 0) return;
                 if (!grouped[cat.group]) grouped[cat.group] = { totalTasks: 0, categories: [] };
-                grouped[cat.group].categories.push(cat);
-                grouped[cat.group].totalTasks += cat.tasks.length;
+                grouped[cat.group].categories.push(cat); grouped[cat.group].totalTasks += cat.tasks.length;
             });
             
             for (const [groupName, groupData] of Object.entries(grouped)) {
-                let isFirstInGroup = true;
+                let isFirstGroup = true;
                 groupData.categories.forEach(cat => {
-                    let isFirstInCat = true;
+                    let isFirstCat = true;
+                    const isBounty = cat.name.toLowerCase().includes('bounty');
                     cat.tasks.forEach(taskName => {
                         const tr = document.createElement('tr');
                         tr.className = `task-row ${groupName === 'Dailies' ? 'is-daily' : 'is-weekly'}`;
-                        tr.style.backgroundColor = cat.color;
-                        tr.style.color = getContrastText(cat.color);
+                        tr.style.background = cat.color; tr.style.color = getContrastText(cat.color);
                         
-                        if (isFirstInGroup) {
-                            const tdGroup = document.createElement('td');
-                            tdGroup.rowSpan = groupData.totalTasks;
-                            tdGroup.className = 'col-group';
-                            tdGroup.textContent = groupName;
-                            tr.appendChild(tdGroup);
-                            isFirstInGroup = false;
-                        }
+                        if (isFirstGroup) { const td = document.createElement('td'); td.rowSpan = groupData.totalTasks; td.className = 'col-group'; td.textContent = groupName; tr.appendChild(td); isFirstGroup = false; }
+                        if (isFirstCat) { const td = document.createElement('td'); td.rowSpan = cat.tasks.length; td.className = 'col-category'; td.textContent = cat.name; tr.appendChild(td); isFirstCat = false; }
                         
-                        if (isFirstInCat) {
-                            const tdCat = document.createElement('td');
-                            tdCat.rowSpan = cat.tasks.length;
-                            tdCat.className = 'col-category';
-                            tdCat.textContent = cat.name;
-                            tr.appendChild(tdCat);
-                            isFirstInCat = false;
-                        }
-                        
-                        const tdTask = document.createElement('td');
-                        tdTask.className = 'task-name';
-                        tdTask.textContent = taskName;
-                        tdTask.title = taskName;
-                        tr.appendChild(tdTask);
+                        const tdTask = document.createElement('td'); tdTask.className = 'task-name'; tdTask.textContent = taskName; tdTask.title = taskName; tr.appendChild(tdTask);
                         
                         characters.forEach(char => {
-                            const td = document.createElement('td');
-                            td.className = 'interactive-cell char-col';
-                            td.dataset.char = char.name;
-                            td.dataset.task = taskName;
-                            td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false';
+                            const td = document.createElement('td'); td.className = 'interactive-cell char-col';
+                            td.dataset.char = char.name; td.dataset.task = taskName; td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false';
                             td.addEventListener('contextmenu', handleRightClick);
                             
-                            const cb = document.createElement('input');
-                            cb.type = 'checkbox';
-                            cb.dataset.char = char.name;
-                            cb.dataset.task = taskName;
-                            cb.addEventListener('change', handleCheck);
-                            
+                            const cb = document.createElement('input'); cb.type = 'checkbox';
+                            cb.dataset.char = char.name; cb.dataset.task = taskName; cb.addEventListener('change', handleCheck);
                             td.appendChild(cb);
+                            
+                            if (isBounty) {
+                                const input = document.createElement('input'); input.type = 'text'; input.className = 'bounty-input';
+                                input.placeholder = 'Target...'; input.dataset.char = char.name; input.dataset.task = taskName;
+                                input.value = getCellRecord(char.name, taskName).note || '';
+                                input.addEventListener('contextmenu', e => e.stopPropagation());
+                                input.addEventListener('change', handleNoteChange);
+                                td.appendChild(input);
+                            }
                             tr.appendChild(td);
                         });
                         tbody.appendChild(tr);
@@ -1507,775 +830,337 @@
             }
         }
 
-        // ==========================================
-        // ⚙️ CELL INTERACTION & COMPLETION MATH
-        // ==========================================
-        function getCellRecord(charName, taskName) { return cloudData.cells?.[charName]?.[taskName] || { state: 'open', updatedAt: 0, deviceId: '' }; }
-        function getCellState(charName, taskName) { return getCellRecord(charName, taskName).state || 'open'; }
+        function getCellRecord(c, t) { return cloudData.cells?.[c]?.[t] || { state: 'open', note: '', updatedAt: 0, deviceId: '' }; }
+        function getCellState(c, t) { return getCellRecord(c, t).state || 'open'; }
         
-        function setCellState(charName, taskName, state, updatedAt = Date.now()) {
-            ensureCellMap(cloudData, charName);
-            cloudData.cells[charName][taskName] = { state, updatedAt, deviceId };
-            cloudData.updatedAt = Math.max(cloudData.updatedAt || 0, updatedAt);
+        function setCellState(c, t, state, forcedTime) {
+            ensureCellMap(cloudData, c);
+            const cur = cloudData.cells[c][t] || { note: '', updatedAt: 0 };
+            cloudData.cells[c][t] = { state, note: cur.note, updatedAt: Math.max(forcedTime || Date.now(), cur.updatedAt + 1), deviceId };
+            cloudData.updatedAt = Date.now();
         }
 
-        function handleCheck(event) {
-            const checkbox = event.target;
-            const charName = checkbox.dataset.char;
-            const taskName = checkbox.dataset.task;
-            const isChecked = checkbox.checked;
-            const previousState = getCellState(charName, taskName);
-            
-            setCellState(charName, taskName, isChecked ? 'done' : 'open');
+        function setCellNote(c, t, note) {
+            ensureCellMap(cloudData, c);
+            const cur = cloudData.cells[c][t] || { state: 'open', updatedAt: 0 };
+            cloudData.cells[c][t] = { state: cur.state, note: String(note).slice(0,20), updatedAt: Math.max(Date.now(), cur.updatedAt + 1), deviceId };
+            cloudData.updatedAt = Date.now();
+        }
 
-            if (isChecked && (previousState === 'marked' || previousState === 'reset')) {
-                const bountyCat = getCategories().find(c => c.name.toLowerCase().includes('bounty'));
-                if (bountyCat && Array.isArray(bountyCat.tasks)) {
-                    for (const bTask of bountyCat.tasks) {
-                        if (getCellState(charName, bTask) === 'open') {
-                            setCellState(charName, bTask, 'done');
-                            break; 
-                        }
+        function handleNoteChange(e) {
+            setCellNote(e.target.dataset.char, e.target.dataset.task, e.target.value);
+            triggerAutoSync();
+        }
+
+        function handleCheck(e) {
+            const c = e.target.dataset.char, t = e.target.dataset.task;
+            const prev = getCellState(c, t);
+            setCellState(c, t, e.target.checked ? 'done' : 'open');
+            if (e.target.checked && (prev === 'marked' || prev === 'reset')) {
+                const bCat = getCategories().find(cat => cat.name.toLowerCase().includes('bounty'));
+                if (bCat) {
+                    for (const bTask of bCat.tasks) {
+                        if (getCellState(c, bTask) === 'open') { setCellState(c, bTask, 'done'); break; }
                     }
                 }
             }
-
-            applyBoardState();
-            triggerAutoSync();
+            applyBoardState(); triggerAutoSync();
         }
 
-        function handleRightClick(event) {
-            event.preventDefault();
-            const cell = event.currentTarget;
-            const currentState = getCellState(cell.dataset.char, cell.dataset.task);
-            
-            let nextState = 'open';
-            if (currentState === 'open' || currentState === 'done') nextState = 'marked';
-            else if (currentState === 'marked') nextState = 'reset';
-            else if (currentState === 'reset') nextState = 'excluded';
-            else nextState = 'open';
-            
-            setCellState(cell.dataset.char, cell.dataset.task, nextState);
-            applyBoardState();
-            triggerAutoSync();
+        function handleRightClick(e) {
+            e.preventDefault(); const c = e.currentTarget.dataset.char, t = e.currentTarget.dataset.task;
+            const s = getCellState(c, t);
+            setCellState(c, t, s === 'open' || s === 'done' ? 'marked' : s === 'marked' ? 'reset' : s === 'reset' ? 'excluded' : 'open');
+            applyBoardState(); triggerAutoSync();
         }
 
         function applyBoardState() {
-            document.querySelectorAll('td.interactive-cell').forEach(cell => {
-                const state = getCellState(cell.dataset.char, cell.dataset.task);
-                const checkbox = cell.querySelector('input[type="checkbox"]');
-                
-                cell.classList.remove('excluded', 'marked', 'reset');
-                if (state === 'excluded') cell.classList.add('excluded');
-                else if (state === 'marked') cell.classList.add('marked');
-                else if (state === 'reset') cell.classList.add('reset');
-                
-                if (checkbox) checkbox.checked = state === 'done';
+            document.querySelectorAll('td.interactive-cell').forEach(td => {
+                const s = getCellState(td.dataset.char, td.dataset.task);
+                const cb = td.querySelector('input[type="checkbox"]');
+                td.classList.remove('excluded', 'marked', 'reset');
+                if (s === 'excluded' || s === 'marked' || s === 'reset') td.classList.add(s);
+                if (cb) cb.checked = s === 'done';
             });
             updateRates();
         }
 
         function updateRates() {
-            characters.forEach(char => {
-                const weeklyCells = document.querySelectorAll(`td[data-char="${CSS.escape(char.name)}"][data-is-weekly="true"]`);
-                let totalCountable = 0, totalCompleted = 0;
-                weeklyCells.forEach(cell => {
-                    const state = getCellState(char.name, cell.dataset.task);
-                    if (state !== 'excluded') {
-                        totalCountable++;
-                        if (state === 'done') totalCompleted++;
-                    }
+            characters.forEach(c => {
+                let ct = 0, dn = 0;
+                document.querySelectorAll(`td[data-char="${CSS.escape(c.name)}"][data-is-weekly="true"]`).forEach(td => {
+                    const s = getCellState(c.name, td.dataset.task);
+                    if (s !== 'excluded') { ct++; if (s === 'done') dn++; }
                 });
-                const rate = totalCountable ? Math.round((totalCompleted / totalCountable) * 100) : 0;
-                const rateElement = document.getElementById(rateElementId(char.name));
-                if (rateElement) rateElement.textContent = `${rate}%`;
+                const el = document.getElementById(rateElementId(c.name));
+                if (el) el.textContent = `${ct ? Math.round((dn / ct) * 100) : 0}%`;
             });
         }
 
-        // ==========================================
-        // ⏱️ AUTO RESETS & COMPACT WEEKLY ARCHIVE
-        // ==========================================
         function checkAutoResets() {
-            let changed = false;
-            const currentDailyTarget = getTargetResetTimeUTC(false);
-            const currentWeeklyTarget = getTargetResetTimeUTC(true);
-
-            if (cloudData.lastDailyReset < currentDailyTarget) {
-                executeDailyReset();
-                cloudData.lastDailyReset = currentDailyTarget;
-                changed = true;
-            }
-            if (cloudData.lastWeeklyReset < currentWeeklyTarget) {
-                executeWeeklyReset(currentWeeklyTarget);
-                cloudData.lastWeeklyReset = currentWeeklyTarget;
-                changed = true;
-            }
+            let changed = false; const dt = getTargetResetTimeUTC(false), wt = getTargetResetTimeUTC(true);
+            if (cloudData.lastDailyReset < dt) { executeDailyReset(); cloudData.lastDailyReset = dt; changed = true; }
+            if (cloudData.lastWeeklyReset < wt) { executeWeeklyReset(wt); cloudData.lastWeeklyReset = wt; changed = true; }
             if (changed) persistLocalData();
-            return changed;
         }
 
-        function getAllKnownCharacterNames() {
-            return [...new Set([...characters.map(char => char.name), ...Object.keys(safeObject(cloudData.cells))])];
-        }
-
+        function getAllKnownCharacterNames() { return [...new Set([...characters.map(c => c.name), ...Object.keys(safeObject(cloudData.cells))])]; }
         function executeDailyReset() {
-            const timestamp = Date.now();
-            document.querySelectorAll('.task-row.is-daily .task-name').forEach(taskElement => {
-                const taskName = taskElement.textContent.trim();
-                getAllKnownCharacterNames().forEach(characterName => {
-                    if (getCellState(characterName, taskName) === 'done') setCellState(characterName, taskName, 'open', timestamp);
-                });
+            const ts = Date.now();
+            document.querySelectorAll('.task-row.is-daily .task-name').forEach(el => {
+                getAllKnownCharacterNames().forEach(c => { if (getCellState(c, el.textContent.trim()) === 'done') setCellState(c, el.textContent.trim(), 'open', ts); });
             });
         }
 
-        function stateToArchiveCode(state) {
-            if (state === 'done') return 'd';
-            if (state === 'excluded') return 'x';
-            return 'm';
-        }
-
-        function executeWeeklyReset(resetKey = getTargetResetTimeUTC(true)) {
-            const archiveKey = String(resetKey);
-            if (!cloudData.weeklyArchive[archiveKey]) {
+        function executeWeeklyReset(rk = getTargetResetTimeUTC(true)) {
+            const k = String(rk);
+            if (!cloudData.weeklyArchive[k]) {
                 const rates = {}, states = {};
-                characters.forEach(char => {
-                    rates[char.name] = parseInt(document.getElementById(rateElementId(char.name))?.textContent, 10) || 0;
-                    states[char.name] = weeklyTaskNames.map(taskName => stateToArchiveCode(getCellState(char.name, taskName))).join('');
+                characters.forEach(c => {
+                    rates[c.name] = parseInt(document.getElementById(rateElementId(c.name))?.textContent, 10) || 0;
+                    states[c.name] = weeklyTaskNames.map(t => { const s = getCellState(c.name, t); return s==='done'?'d':s==='excluded'?'x':'m'; }).join('');
                 });
-                cloudData.weeklyArchive[archiveKey] = { createdAt: Date.now(), taskOrder: [...weeklyTaskNames], rates, states };
+                cloudData.weeklyArchive[k] = { createdAt: Date.now(), taskOrder: [...weeklyTaskNames], rates, states };
                 trimWeeklyArchive();
             }
-
-            const timestamp = Date.now();
-            getAllKnownCharacterNames().forEach(characterName => {
-                weeklyTaskNames.forEach(taskName => {
-                    const state = getCellState(characterName, taskName);
-                    if (state === 'done' || state === 'marked' || state === 'reset') setCellState(characterName, taskName, 'open', timestamp);
-                });
-            });
+            const ts = Date.now();
+            getAllKnownCharacterNames().forEach(c => weeklyTaskNames.forEach(t => { const s = getCellState(c, t); if(s!=='open'&&s!=='excluded') setCellState(c, t, 'open', ts); }));
         }
 
-        function manualDailyReset() {
-            if (confirm('Force Daily Reset?')) {
-                executeDailyReset();
-                cloudData.lastDailyReset = getTargetResetTimeUTC(false);
-                applyBoardState();
-                triggerAutoSync();
-            }
-        }
+        function manualDailyReset() { if (confirm('Force Daily Reset?')) { executeDailyReset(); cloudData.lastDailyReset = getTargetResetTimeUTC(false); applyBoardState(); triggerAutoSync(); } }
+        function manualWeeklyReset() { if (confirm('Force Weekly Archive?')) { const rk = Math.max(Date.now(), getTargetResetTimeUTC(true)); executeWeeklyReset(rk); cloudData.lastWeeklyReset = rk; applyBoardState(); renderAnalytics(); triggerAutoSync(); } }
 
-        function manualWeeklyReset() {
-            if (confirm('Force Weekly Archive? This will archive current results and wipe completed weekly checks.')) {
-                const resetKey = Math.max(Date.now(), getTargetResetTimeUTC(true));
-                executeWeeklyReset(resetKey);
-                cloudData.lastWeeklyReset = resetKey;
-                applyBoardState();
-                renderAnalytics();
-                triggerAutoSync();
-            }
-        }
-
-        // ==========================================
-        // 📊 SMART LOOT-WEIGHTED ANALYTICS
-        // ==========================================
-        function clampWeight(value) { return Math.min(5, Math.max(1, Math.round(Number(value) || 1))); }
-        function getLootWeight(taskName) { return clampWeight(cloudData.settings?.lootWeights?.[taskName] ?? DEFAULT_LOOT_WEIGHTS[taskName] ?? 3); }
-        function lootWeightLabel(weight) { return ['Minor', 'Low', 'Medium', 'High', 'Critical'][clampWeight(weight) - 1]; }
-
-        function getCharacterTaskStats(charName) {
-            const stats = {};
-            weeklyTaskNames.forEach(taskName => { stats[taskName] = { missed: 0, completed: 0, excluded: 0, opportunities: 0, legacyMissed: 0 }; });
-
-            const archives = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
-            archives.forEach(([, archive]) => {
-                const taskOrder = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
-                const stateString = String(archive.states?.[charName] || '');
-                taskOrder.forEach((taskName, index) => {
-                    if (!stats[taskName]) stats[taskName] = { missed: 0, completed: 0, excluded: 0, opportunities: 0, legacyMissed: 0 };
-                    const code = stateString[index];
-                    if (!code) return;
-                    stats[taskName].opportunities++;
-                    if (code === 'x') stats[taskName].excluded++;
-                    else if (code === 'd') stats[taskName].completed++;
-                    else stats[taskName].missed++;
-                });
-            });
-
-            const legacyMissed = safeObject(cloudData.history?.[charName]?.missed);
-            for (const [taskName, countValue] of Object.entries(legacyMissed)) {
-                if (!stats[taskName]) stats[taskName] = { missed: 0, completed: 0, excluded: 0, opportunities: 0, legacyMissed: 0 };
-                const count = Math.max(0, Number(countValue) || 0);
-                stats[taskName].missed += count;
-                stats[taskName].legacyMissed += count;
-            }
-            return stats;
-        }
-
-        function calculatePriority(taskName, stat) {
-            const weight = getLootWeight(taskName);
-            const eligible = stat.missed + stat.completed;
-            const missRate = eligible ? stat.missed / eligible : 0;
-            const missVolume = Math.min(1, stat.missed / 3);
-            const historyConfidence = Math.min(1, Math.max(eligible, stat.opportunities) / 4);
-            const naRate = stat.opportunities ? stat.excluded / stat.opportunities : 0;
-            const naPenalty = 1 - (0.65 * naRate);
-            const score = weight * (0.55 * missRate + 0.30 * missVolume + 0.15 * historyConfidence) * naPenalty * 20;
-            return { taskName, ...stat, weight, eligible, missRate, naRate, score: Math.max(0, Math.round(score)) };
-        }
-
-        function getRateHistory(charName) {
-            const legacyRates = Array.isArray(cloudData.history?.[charName]?.rates) ? cloudData.history[charName].rates : [];
-            const archiveRates = Object.entries(safeObject(cloudData.weeklyArchive))
-                .sort((a, b) => Number(a[0]) - Number(b[0]))
-                .map(([, archive]) => Number(archive.rates?.[charName])).filter(Number.isFinite);
-            return [...legacyRates, ...archiveRates].slice(-5);
-        }
+        function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
+        function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
 
         function renderAnalytics() {
-            const container = document.getElementById('analytics-grid');
-            if (!container) return;
-            container.innerHTML = '';
-
+            const cont = document.getElementById('analytics-grid');
+            if (!cont) return; cont.innerHTML = '';
             characters.forEach(char => {
-                const card = document.createElement('div');
-                card.className = 'char-card';
-                card.style.borderTopColor = char.color;
+                const card = document.createElement('div'); card.className = 'char-card'; card.style.borderTopColor = char.color;
+                
+                const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>a[0]-b[0]).map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
+                const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
 
-                const rates = getRateHistory(char.name);
-                const trendHTML = rates.length
-                    ? rates.map(rate => `<span style="color:${rate > 80 ? '#b5e5c5' : (rate > 40 ? '#fceea7' : '#f7bab4')};font-weight:bold;">${rate}%</span>`).join(' <span style="color:#555;">➔</span> ')
-                    : '<div style="font-family:monospace;font-size:1rem;color:#888;">No history yet.</div>';
+                const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m: 0, c: 0, x: 0, o: 0 });
+                Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>a[0]-b[0]).forEach(([,a]) => {
+                    const order = Array.isArray(a.taskOrder) ? a.taskOrder : weeklyTaskNames;
+                    const sStr = String(a.states?.[char.name] || '');
+                    order.forEach((t, i) => { if(!stats[t])stats[t]={m:0,c:0,x:0,o:0}; if(sStr[i]) { stats[t].o++; if(sStr[i]==='x')stats[t].x++; else if(sStr[i]==='d')stats[t].c++; else stats[t].m++; } });
+                });
+                
+                const p = Object.entries(stats).map(([t, s]) => {
+                    const e = s.m + s.c, w = getLootWeight(t);
+                    return { t, m: s.m, e, x: s.x, w, sc: Math.max(0, Math.round(w * (0.55 * (e?s.m/e:0) + 0.3 * Math.min(1,s.m/3) + 0.15 * Math.min(1,Math.max(e,s.o)/4)) * (1-(0.65*(s.o?s.x/s.o:0))) * 20)) };
+                }).filter(x => x.m > 0).sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m).slice(0, 3);
+                
+                const prioHTML = p.length ? p.map(i => `<div class="missed-item"><div><strong>${escapeHTML(i.t)}</strong><div style="color:#aaa;font-size:0.75rem;">${i.m}/${i.e||i.m} missed • ${i.x} N/A • L${i.w}</div></div><div style="background:#262630;padding:5px;border-radius:5px;color:#ffd27d;font-weight:bold;">P${i.sc}</div></div>`).join('') : '<div class="missed-item" style="color:#b5e5c5;">No priorities yet.</div>';
 
-                const priorities = Object.entries(getCharacterTaskStats(char.name))
-                    .map(([taskName, stat]) => calculatePriority(taskName, stat))
-                    .filter(item => item.missed > 0)
-                    .sort((a, b) => b.score - a.score || b.weight - a.weight || b.missed - a.missed).slice(0, 3);
-
-                const priorityHTML = priorities.length
-                    ? priorities.map(item => {
-                        const denominator = item.eligible || item.missed;
-                        const legacyNote = item.legacyMissed ? ` • ${item.legacyMissed} legacy` : '';
-                        return `<div class="missed-item priority-item">
-                                <div class="priority-main">
-                                    <div class="priority-task">${escapeHTML(item.taskName)}</div>
-                                    <div class="priority-meta">${item.missed}/${denominator} eligible missed • ${item.excluded} N/A • Loot ${item.weight}/5 ${lootWeightLabel(item.weight)}${legacyNote}</div>
-                                </div>
-                                <div class="priority-score">P${item.score}</div>
-                            </div>`;
-                    }).join('')
-                    : '<div class="missed-item" style="color:#b5e5c5;">No historical loot priorities yet.</div>';
-
-                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}</div>
-                    <div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Completion Trend</div>${trendHTML}</div>
-                    <div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${priorityHTML}</div>`;
-                container.appendChild(card);
+                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}</div><div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${prioHTML}</div>`;
+                cont.appendChild(card);
             });
         }
+        function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]); }
 
-        function escapeHTML(value) {
-            return String(value).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]);
-        }
-
-        // ==========================================
-        // 💰 SCHOLARSHIP ESTATE LEDGER
-        // ==========================================
-        function openScholarModal() { 
-            renderScholarLedger();
-            openModal('scholar-modal'); 
-        }
-        
+        function openScholarModal() { renderScholarLedger(); openModal('scholar-modal'); }
         function submitScholarLog(player) {
-            const type = document.getElementById(`scholar-type-${player}`).value;
-            
-            // Safe DOM queries
-            const goldEl = document.getElementById(`scholar-gold-${player}`);
-            const diaEl = document.getElementById(`scholar-dia-${player}`);
-            const eolEl = document.getElementById(`scholar-eol-${player}`);
-            const noteEl = document.getElementById(`scholar-note-${player}`);
-            
-            const gold = goldEl ? parseFloat(goldEl.value) || 0 : 0;
-            const dia = diaEl ? parseFloat(diaEl.value) || 0 : 0;
-            const eol = eolEl ? parseFloat(eolEl.value) || 0 : 0;
-            const note = noteEl ? noteEl.value.trim() : '';
-
-            if (gold === 0 && dia === 0 && eol === 0) return;
-
-            const logId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-            cloudData.scholarship[player].logs[logId] = {
-                timestamp: Date.now(),
-                type, gold, dia, eol, note
-            };
+            const g = parseFloat(document.getElementById(`scholar-gold-${player}`)?.value) || 0, d = parseFloat(document.getElementById(`scholar-dia-${player}`)?.value) || 0, e = parseFloat(document.getElementById(`scholar-eol-${player}`)?.value) || 0, n = document.getElementById(`scholar-note-${player}`)?.value.trim() || '';
+            if (!g && !d && !e) return;
+            cloudData.scholarship[player].logs[Date.now().toString(36)+Math.random().toString(36).substr(2,5)] = { timestamp: Date.now(), type: document.getElementById(`scholar-type-${player}`).value, gold: g, dia: d, eol: e, note: n };
             cloudData.updatedAt = Date.now();
-            
-            ['gold', 'dia', 'eol', 'note'].forEach(f => {
-                const el = document.getElementById(`scholar-${f}-${player}`);
-                if (el) el.value = '';
-            });
-            
-            renderScholarLedger();
-            
-            // IMMEDIATE SYNC: Log submissions are financial data, don't wait for the 1.5s timer incase tab is closed
-            persistLocalData();
-            forceSync(false);
+            ['gold', 'dia', 'eol', 'note'].forEach(f => { const el = document.getElementById(`scholar-${f}-${player}`); if(el) el.value = ''; });
+            renderScholarLedger(); persistLocalData(); forceSync(false);
         }
-
-        function deleteScholarLog(player, logId) {
-            if (!confirm('Remove this log entry?')) return;
-            
-            if (cloudData.scholarship[player].logs[logId]) {
-                cloudData.scholarship[player].logs[logId].deleted = true;
-                cloudData.updatedAt = Date.now();
-                renderScholarLedger();
-                
-                // IMMEDIATE SYNC
-                persistLocalData();
-                forceSync(false);
-            }
-        }
-
+        function deleteScholarLog(player, id) { if (!confirm('Remove log?')) return; if (cloudData.scholarship[player].logs[id]) { cloudData.scholarship[player].logs[id].deleted = true; cloudData.updatedAt = Date.now(); renderScholarLedger(); persistLocalData(); forceSync(false); } }
         function renderScholarLedger() {
-            ['cheean', 'bio', 'idontheal'].forEach(player => {
-                const logsObj = cloudData.scholarship[player]?.logs || {};
-                const logs = Object.entries(logsObj)
-                    .filter(([id, data]) => !data.deleted) // Hide tombstoned logs
-                    .map(([id, data]) => ({ id, ...data }))
-                    .sort((a, b) => b.timestamp - a.timestamp);
-
-                let balGold = 0, balDia = 0, balEol = 0;
-                
-                logs.forEach(l => {
-                    if (l.type === 'income') {
-                        balGold += (l.gold / 2);
-                        balDia += (l.dia / 2);
-                        balEol += (l.eol / 2);
-                    } else {
-                        balGold -= l.gold;
-                        balDia -= l.dia;
-                        balEol -= l.eol;
-                    }
-                });
-
-                const balGoldEl = document.getElementById(`bal-gold-${player}`);
-                if (balGoldEl) balGoldEl.textContent = balGold.toFixed(2);
-                
-                const balDiaEl = document.getElementById(`bal-dia-${player}`);
-                if (balDiaEl) balDiaEl.textContent = balDia.toFixed(1);
-                
-                const balEolEl = document.getElementById(`bal-eol-${player}`);
-                if (balEolEl) balEolEl.textContent = balEol.toFixed(1);
-
-                const historyContainer = document.getElementById(`scholar-history-${player}`);
-                if (!historyContainer) return;
-                
-                if (logs.length === 0) {
-                    historyContainer.innerHTML = '<div style="color:#888; font-size:0.85rem; padding:10px;">No logs recorded yet.</div>';
-                } else {
-                    historyContainer.innerHTML = logs.map(l => {
-                        const isInc = l.type === 'income';
-                        const sign = isInc ? '+' : '-';
-                        const cls = isInc ? 'scholar-log-income' : 'scholar-log-deposit';
-                        const date = new Date(l.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        const values = [];
-                        
-                        if(l.gold) values.push(`${sign}${(isInc ? l.gold/2 : l.gold).toFixed(2)}g`);
-                        if(l.dia) values.push(`${sign}${(isInc ? l.dia/2 : l.dia).toFixed(1)} Dia`);
-                        if(l.eol) values.push(`${sign}${(isInc ? l.eol/2 : l.eol).toFixed(1)} EoL`);
-                        
-                        let noteHTML = l.note ? `<br><span style="color:#aaa; font-weight:normal; font-size:0.75rem;">${escapeHTML(l.note)}</span>` : '';
-                        
-                        return `
-                        <div class="scholar-log-item">
-                            <div class="scholar-log-date">${date}</div>
-                            <div class="scholar-log-msg ${cls}">
-                                ${values.join(', ')}
-                                ${noteHTML}
-                            </div>
-                            <button class="scholar-del-btn" onclick="deleteScholarLog('${player}', '${l.id}')" title="Delete Log">×</button>
-                        </div>`;
-                    }).join('');
-                }
+            ['cheean', 'bio', 'idontheal'].forEach(p => {
+                let bg=0, bd=0, be=0; const logs = Object.entries(cloudData.scholarship[p]?.logs||{}).filter(([,d])=>!d.deleted).map(([id,d])=>({id,...d})).sort((a,b)=>b.timestamp-a.timestamp);
+                logs.forEach(l => { if(l.type==='income'){bg+=l.gold/2;bd+=l.dia/2;be+=l.eol/2;}else{bg-=l.gold;bd-=l.dia;be-=l.eol;} });
+                ['gold','dia','eol'].forEach(f => { const el = document.getElementById(`bal-${f}-${p}`); if(el) el.textContent = (f==='gold'?bg:f==='dia'?bd:be).toFixed(f==='gold'?2:1); });
+                const cont = document.getElementById(`scholar-history-${p}`); if(!cont) return;
+                cont.innerHTML = logs.length ? logs.map(l => {
+                    const isInc=l.type==='income', s=isInc?'+':'-', vals=[];
+                    if(l.gold) vals.push(`${s}${(isInc?l.gold/2:l.gold).toFixed(2)}g`); if(l.dia) vals.push(`${s}${(isInc?l.dia/2:l.dia).toFixed(1)} Dia`); if(l.eol) vals.push(`${s}${(isInc?l.eol/2:l.eol).toFixed(1)} EoL`);
+                    return `<div class="scholar-log-item"><div class="scholar-log-date">${new Date(l.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div><div class="scholar-log-msg ${isInc?'scholar-log-income':'scholar-log-deposit'}">${vals.join(', ')}${l.note?`<br><span style="color:#aaa;font-weight:normal;font-size:0.75rem;">${escapeHTML(l.note)}</span>`:''}</div><button class="scholar-del-btn" onclick="deleteScholarLog('${p}', '${l.id}')">×</button></div>`;
+                }).join('') : '<div style="color:#888;padding:10px;">No logs yet.</div>';
             });
         }
 
-        // ==========================================
-        // 🎁 LOOT WEIGHT SETTINGS
-        // ==========================================
         function buildLootWeightEditor() {
-            const editor = document.getElementById('weight-editor');
-            if (!editor) return;
-            editor.innerHTML = weeklyTaskNames.map(taskName => {
-                const selectedWeight = getLootWeight(taskName);
-                const options = [1, 2, 3, 4, 5].map(w => `<option value="${w}" ${w === selectedWeight ? 'selected' : ''}>${w}</option>`).join('');
-                return `<div class="weight-row">
-                        <div>${escapeHTML(taskName)}</div>
-                        <select data-weight-task="${escapeHTML(taskName)}">${options}</select>
-                        <div class="weight-label" data-weight-label="${escapeHTML(taskName)}">${lootWeightLabel(selectedWeight)}</div>
-                    </div>`;
-            }).join('');
-            editor.querySelectorAll('select[data-weight-task]').forEach(select => {
-                select.addEventListener('change', () => {
-                    const taskName = select.dataset.weightTask;
-                    const label = editor.querySelector(`[data-weight-label="${CSS.escape(taskName)}"]`);
-                    if (label) label.textContent = lootWeightLabel(select.value);
-                });
-            });
+            document.getElementById('weight-editor').innerHTML = weeklyTaskNames.map(t => `<div class="weight-row"><div>${escapeHTML(t)}</div><select data-weight-task="${escapeHTML(t)}">${[1,2,3,4,5].map(w=>`<option value="${w}" ${w===getLootWeight(t)?'selected':''}>${w}</option>`).join('')}</select><div class="weight-label" data-weight-label="${escapeHTML(t)}">${['Minor','Low','Medium','High','Critical'][getLootWeight(t)-1]}</div></div>`).join('');
+            document.querySelectorAll('select[data-weight-task]').forEach(sel => sel.addEventListener('change', () => { const l = document.querySelector(`[data-weight-label="${CSS.escape(sel.dataset.weightTask)}"]`); if(l) l.textContent = ['Minor','Low','Medium','High','Critical'][sel.value-1]; }));
         }
-
-        function saveLootWeights() {
-            const timestamp = Date.now();
-            document.querySelectorAll('select[data-weight-task]').forEach(select => {
-                const taskName = select.dataset.weightTask;
-                cloudData.settings.lootWeights[taskName] = clampWeight(select.value);
-                cloudData.settings.lootWeightUpdatedAt[taskName] = timestamp;
-            });
-            renderAnalytics();
-            triggerAutoSync();
-            closeModal('weights-modal');
-        }
-
-        function resetLootWeights() {
-            if (!confirm('Reset all loot gravity weights to the built-in defaults?')) return;
-            const timestamp = Date.now();
-            weeklyTaskNames.forEach(taskName => {
-                cloudData.settings.lootWeights[taskName] = clampWeight(DEFAULT_LOOT_WEIGHTS[taskName] || 3);
-                cloudData.settings.lootWeightUpdatedAt[taskName] = timestamp;
-            });
-            buildLootWeightEditor();
-            renderAnalytics();
-            triggerAutoSync();
-        }
-
+        function saveLootWeights() { const ts = Date.now(); document.querySelectorAll('select[data-weight-task]').forEach(sel => { cloudData.settings.lootWeights[sel.dataset.weightTask] = clampWeight(sel.value); cloudData.settings.lootWeightUpdatedAt[sel.dataset.weightTask] = ts; }); renderAnalytics(); triggerAutoSync(); closeModal('weights-modal'); }
+        function resetLootWeights() { if (!confirm('Reset?')) return; const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(DEFAULT_LOOT_WEIGHTS[t]||3); cloudData.settings.lootWeightUpdatedAt[t] = ts; }); buildLootWeightEditor(); renderAnalytics(); triggerAutoSync(); }
         function openWeightsModal() { buildLootWeightEditor(); openModal('weights-modal'); }
 
-        // ==========================================
-        // 🧾 ROSTER REGISTRATION
-        // ==========================================
+        // --- Drag & Drop Variables ---
+        let dragSrcData = null; 
+        
         function getRosters() { return cloudData.settings.rosters; }
-        function findRoster(rosterId) { return getRosters().find(r => r.id === rosterId); }
-        function createRosterId(ownerName) { return `${String(ownerName || 'roster').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'roster'}-${Date.now().toString(36)}`; }
-        function touchRosterSettings() {
-            cloudData.settings.rosterUpdatedAt = Date.now();
-            cloudData.settings.rosterUpdatedBy = deviceId;
-            cloudData.updatedAt = Math.max(cloudData.updatedAt || 0, cloudData.settings.rosterUpdatedAt);
-        }
+        function findRoster(id) { return getRosters().find(r => r.id === id); }
+        function touchRosterSettings() { cloudData.settings.rosterUpdatedAt = Date.now(); cloudData.settings.rosterUpdatedBy = deviceId; cloudData.updatedAt = Date.now(); }
 
         function renderRosterRegistration() {
-            const select = document.getElementById('registration-roster-select');
-            const list = document.getElementById('roster-management-list');
-            if (!select || !list) return;
-
-            const previousSelection = select.value;
-            select.innerHTML = '<option value="__new__">＋ Create a new owner group</option>' + getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
-            select.value = getRosters().some(r => r.id === previousSelection) ? previousSelection : '__new__';
-            handleRegistrationRosterChange(false);
-
-            list.innerHTML = getRosters().length ? getRosters().map(roster => {
-                const characterChips = roster.characters.length ? roster.characters.map(char => `<span class="character-chip">${escapeHTML(char)}<button type="button" class="remove-character-button" data-roster-id="${escapeHTML(roster.id)}" data-character-name="${escapeHTML(char)}" title="Remove">×</button></span>`).join('') : '<div class="empty-roster-note">No characters yet.</div>';
-                return `<div class="roster-editor-card">
-                        <div class="roster-editor-head" style="border-top:4px solid ${normalizeColor(roster.color)};">
-                            <input class="roster-name-input" data-roster-name="${escapeHTML(roster.id)}" maxlength="30" value="${escapeHTML(roster.name)}">
-                            <input type="color" data-roster-color="${escapeHTML(roster.id)}" value="${normalizeColor(roster.color)}">
-                            <button class="btn btn-roster save-roster-button" type="button" data-roster-id="${escapeHTML(roster.id)}">Save</button>
-                            <button class="btn btn-danger delete-roster-button" type="button" data-roster-id="${escapeHTML(roster.id)}">Remove</button>
-                        </div>
-                        <div class="character-chip-list">${characterChips}</div>
-                    </div>`;
-            }).join('') : '<div class="empty-roster-note">No owner groups exist yet.</div>';
-
-            list.querySelectorAll('.save-roster-button').forEach(btn => btn.addEventListener('click', () => saveRosterGroup(btn.dataset.rosterId)));
-            list.querySelectorAll('.delete-roster-button').forEach(btn => btn.addEventListener('click', () => removeRosterGroup(btn.dataset.rosterId)));
-            list.querySelectorAll('.remove-character-button').forEach(btn => btn.addEventListener('click', () => removeCharacterFromRoster(btn.dataset.rosterId, btn.dataset.characterName)));
+            const sel = document.getElementById('registration-roster-select'), list = document.getElementById('roster-management-list');
+            if(!sel||!list) return;
+            const cur = sel.value; sel.innerHTML = '<option value="__new__">＋ Create new group</option>' + getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
+            sel.value = getRosters().some(r => r.id === cur) ? cur : '__new__'; handleRegistrationRosterChange(false);
+            list.innerHTML = getRosters().length ? getRosters().map(r => `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><input class="roster-name-input" data-roster-name="${escapeHTML(r.id)}" maxlength="30" value="${escapeHTML(r.name)}"><input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save</button><button class="btn btn-danger" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Remove</button></div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="true" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')">×</button></span>`).join('') : '<div style="color:#aaa;">No characters yet.</div>'}</div></div>`).join('') : '<div style="color:#aaa;">No groups yet.</div>';
+            attachDragDropListeners();
         }
 
-        function handleRegistrationRosterChange(resetInputs = true) {
-            const select = document.getElementById('registration-roster-select');
-            const newFields = document.getElementById('registration-new-owner-fields');
-            const ownerInput = document.getElementById('registration-owner-name');
-            const colorInput = document.getElementById('registration-color');
-            if (!select || !newFields || !ownerInput || !colorInput) return;
-
-            const isNew = select.value === '__new__';
-            newFields.style.display = isNew ? 'grid' : 'none';
-            if (isNew) {
-                if (resetInputs) ownerInput.value = '';
-                colorInput.disabled = false;
-                if (resetInputs) colorInput.value = '#7aa2f7';
-            } else {
-                const roster = findRoster(select.value);
-                if (roster) colorInput.value = normalizeColor(roster.color);
-                colorInput.disabled = true;
-            }
+        function handleRegistrationRosterChange(reset=true) {
+            const isNew = document.getElementById('registration-roster-select').value === '__new__';
+            document.getElementById('registration-new-owner-fields').style.display = isNew ? 'grid' : 'none';
+            if(isNew) { if(reset){ document.getElementById('registration-owner-name').value=''; document.getElementById('registration-color').value='#7aa2f7'; } document.getElementById('registration-color').disabled=false; }
+            else { const r = findRoster(document.getElementById('registration-roster-select').value); if(r) document.getElementById('registration-color').value=r.color; document.getElementById('registration-color').disabled=true; }
         }
 
         function registerCharacter() {
-            const select = document.getElementById('registration-roster-select');
-            const ownerInput = document.getElementById('registration-owner-name');
-            const colorInput = document.getElementById('registration-color');
-            const characterInput = document.getElementById('registration-character-name');
-            const charName = characterInput.value.trim();
-
-            if (!charName) { alert('Enter character name.'); return; }
-            if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === charName.toLowerCase()))) { alert('Character name already registered.'); return; }
-
-            let roster;
-            if (select.value === '__new__') {
-                const ownerName = ownerInput.value.trim();
-                if (!ownerName) { alert('Enter owner name.'); return; }
-                roster = { id: createRosterId(ownerName), name: ownerName.slice(0, 30), color: normalizeColor(colorInput.value), characters: [] };
-                getRosters().push(roster);
-            } else {
-                roster = findRoster(select.value);
-                if (!roster) return;
-            }
-
-            roster.characters.push(charName.slice(0, 40));
-            touchRosterSettings();
-            characterInput.value = '';
-            refreshTrackerUI();
-            document.getElementById('registration-roster-select').value = roster.id;
-            handleRegistrationRosterChange(false);
-            triggerAutoSync();
+            const v = document.getElementById('registration-character-name').value.trim(); if(!v) return alert('Enter character name.');
+            if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === v.toLowerCase()))) return alert('Character exists.');
+            let r; if (document.getElementById('registration-roster-select').value === '__new__') { const n = document.getElementById('registration-owner-name').value.trim(); if(!n) return alert('Enter owner.'); r = { id: `roster-${Date.now().toString(36)}`, name: n.slice(0,30), color: normalizeColor(document.getElementById('registration-color').value), characters: [] }; getRosters().push(r); }
+            else r = findRoster(document.getElementById('registration-roster-select').value);
+            r.characters.push(v.slice(0,40)); touchRosterSettings(); document.getElementById('registration-character-name').value=''; refreshTrackerUI(); document.getElementById('registration-roster-select').value = r.id; handleRegistrationRosterChange(false); triggerAutoSync();
         }
 
-        function saveRosterGroup(rosterId) {
-            const roster = findRoster(rosterId);
-            const nameInput = document.querySelector(`[data-roster-name="${CSS.escape(rosterId)}"]`);
-            const colorInput = document.querySelector(`[data-roster-color="${CSS.escape(rosterId)}"]`);
-            if (!roster || !nameInput || !colorInput) return;
-            roster.name = nameInput.value.trim().slice(0, 30) || roster.name;
-            roster.color = normalizeColor(colorInput.value, roster.color);
-            touchRosterSettings();
-            refreshTrackerUI();
-            triggerAutoSync();
-        }
-
-        function removeCharacterFromRoster(rosterId, charName) {
-            const roster = findRoster(rosterId);
-            if (!roster || !confirm(`Remove ${charName}?`)) return;
-            roster.characters = roster.characters.filter(n => n !== charName);
-            touchRosterSettings();
-            refreshTrackerUI();
-            triggerAutoSync();
-        }
-
-        function removeRosterGroup(rosterId) {
-            const roster = findRoster(rosterId);
-            if (!roster || !confirm(`Remove group ${roster.name}?`)) return;
-            cloudData.settings.rosters = getRosters().filter(r => r.id !== rosterId);
-            touchRosterSettings();
-            refreshTrackerUI();
-            triggerAutoSync();
-        }
+        function saveRosterGroup(id) { const r = findRoster(id); if(r) { r.name = document.querySelector(`[data-roster-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || r.name; r.color = normalizeColor(document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`).value, r.color); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); } }
+        function removeCharacterFromRoster(id, n) { const r = findRoster(id); if(r && confirm(`Remove ${n}?`)) { r.characters = r.characters.filter(c => c !== n); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); } }
+        function removeRosterGroup(id) { if(confirm('Remove group?')) { cloudData.settings.rosters = getRosters().filter(r => r.id !== id); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); } }
         
-        // ==========================================
-        // 🏰 DUNGEON REGISTRATION
-        // ==========================================
         function getCategories() { return cloudData.settings.categories; }
-        function findCategory(catId) { return getCategories().find(c => c.id === catId); }
-        function createCategoryId() { return `cat-${Date.now().toString(36)}`; }
-        function touchCategorySettings() {
-            cloudData.settings.categoriesUpdatedAt = Date.now();
-            cloudData.settings.categoriesUpdatedBy = deviceId;
-            cloudData.updatedAt = Math.max(cloudData.updatedAt || 0, cloudData.settings.categoriesUpdatedAt);
+        function findCategory(id) { return getCategories().find(c => c.id === id); }
+        function touchCategorySettings() { cloudData.settings.categoriesUpdatedAt = Date.now(); cloudData.settings.categoriesUpdatedBy = deviceId; cloudData.updatedAt = Date.now(); }
+
+        function renderPastelPalette() {
+            const container = document.getElementById('reg-dungeon-palette');
+            if(!container) return;
+            container.innerHTML = PASTEL_COLORS.map(c => `<div class="swatch" style="background-color: ${c}" data-color="${c}"></div>`).join('');
+            container.querySelectorAll('.swatch').forEach(sw => sw.addEventListener('click', () => {
+                container.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+                sw.classList.add('active');
+                document.getElementById('reg-dungeon-color').value = sw.dataset.color;
+            }));
         }
 
         function renderDungeonRegistration() {
-            const select = document.getElementById('reg-dungeon-cat-select');
-            const list = document.getElementById('dungeon-management-list');
-            if (!select || !list) return;
-
-            const prevSelect = select.value;
-            select.innerHTML = '<option value="__new__">＋ Create new category</option>' + getCategories().map(c => `<option value="${escapeHTML(c.id)}">[${escapeHTML(c.group)}] ${escapeHTML(c.name)}</option>`).join('');
-            select.value = getCategories().some(c => c.id === prevSelect) ? prevSelect : '__new__';
-            handleDungeonCatChange(false);
-
-            list.innerHTML = getCategories().length ? getCategories().map(cat => {
-                const taskChips = cat.tasks.length ? cat.tasks.map(t => `<span class="character-chip">${escapeHTML(t)}<button type="button" class="remove-task-button" data-cat-id="${escapeHTML(cat.id)}" data-task-name="${escapeHTML(t)}" title="Remove">×</button></span>`).join('') : '<div class="empty-roster-note">No tasks yet.</div>';
-                return `<div class="roster-editor-card">
-                        <div class="roster-editor-head dungeon-editor-head" style="border-top:4px solid ${normalizeColor(cat.color, '#fff')};">
-                            <input class="roster-name-input" data-cat-name="${escapeHTML(cat.id)}" maxlength="30" value="${escapeHTML(cat.name)}">
-                            <select data-cat-group="${escapeHTML(cat.id)}" style="background-color:#17171d;color:#fff;">
-                                <option value="Weeklies" ${cat.group==='Weeklies'?'selected':''}>Weeklies</option>
-                                <option value="Dailies" ${cat.group==='Dailies'?'selected':''}>Dailies</option>
-                            </select>
-                            <input type="color" data-cat-color="${escapeHTML(cat.id)}" value="${normalizeColor(cat.color, '#ffffff')}">
-                            <button class="btn btn-dungeon save-cat-button" type="button" data-cat-id="${escapeHTML(cat.id)}">Save</button>
-                            <button class="btn btn-danger delete-cat-button" type="button" data-cat-id="${escapeHTML(cat.id)}">Remove</button>
-                        </div>
-                        <div class="character-chip-list">${taskChips}</div>
-                    </div>`;
-            }).join('') : '<div class="empty-roster-note">No categories exist yet.</div>';
-
-            list.querySelectorAll('.save-cat-button').forEach(btn => btn.addEventListener('click', () => saveCategoryGroup(btn.dataset.catId)));
-            list.querySelectorAll('.delete-cat-button').forEach(btn => btn.addEventListener('click', () => removeCategoryGroup(btn.dataset.catId)));
-            list.querySelectorAll('.remove-task-button').forEach(btn => btn.addEventListener('click', () => removeTaskFromCategory(btn.dataset.catId, btn.dataset.taskName)));
+            renderPastelPalette();
+            const sel = document.getElementById('reg-dungeon-cat-select'), list = document.getElementById('dungeon-management-list');
+            if(!sel||!list) return;
+            const cur = sel.value; sel.innerHTML = '<option value="__new__">＋ Create new category</option>' + getCategories().map(c => `<option value="${escapeHTML(c.id)}">[${escapeHTML(c.group)}] ${escapeHTML(c.name)}</option>`).join('');
+            sel.value = getCategories().some(c => c.id === cur) ? cur : '__new__'; handleDungeonCatChange(false);
+            
+            list.innerHTML = getCategories().length ? getCategories().map(c => `<div class="roster-editor-card"><div class="roster-editor-head dungeon-editor-head" style="border-top:4px solid ${c.color};"><input class="roster-name-input" data-cat-name="${escapeHTML(c.id)}" maxlength="30" value="${escapeHTML(c.name)}"><select data-cat-group="${escapeHTML(c.id)}" style="background-color:#17171d;color:#fff;"><option value="Weeklies" ${c.group==='Weeklies'?'selected':''}>Weeklies</option><option value="Dailies" ${c.group==='Dailies'?'selected':''}>Dailies</option></select><input type="color" data-cat-color="${escapeHTML(c.id)}" value="${c.color}"><button class="btn btn-dungeon" type="button" onclick="saveCategoryGroup('${escapeHTML(c.id)}')">Save</button><button class="btn btn-danger" type="button" onclick="removeCategoryGroup('${escapeHTML(c.id)}')">Remove</button></div><div class="character-chip-list" data-drag-list="dungeon" data-parent-id="${escapeHTML(c.id)}">${c.tasks.length ? c.tasks.map((t, i) => `<span class="character-chip" draggable="true" data-type="dungeon" data-parent="${escapeHTML(c.id)}" data-index="${i}">${escapeHTML(t)}<button type="button" onclick="removeTaskFromCategory('${escapeHTML(c.id)}', '${escapeHTML(t)}')">×</button></span>`).join('') : '<div style="color:#aaa;">No tasks yet.</div>'}</div></div>`).join('') : '<div style="color:#aaa;">No categories yet.</div>';
+            attachDragDropListeners();
         }
 
-        function handleDungeonCatChange(resetInputs = true) {
-            const select = document.getElementById('reg-dungeon-cat-select');
-            const newFields = document.getElementById('reg-dungeon-new-cat-fields');
-            const nameInput = document.getElementById('reg-dungeon-cat-name');
-            const colorInput = document.getElementById('reg-dungeon-color');
-            const groupSelect = document.getElementById('reg-dungeon-cat-group');
-            if (!select || !newFields || !nameInput || !colorInput) return;
-
-            const isNew = select.value === '__new__';
-            newFields.style.display = isNew ? 'grid' : 'none';
-            if (isNew) {
-                if (resetInputs) nameInput.value = '';
-                colorInput.disabled = false;
-                if (resetInputs) colorInput.value = '#ffffff';
+        function handleDungeonCatChange(reset=true) {
+            const isNew = document.getElementById('reg-dungeon-cat-select').value === '__new__';
+            document.getElementById('reg-dungeon-new-cat-fields').style.display = isNew ? 'grid' : 'none';
+            const pal = document.getElementById('reg-dungeon-palette');
+            if(isNew) {
+                if(reset){ document.getElementById('reg-dungeon-cat-name').value=''; document.getElementById('reg-dungeon-color').value='#ffffff'; }
+                pal.style.pointerEvents = 'auto'; pal.style.opacity = '1';
+                const ac = document.getElementById('reg-dungeon-color').value;
+                pal.querySelectorAll('.swatch').forEach(s => s.dataset.color === ac ? s.classList.add('active') : s.classList.remove('active'));
             } else {
-                const cat = findCategory(select.value);
-                if (cat) {
-                    colorInput.value = normalizeColor(cat.color, '#ffffff');
-                    groupSelect.value = cat.group;
+                const c = findCategory(document.getElementById('reg-dungeon-cat-select').value);
+                if(c) {
+                    document.getElementById('reg-dungeon-color').value = c.color;
+                    pal.querySelectorAll('.swatch').forEach(s => s.dataset.color.toLowerCase() === c.color.toLowerCase() ? s.classList.add('active') : s.classList.remove('active'));
                 }
-                colorInput.disabled = true;
+                pal.style.pointerEvents = 'none'; pal.style.opacity = '0.5';
             }
         }
 
         function registerDungeonTask() {
-            const select = document.getElementById('reg-dungeon-cat-select');
-            const nameInput = document.getElementById('reg-dungeon-cat-name');
-            const colorInput = document.getElementById('reg-dungeon-color');
-            const groupSelect = document.getElementById('reg-dungeon-cat-group');
-            const taskInput = document.getElementById('reg-dungeon-task-name');
-            const taskName = taskInput.value.trim();
-
-            if (!taskName) { alert('Enter task name.'); return; }
-            if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === taskName.toLowerCase()))) { alert('Task name already exists.'); return; }
-
-            let cat;
-            if (select.value === '__new__') {
-                const catName = nameInput.value.trim();
-                if (!catName) { alert('Enter category name.'); return; }
-                cat = { id: createCategoryId(), group: groupSelect.value, name: catName.slice(0, 30), color: normalizeColor(colorInput.value, '#ffffff'), tasks: [] };
-                getCategories().push(cat);
-            } else {
-                cat = findCategory(select.value);
-                if (!cat) return;
-            }
-
-            cat.tasks.push(taskName.slice(0, 40));
-            touchCategorySettings();
-            taskInput.value = '';
-            refreshTrackerUI();
-            document.getElementById('reg-dungeon-cat-select').value = cat.id;
-            handleDungeonCatChange(false);
-            triggerAutoSync();
+            const v = document.getElementById('reg-dungeon-task-name').value.trim(); if(!v) return alert('Enter task name.');
+            if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === v.toLowerCase()))) return alert('Task exists.');
+            let c; if (document.getElementById('reg-dungeon-cat-select').value === '__new__') { const n = document.getElementById('reg-dungeon-cat-name').value.trim(); if(!n) return alert('Enter category.'); c = { id: `cat-${Date.now().toString(36)}`, group: document.getElementById('reg-dungeon-cat-group').value, name: n.slice(0,30), color: normalizeColor(document.getElementById('reg-dungeon-color').value, '#ffffff'), tasks: [] }; getCategories().push(c); }
+            else c = findCategory(document.getElementById('reg-dungeon-cat-select').value);
+            c.tasks.push(v.slice(0,40)); touchCategorySettings(); document.getElementById('reg-dungeon-task-name').value=''; refreshTrackerUI(); document.getElementById('reg-dungeon-cat-select').value = c.id; handleDungeonCatChange(false); triggerAutoSync();
         }
         
-        function saveCategoryGroup(catId) {
-            const cat = findCategory(catId);
-            const nameInput = document.querySelector(`[data-cat-name="${CSS.escape(catId)}"]`);
-            const colorInput = document.querySelector(`[data-cat-color="${CSS.escape(catId)}"]`);
-            const groupInput = document.querySelector(`[data-cat-group="${CSS.escape(catId)}"]`);
-            if (!cat || !nameInput || !colorInput || !groupInput) return;
-            cat.name = nameInput.value.trim().slice(0, 30) || cat.name;
-            cat.color = normalizeColor(colorInput.value, '#ffffff');
-            cat.group = groupInput.value;
-            touchCategorySettings();
-            refreshTrackerUI();
-            triggerAutoSync();
+        function saveCategoryGroup(id) { const c = findCategory(id); if(c) { c.name = document.querySelector(`[data-cat-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || c.name; c.color = normalizeColor(document.querySelector(`[data-cat-color="${CSS.escape(id)}"]`).value, '#ffffff'); c.group = document.querySelector(`[data-cat-group="${CSS.escape(id)}"]`).value; touchCategorySettings(); refreshTrackerUI(); triggerAutoSync(); } }
+        function removeTaskFromCategory(id, t) { const c = findCategory(id); if(c && confirm(`Remove ${t}?`)) { c.tasks = c.tasks.filter(n => n !== t); touchCategorySettings(); refreshTrackerUI(); triggerAutoSync(); } }
+        function removeCategoryGroup(id) { if(confirm('Remove category?')) { cloudData.settings.categories = getCategories().filter(c => c.id !== id); touchCategorySettings(); refreshTrackerUI(); triggerAutoSync(); } }
+
+        // --- Drag and Drop Handlers ---
+        function attachDragDropListeners() {
+            document.querySelectorAll('.character-chip').forEach(chip => {
+                chip.addEventListener('dragstart', e => {
+                    dragSrcData = { type: chip.dataset.type, parent: chip.dataset.parent, index: parseInt(chip.dataset.index, 10) };
+                    chip.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                chip.addEventListener('dragend', () => { chip.classList.remove('dragging'); document.querySelectorAll('.character-chip').forEach(c => c.classList.remove('drag-over')); });
+                chip.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; chip.classList.add('drag-over'); });
+                chip.addEventListener('dragleave', () => chip.classList.remove('drag-over'));
+                chip.addEventListener('drop', e => {
+                    e.preventDefault(); chip.classList.remove('drag-over');
+                    if (!dragSrcData || dragSrcData.type !== chip.dataset.type || dragSrcData.parent !== chip.dataset.parent) return;
+                    const tgtIdx = parseInt(chip.dataset.index, 10);
+                    if (dragSrcData.index === tgtIdx) return;
+
+                    if (dragSrcData.type === 'roster') {
+                        const r = findRoster(dragSrcData.parent);
+                        const item = r.characters.splice(dragSrcData.index, 1)[0];
+                        r.characters.splice(tgtIdx, 0, item);
+                        touchRosterSettings(); renderRosterRegistration();
+                    } else if (dragSrcData.type === 'dungeon') {
+                        const c = findCategory(dragSrcData.parent);
+                        const item = c.tasks.splice(dragSrcData.index, 1)[0];
+                        c.tasks.splice(tgtIdx, 0, item);
+                        touchCategorySettings(); renderDungeonRegistration();
+                    }
+                    refreshTrackerUI(); triggerAutoSync();
+                });
+            });
+            // Allow dropping at the end of the container
+            document.querySelectorAll('.character-chip-list').forEach(list => {
+                list.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+                list.addEventListener('drop', e => {
+                    e.preventDefault(); if (e.target !== list || !dragSrcData) return;
+                    const lType = list.dataset.dragList, lParent = list.dataset.parentId;
+                    if (dragSrcData.type !== lType || dragSrcData.parent !== lParent) return;
+                    
+                    if (lType === 'roster') {
+                        const r = findRoster(lParent);
+                        if(dragSrcData.index === r.characters.length - 1) return;
+                        r.characters.push(r.characters.splice(dragSrcData.index, 1)[0]);
+                        touchRosterSettings(); renderRosterRegistration();
+                    } else {
+                        const c = findCategory(lParent);
+                        if(dragSrcData.index === c.tasks.length - 1) return;
+                        c.tasks.push(c.tasks.splice(dragSrcData.index, 1)[0]);
+                        touchCategorySettings(); renderDungeonRegistration();
+                    }
+                    refreshTrackerUI(); triggerAutoSync();
+                });
+            });
         }
 
-        function removeTaskFromCategory(catId, taskName) {
-            const cat = findCategory(catId);
-            if (!cat || !confirm(`Remove ${taskName}?`)) return;
-            cat.tasks = cat.tasks.filter(t => t !== taskName);
-            touchCategorySettings();
-            refreshTrackerUI();
-            triggerAutoSync();
-        }
-
-        function removeCategoryGroup(catId) {
-            const cat = findCategory(catId);
-            if (!cat || !confirm(`Remove category ${cat.name}?`)) return;
-            cloudData.settings.categories = getCategories().filter(c => c.id !== catId);
-            touchCategorySettings();
-            refreshTrackerUI();
-            triggerAutoSync();
-        }
-
-        // ==========================================
-        // 🖼️ MODAL CONTROLS
-        // ==========================================
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
         function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
-        function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
+        function closeDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
-            closeModal('roster-modal');
-            closeModal('dungeon-modal');
-            closeModal('scholar-modal');
+            closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal');
             if (location.hash === '#registration') { renderRosterRegistration(); openModal('roster-modal'); }
             if (location.hash === '#dungeons') { renderDungeonRegistration(); openModal('dungeon-modal'); }
         }
 
-        function loadCloudForm() {
-            const config = getCloudConfig();
-            document.getElementById('cloud-bin-id').value = config.binId;
-            document.getElementById('cloud-api-key').value = config.apiKey;
-        }
-
-        function showCloudMessage(message, isError = false) {
-            const el = document.getElementById('cloud-modal-message');
-            el.style.display = 'block';
-            el.style.borderLeftColor = isError ? '#c45858' : '#4f7cac';
-            el.textContent = message;
-        }
-
-        function saveCloudSettings(connectAfterSave = false) {
-            const config = { binId: document.getElementById('cloud-bin-id').value.trim(), apiKey: document.getElementById('cloud-api-key').value.trim() };
-            if (!config.binId || !config.apiKey) { showCloudMessage('Enter both the Bin ID and Master API key.', true); return; }
-            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(config));
-            showCloudMessage('Saved on this PC. Connecting to JSONBin...');
-            if (connectAfterSave) forceSync(true);
-        }
-
-        async function createNewCloudBin() {
-            const apiKey = document.getElementById('cloud-api-key').value.trim();
-            if (!apiKey) { showCloudMessage('Paste a Master API key first.', true); return; }
-            showCloudMessage('Creating a private JSONBin record...');
-            try {
-                const config = { binId: '', apiKey };
-                const response = await fetch(`${JSONBIN_ROOT}/b`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders(config) },
-                    body: JSON.stringify(cloudData)
-                });
-                const payload = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(payload.message || `JSONBin create failed (${response.status})`);
-                const binId = payload.metadata?.id;
-                document.getElementById('cloud-bin-id').value = binId;
-                localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId, apiKey }));
-                showCloudMessage(`Private Bin created. Bin ID: ${binId}`);
-                await forceSync(true);
-            } catch (error) { showCloudMessage(error.message, true); }
-        }
-
-        function clearCloudSettings() {
-            if (!confirm('Remove cloud settings from this PC?')) return;
-            localStorage.removeItem(CLOUD_CONFIG_KEY);
-            loadCloudForm();
-            setStatus('⚪ Local mode — cloud settings cleared');
-            showCloudMessage('Cloud settings removed from this PC.');
-        }
-
+        function loadCloudForm() { const c = getCloudConfig(); document.getElementById('cloud-bin-id').value = c.binId; document.getElementById('cloud-api-key').value = c.apiKey; }
+        function showCloudMessage(msg, isErr = false) { const el = document.getElementById('cloud-modal-message'); el.style.display = 'block'; el.style.borderLeftColor = isErr ? '#c45858' : '#4f7cac'; el.textContent = msg; }
+        function saveCloudSettings(con = false) { const c = { binId: document.getElementById('cloud-bin-id').value.trim(), apiKey: document.getElementById('cloud-api-key').value.trim() }; if (!c.binId || !c.apiKey) return showCloudMessage('Enter both ID and Key.', true); localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(c)); showCloudMessage('Saved. Connecting...'); if (con) forceSync(true); }
+        async function createNewCloudBin() { const key = document.getElementById('cloud-api-key').value.trim(); if (!key) return showCloudMessage('Paste API key first.', true); showCloudMessage('Creating...'); try { const res = await fetch(`${JSONBIN_ROOT}/b`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders({binId:'', apiKey:key}) }, body: JSON.stringify(cloudData) }); if (!res.ok) throw new Error(`Create failed (${res.status})`); const id = (await res.json()).metadata?.id; document.getElementById('cloud-bin-id').value = id; localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId: id, apiKey: key })); showCloudMessage(`Created. ID: ${id}`); await forceSync(true); } catch (e) { showCloudMessage(e.message, true); } }
+        function clearCloudSettings() { if (!confirm('Remove cloud settings?')) return; localStorage.removeItem(CLOUD_CONFIG_KEY); loadCloudForm(); setStatus('⚪ Local mode'); showCloudMessage('Cleared.'); }
         function openCloudModal() { loadCloudForm(); document.getElementById('cloud-modal-message').style.display = 'none'; openModal('cloud-modal'); }
         function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { 
-                closeModal('cloud-modal'); 
-                closeModal('weights-modal'); 
-                closeModal('scholar-modal'); 
-                closeRegistrationPage(); 
-                closeDungeonPage(); 
-            }
-        });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 </body>
 </html>
