@@ -106,6 +106,8 @@
         
         td.reset { background-color: #d9d2e9 !important; border: 2px solid #8e7cc3 !important; box-shadow: inset 0 0 8px rgba(142, 124, 195, 0.4); }
         td.reset::before { content: "🔄"; position: absolute; top: 2px; left: 4px; font-size: 0.85rem; pointer-events: none; }
+        
+        td.done { background-color: #d9ead3 !important; border: 2px solid #93c47d !important; box-shadow: inset 0 0 8px rgba(147, 196, 125, 0.3); }
 
         input[type="checkbox"] { transform: scale(1.25); cursor: pointer; accent-color: #333; position: relative; z-index: 1; margin: 0; }
 
@@ -878,8 +880,8 @@
             document.querySelectorAll('td.interactive-cell').forEach(td => {
                 const s = getCellState(td.dataset.char, td.dataset.task);
                 const cb = td.querySelector('input[type="checkbox"]');
-                td.classList.remove('excluded', 'marked', 'reset');
-                if (s === 'excluded' || s === 'marked' || s === 'reset') td.classList.add(s);
+                td.classList.remove('excluded', 'marked', 'reset', 'done');
+                if (s === 'excluded' || s === 'marked' || s === 'reset' || s === 'done') td.classList.add(s);
                 if (cb) cb.checked = s === 'done';
             });
             updateRates();
@@ -917,7 +919,12 @@
             if (!cloudData.weeklyArchive[k]) {
                 const rates = {}, states = {};
                 characters.forEach(c => {
-                    rates[c.name] = parseInt(document.getElementById(rateElementId(c.name))?.textContent, 10) || 0;
+                    let ct = 0, dn = 0;
+                    weeklyTaskNames.forEach(t => {
+                        const s = getCellState(c.name, t);
+                        if (s !== 'excluded') { ct++; if (s === 'done') dn++; }
+                    });
+                    rates[c.name] = ct ? Math.round((dn / ct) * 100) : 0;
                     states[c.name] = weeklyTaskNames.map(t => { const s = getCellState(c.name, t); return s==='done'?'d':s==='excluded'?'x':'m'; }).join('');
                 });
                 cloudData.weeklyArchive[k] = { createdAt: Date.now(), taskOrder: [...weeklyTaskNames], rates, states };
