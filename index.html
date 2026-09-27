@@ -136,7 +136,7 @@
 
     <div class="controls">
         <div>
-            <img src="https://i.imgur.com/Yw1Z11J.png" alt="Pantheon" style="height: 50px; vertical-align: middle; margin-right: 20px;">
+            <img src="Guild Banner.png" alt="Pantheon" style="height: 50px; vertical-align: middle; margin-right: 20px;">
             <span class="sync-status" id="sync-status">🟢 Loading...</span>
         </div>
         <div class="control-actions">
@@ -299,12 +299,13 @@
         // ==========================================
         
         // --- STEP 2: PASTE YOUR JSONBIN ID BELOW ---
-        const MASTER_BIN_ID = '6a6f2a68da38895dfeaf6603'; 
+        const MASTER_BIN_ID = 'PASTE_YOUR_BIN_ID_HERE'; 
         // -------------------------------------------
 
         const APP_SCHEMA_VERSION = 11; 
         const MAX_ARCHIVE_WEEKS = 12;
-        const LOCAL_DATA_KEY = 'pantheon-dn-personal-v5';
+        // Reverted to v4 to instantly recover all your hidden local data
+        const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const CLOUD_CONFIG_KEY = 'pantheon-config-v5';
         const DEVICE_ID_KEY = 'pantheon-device-id';
         const JSONBIN_ROOT = 'https://api.jsonbin.io/v3';
@@ -349,7 +350,19 @@
         function getContrastText(hex) { const c = normalizeColor(hex).slice(1); return ((parseInt(c.slice(0, 2), 16) * 299 + parseInt(c.slice(2, 4), 16) * 587 + parseInt(c.slice(4, 6), 16) * 114) / 1000) >= 150 ? '#000' : '#fff'; }
         
         function getOrCreateDeviceId() { let id = localStorage.getItem(DEVICE_ID_KEY); if (!id) { id = `device-${Date.now()}-${Math.random().toString(36)}`; localStorage.setItem(DEVICE_ID_KEY, id); } return id; }
-        function getCloudConfig() { try { return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{"adminKey":"","personalBinId":"","personalApiKey":""}'); } catch(e) { return { adminKey:'', personalBinId:'', personalApiKey:'' }; } }
+        
+        // Auto-migrate Master Key to restore Admin Buttons instantly
+        function getCloudConfig() { 
+            try { 
+                let oldConf = JSON.parse(localStorage.getItem('pantheon-jsonbin-config-v3') || '{}');
+                let newConf = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{"adminKey":"","personalBinId":"","personalApiKey":""}');
+                if (oldConf.apiKey && !newConf.adminKey) {
+                    newConf.adminKey = oldConf.apiKey;
+                    localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(newConf));
+                }
+                return newConf;
+            } catch(e) { return { adminKey:'', personalBinId:'', personalApiKey:'' }; } 
+        }
         
         // Normalization
         function normalizeData(record) {
@@ -386,24 +399,33 @@
         });
 
         async function bootApp() {
-            // 1. Load Personal Local Data
+            // 1. Load Personal Local Data (This brings back the hidden table data)
             try { personalData = normalizeData(JSON.parse(localStorage.getItem(LOCAL_DATA_KEY))); } catch(e) {}
             
             // 2. Fetch Guild Master Data
             setStatus('🟡 Fetching Guild Data...');
+            let cloudFetchSuccess = false;
             if (MASTER_BIN_ID !== 'PASTE_YOUR_BIN_ID_HERE') {
                 try {
                     const res = await fetch(`${JSONBIN_ROOT}/b/${MASTER_BIN_ID}/latest`, { cache: 'no-store' });
-                    if (res.ok) { masterData = normalizeData((await res.json()).record); }
+                    if (res.ok) { masterData = normalizeData((await res.json()).record); cloudFetchSuccess = true; }
                 } catch (e) { console.warn("Guild fetch failed", e); }
             }
 
-            // 3. Determine Admin Status
+            // 3. Determine Admin Status (Checks the auto-migrated config)
             const config = getCloudConfig();
             if (config.adminKey) isAdmin = true;
             document.body.classList.toggle('is-admin', isAdmin);
 
-            // 4. Personal Cloud Sync (If configured)
+            // 4. DATA MIGRATION: Salvage old Salary logs and categories into the new Master state
+            if (isAdmin && (!cloudFetchSuccess || masterData.settings.categories.length <= 1)) {
+                masterData.scholarship = JSON.parse(JSON.stringify(personalData.scholarship));
+                masterData.settings.categories = cloneCategories(personalData.settings.categories);
+                masterData.settings.lootWeights = JSON.parse(JSON.stringify(personalData.settings.lootWeights));
+                masterData.settings.rosters = cloneRosters(personalData.settings.rosters); 
+            }
+
+            // 5. Personal Cloud Sync (If configured)
             if (config.personalBinId && config.personalApiKey) {
                 setStatus('🟡 Fetching Personal Sync...');
                 try {
@@ -430,6 +452,7 @@
             try {
                 if (viewMode === 'guild') {
                     if (!isAdmin) return manual ? alert("You do not have the Master Key to sync Guild data.") : null;
+                    if (MASTER_BIN_ID === 'PASTE_YOUR_BIN_ID_HERE') return manual ? alert("Please add your JSONBin ID to the code first.") : null;
                     setStatus('🟡 Pushing Guild Update...');
                     const res = await fetch(`${JSONBIN_ROOT}/b/${MASTER_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': config.adminKey }, body: JSON.stringify(masterData) });
                     if (!res.ok) throw new Error("Guild sync failed.");
