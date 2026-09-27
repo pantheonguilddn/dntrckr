@@ -449,7 +449,6 @@
         // ==========================================
         const APP_SCHEMA_VERSION = 12; 
         const MAX_ARCHIVE_WEEKS = 12;
-        // Bumped version slightly to instantly clear the messy dual-state cache
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
@@ -585,7 +584,6 @@
                 document.getElementById('roster-filter').value = val;
                 applyRosterFilter();
             } else if (isPersonalView && !val) {
-                // If they remove their identity, flip back to universal
                 togglePersonalView(); 
             }
         }
@@ -640,7 +638,7 @@
         function normalizeCellRecord(value) {
             if (!value || typeof value !== 'object') return null;
             const state = ['open', 'done', 'excluded', 'marked', 'reset'].includes(value.state) ? value.state : 'open';
-            return { state, note: String(value.note || '').slice(0, 20), updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
+            return { state, note: String(value.note || '').slice(0, 40), updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
         }
 
         function normalizeData(record) {
@@ -910,7 +908,7 @@
         function setCellNote(c, t, note) {
             ensureCellMap(cloudData, c);
             const cur = cloudData.cells[c][t] || { state: 'open', updatedAt: 0 };
-            cloudData.cells[c][t] = { state: cur.state, note: String(note).slice(0,20), updatedAt: Math.max(Date.now(), cur.updatedAt + 1), deviceId };
+            cloudData.cells[c][t] = { state: cur.state, note: String(note).slice(0,40), updatedAt: Math.max(Date.now(), cur.updatedAt + 1), deviceId };
             cloudData.updatedAt = Date.now();
         }
 
@@ -919,16 +917,37 @@
             triggerAutoSync();
         }
 
+        // ==========================================
+        // 🧠 SMART BOUNTY LOGIC
+        // ==========================================
         function handleCheck(e) {
             const c = e.target.dataset.char, t = e.target.dataset.task;
             const prev = getCellState(c, t);
             setCellState(c, t, e.target.checked ? 'done' : 'open');
-            if (e.target.checked && (prev === 'marked' || prev === 'reset')) {
+            
+            // Only auto-check bounty if it was previously pinned (marked 🎯)
+            if (e.target.checked && prev === 'marked') {
                 const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
-                if (bCat) {
+                if (bCat && !bCat.tasks.includes(t)) {
+                    let targetBounty = null;
+                    
+                    // 1. First, search for a bounty slot that exactly matches this dungeon's name
                     for (const bTask of bCat.tasks) {
-                        if (getCellState(c, bTask) === 'open') { setCellState(c, bTask, 'done'); break; }
+                        const bCell = getCellRecord(c, bTask);
+                        if (bCell.state !== 'done' && bCell.note === t) {
+                            targetBounty = bTask;
+                            break;
+                        }
                     }
+                    
+                    // 2. If not found, fall back to grabbing the first available open bounty slot
+                    if (!targetBounty) {
+                        for (const bTask of bCat.tasks) {
+                            if (getCellState(c, bTask) !== 'done') { targetBounty = bTask; break; }
+                        }
+                    }
+                    
+                    if (targetBounty) setCellState(c, targetBounty, 'done');
                 }
             }
             applyBoardState(); triggerAutoSync();
@@ -937,7 +956,26 @@
         function handleRightClick(e) {
             e.preventDefault(); const c = e.currentTarget.dataset.char, t = e.currentTarget.dataset.task;
             const s = getCellState(c, t);
-            setCellState(c, t, s === 'open' || s === 'done' ? 'marked' : s === 'marked' ? 'reset' : s === 'reset' ? 'excluded' : 'open');
+            const newState = s === 'open' || s === 'done' ? 'marked' : s === 'marked' ? 'reset' : s === 'reset' ? 'excluded' : 'open';
+            setCellState(c, t, newState);
+            
+            // Auto-fill the first available bounty text box when pinning (marking 🎯) a dungeon
+            if (newState === 'marked') {
+                const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
+                if (bCat && !bCat.tasks.includes(t)) { 
+                    for (const bTask of bCat.tasks) {
+                        const bCell = getCellRecord(c, bTask);
+                        if (bCell.state !== 'done' && !bCell.note) {
+                            setCellNote(c, bTask, t);
+                            // Instantly update the text box on screen
+                            const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(bTask)}"]`);
+                            if (input) input.value = t;
+                            break;
+                        }
+                    }
+                }
+            }
+
             applyBoardState(); triggerAutoSync();
         }
 
