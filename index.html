@@ -444,6 +444,183 @@
         .help-topic .help-callout { margin: 12px 0; padding: 10px 12px; border-left: 4px solid #5d8ca7; background: #20202a; color: #ddd; }
         .help-step { margin: 6px 0; }
         @media (max-width: 780px) { .help-layout { grid-template-columns: 1fr; } .help-nav { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        /* ===== Page Navigation ===== */
+        .page-nav-wrap {
+            width: 100%; max-width: 1600px; margin: -2px auto 18px;
+            display: flex; justify-content: center;
+        }
+        .page-nav {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px; border: 1px solid #343742; border-radius: 11px;
+            background: #24262f; box-shadow: 0 5px 18px rgba(0,0,0,.18);
+        }
+        .page-nav button {
+            min-width: 150px; padding: 9px 16px; border: 0; border-radius: 8px;
+            background: transparent; color: #9ea4b4; font: inherit; font-size: .8rem;
+            font-weight: 850; cursor: pointer; transition: background .16s ease, color .16s ease, transform .16s ease;
+        }
+        .page-nav button:hover { color: #e9ecf2; }
+        .page-nav button.active { background: #3b3f4d; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.22); }
+        .page-nav button:active { transform: translateY(1px); }
+
+        .app-page.hidden-page { display: none !important; }
+        .app-page { width: 100%; max-width: 1600px; }
+
+        /* ===== Team Builder ===== */
+        .team-builder-header {
+            display:flex; align-items:flex-end; justify-content:space-between; gap:18px;
+            margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid #353844;
+        }
+        .team-builder-header h2 { margin:0; font-size:1.45rem; }
+        .team-builder-header p { margin:5px 0 0; color:#858c9c; font-size:.82rem; }
+        .builder-header-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .builder-toolbar {
+            display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+            margin-bottom:14px; padding:10px; border:1px solid #363944; border-radius:10px;
+            background:#23252d;
+        }
+        .builder-toolbar-left, .builder-toolbar-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .builder-select, .builder-check {
+            min-height:36px; box-sizing:border-box; border:1px solid #474b58; border-radius:8px;
+            background:#1b1d24; color:#e8ebf0; font:inherit; font-size:.78rem; padding:7px 10px;
+        }
+        .builder-check { display:inline-flex; align-items:center; gap:7px; padding-right:12px; }
+        .builder-check input { transform:none !important; }
+        .builder-alert {
+            display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+            margin-bottom:14px; padding:11px 13px; border:1px solid #564d35; border-radius:10px;
+            background:linear-gradient(90deg,#332f25,#282a31); color:#ece4ce;
+        }
+        .builder-alert-main { display:flex; align-items:center; gap:9px; }
+        .builder-alert-count { color:#ffd27d; font-weight:850; }
+        .builder-alert small { display:block; color:#aaa; margin-top:2px; }
+        .builder-alert button { flex:0 0 auto; }
+        .team-builder-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+        .team-card {
+            overflow:hidden; border:1px solid #3b3e4a; border-radius:11px; background:#23252d;
+            box-shadow:0 7px 24px rgba(0,0,0,.2);
+        }
+        .team-card-head {
+            display:flex; align-items:center; justify-content:space-between; gap:10px;
+            padding:13px 14px; border-bottom:1px solid #393c47; background:#2d303a;
+        }
+        .team-card-title { font-size:1rem; font-weight:900; letter-spacing:.05em; }
+        .team-card-sub { margin-top:3px; color:#8d94a4; font-size:.68rem; }
+        .team-card-actions { display:flex; gap:6px; align-items:center; }
+        .team-run-type { min-height:34px; padding:6px 9px; border:1px solid #505463; border-radius:7px; background:#1f2128; color:#e9ecf1; font:inherit; font-size:.76rem; }
+        .team-mini-btn {
+            min-height:34px; padding:6px 9px; border:1px solid #505463; border-radius:7px; background:#242731; color:#dfe2e8;
+            font:inherit; font-size:.73rem; font-weight:800; cursor:pointer;
+        }
+        .team-mini-btn:hover { background:#30343f; }
+        .team-table-wrap { overflow-x:auto; }
+        .team-table { width:100%; border-collapse:collapse; table-layout:auto; }
+        .team-table th {
+            padding:8px 7px; border-bottom:1px solid #3a3d49; background:#20222a; color:#aeb4c1;
+            font-size:.64rem; text-transform:uppercase; letter-spacing:.08em; text-align:left; white-space:nowrap;
+        }
+        .team-table td { padding:7px; border-bottom:1px solid #333641; font-size:.74rem; color:#dfe2e8; vertical-align:middle; text-align:left; }
+        .team-table tbody tr:last-child td { border-bottom:0; }
+        .team-slot { width:34px; color:#7f8797 !important; text-align:center !important; font-weight:900; }
+        .team-character-select {
+            width:100%; min-width:145px; box-sizing:border-box; padding:7px 8px; border:1px solid #444854; border-radius:7px;
+            background:#1a1c23; color:#edf0f4; font:inherit; font-size:.74rem;
+        }
+        .team-character-select.needs-job { border-color:#9d7d45; }
+        .team-class-select {
+            width:100%; min-width:112px; box-sizing:border-box; padding:7px 8px; border:1px solid #444854; border-radius:7px;
+            background:#1a1c23; color:#edf0f4; font:inherit; font-size:.72rem;
+        }
+        .team-class-select:focus, .team-character-select:focus { outline:none; border-color:#65718a; box-shadow:0 0 0 2px rgba(101,113,138,.16); }
+        .class-count-note { color:#7f8796; font-size:.62rem; margin-top:3px; }
+        .team-meta { white-space:nowrap; }
+        .team-job { font-weight:800; color:#f0f2f6; }
+        .team-unknown { color:#8e95a4; font-style:italic; }
+        .team-badge-row { display:flex; gap:4px; flex-wrap:wrap; }
+        .team-badge {
+            display:inline-flex; align-items:center; min-height:20px; padding:2px 6px; border-radius:999px;
+            border:1px solid #474b56; background:#292c35; color:#cfd4de; font-size:.61rem; font-weight:800;
+        }
+        .team-badge.position { background:#303847; border-color:#4a5a70; color:#d8e3f2; }
+        .owner-chip {
+            display:inline-flex; align-items:center; max-width:110px; padding:4px 7px; border-radius:999px;
+            background:#2c2f38; border:1px solid #414550; color:#bbc1cc; font-size:.62rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .remove-slot-btn {
+            width:28px; height:28px; padding:0; border:1px solid #474a55; border-radius:7px; background:#282b34; color:#bfc4cd;
+            cursor:pointer; font-size:1rem; line-height:1;
+        }
+        .remove-slot-btn:hover { background:#422d31; border-color:#71454b; color:#ffd7d9; }
+        .team-card-foot {
+            display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+            padding:10px 12px; border-top:1px solid #363944; background:#20222a;
+        }
+        .team-summary { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+        .team-summary .summary-label { color:#858c9d; font-size:.65rem; font-weight:800; margin-right:2px; }
+        .team-summary-pill { padding:4px 7px; border:1px solid #424651; border-radius:999px; background:#292c34; color:#d7dbe2; font-size:.61rem; font-weight:850; }
+        .team-summary-pill.empty { color:#777f8f; }
+        .team-builder-bottom {
+            margin-top:14px; padding:12px 13px; border:1px solid #343741; border-radius:10px; background:#20222a;
+            color:#8e95a4; font-size:.72rem; line-height:1.45;
+        }
+        .team-builder-bottom strong { color:#cfd3db; }
+        .builder-field { display:inline-flex; flex-direction:column; gap:4px; color:#969eae; font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; }
+        .builder-field .builder-select { text-transform:none; letter-spacing:normal; }
+        .builder-format-field { min-width: 205px; }
+        .builder-format-field .builder-select { width: 205px; min-width: 205px; padding-right: 28px; }
+        .builder-roster-filter { min-width: 170px; }
+        .builder-toolbar-left { min-width: 0; }
+
+        .builder-format-card { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 13px; margin-bottom:14px; border:1px solid #343741; border-radius:10px; background:linear-gradient(90deg,#252832,#202229); }
+        .format-tag { display:inline-flex; align-items:center; padding:4px 8px; border:1px solid #4b5263; border-radius:999px; background:#303441; color:#e8ebf1; font-size:.67rem; font-weight:900; margin-right:8px; }
+        .format-description { color:#c3c8d2; font-size:.76rem; }
+        .format-quick-help { color:#858c9d; font-size:.68rem; text-align:right; }
+        .team-card-compact .team-table td { padding-top:6px; padding-bottom:6px; }
+        .team-summary-pill.warning { border-color:#715c38; background:#332d24; color:#ffd27d; }
+        .damage-physical { background:#30383a; border-color:#596a6d; }
+        .damage-magical { background:#33313b; border-color:#635b78; }
+                .team-balance-panel { margin-top:14px; padding:13px; border:1px solid #4a435c; border-radius:10px; background:linear-gradient(90deg,#27252f,#22232b); }
+        .team-balance-panel.hidden { display:none; }
+        .team-balance-head { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; color:#dfe3eb; font-size:.75rem; }
+        .team-balance-head span { color:#ffd27d; font-weight:850; }
+        .team-balance-panel p { margin:7px 0 10px; color:#9299a8; font-size:.69rem; }
+        .team-balance-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .balance-card { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; border:1px solid #393c47; border-radius:8px; background:#20222a; }
+        .balance-card span { color:#838a9a; font-size:.62rem; font-weight:850; letter-spacing:.06em; }
+        .balance-card strong { color:#d9dde5; font-size:.68rem; }
+        @media (max-width: 760px) { .builder-format-card { align-items:flex-start; flex-direction:column; } .format-quick-help { text-align:left; } .team-balance-grid { grid-template-columns:1fr; } }
+
+        /* ===== Character Class Setup ===== */
+        .class-setup-table-wrap { max-height:58vh; overflow:auto; border:1px solid #3d404b; border-radius:8px; }
+        .class-setup-table { width:100%; border-collapse:collapse; }
+        .class-setup-table th { position:sticky; top:0; z-index:1; padding:9px 8px; background:#20222a; color:#9ba2b1; border-bottom:1px solid #3c3f49; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; text-align:left; }
+        .class-setup-table td { padding:8px; border-bottom:1px solid #333640; font-size:.74rem; text-align:left; vertical-align:middle; }
+        .class-setup-table tbody tr:last-child td { border-bottom:0; }
+        .class-setup-owner { color:#9198a8; }
+        .class-setup-select { width:100%; padding:7px 8px; border:1px solid #494d59; border-radius:7px; background:#191b22; color:#edf0f3; font:inherit; font-size:.73rem; }
+        .class-setup-status { font-size:.62rem; font-weight:800; }
+        .class-setup-status.ok { color:#b6d7a8; }
+        .class-setup-status.missing { color:#ffd27d; }
+        .role-config-modal { width:min(1400px,98vw); }
+        .role-config-scroll { max-height:70vh; overflow:auto; border:1px solid #3d404b; border-radius:8px; }
+        .role-config-table { width:100%; border-collapse:collapse; min-width:980px; }
+        .role-config-table th { position:sticky; top:0; z-index:2; padding:9px 8px; background:#20222a; color:#9ba2b1; border-bottom:1px solid #3c3f49; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; text-align:left; }
+        .role-config-table td { padding:8px; border-bottom:1px solid #333640; font-size:.73rem; text-align:left; vertical-align:top; }
+        .role-config-table tbody tr:last-child td { border-bottom:0; }
+        .role-config-select { width:100%; box-sizing:border-box; padding:7px 8px; border:1px solid #494d59; border-radius:7px; background:#191b22; color:#edf0f3; font:inherit; font-size:.72rem; }
+        .role-check-wrap { display:flex; flex-wrap:wrap; gap:5px; max-width:580px; }
+        .role-check { display:inline-flex; align-items:center; gap:5px; padding:4px 7px; border:1px solid #3f4350; border-radius:999px; background:#242730; color:#cfd3dc; font-size:.67rem; cursor:pointer; }
+        .role-check input { transform:none !important; margin:0; }
+        .role-check:has(input:checked) { border-color:#65718a; background:#303441; color:#fff; }
+        @media (max-width: 1080px) { .team-builder-grid { grid-template-columns:1fr; } }
+        @media (max-width: 760px) {
+            .page-nav button { min-width:120px; }
+            .team-builder-header { align-items:flex-start; flex-direction:column; }
+            .team-card-head { align-items:flex-start; flex-direction:column; }
+            .team-card-actions { width:100%; }
+            .team-run-type { flex:1; }
+        }
+
     </style>
 </head>
 <body>
@@ -485,6 +662,12 @@
 
         <div class="drawer-content">
             <div class="drawer-section">
+                <div class="drawer-section-title">Pages</div>
+                <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('tracker'); toggleSideMenu(false)"><span class="drawer-icon">📋</span><span><strong>Tracker</strong><small>Daily & weekly board</small></span></button>
+                <button class="drawer-item" type="button" onclick="showAppPage('team-builder'); toggleSideMenu(false)"><span class="drawer-icon">⚔</span><span><strong>Team Builder</strong><small>Build two parties</small></span></button>
+            </div>
+
+            <div class="drawer-section">
                 <div class="drawer-section-title">Party</div>
                 <button class="drawer-item drawer-item-gold" type="button" onclick="openScholarModal()"><span class="drawer-icon">💰</span><span><strong>Ledger</strong><small>Shared salary records</small></span></button>
                 <button class="drawer-item" type="button" onclick="openSalaryModal()"><span class="drawer-icon">🧮</span><span><strong>Salary Calculator</strong><small>Split party income</small></span></button>
@@ -512,6 +695,14 @@
 
     <div class="drawer-scrim" id="drawer-scrim" onclick="toggleSideMenu(false)"></div>
 
+    <div class="page-nav-wrap">
+        <nav class="page-nav" aria-label="Pantheon Pages">
+            <button id="page-tab-tracker" class="active" type="button" onclick="showAppPage('tracker')">📋 Tracker</button>
+            <button id="page-tab-team-builder" type="button" onclick="showAppPage('team-builder')">⚔ Team Builder</button>
+        </nav>
+    </div>
+
+    <main id="tracker-page" class="app-page">
     <div class="table-responsive">
         <table id="dn-tracker">
             <colgroup id="table-colgroup"></colgroup>
@@ -544,6 +735,138 @@
         <span style="color: #666; font-size: 0.8rem; display: block; margin-bottom: 10px;">System Auto-Resets Weeklies at 9AM MNL.</span>
         <button class="btn" style="background-color: #555; color: white;" onclick="manualDailyReset()">Force Daily Reset</button>
         <button class="btn btn-danger" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
+    </div>
+    </main>
+
+    <main id="team-builder-page" class="app-page hidden-page">
+        <div class="team-builder-header">
+            <div>
+                <h2>⚔ Team Builder <button class="mini-help" type="button" title="Team Builder Guide" onclick="openHelpModal('team-builder')">?</button></h2>
+                <p>Build coordinated parties directly from the characters registered in the tracker.</p>
+            </div>
+            <div class="builder-header-actions">
+                <button class="btn btn-secondary" type="button" onclick="openClassSetupModal()">🎓 Configure Classes</button>
+                <button class="btn btn-weights" type="button" onclick="openRoleConfigModal()">⚙ Role Settings</button>
+            </div>
+        </div>
+
+        <div class="builder-alert" id="class-setup-alert">
+            <div class="builder-alert-main">
+                <div style="font-size:1.15rem;">🎓</div>
+                <div><strong>Character Class Setup</strong><small><span id="class-setup-count" class="builder-alert-count">0 characters</span> still need a Job assigned. The builder uses the Job to determine class, raid position, and DPS side.</small></div>
+            </div>
+            <button class="btn btn-roster" type="button" onclick="openClassSetupModal()">Configure Classes</button>
+        </div>
+
+        <div class="builder-toolbar">
+            <div class="builder-toolbar-left">
+                <label class="builder-field builder-format-field"><span>Party Format</span><select id="team-builder-format" class="builder-select" onchange="setTeamFormat(this.value)" aria-label="Party Format"></select></label>
+                <select id="team-builder-roster-filter" class="builder-select builder-roster-filter" onchange="renderTeamBuilder()"></select>
+                <label class="builder-check"><input type="checkbox" id="allow-same-owner" onchange="saveTeamBuilderPrefs()"> Allow same owner</label>
+                <label class="builder-check" id="split-party-wrap" style="display:none;" title="When enabled, Team 1 and Team 2 are treated as separate parties for 8-man composition checks."><input type="checkbox" id="split-party-mechanic" onchange="saveSplitPartyMechanic()"> Split Party Mechanic</label>
+            </div>
+            <div class="builder-toolbar-right">
+                <button class="team-mini-btn" type="button" onclick="fillNextEmptySlot('team1')">＋ Add to Team 1</button>
+                <button class="team-mini-btn" type="button" onclick="fillNextEmptySlot('team2')">＋ Add to Team 2</button>
+                <button class="team-mini-btn" type="button" onclick="resetTeamsForNewWeek()">↺ Reset Teams</button>
+            </div>
+        </div>
+
+        <div class="builder-format-card">
+            <div><span class="format-tag" id="team-format-tag">4 Man Normal</span><span class="format-description" id="team-format-description">Casual 4-man nests.</span></div>
+            <div class="format-quick-help">The format controls how many slots are open in each team.</div>
+        </div>
+
+        <div class="team-builder-grid">
+            <section class="team-card" id="team-card-team1">
+                <div class="team-card-head">
+                    <div><div class="team-card-title">TEAM 1</div><div class="team-card-sub" id="team1-sub">4 Man Normal · 0 / 4 filled</div></div>
+                    <div class="team-card-actions">
+                        <button class="team-mini-btn" type="button" onclick="copyTeamToClipboard('team1')">Copy</button>
+                        <button class="team-mini-btn" type="button" onclick="clearTeam('team1')">Clear</button>
+                    </div>
+                </div>
+                <div class="team-table-wrap">
+                    <table class="team-table">
+                        <thead><tr><th style="width:34px;">#</th><th style="min-width:165px;">Character</th><th style="min-width:125px;">Class</th><th>Job</th><th>Raid Position</th><th>DPS Type</th><th>Owner</th><th style="width:36px;"></th></tr></thead>
+                        <tbody id="team1-slots"></tbody>
+                    </table>
+                </div>
+                <div class="team-card-foot"><div id="team1-summary" class="team-summary"></div><div class="team-summary-pill" id="team1-filled">0 / 4</div></div>
+            </section>
+
+            <section class="team-card" id="team-card-team2">
+                <div class="team-card-head">
+                    <div><div class="team-card-title">TEAM 2</div><div class="team-card-sub" id="team2-sub">4 Man Normal · 0 / 4 filled</div></div>
+                    <div class="team-card-actions">
+                        <button class="team-mini-btn" type="button" onclick="copyTeamToClipboard('team2')">Copy</button>
+                        <button class="team-mini-btn" type="button" onclick="clearTeam('team2')">Clear</button>
+                    </div>
+                </div>
+                <div class="team-table-wrap">
+                    <table class="team-table">
+                        <thead><tr><th style="width:34px;">#</th><th style="min-width:165px;">Character</th><th style="min-width:125px;">Class</th><th>Job</th><th>Raid Position</th><th>DPS Type</th><th>Owner</th><th style="width:36px;"></th></tr></thead>
+                        <tbody id="team2-slots"></tbody>
+                    </table>
+                </div>
+                <div class="team-card-foot"><div id="team2-summary" class="team-summary"></div><div class="team-summary-pill" id="team2-filled">0 / 4</div></div>
+            </section>
+        </div>
+
+        <div class="team-balance-panel hidden" id="team-balance-panel">
+            <div class="team-balance-head"><strong>8 Man Hardcore · Two-Team DPS Balance</strong><span id="combined-dps-balance">Combined: Physical 0 · Magical 0</span></div>
+            <p id="team-balance-description">Use both teams together and watch physical / magical DPS coverage for mechanics.</p>
+            <div class="team-balance-grid">
+                <div class="balance-card"><span>TEAM 1</span><strong id="team1-dps-balance">Physical 0 · Magical 0</strong></div>
+                <div class="balance-card"><span>TEAM 2</span><strong id="team2-dps-balance">Physical 0 · Magical 0</strong></div>
+            </div>
+        </div>
+
+        <div class="team-builder-bottom">
+            <strong>How it works:</strong> Characters come from Roster Registration. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
+        </div>
+    </main>
+
+
+    <!-- Character Class Setup Modal -->
+    <div class="modal-overlay hidden" id="class-setup-modal" role="dialog" aria-label="Character Class Setup">
+        <div class="modal-card wide-modal">
+            <h3>🎓 Character Class Setup</h3>
+            <div class="modal-note">Choose the <b>Job</b> for each registered character. The base Class and Raid Position are derived automatically. Use Role Settings to adjust class balance, primary position, DPS type, and secondary roles.</div>
+            <div class="builder-toolbar" style="margin-bottom:12px;">
+                <div class="builder-toolbar-left"><select id="class-setup-roster-filter" class="builder-select" onchange="renderClassSetup()"></select></div>
+                <div class="builder-toolbar-right"><span id="class-setup-modal-count" style="color:#9ba2b0;font-size:.74rem;"></span></div>
+            </div>
+            <div class="class-setup-table-wrap">
+                <table class="class-setup-table">
+                    <thead><tr><th>Character</th><th>Owner</th><th>Job</th><th>Class</th><th>Raid Position</th><th>Status</th></tr></thead>
+                    <tbody id="class-setup-list"></tbody>
+                </table>
+            </div>
+            <div class="modal-actions" style="justify-content:flex-end;">
+                <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Changes</button>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('class-setup-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role Settings Modal -->
+    <div class="modal-overlay hidden" id="role-config-modal" role="dialog" aria-label="Team Builder Role Settings">
+        <div class="modal-card wide-modal role-config-modal">
+            <h3>⚙ Team Builder Role Settings</h3>
+            <div class="modal-note">Customize the Team Builder's job metadata without editing the code. <b>Raid Position</b> is the primary assignment. <b>Secondary Roles</b> are lower-priority capabilities used when checking party coverage. Changes are shared with the guild.</div>
+            <div class="role-config-scroll">
+                <table class="role-config-table">
+                    <thead><tr><th>Job</th><th>Class</th><th>Raid Position</th><th>DPS Type</th><th>Secondary Roles</th></tr></thead>
+                    <tbody id="role-config-list"></tbody>
+                </table>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-weights" type="button" onclick="saveRoleConfig()">Save Role Settings</button>
+                <button class="btn btn-secondary" type="button" onclick="resetRoleConfig()">Reset Defaults</button>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('role-config-modal')">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- Salary Calculator Modal -->
@@ -683,6 +1006,7 @@
                     <button type="button" data-help-target="tracker" onclick="showHelpTopic('tracker')">Tracker & Bounty</button>
                     <button type="button" data-help-target="analytics" onclick="showHelpTopic('analytics')">Roster Analytics</button>
                     <button type="button" data-help-target="weights" onclick="showHelpTopic('weights')">Loot Weights</button>
+                    <button type="button" data-help-target="team-builder" onclick="showHelpTopic('team-builder')">Team Builder</button>
                     <button type="button" data-help-target="salary" onclick="showHelpTopic('salary')">Salary Calculator</button>
                 </div>
                 <div class="help-content">
@@ -697,8 +1021,9 @@
                         <p>Use <b>Roster Registration</b> to add characters and maintain the owner/character groups shown across the tracker.</p>
                         <div class="help-step"><b>1.</b> Choose an existing owner, or choose <b>＋ Create new group</b>.</div>
                         <div class="help-step"><b>2.</b> Enter the exact in-game character name.</div>
-                        <div class="help-step"><b>3.</b> For a new group, choose the owner's name and a color.</div>
-                        <div class="help-step"><b>4.</b> Press <b>Register Character</b>.</div>
+                        <div class="help-step"><b>3.</b> Select the character's <b>Class / Job</b>.</div>
+                        <div class="help-step"><b>4.</b> For a new group, choose the owner's name and a color.</div>
+                        <div class="help-step"><b>5.</b> Press <b>Register Character</b>.</div>
                         <p>You can later rename groups, change colors, remove characters, or drag characters into a different order.</p>
                         <div class="help-callout"><b>Guild-wide setting:</b> roster changes affect everyone. Only change roster structure when it is actually needed.</div>
                     </section>
@@ -746,6 +1071,21 @@
                         <p>These weights affect how strongly missed content contributes to the Analytics priority score.</p>
                         <p>Open <b>Loot Weights</b>, choose the desired number for each task, then press <b>Save Weights</b>. <b>Reset Defaults</b> restores the predefined settings.</p>
                         <div class="help-callout"><b>Weights do not change completion.</b> They only change how Analytics evaluates missed content.</div>
+                    </section>
+                    <section class="help-topic" data-help-topic="team-builder">
+                        <h4>Team Builder</h4>
+                        <p>Team Builder is the second page of the tracker. It uses the characters registered in Roster Registration.</p>
+                        <h5>Set each character's Job</h5>
+                        <p>Open <b>Configure Classes</b> and choose the correct Job. The Class, Raid Position, and default DPS side are filled automatically from the guild's Job list. The Class dropdown can also be used first to narrow the character list.</p>
+                        <h5>Choose a Party Format</h5>
+                        <p><b>4 Man Normal</b> is for casual normal nests. <b>4 Man Hardcore</b> is for higher-intensity 4-man content such as Hell Nests and Dragon Memoria. <b>8 Man Normal</b> is for Classic Raids with more composition flexibility. <b>8 Man Hardcore</b> uses both teams for high-end mechanics and exposes physical / magical DPS balance.</p>
+                        <h5>Build the two teams</h5>
+                        <p>Select characters in Team 1 or Team 2. The builder fills in their Job, Raid Position, DPS side, and Owner automatically. Use <b>Role Settings</b> to adjust the underlying class, primary position, DPS type, and lower-priority secondary roles when the class balance changes.</p>
+                        <p>Character duplicates are always prevented. <b>Allow same owner</b> lets one player contribute different characters to coordinated parties when needed.</p>
+                        <h5>Split Party Mechanic</h5>
+                        <p>For <b>8 Man Normal</b> and <b>8 Man Hardcore</b>, enable <b>Split Party Mechanic</b> when Team 1 and Team 2 must function as separate parties. The builder then checks each 4-man team separately. In 8 Man Hardcore, it also enables the physical / magical DPS balance panel and the deeper per-team utility checks.</p>
+                        <p>Turn it off when the raid does <b>not</b> split the party. The builder then treats both teams as one 8-man composition and only checks the normal baseline of Heal, Tank / Provoke, and DPS coverage.</p>
+                        <div class="help-callout"><b>Shared data:</b> Roster and class information is part of the shared database, so keep character details accurate. 8 Man Hardcore with Split Party Mechanic enabled also shows deeper composition checks such as missing Heal, Tank / Provoke, Debuff, Mobility, Beyond Time, Highlander, and low DPS coverage.</div>
                     </section>
                     <section class="help-topic" data-help-topic="salary">
                         <h4>Salary Calculator</h4>
@@ -815,6 +1155,7 @@
                             <input id="registration-color" type="color" value="#7aa2f7"><span style="color:#aaa;font-size:0.82rem;">Used for headers.</span>
                         </div>
                         <label>Character name</label><input id="registration-character-name" maxlength="40" placeholder="Exact in-game name" onkeydown="if(event.key==='Enter') registerCharacter()">
+                        <label>Class / Job</label><select id="registration-job"></select>
                         <button class="btn btn-roster" type="button" onclick="registerCharacter()">Register Character</button>
                     </div>
                 </section>
@@ -867,7 +1208,7 @@
         // ==========================================
         // ☁️ APP CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 12; 
+        const APP_SCHEMA_VERSION = 14; 
         const MAX_ARCHIVE_WEEKS = 12;
         const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
@@ -907,6 +1248,136 @@
             { id: 'cat-special', group: 'Weeklies', name: 'Special Dungeons', color: '#d0e0e3', tasks: ['Abyssal Mire', 'Dark Banquet (Lv 50)', 'Dragon Fellowship'] }
         ];
 
+        // ===== Class / Job metadata used by Team Builder =====
+        const JOB_DATABASE = {
+            'Adept':         { className: 'Academic',   role: 'DPS / Utility',                raidPosition: 'DPS', damageType: 'Magical' },
+            'Physician':     { className: 'Academic',   role: 'Support / DPS',                raidPosition: 'Heal', damageType: 'Magical' },
+            'Gear Master':   { className: 'Academic',   role: 'DPS',                          raidPosition: 'DPS', damageType: 'Physical' },
+            'Shooting Star': { className: 'Academic',   role: 'DPS',                          raidPosition: 'DPS', damageType: 'Magical' },
+            'Sniper':        { className: 'Archer',     role: 'DPS',                          raidPosition: 'DPS', damageType: 'Physical' },
+            'Artillery':     { className: 'Archer',     role: 'DPS',                          raidPosition: 'DPS', damageType: 'Magical' },
+            'Wind Walker':   { className: 'Archer',     role: 'Utility / DPS',                raidPosition: 'Mobility', damageType: 'Physical' },
+            'Tempest':       { className: 'Archer',     role: 'Utility / DPS',                raidPosition: 'Mobility', damageType: 'Physical' },
+            'Light Fury':    { className: 'Assassin',   role: 'Utility / Support / DPS',      raidPosition: 'Utility', damageType: '' },
+            'Abyss Walker':  { className: 'Assassin',   role: 'Utility / DPS',                raidPosition: 'DPS', damageType: 'Magical' },
+            'Raven':         { className: 'Assassin',   role: 'DPS',                          raidPosition: 'DPS', damageType: 'Physical' },
+            'Ripper':        { className: 'Assassin',   role: 'DPS',                          raidPosition: 'DPS', damageType: 'Physical' },
+            'Saint':         { className: 'Cleric',     role: 'Support / Utility',            raidPosition: 'Heal', damageType: 'Magical' },
+            'Inquisitor':    { className: 'Cleric',     role: 'DPS / Utility',                raidPosition: 'DPS', damageType: 'Magical' },
+            'Crusader':      { className: 'Cleric',     role: 'DPS / Utility',                raidPosition: 'DPS', damageType: 'Magical' },
+            'Guardian':      { className: 'Cleric',     role: 'Tank / Support / Utility',     raidPosition: 'Tank', damageType: 'Physical' },
+            'Spirit Dancer': { className: 'Kali',       role: 'Support / Utility / DPS',      raidPosition: 'Utility', damageType: 'Physical' },
+            'Blade Dancer':  { className: 'Kali',       role: 'DPS / Utility',                raidPosition: 'DPS', damageType: 'Physical' },
+            'Dark Summoner': { className: 'Kali',       role: 'Utility / DPS',                raidPosition: 'Utility', damageType: 'Magical' },
+            'Soul Eater':    { className: 'Kali',       role: 'Utility / Support / DPS',      raidPosition: 'Debuff', damageType: 'Magical' },
+            'Saleana':       { className: 'Sorceress',  role: 'DPS',                          raidPosition: 'DPS', damageType: 'Magical' },
+            'Elestra':       { className: 'Sorceress',  role: 'Utility / Support / DPS',      raidPosition: 'Debuff', damageType: 'Magical' },
+            'Majesty':       { className: 'Sorceress',  role: 'Support / Utility / DPS',      raidPosition: 'Beyond Time', damageType: 'Magical' },
+            'Smasher':       { className: 'Sorceress',  role: 'DPS / Utility',                raidPosition: 'Beyond Time', damageType: 'Magical' },
+            'Gladiator':     { className: 'Warrior',    role: 'DPS / Highlander',             raidPosition: 'Highlander', damageType: 'Physical' },
+            'Moonlord':      { className: 'Warrior',    role: 'DPS / Highlander',             raidPosition: 'Highlander', damageType: 'Magical' },
+            'Barbarian':     { className: 'Warrior',    role: 'Utility / DPS / Highlander',   raidPosition: 'Highlander', damageType: 'Physical' },
+            'Destroyer':     { className: 'Warrior',    role: 'Utility / Tank / DPS / Highlander', raidPosition: 'Highlander', damageType: 'Physical' },
+            'Dark Avenger':  { className: 'Warrior',    role: 'DPS / Highlander',             raidPosition: 'DPS', damageType: 'Physical' }
+        };
+        const JOB_ORDER = Object.keys(JOB_DATABASE);
+        const CLASS_ORDER = [...new Set(JOB_ORDER.map(job => JOB_DATABASE[job].className))];
+        const RAID_POSITION_OPTIONS = ['DPS', 'Heal', 'Tank', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility'];
+        const DPS_TYPE_OPTIONS = ['', 'Physical', 'Magical'];
+        const SECONDARY_ROLE_OPTIONS = ['DPS', 'Heal', 'Tank', 'Provoke', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility', 'Support'];
+
+        // Default secondary-role configuration. The first/primary responsibility is Raid Position.
+        // Secondary roles are lower-priority capabilities used by Team Builder composition checks.
+        function deriveDefaultSecondaryRoles(job) {
+            const meta = JOB_DATABASE[job];
+            if (!meta) return [];
+            const tokens = String(meta.role || '').split('/').map(x => x.trim()).filter(Boolean);
+            const primary = String(meta.raidPosition || '').trim();
+            const out = tokens.filter(role => role && role !== primary);
+            if ((meta.className === 'Academic' || job === 'Light Fury' || job === 'Abyss Walker') && !out.includes('Mobility')) out.push('Mobility');
+            if (job === 'Wind Walker' || job === 'Tempest') {
+                // These are the primary Mobility providers. Their other utility remains secondary.
+                return ['Utility', 'DPS'].filter(Boolean);
+            }
+            return [...new Set(out)];
+        }
+
+        const DEFAULT_JOB_PROFILES = Object.fromEntries(JOB_ORDER.map(job => [job, {
+            className: JOB_DATABASE[job].className,
+            raidPosition: JOB_DATABASE[job].raidPosition === 'Mobility' ? 'Mobility' : JOB_DATABASE[job].raidPosition,
+            damageType: JOB_DATABASE[job].damageType || '',
+            secondaryRoles: deriveDefaultSecondaryRoles(job)
+        }]));
+
+        // Per-slot class filters are UI-only. A selected class narrows the Character dropdown;
+        // selecting a character automatically sets the class to that character's class.
+        const teamClassFilters = { team1: Array(8).fill(''), team2: Array(8).fill('') };
+
+        // ===== Team Builder Party Formats =====
+        const TEAM_FORMATS = {
+            '4N': { label: '4 Man Normal', size: 4, difficulty: 'Normal', short: '4N', desc: 'Casual 4-man nests. Minimal composition pressure, built for quick normal runs.', hint: 'Flex freely. Fill the four slots and use the roles that make the run comfortable.' },
+            '4HC': { label: '4 Man Hardcore', size: 4, difficulty: 'Hardcore', short: '4HC', desc: 'Higher-intensity 4-man content such as Hell Nests and Dragon Memoria.', hint: 'Aim for practical mitigation and sustain coverage, usually including Heal, Tank / Provoke, and enough DPS / utility.' },
+            '8N': { label: '8 Man Normal', size: 8, difficulty: 'Normal', short: '8N', desc: 'Classic 8-man raids using the usual lineup with more room to flex the composition.', hint: 'Build a normal raid shell first, then use the extra slots for utility, support, debuff, or additional damage.' },
+            '8HC': { label: '8 Man Hardcore', size: 8, difficulty: 'Hardcore', short: '8HC', desc: 'High-end 8-man raid format. Use both teams together and watch physical / magical DPS coverage for mechanics.', hint: 'Treat Team 1 and Team 2 as coordinated parties. The builder tracks physical and magical DPS on both sides and checks for missing core raid utility on each team.' }
+        };
+        const TEAM_FORMAT_ORDER = ['4N','4HC','8N','8HC'];
+
+        function getDefaultTeamFormat() { return '4N'; }
+        function normalizeTeamFormat(value) { return TEAM_FORMATS[value] ? value : getDefaultTeamFormat(); }
+        function getTeamFormat() { return normalizeTeamFormat(cloudData.settings?.teamBuilder?.format); }
+        function getActiveTeamSize() { return TEAM_FORMATS[getTeamFormat()].size; }
+
+        function createEmptyTeamBuilder() {
+            const slots = () => Array.from({length: 8}, () => ({ character: '', updatedAt: 0, deviceId: '' }));
+            return {
+                format: getDefaultTeamFormat(), formatUpdatedAt: 0, formatUpdatedBy: '',
+                splitPartyMechanic: true, splitPartyUpdatedAt: 0, splitPartyUpdatedBy: '',
+                team1: { runType: 'Normal', runTypeUpdatedAt: 0, runTypeUpdatedBy: '', slots: slots() },
+                team2: { runType: 'Normal', runTypeUpdatedAt: 0, runTypeUpdatedBy: '', slots: slots() }
+            };
+        }
+
+        function normalizeCharacterJobs(value) {
+            const source = safeObject(value), out = {};
+            Object.entries(source).forEach(([name, rec]) => {
+                if (!name) return;
+                if (typeof rec === 'string') out[name] = { job: JOB_DATABASE[rec] ? rec : '', updatedAt: 0, deviceId: '' };
+                else out[name] = { job: JOB_DATABASE[String(rec?.job || '')] ? String(rec.job) : '', updatedAt: Number(rec?.updatedAt) || 0, deviceId: String(rec?.deviceId || '') };
+            });
+            return out;
+        }
+
+        function normalizeTeamBuilder(value) {
+            const base = createEmptyTeamBuilder(), source = safeObject(value);
+            let format = normalizeTeamFormat(source.format);
+            // Migrate the previous per-team difficulty selector when old data is loaded.
+            if (!TEAM_FORMATS[source.format]) {
+                const legacy = String(source.team1?.runType || '');
+                if (legacy === 'Hell') format = '4HC';
+                else if (legacy === 'Hardcore') format = '8HC';
+                else if (legacy === 'Normal') format = '8N';
+            }
+            base.format = format;
+            base.formatUpdatedAt = Number(source.formatUpdatedAt) || Math.max(Number(source.team1?.runTypeUpdatedAt)||0, Number(source.team2?.runTypeUpdatedAt)||0);
+            base.formatUpdatedBy = String(source.formatUpdatedBy || source.team1?.runTypeUpdatedBy || source.team2?.runTypeUpdatedBy || '');
+            base.splitPartyMechanic = source.splitPartyMechanic !== false;
+            base.splitPartyUpdatedAt = Number(source.splitPartyUpdatedAt) || 0;
+            base.splitPartyUpdatedBy = String(source.splitPartyUpdatedBy || '');
+            ['team1','team2'].forEach(k => {
+                const src = safeObject(source[k]);
+                const srcSlots = Array.isArray(src.slots) ? src.slots : [];
+                base[k].runType = String(src.runType || 'Normal'); // retained only for backwards compatibility
+                base[k].runTypeUpdatedAt = Number(src.runTypeUpdatedAt) || 0;
+                base[k].runTypeUpdatedBy = String(src.runTypeUpdatedBy || '');
+                base[k].slots = base[k].slots.map((_, i) => {
+                    const sl = safeObject(srcSlots[i]);
+                    return { character: String(sl.character || '').trim(), updatedAt: Number(sl.updatedAt) || 0, deviceId: String(sl.deviceId || '') };
+                });
+            });
+            return base;
+        }
+
+
         let characters = flattenRosters(DEFAULT_ROSTERS);
         let weeklyTaskNames = [];
         let autoSyncTimer;
@@ -926,7 +1397,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '' },
+                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder() },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -1076,7 +1547,7 @@
         function normalizeData(record) {
             const source = safeObject(record);
             const norm = createEmptyData();
-            norm.schemaVersion = 12;
+            norm.schemaVersion = APP_SCHEMA_VERSION;
             norm.history = safeObject(source.history);
             norm.weeklyArchive = safeObject(source.weeklyArchive);
             norm.lastDailyReset = Number(source.lastDailyReset) || norm.lastDailyReset;
@@ -1092,6 +1563,11 @@
             norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : cloneCategories(DEFAULT_CATEGORIES);
             norm.settings.categoriesUpdatedAt = Number(sets.categoriesUpdatedAt) || 0;
             norm.settings.categoriesUpdatedBy = String(sets.categoriesUpdatedBy || '');
+            norm.settings.characterJobs = normalizeCharacterJobs(sets.characterJobs);
+            norm.settings.jobProfiles = normalizeJobProfiles(sets.jobProfiles);
+            norm.settings.jobProfilesUpdatedAt = Number(sets.jobProfilesUpdatedAt) || 0;
+            norm.settings.jobProfilesUpdatedBy = String(sets.jobProfilesUpdatedBy || '');
+            norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
 
             norm.scholarship = JSON.parse(JSON.stringify(safeObject(source.scholarship)));
             ['cheean', 'bio', 'idontheal'].forEach(p => { if (!norm.scholarship[p]) norm.scholarship[p] = { logs: {} }; });
@@ -1120,6 +1596,44 @@
             const r = normalizeCellRecord(b) || { state: 'open', note: '', updatedAt: 0, deviceId: '' };
             if (l.updatedAt !== r.updatedAt) return l.updatedAt > r.updatedAt ? l : r;
             return l.deviceId >= r.deviceId ? l : r;
+        }
+
+        function mergeCharacterJobs(localJobs, remoteJobs) {
+            const lMap = normalizeCharacterJobs(localJobs), rMap = normalizeCharacterJobs(remoteJobs), merged = {};
+            new Set([...Object.keys(lMap), ...Object.keys(rMap)]).forEach(name => {
+                const l = lMap[name], r = rMap[name];
+                if (!l) merged[name] = r;
+                else if (!r) merged[name] = l;
+                else merged[name] = (Number(l.updatedAt)||0) >= (Number(r.updatedAt)||0) ? l : r;
+            });
+            return merged;
+        }
+
+        function compareTeamSlot(a, b) {
+            const l = safeObject(a), r = safeObject(b), lt = Number(l.updatedAt)||0, rt = Number(r.updatedAt)||0;
+            if (lt !== rt) return lt > rt ? { character:String(l.character||''), updatedAt:lt, deviceId:String(l.deviceId||'') } : { character:String(r.character||''), updatedAt:rt, deviceId:String(r.deviceId||'') };
+            return String(l.deviceId||'') >= String(r.deviceId||'') ? { character:String(l.character||''), updatedAt:lt, deviceId:String(l.deviceId||'') } : { character:String(r.character||''), updatedAt:rt, deviceId:String(r.deviceId||'') };
+        }
+
+        function mergeTeamBuilder(localTB, remoteTB) {
+            const l = normalizeTeamBuilder(localTB), r = normalizeTeamBuilder(remoteTB), m = createEmptyTeamBuilder();
+            const lf = Number(l.formatUpdatedAt)||0, rf = Number(r.formatUpdatedAt)||0;
+            const fsrc = lf >= rf ? l : r;
+            m.format = normalizeTeamFormat(fsrc.format);
+            m.formatUpdatedAt = Math.max(lf, rf);
+            m.formatUpdatedBy = fsrc.formatUpdatedBy || '';
+            const ls = Number(l.splitPartyUpdatedAt)||0, rs = Number(r.splitPartyUpdatedAt)||0;
+            const ssrc = ls >= rs ? l : r;
+            m.splitPartyMechanic = ssrc.splitPartyMechanic !== false;
+            m.splitPartyUpdatedAt = Math.max(ls, rs);
+            m.splitPartyUpdatedBy = ssrc.splitPartyUpdatedBy || '';
+            ['team1','team2'].forEach(k => {
+                const lt = Number(l[k].runTypeUpdatedAt)||0, rt = Number(r[k].runTypeUpdatedAt)||0;
+                const src = lt >= rt ? l[k] : r[k];
+                m[k].runType = src.runType; m[k].runTypeUpdatedAt = Math.max(lt, rt); m[k].runTypeUpdatedBy = src.runTypeUpdatedBy;
+                m[k].slots = m[k].slots.map((_, i) => compareTeamSlot(l[k].slots[i], r[k].slots[i]));
+            });
+            return m;
         }
 
         function mergeData(localRecord, remoteRecord) {
@@ -1159,6 +1673,13 @@
             const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
             merged.settings.categories = cloneCategories(cSrc.categories);
             merged.settings.categoriesUpdatedAt = cSrc.categoriesUpdatedAt; merged.settings.categoriesUpdatedBy = cSrc.categoriesUpdatedBy;
+            merged.settings.characterJobs = mergeCharacterJobs(local.settings.characterJobs, remote.settings.characterJobs);
+            const ljp = Number(local.settings.jobProfilesUpdatedAt) || 0, rjp = Number(remote.settings.jobProfilesUpdatedAt) || 0;
+            const jsrc = (ljp > rjp || (ljp === rjp && String(local.settings.jobProfilesUpdatedBy) >= String(remote.settings.jobProfilesUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.jobProfiles = normalizeJobProfiles(jsrc.jobProfiles);
+            merged.settings.jobProfilesUpdatedAt = Math.max(ljp, rjp);
+            merged.settings.jobProfilesUpdatedBy = jsrc.jobProfilesUpdatedBy || '';
+            merged.settings.teamBuilder = mergeTeamBuilder(local.settings.teamBuilder, remote.settings.teamBuilder);
 
             ['cheean', 'bio', 'idontheal'].forEach(p => {
                 const lL = local.scholarship[p]?.logs || {}, rL = remote.scholarship[p]?.logs || {};
@@ -1221,6 +1742,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadCloudForm();
+            populateRegistrationJobSelect();
             window.addEventListener('hashchange', handlePageRoute);
             loadLiveTracker().then(handlePageRoute);
         });
@@ -1246,6 +1768,8 @@
             renderScholarLedger();
             applyBoardState();
             renderAnalytics();
+            updateClassSetupSummary();
+            renderTeamBuilder();
         }
 
         function buildTrackerTable() {
@@ -1602,6 +2126,7 @@
         function renderRosterRegistration() {
             const sel = document.getElementById('registration-roster-select'), list = document.getElementById('roster-management-list');
             if(!sel||!list) return;
+            populateRegistrationJobSelect();
             const cur = sel.value; sel.innerHTML = '<option value="__new__">＋ Create new group</option>' + getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
             sel.value = getRosters().some(r => r.id === cur) ? cur : '__new__'; handleRegistrationRosterChange(false);
             list.innerHTML = getRosters().length ? getRosters().map(r => `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><input class="roster-name-input" data-roster-name="${escapeHTML(r.id)}" maxlength="30" value="${escapeHTML(r.name)}"><input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save</button><button class="btn btn-danger" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Remove</button></div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="true" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')">×</button></span>`).join('') : '<div style="color:#aaa;">No characters yet.</div>'}</div></div>`).join('') : '<div style="color:#aaa;">No groups yet.</div>';
@@ -1618,9 +2143,15 @@
         function registerCharacter() {
             const v = document.getElementById('registration-character-name').value.trim(); if(!v) return alert('Enter character name.');
             if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === v.toLowerCase()))) return alert('Character exists.');
+            const job = document.getElementById('registration-job')?.value || '';
+            if (!job) return alert("Choose the character's Class / Job. Team Builder uses this to determine roles and raid position.");
             let r; if (document.getElementById('registration-roster-select').value === '__new__') { const n = document.getElementById('registration-owner-name').value.trim(); if(!n) return alert('Enter owner.'); r = { id: `roster-${Date.now().toString(36)}`, name: n.slice(0,30), color: normalizeColor(document.getElementById('registration-color').value), characters: [] }; getRosters().push(r); }
             else r = findRoster(document.getElementById('registration-roster-select').value);
-            r.characters.push(v.slice(0,40)); touchRosterSettings(); document.getElementById('registration-character-name').value=''; refreshTrackerUI(); document.getElementById('registration-roster-select').value = r.id; handleRegistrationRosterChange(false); triggerAutoSync();
+            const name = v.slice(0,40); r.characters.push(name);
+            cloudData.settings.characterJobs[name] = { job, updatedAt: Date.now(), deviceId };
+            touchRosterSettings(); document.getElementById('registration-character-name').value='';
+            if (document.getElementById('registration-job')) document.getElementById('registration-job').value='';
+            refreshTrackerUI(); document.getElementById('registration-roster-select').value = r.id; handleRegistrationRosterChange(false); triggerAutoSync();
         }
 
         function saveRosterGroup(id) { const r = findRoster(id); if(r) { r.name = document.querySelector(`[data-roster-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || r.name; r.color = normalizeColor(document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`).value, r.color); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); } }
@@ -1739,15 +2270,573 @@
             });
         }
 
+        // ==========================================
+        // ⚔ TEAM BUILDER
+        // ==========================================
+        function allRegisteredCharacters() { return flattenRosters(cloudData.settings.rosters); }
+        function getCharacterJob(name) { return cloudData.settings.characterJobs?.[name]?.job || ''; }
+
+        function setCharacterJob(name, job) {
+            if (!cloudData.settings.characterJobs) cloudData.settings.characterJobs = {};
+            cloudData.settings.characterJobs[name] = { job: JOB_DATABASE[job] ? job : '', updatedAt: Date.now(), deviceId };
+            cloudData.updatedAt = Date.now();
+            updateClassSetupSummary();
+            renderClassSetup();
+            renderTeamBuilder();
+            triggerAutoSync();
+        }
+
+        function buildJobOptions(selected = '') {
+            return '<option value="">Select Job...</option>' + JOB_ORDER.map(job => `<option value="${escapeHTML(job)}" ${job === selected ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
+        }
+
+        function populateRegistrationJobSelect() {
+            const sel = document.getElementById('registration-job');
+            if (sel && !sel.options.length) sel.innerHTML = buildJobOptions();
+        }
+
+        function normalizeJobProfiles(value) {
+            const source = safeObject(value), out = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES));
+            for (const job of JOB_ORDER) {
+                const rec = safeObject(source[job]);
+                if (!rec || !Object.keys(rec).length) continue;
+                if (typeof rec.className === 'string' && CLASS_ORDER.includes(rec.className)) out[job].className = rec.className;
+                if (typeof rec.raidPosition === 'string' && RAID_POSITION_OPTIONS.includes(rec.raidPosition)) out[job].raidPosition = rec.raidPosition;
+                if (typeof rec.damageType === 'string' && DPS_TYPE_OPTIONS.includes(rec.damageType)) out[job].damageType = rec.damageType;
+                if (Array.isArray(rec.secondaryRoles)) out[job].secondaryRoles = [...new Set(rec.secondaryRoles.map(String).filter(r => SECONDARY_ROLE_OPTIONS.includes(r)))];
+            }
+            return out;
+        }
+
+        function getJobMeta(job) {
+            if (!job || !JOB_DATABASE[job]) return null;
+            const profile = cloudData.settings?.jobProfiles?.[job] || DEFAULT_JOB_PROFILES[job];
+            return {
+                ...JOB_DATABASE[job],
+                className: profile.className,
+                raidPosition: profile.raidPosition,
+                damageType: profile.damageType || '',
+                secondaryRoles: Array.isArray(profile.secondaryRoles) ? [...profile.secondaryRoles] : []
+            };
+        }
+
+        function jobHasRole(meta, role) {
+            if (!meta) return false;
+            return meta.raidPosition === role || (Array.isArray(meta.secondaryRoles) && meta.secondaryRoles.includes(role));
+        }
+
+        function updateJobProfiles(profiles) {
+            cloudData.settings.jobProfiles = normalizeJobProfiles(profiles);
+            cloudData.settings.jobProfilesUpdatedAt = Date.now();
+            cloudData.settings.jobProfilesUpdatedBy = deviceId;
+            cloudData.updatedAt = Date.now();
+        }
+
+        function buildRoleCheckboxes(job) {
+            const meta = getJobMeta(job) || DEFAULT_JOB_PROFILES[job];
+            const selected = new Set(meta?.secondaryRoles || []);
+            return SECONDARY_ROLE_OPTIONS.map(role => `<label class="role-check"><input type="checkbox" data-role-job="${escapeHTML(job)}" data-role-name="${escapeHTML(role)}" ${selected.has(role) ? 'checked' : ''}><span>${escapeHTML(role)}</span></label>`).join('');
+        }
+
+        function openRoleConfigModal() { renderRoleConfig(); openModal('role-config-modal'); }
+
+        function renderRoleConfig() {
+            const list = document.getElementById('role-config-list');
+            if (!list) return;
+            list.innerHTML = JOB_ORDER.map(job => {
+                const meta = getJobMeta(job) || DEFAULT_JOB_PROFILES[job];
+                return `<tr>
+                    <td><strong>${escapeHTML(job)}</strong></td>
+                    <td><select class="role-config-select" data-job-field="className" data-job="${escapeHTML(job)}">${CLASS_ORDER.map(c => `<option value="${escapeHTML(c)}" ${c === meta.className ? 'selected' : ''}>${escapeHTML(c)}</option>`).join('')}</select></td>
+                    <td><select class="role-config-select" data-job-field="raidPosition" data-job="${escapeHTML(job)}">${RAID_POSITION_OPTIONS.map(r => `<option value="${escapeHTML(r)}" ${r === meta.raidPosition ? 'selected' : ''}>${escapeHTML(r)}</option>`).join('')}</select></td>
+                    <td><select class="role-config-select" data-job-field="damageType" data-job="${escapeHTML(job)}">${DPS_TYPE_OPTIONS.map(d => `<option value="${escapeHTML(d)}" ${d === (meta.damageType || '') ? 'selected' : ''}>${d || '—'}</option>`).join('')}</select></td>
+                    <td><div class="role-check-wrap">${buildRoleCheckboxes(job)}</div></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function saveRoleConfig() {
+            const next = normalizeJobProfiles(cloudData.settings.jobProfiles);
+            document.querySelectorAll('[data-job-field][data-job]').forEach(el => {
+                const job = el.dataset.job, field = el.dataset.jobField;
+                if (!next[job]) next[job] = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES[job]));
+                next[job][field] = el.value;
+            });
+            JOB_ORDER.forEach(job => {
+                if (!next[job]) next[job] = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES[job]));
+                next[job].secondaryRoles = [...document.querySelectorAll(`input[data-role-job="${CSS.escape(job)}"][data-role-name]`)]
+                    .filter(input => input.checked).map(input => input.dataset.roleName);
+            });
+            updateJobProfiles(next);
+            renderTeamBuilder();
+            renderClassSetup();
+            triggerAutoSync();
+            closeModal('role-config-modal');
+        }
+
+        function resetRoleConfig() {
+            if (!confirm('Reset all Job role settings to the built-in defaults?')) return;
+            updateJobProfiles(DEFAULT_JOB_PROFILES);
+            renderRoleConfig();
+            renderTeamBuilder();
+            renderClassSetup();
+            triggerAutoSync();
+        }
+
+        function getUnassignedJobCharacters() { return allRegisteredCharacters().filter(c => !getCharacterJob(c.name)); }
+
+        function updateClassSetupSummary() {
+            const missing = getUnassignedJobCharacters().length;
+            const count = document.getElementById('class-setup-count');
+            const alert = document.getElementById('class-setup-alert');
+            if (count) count.textContent = missing ? `${missing} character${missing === 1 ? '' : 's'}` : 'All characters configured';
+            if (alert) {
+                alert.style.borderColor = missing ? '#564d35' : '#314838';
+                alert.style.background = missing ? 'linear-gradient(90deg,#332f25,#282a31)' : 'linear-gradient(90deg,#27312a,#242a2d)';
+            }
+            const modalCount = document.getElementById('class-setup-modal-count');
+            if (modalCount) modalCount.textContent = `${missing} without a Job`;
+        }
+
+        function populateClassSetupRosterFilter() {
+            const sel = document.getElementById('class-setup-roster-filter');
+            if (!sel) return;
+            const cur = sel.value || 'all';
+            sel.innerHTML = '<option value="all">All Rosters</option>' + cloudData.settings.rosters.map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)}</option>`).join('');
+            sel.value = cloudData.settings.rosters.some(r => r.id === cur) ? cur : 'all';
+        }
+
+        function openClassSetupModal() {
+            populateClassSetupRosterFilter();
+            renderClassSetup();
+            openModal('class-setup-modal');
+        }
+
+        function renderClassSetup() {
+            const list = document.getElementById('class-setup-list');
+            if (!list) return;
+            const filter = document.getElementById('class-setup-roster-filter')?.value || 'all';
+            const rosterSet = filter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === filter);
+            const chars = flattenRosters(rosterSet);
+            list.innerHTML = chars.length ? chars.map(c => {
+                const job = getCharacterJob(c.name), meta = getJobMeta(job);
+                return `<tr><td><strong>${escapeHTML(c.name)}</strong></td><td class="class-setup-owner">${escapeHTML(c.rosterName)}</td><td><select class="class-setup-select" data-class-char="${escapeHTML(c.name)}" onchange="setCharacterJob('${escapeHTML(c.name)}', this.value)">${buildJobOptions(job)}</select></td><td>${meta ? escapeHTML(meta.className) : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? '<span class="class-setup-status ok">Configured</span>' : '<span class="class-setup-status missing">Needs Job</span>'}</td></tr>`;
+            }).join('') : '<tr><td colspan="6" style="color:#8b92a0;padding:16px;text-align:center;">No characters in this roster.</td></tr>';
+            updateClassSetupSummary();
+        }
+
+        function getTeamBuilderPrefs() { return { allowSameOwner: localStorage.getItem('pantheon-team-allow-same-owner') === '1' }; }
+        function saveTeamBuilderPrefs() {
+            const checked = document.getElementById('allow-same-owner')?.checked;
+            localStorage.setItem('pantheon-team-allow-same-owner', checked ? '1' : '0');
+            renderTeamBuilder();
+        }
+
+        function getSplitPartyMechanic() {
+            return !!cloudData.settings?.teamBuilder?.splitPartyMechanic;
+        }
+
+        function saveSplitPartyMechanic() {
+            if (!cloudData.settings?.teamBuilder) return;
+            const checked = document.getElementById('split-party-mechanic')?.checked !== false;
+            const now = Date.now();
+            cloudData.settings.teamBuilder.splitPartyMechanic = checked;
+            cloudData.settings.teamBuilder.splitPartyUpdatedAt = now;
+            cloudData.settings.teamBuilder.splitPartyUpdatedBy = deviceId;
+            cloudData.updatedAt = now;
+            renderTeamBuilder();
+            triggerAutoSync();
+        }
+
+        function populateTeamFormatSelect() {
+            const sel = document.getElementById('team-builder-format');
+            if (!sel) return;
+            const current = getTeamFormat();
+            sel.innerHTML = TEAM_FORMAT_ORDER.map(key => {
+                const fmt = TEAM_FORMATS[key];
+                return `<option value="${escapeHTML(key)}">${escapeHTML(fmt.label)}</option>`;
+            }).join('');
+            sel.value = current;
+        }
+
+        function populateTeamBuilderRosterFilter() {
+            const sel = document.getElementById('team-builder-roster-filter');
+            if (!sel) return;
+            const cur = sel.value || 'all';
+            sel.innerHTML = '<option value="all">All Rosters</option>' + cloudData.settings.rosters.map(r => `<option value="${escapeHTML(r.id)}">Only ${escapeHTML(r.name)}</option>`).join('');
+            sel.value = cloudData.settings.rosters.some(r => r.id === cur) ? cur : 'all';
+        }
+
+        function getTeamState(teamKey) { return cloudData.settings.teamBuilder[teamKey]; }
+
+        function getUsedTeamCharacters(exceptTeam = '', exceptSlot = -1) {
+            const used = new Set();
+            ['team1','team2'].forEach(t => getTeamState(t).slots.forEach((slot, i) => {
+                if (t !== exceptTeam || i !== exceptSlot) if (slot.character) used.add(slot.character);
+            }));
+            return used;
+        }
+
+        function getTeamOwners(teamKey, exceptSlot = -1) {
+            const used = new Set();
+            const chars = allRegisteredCharacters();
+            getTeamState(teamKey).slots.forEach((slot, i) => {
+                if (i === exceptSlot || !slot.character) return;
+                const c = chars.find(x => x.name === slot.character);
+                if (c?.rosterId) used.add(c.rosterId);
+            });
+            return used;
+        }
+
+        function getOtherTeamOwners(teamKey) {
+            const other = teamKey === 'team1' ? 'team2' : 'team1';
+            return getTeamOwners(other);
+        }
+
+        function getTeamBuilderRosterCharacters() {
+            const filter = document.getElementById('team-builder-roster-filter')?.value || 'all';
+            const rosterSet = filter === 'all'
+                ? cloudData.settings.rosters
+                : cloudData.settings.rosters.filter(r => r.id === filter);
+            return flattenRosters(rosterSet);
+        }
+
+        function getClassCounts(teamKey = '', slotIndex = -1) {
+            const counts = {};
+            CLASS_ORDER.forEach(c => counts[c] = 0);
+            getTeamBuilderRosterCharacters().forEach(c => {
+                const meta = getJobMeta(getCharacterJob(c.name));
+                if (meta?.className && counts[meta.className] !== undefined) counts[meta.className]++;
+            });
+            return counts;
+        }
+
+        function getSlotClassFilter(teamKey, slotIndex, currentChar = '') {
+            const currentMeta = currentChar ? getJobMeta(getCharacterJob(currentChar)) : null;
+            if (currentMeta?.className) return currentMeta.className;
+            return teamClassFilters[teamKey]?.[slotIndex] || '';
+        }
+
+        function setTeamClassFilter(teamKey, index, className) {
+            if (!teamClassFilters[teamKey]) teamClassFilters[teamKey] = Array(8).fill('');
+            teamClassFilters[teamKey][index] = CLASS_ORDER.includes(className) ? className : '';
+            const current = getTeamState(teamKey).slots[index]?.character || '';
+            if (current) {
+                const currentMeta = getJobMeta(getCharacterJob(current));
+                if (className && currentMeta?.className !== className) {
+                    setTeamSlot(teamKey, index, '');
+                    teamClassFilters[teamKey][index] = className;
+                    renderTeamBuilder();
+                    return;
+                }
+            }
+            renderTeamBuilder();
+        }
+
+        function buildTeamClassOptions(teamKey, slotIndex, currentChar) {
+            const selectedClass = getSlotClassFilter(teamKey, slotIndex, currentChar);
+            const options = [`<option value="">Any Class</option>`];
+            CLASS_ORDER.forEach(className => {
+                options.push(`<option value="${escapeHTML(className)}" ${className === selectedClass ? 'selected' : ''}>${escapeHTML(className)}</option>`);
+            });
+            return options.join('');
+        }
+
+        function teamCharacterOptions(teamKey, slotIndex, currentChar) {
+            const allChars = allRegisteredCharacters();
+            const rosterChars = getTeamBuilderRosterCharacters();
+            let chars = [...rosterChars];
+            const currentObj = currentChar ? allChars.find(c => c.name === currentChar) : null;
+            if (currentObj && !chars.some(c => c.name === currentChar)) chars = [currentObj, ...chars];
+
+            const selectedClass = getSlotClassFilter(teamKey, slotIndex, currentChar);
+            if (selectedClass) {
+                chars = chars.filter(c => {
+                    const meta = getJobMeta(getCharacterJob(c.name));
+                    return meta?.className === selectedClass || c.name === currentChar;
+                });
+            }
+
+            const usedChars = getUsedTeamCharacters(teamKey, slotIndex);
+            const sameTeamOwners = getTeamOwners(teamKey, slotIndex);
+            const otherTeamOwners = getOtherTeamOwners(teamKey);
+            const allowSameOwner = getTeamBuilderPrefs().allowSameOwner;
+            const opts = chars.filter(c => {
+                // Exact same character is never allowed twice, regardless of owner setting.
+                if (usedChars.has(c.name) && c.name !== currentChar) return false;
+                // Owner duplication is controlled entirely by the Allow same owner toggle.
+                if (!allowSameOwner && sameTeamOwners.has(c.rosterId) && c.name !== currentChar) return false;
+                if (!allowSameOwner && otherTeamOwners.has(c.rosterId) && c.name !== currentChar) return false;
+                return true;
+            });
+
+            return '<option value="">Empty Slot</option>' + opts.map(c => `<option value="${escapeHTML(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+        }
+
+        function setTeamFormat(value) {
+            const next = normalizeTeamFormat(value);
+            const tb = cloudData.settings.teamBuilder;
+            if (tb.format === next) return;
+            const now = Date.now();
+            tb.format = next; tb.formatUpdatedAt = now; tb.formatUpdatedBy = deviceId;
+            cloudData.updatedAt = now;
+            renderTeamBuilder();
+            triggerAutoSync();
+        }
+
+        function setTeamSlot(teamKey, index, character) {
+            const activeSize = getActiveTeamSize();
+            if (index >= activeSize) return;
+            const team = getTeamState(teamKey);
+            if (character) {
+                const duplicate = getUsedTeamCharacters(teamKey, index);
+                if (duplicate.has(character)) { alert('That character is already assigned to a team.'); return; }
+                const owner = allRegisteredCharacters().find(c => c.name === character)?.rosterId;
+                const allowSameOwner = getTeamBuilderPrefs().allowSameOwner;
+                if (!allowSameOwner && owner && getTeamOwners(teamKey, index).has(owner)) {
+                    alert('That owner already has a character assigned. Enable “Allow same owner” to let one player pilot multiple characters.');
+                    return;
+                }
+                if (!allowSameOwner && owner && getOtherTeamOwners(teamKey).has(owner)) {
+                    alert('That owner is already represented in the other team. Enable “Allow same owner” when one player is piloting multiple characters.');
+                    return;
+                }
+            }
+            team.slots[index] = { character: character || '', updatedAt: Date.now(), deviceId };
+            if (character) {
+                const meta = getJobMeta(getCharacterJob(character));
+                teamClassFilters[teamKey][index] = meta?.className || '';
+            }
+            cloudData.updatedAt = Date.now();
+            renderTeamBuilder();
+            triggerAutoSync();
+        }
+
+        function clearTeam(teamKey) {
+            if (!confirm(`Clear ${teamKey === 'team1' ? 'Team 1' : 'Team 2'}?`)) return;
+            const team = getTeamState(teamKey), now = Date.now();
+            team.slots = team.slots.map(() => ({ character: '', updatedAt: now, deviceId }));
+            teamClassFilters[teamKey] = Array(8).fill('');
+            cloudData.updatedAt = now;
+            renderTeamBuilder();
+            triggerAutoSync();
+        }
+
+        function fillNextEmptySlot(teamKey) {
+            const team = getTeamState(teamKey);
+            const activeSize = getActiveTeamSize();
+            const filter = document.getElementById('team-builder-roster-filter')?.value || 'all';
+            const rosterSet = filter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === filter);
+            const rosterChars = flattenRosters(rosterSet);
+            const usedChars = getUsedTeamCharacters(teamKey, -1);
+            const sameTeamOwners = getTeamOwners(teamKey, -1);
+            const otherTeamOwners = getOtherTeamOwners(teamKey);
+            const allowSameOwner = getTeamBuilderPrefs().allowSameOwner;
+            const ownerBlocked = c => !allowSameOwner && (sameTeamOwners.has(c.rosterId) || otherTeamOwners.has(c.rosterId));
+            const candidate = rosterChars.find(c => getCharacterJob(c.name) && !usedChars.has(c.name) && !ownerBlocked(c) && !team.slots.slice(0, activeSize).some(s => s.character === c.name));
+            if (!candidate) {
+                const missing = rosterChars.find(c => !getCharacterJob(c.name) && !usedChars.has(c.name) && !ownerBlocked(c));
+                if (missing) alert(`Set a Job for ${missing.name} first.`); else alert('No available configured characters found.');
+                return;
+            }
+            const idx = team.slots.slice(0, activeSize).findIndex(s => !s.character);
+            if (idx < 0) { alert('That team is already full.'); return; }
+            setTeamSlot(teamKey, idx, candidate.name);
+        }
+
+        function getTeamDpsBalance(teamKey) {
+            const counts = { Physical: 0, Magical: 0 };
+            const team = getTeamState(teamKey);
+            team.slots.slice(0, getActiveTeamSize()).map(s => s.character).filter(Boolean).forEach(name => {
+                const meta = getJobMeta(getCharacterJob(name));
+                if (!meta || !jobHasRole(meta, 'DPS')) return;
+                if (counts[meta.damageType] !== undefined) counts[meta.damageType]++;
+            });
+            return counts;
+        }
+
+        function buildTeamSummary(teamKey) {
+            const team = getTeamState(teamKey);
+            const counts = { DPS:0, Heal:0, Tank:0, Utility:0, Support:0, Debuff:0, Mobility:0, 'Beyond Time':0, Highlander:0, Provoke:0 };
+            team.slots.slice(0, getActiveTeamSize()).map(s => s.character).filter(Boolean).forEach(name => {
+                const meta = getJobMeta(getCharacterJob(name));
+                if (!meta) return;
+                SECONDARY_ROLE_OPTIONS.forEach(role => { if (jobHasRole(meta, role) && counts[role] !== undefined) counts[role]++; });
+            });
+            return counts;
+        }
+
+        function getTeamCompositionMessages(teamKey) {
+            const format = getTeamFormat(), c = buildTeamSummary(teamKey);
+            const messages = [];
+
+            if (format === '4HC') {
+                if (!c.Heal) messages.push('No Heal');
+                if (!c.Tank && !c.Provoke) messages.push('No Tank / Provoke');
+                if (c.DPS < 2) messages.push('Low DPS coverage');
+                return messages;
+            }
+
+            if (format === '8N' || format === '8HC') {
+                if (getSplitPartyMechanic()) {
+                    // Split mechanic: each 4-man party must satisfy the baseline composition.
+                    if (!c.Heal) messages.push('No Heal');
+                    if (!c.Tank && !c.Provoke) messages.push('No Tank / Provoke');
+                    if (c.DPS < 2) messages.push('Low DPS coverage');
+
+                    // 8 Man Hardcore adds the deeper per-party utility checks.
+                    if (format === '8HC') {
+                        if (!c.Debuff) messages.push('No Debuff');
+                        if (!c.Mobility) messages.push('No Mobility');
+                        if (!c['Beyond Time']) messages.push('No Beyond Time');
+                        if (!c.Highlander) messages.push('No Highlander');
+                    }
+                }
+            }
+
+            return messages;
+        }
+
+        function buildCombinedTeamSummary() {
+            const a = buildTeamSummary('team1'), b = buildTeamSummary('team2');
+            const keys = ['DPS','Heal','Tank','Utility','Support','Debuff','Mobility','Beyond Time','Highlander','Provoke'];
+            const out = {};
+            keys.forEach(k => out[k] = (a[k] || 0) + (b[k] || 0));
+            return out;
+        }
+
+        function getCombinedCompositionMessages() {
+            const format = getTeamFormat(), c = buildCombinedTeamSummary(), messages = [];
+            if (format !== '8N' && format !== '8HC') return messages;
+            if (c.Heal < 1) messages.push('No Heal');
+            if (c.Tank < 1 && c.Provoke < 1) messages.push('No Tank / Provoke');
+            if (c.DPS < 4) messages.push('Low DPS coverage');
+            return messages;
+        }
+
+        function renderTeamSummary(teamKey) {
+            const el = document.getElementById(`${teamKey}-summary`), fill = document.getElementById(`${teamKey}-filled`), sub = document.getElementById(`${teamKey}-sub`);
+            if (!el || !fill) return;
+            const team = getTeamState(teamKey), size = getActiveTeamSize(), members = team.slots.slice(0, size).filter(s => s.character).length, c = buildTeamSummary(teamKey);
+            const items = [['DPS',c.DPS],['Heal',c.Heal],['Tank',c.Tank],['Utility',c.Utility],['Support',c.Support],['Debuff',c.Debuff],['Mobility',c.Mobility],['Beyond Time',c['Beyond Time']],['Highlander',c.Highlander]];
+            el.innerHTML = '<span class="summary-label">Coverage:</span>' + items.map(([k,v]) => `<span class="team-summary-pill ${v ? '' : 'empty'}">${escapeHTML(k)} ${v}</span>`).join('');
+            fill.textContent = `${members} / ${size}`;
+            let warnings = getTeamCompositionMessages(teamKey);
+            if ((getTeamFormat() === '8N' || getTeamFormat() === '8HC') && !getSplitPartyMechanic()) {
+                warnings = teamKey === 'team1' ? getCombinedCompositionMessages() : [];
+            }
+            if (warnings.length) el.innerHTML += `<span class="team-summary-pill warning">⚠ ${escapeHTML(warnings.join(' · '))}</span>`;
+            if (sub) sub.textContent = `${TEAM_FORMATS[getTeamFormat()].label} · ${members} / ${size} filled`;
+        }
+
+        function renderTeamBalancePanel() {
+            const panel = document.getElementById('team-balance-panel');
+            if (!panel) return;
+            const fmt = TEAM_FORMATS[getTeamFormat()];
+            if (getTeamFormat() !== '8HC' || !getSplitPartyMechanic()) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            const a = getTeamDpsBalance('team1'), b = getTeamDpsBalance('team2');
+            const combined = { Physical: a.Physical + b.Physical, Magical: a.Magical + b.Magical };
+            const gap = Math.abs(combined.Physical - combined.Magical);
+            const sideText = gap === 0 ? 'Physical / Magical DPS are even' : `Physical / Magical DPS gap: ${gap}`;
+            document.getElementById('team-balance-description').textContent = fmt.hint;
+            document.getElementById('team1-dps-balance').textContent = `Physical ${a.Physical} · Magical ${a.Magical}`;
+            document.getElementById('team2-dps-balance').textContent = `Physical ${b.Physical} · Magical ${b.Magical}`;
+            document.getElementById('combined-dps-balance').textContent = `Combined: Physical ${combined.Physical} · Magical ${combined.Magical} · ${sideText}`;
+        }
+
+        function renderTeamBuilder() {
+            const filter = document.getElementById('team-builder-roster-filter');
+            if (!filter || !cloudData.settings?.teamBuilder) return;
+            populateTeamBuilderRosterFilter();
+            populateTeamFormatSelect();
+            const ownerDup = document.getElementById('allow-same-owner');
+            if (ownerDup) ownerDup.checked = getTeamBuilderPrefs().allowSameOwner;
+            const splitWrap = document.getElementById('split-party-wrap');
+            const splitBox = document.getElementById('split-party-mechanic');
+            const isEightMan = getTeamFormat() === '8N' || getTeamFormat() === '8HC';
+            if (splitWrap) splitWrap.style.display = isEightMan ? 'inline-flex' : 'none';
+            if (splitBox) splitBox.checked = getSplitPartyMechanic();
+            const formatSel = document.getElementById('team-builder-format');
+            if (formatSel) formatSel.value = getTeamFormat();
+            const fmt = TEAM_FORMATS[getTeamFormat()];
+            const desc = document.getElementById('team-format-description'), tag = document.getElementById('team-format-tag');
+            if (desc) desc.textContent = `${fmt.desc} ${fmt.hint}`;
+            if (tag) tag.textContent = fmt.label;
+
+            ['team1','team2'].forEach(teamKey => {
+                const team = getTeamState(teamKey), tbody = document.getElementById(`${teamKey}-slots`);
+                const card = document.getElementById(`team-card-${teamKey}`);
+                if (!tbody) return;
+                if (card) card.classList.toggle('team-card-compact', fmt.size === 4);
+                tbody.innerHTML = team.slots.slice(0, fmt.size).map((slot, i) => {
+                    const char = slot.character || '', job = getCharacterJob(char), meta = getJobMeta(job), owner = allRegisteredCharacters().find(c => c.name === char)?.rosterName || '';
+                    const posHTML = meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">—</span>';
+                    const jobHTML = meta ? `<span class="team-job">${escapeHTML(job)}</span>` : (char ? '<span class="team-job team-unknown">Job not set</span>' : '<span class="team-unknown">—</span>');
+                    const classHTML = `<select class="team-class-select" onchange="setTeamClassFilter('${teamKey}', ${i}, this.value)">${buildTeamClassOptions(teamKey, i, char)}</select>`;
+                    const dmgHTML = meta && meta.raidPosition === 'DPS' ? `<span class="team-badge damage-${String(meta.damageType||'').toLowerCase()}">${escapeHTML(meta.damageType || '—')}</span>` : '<span class="team-unknown">—</span>';
+                    return `<tr><td class="team-slot">${i+1}</td><td><select class="team-character-select ${char && !job ? 'needs-job' : ''}" onchange="setTeamSlot('${teamKey}', ${i}, this.value)">${teamCharacterOptions(teamKey,i,char)}</select></td><td class="team-meta">${classHTML}</td><td class="team-meta">${jobHTML}</td><td class="team-meta">${posHTML}</td><td>${dmgHTML}</td><td>${owner ? `<span class="owner-chip">${escapeHTML(owner)}</span>` : '<span class="team-unknown">—</span>'}</td><td><button class="remove-slot-btn" type="button" title="Empty slot" onclick="setTeamSlot('${teamKey}', ${i}, '')">×</button></td></tr>`;
+                }).join('');
+                renderTeamSummary(teamKey);
+            });
+            renderTeamBalancePanel();
+            updateClassSetupSummary();
+        }
+
+        function copyTeamToClipboard(teamKey) {
+            const team = getTeamState(teamKey), title = teamKey === 'team1' ? 'TEAM 1' : 'TEAM 2', fmt = TEAM_FORMATS[getTeamFormat()];
+            const lines = [`${title} · ${fmt.label}`];
+            team.slots.slice(0, fmt.size).forEach((slot, i) => {
+                if (!slot.character) return;
+                const job = getCharacterJob(slot.character), meta = getJobMeta(job), owner = allRegisteredCharacters().find(c => c.name === slot.character)?.rosterName || '';
+                lines.push(`${i+1}. ${slot.character} | ${job || 'Job not set'} | ${meta?.raidPosition || 'Position not set'} | ${owner}`);
+            });
+            if (getTeamFormat() === '8HC') {
+                const d = getTeamDpsBalance(teamKey);
+                lines.push(`DPS balance: Physical ${d.Physical} · Magical ${d.Magical}`);
+            }
+            const textOut = lines.length > 1 ? lines.join(String.fromCharCode(10)) : `${title} · ${fmt.label}` + String.fromCharCode(10) + 'No members assigned.';
+            if (navigator.clipboard?.writeText) navigator.clipboard.writeText(textOut).then(() => alert(`${title} copied to clipboard.`)).catch(() => window.prompt('Copy team summary:', textOut));
+            else window.prompt('Copy team summary:', textOut);
+        }
+
+        function resetTeamsForNewWeek() {
+            if (!confirm('Clear both teams for a new week?')) return;
+            const now = Date.now();
+            ['team1','team2'].forEach(k => {
+                const t = getTeamState(k);
+                t.slots = t.slots.map(() => ({ character:'', updatedAt:now, deviceId }));
+                teamClassFilters[k] = Array(8).fill('');
+            });
+            cloudData.updatedAt = now;
+            renderTeamBuilder();
+            triggerAutoSync();
+        }
+
+        function showAppPage(page) {
+            const tracker = document.getElementById('tracker-page'), builder = document.getElementById('team-builder-page');
+            if (!tracker || !builder) return;
+            const isBuilder = page === 'team-builder';
+            tracker.classList.toggle('hidden-page', isBuilder);
+            builder.classList.toggle('hidden-page', !isBuilder);
+            document.getElementById('page-tab-tracker')?.classList.toggle('active', !isBuilder);
+            document.getElementById('page-tab-team-builder')?.classList.toggle('active', isBuilder);
+            if (isBuilder) { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
+            else if (location.hash === '#team-builder') history.replaceState(null, '', location.pathname + location.search);
+        }
+
+
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
         function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
         function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
-            closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal');
-            if (location.hash === '#registration') { renderRosterRegistration(); openModal('roster-modal'); }
-            if (location.hash === '#dungeons') { renderDungeonRegistration(); openModal('dungeon-modal'); }
+            closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal');
+            if (location.hash === '#registration') { showAppPage('tracker'); renderRosterRegistration(); openModal('roster-modal'); }
+            if (location.hash === '#dungeons') { showAppPage('tracker'); renderDungeonRegistration(); openModal('dungeon-modal'); }
+            if (location.hash === '#team-builder') showAppPage('team-builder');
+            else if (location.hash !== '#registration' && location.hash !== '#dungeons') showAppPage('tracker');
         }
 
         function loadCloudForm() { const c = getCloudConfig(); document.getElementById('cloud-bin-id').value = c.binId; document.getElementById('cloud-api-key').value = c.apiKey; }
@@ -1782,7 +2871,7 @@
 
         function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 </body>
 </html>
