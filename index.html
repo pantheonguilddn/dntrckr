@@ -2774,7 +2774,7 @@
                     const posHTML = meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">—</span>';
                     const jobHTML = meta ? `<span class="team-job">${escapeHTML(job)}</span>` : (char ? '<span class="team-job team-unknown">Job not set</span>' : '<span class="team-unknown">—</span>');
                     const classHTML = `<select class="team-class-select" onchange="setTeamClassFilter('${teamKey}', ${i}, this.value)">${buildTeamClassOptions(teamKey, i, char)}</select>`;
-                    const dmgHTML = meta && meta.raidPosition === 'DPS' ? `<span class="team-badge damage-${String(meta.damageType||'').toLowerCase()}">${escapeHTML(meta.damageType || '—')}</span>` : '<span class="team-unknown">—</span>';
+                    const dmgHTML = meta && jobHasRole(meta, 'DPS') && meta.damageType ? `<span class="team-badge damage-${String(meta.damageType||'').toLowerCase()}">${escapeHTML(meta.damageType)}</span>` : '<span class="team-unknown">—</span>';
                     return `<tr><td class="team-slot">${i+1}</td><td><select class="team-character-select ${char && !job ? 'needs-job' : ''}" onchange="setTeamSlot('${teamKey}', ${i}, this.value)">${teamCharacterOptions(teamKey,i,char)}</select></td><td class="team-meta">${classHTML}</td><td class="team-meta">${jobHTML}</td><td class="team-meta">${posHTML}</td><td>${dmgHTML}</td><td>${owner ? `<span class="owner-chip">${escapeHTML(owner)}</span>` : '<span class="team-unknown">—</span>'}</td><td><button class="remove-slot-btn" type="button" title="Empty slot" onclick="setTeamSlot('${teamKey}', ${i}, '')">×</button></td></tr>`;
                 }).join('');
                 renderTeamSummary(teamKey);
