@@ -925,13 +925,11 @@
             const prev = getCellState(c, t);
             setCellState(c, t, e.target.checked ? 'done' : 'open');
             
-            // Only auto-check bounty if it was previously pinned (marked 🎯)
             if (e.target.checked && prev === 'marked') {
                 const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
                 if (bCat && !bCat.tasks.includes(t)) {
                     let targetBounty = null;
                     
-                    // 1. First, search for a bounty slot that exactly matches this dungeon's name
                     for (const bTask of bCat.tasks) {
                         const bCell = getCellRecord(c, bTask);
                         if (bCell.state !== 'done' && bCell.note === t) {
@@ -940,7 +938,6 @@
                         }
                     }
                     
-                    // 2. If not found, fall back to grabbing the first available open bounty slot
                     if (!targetBounty) {
                         for (const bTask of bCat.tasks) {
                             if (getCellState(c, bTask) !== 'done') { targetBounty = bTask; break; }
@@ -959,19 +956,30 @@
             const newState = s === 'open' || s === 'done' ? 'marked' : s === 'marked' ? 'reset' : s === 'reset' ? 'excluded' : 'open';
             setCellState(c, t, newState);
             
+            const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
+            
+            // If cycling from marked 🎯 to reset 🔄 (or clearing back to open), auto-clear matching bounty text box
+            if (s === 'marked' && bCat && !bCat.tasks.includes(t)) {
+                for (const bTask of bCat.tasks) {
+                    const bCell = getCellRecord(c, bTask);
+                    if (bCell.note === t) {
+                        setCellNote(c, bTask, '');
+                        const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(bTask)}"]`);
+                        if (input) input.value = '';
+                        break;
+                    }
+                }
+            }
+
             // Auto-fill the first available bounty text box when pinning (marking 🎯) a dungeon
-            if (newState === 'marked') {
-                const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
-                if (bCat && !bCat.tasks.includes(t)) { 
-                    for (const bTask of bCat.tasks) {
-                        const bCell = getCellRecord(c, bTask);
-                        if (bCell.state !== 'done' && !bCell.note) {
-                            setCellNote(c, bTask, t);
-                            // Instantly update the text box on screen
-                            const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(bTask)}"]`);
-                            if (input) input.value = t;
-                            break;
-                        }
+            if (newState === 'marked' && bCat && !bCat.tasks.includes(t)) { 
+                for (const bTask of bCat.tasks) {
+                    const bCell = getCellRecord(c, bTask);
+                    if (bCell.state !== 'done' && !bCell.note) {
+                        setCellNote(c, bTask, t);
+                        const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(bTask)}"]`);
+                        if (input) input.value = t;
+                        break;
                     }
                 }
             }
