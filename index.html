@@ -205,6 +205,26 @@
         .scholar-log-msg { flex-grow: 1; padding-left: 10px; }
         .scholar-del-btn { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 1.1rem; padding: 0 5px; }
         .scholar-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+        /* Help / Guide */
+        .help-btn { background-color: #3f647a; color: #fff; min-width: 38px; padding: 10px 13px; }
+        .help-btn:hover { background-color: #4d7890; }
+        .mini-help { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; margin-left: 6px; border: 1px solid #777; border-radius: 50%; background: #3b3b48; color: #fff; font-size: 0.72rem; font-weight: bold; cursor: pointer; vertical-align: middle; }
+        .mini-help:hover { background: #555568; }
+        .help-layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: start; }
+        .help-nav { display: grid; gap: 6px; position: sticky; top: 0; }
+        .help-nav button { width: 100%; text-align: left; padding: 9px 11px; border: 1px solid #444451; border-radius: 6px; background: #202029; color: #ddd; cursor: pointer; }
+        .help-nav button:hover { background: #2f2f3b; }
+        .help-nav button.active { background: #3f647a; border-color: #5d8ca7; color: #fff; }
+        .help-content { background: #17171d; border: 1px solid #444; border-radius: 7px; padding: 18px 20px; line-height: 1.55; }
+        .help-topic { display: none; }
+        .help-topic.active { display: block; }
+        .help-topic h4 { margin: 0 0 8px; font-size: 1.05rem; }
+        .help-topic h5 { margin: 16px 0 5px; color: #ddd; }
+        .help-topic p { margin: 8px 0; color: #cfcfd8; }
+        .help-topic .help-callout { margin: 12px 0; padding: 10px 12px; border-left: 4px solid #5d8ca7; background: #20202a; color: #ddd; }
+        .help-step { margin: 6px 0; }
+        @media (max-width: 780px) { .help-layout { grid-template-columns: 1fr; } .help-nav { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     </style>
 </head>
 <body>
@@ -217,19 +237,20 @@
         <div class="control-actions">
             <select id="user-identity" class="btn" style="background-color: #2b2b36; color: #b5e5c5; border: 1px solid #4CAF50; cursor: pointer;" onchange="saveIdentity()">
                 <option value="">👤 Who are you?</option>
-            </select>
-            <button id="mode-toggle-btn" class="btn btn-view-toggle" type="button" onclick="togglePersonalView()">🌍 Universal View</button>
+            </select><button class="mini-help" type="button" title="Getting Started" onclick="openHelpModal('start')">?</button>
+            <button id="mode-toggle-btn" class="btn btn-view-toggle" type="button" onclick="togglePersonalView()">🌍 Universal View</button><button class="mini-help" type="button" title="Universal vs Personal View" onclick="openHelpModal('views')">?</button>
             <select id="roster-filter" class="btn" style="background-color: #393946; color: white; border: 1px solid #555; cursor: pointer; display: none;" onchange="applyRosterFilter()">
                 <option value="all">👁️ Show All Rosters</option>
             </select>
             <!-- Specific visibility buttons -->
             <button id="btn-ledger" class="btn btn-estate" type="button" onclick="openScholarModal()" style="display: none;">💰 Ledger</button>
-            <button class="btn btn-secondary" type="button" onclick="openSalaryModal()">🧮 Salary Calc</button>
+            <button class="btn btn-secondary" type="button" onclick="openSalaryModal()">🧮 Salary Calc</button><button class="mini-help" type="button" title="Salary Calculator" onclick="openHelpModal('salary')">?</button>
             <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Now</button>
             <button class="btn btn-cloud" type="button" onclick="openCloudModal()">Cloud Setup</button>
-            <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button>
-            <button class="btn btn-roster" type="button" onclick="openRegistrationPage()">Roster Registration</button>
-            <button class="btn btn-weights" type="button" onclick="openWeightsModal()">Loot Weights</button>
+            <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button><button class="mini-help" type="button" title="Dungeon Registration" onclick="openHelpModal('dungeons')">?</button>
+            <button class="btn btn-roster" type="button" onclick="openRegistrationPage()">Roster Registration</button><button class="mini-help" type="button" title="Roster Registration" onclick="openHelpModal('registration')">?</button>
+            <button class="btn btn-weights" type="button" onclick="openWeightsModal()">Loot Weights</button><button class="mini-help" type="button" title="Loot Weights" onclick="openHelpModal('weights')">?</button>
+            <button class="btn help-btn" type="button" onclick="openHelpModal('start')">❔ Help</button>
         </div>
     </div>
 
@@ -238,7 +259,7 @@
             <colgroup id="table-colgroup"></colgroup>
             <thead>
                 <tr id="roster-row">
-                    <th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>
+                    <th rowspan="2" colspan="3" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker & Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>
                 </tr>
                 <tr id="header-row">
                 </tr>
@@ -254,7 +275,7 @@
     </div>
 
     <div style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
-        <h2 style="margin: 0;">📊 Roster Analytics</h2>
+        <h2 style="margin: 0;">📊 Roster Analytics <button class="mini-help" type="button" title="Analytics Guide" onclick="openHelpModal('analytics')">?</button></h2>
         <button id="toggle-analytics-btn" class="btn btn-secondary" onclick="toggleAnalytics()">👁️ Hide Analytics</button>
     </div>
     
@@ -387,6 +408,101 @@
                 </div>
             </div>
             <div class="modal-actions" style="margin-top:20px; justify-content: flex-end;"><button class="btn btn-secondary" type="button" onclick="closeModal('scholar-modal')">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Help & Guide Modal -->
+    <div class="modal-overlay hidden" id="help-modal" role="dialog" aria-label="Pantheon Tracker Help">
+        <div class="modal-card wide-modal">
+            <h3>❔ Pantheon Tracker Help</h3>
+            <div class="modal-note">Use the tabs on the left to learn the part of the tracker you are currently using. You can also click the small <b>?</b> buttons beside controls throughout the tool.</div>
+            <div class="help-layout">
+                <div class="help-nav">
+                    <button type="button" data-help-target="start" onclick="showHelpTopic('start')">Getting Started</button>
+                    <button type="button" data-help-target="registration" onclick="showHelpTopic('registration')">Roster Registration</button>
+                    <button type="button" data-help-target="dungeons" onclick="showHelpTopic('dungeons')">Dungeon Registration</button>
+                    <button type="button" data-help-target="views" onclick="showHelpTopic('views')">Universal / Personal</button>
+                    <button type="button" data-help-target="tracker" onclick="showHelpTopic('tracker')">Tracker & Bounty</button>
+                    <button type="button" data-help-target="analytics" onclick="showHelpTopic('analytics')">Roster Analytics</button>
+                    <button type="button" data-help-target="weights" onclick="showHelpTopic('weights')">Loot Weights</button>
+                    <button type="button" data-help-target="salary" onclick="showHelpTopic('salary')">Salary Calculator</button>
+                </div>
+                <div class="help-content">
+                    <section class="help-topic" data-help-topic="start">
+                        <h4>Getting Started</h4>
+                        <p>Start by choosing your identity from <b>👤 Who are you?</b>. This tells the tracker which roster belongs to you and enables Personal View.</p>
+                        <div class="help-callout"><b>Simple rule:</b> select your identity once, then use the tracker normally. Your identity is saved in your browser.</div>
+                        <p><b>Universal View</b> is for seeing the guild-wide board. <b>Personal View</b> is for focusing on your own roster.</p>
+                    </section>
+                    <section class="help-topic" data-help-topic="registration">
+                        <h4>Roster Registration</h4>
+                        <p>Use <b>Roster Registration</b> to add characters and maintain the owner/character groups shown across the tracker.</p>
+                        <div class="help-step"><b>1.</b> Choose an existing owner, or choose <b>＋ Create new group</b>.</div>
+                        <div class="help-step"><b>2.</b> Enter the exact in-game character name.</div>
+                        <div class="help-step"><b>3.</b> For a new group, choose the owner's name and a color.</div>
+                        <div class="help-step"><b>4.</b> Press <b>Register Character</b>.</div>
+                        <p>You can later rename groups, change colors, remove characters, or drag characters into a different order.</p>
+                        <div class="help-callout"><b>Guild-wide setting:</b> roster changes affect everyone. Only change roster structure when it is actually needed.</div>
+                    </section>
+                    <section class="help-topic" data-help-topic="dungeons">
+                        <h4>Dungeon Registration</h4>
+                        <p>Use <b>Dungeon Registration</b> to maintain the tasks displayed on the tracker.</p>
+                        <div class="help-step"><b>1.</b> Choose an existing category or create a new one.</div>
+                        <div class="help-step"><b>2.</b> Choose whether the category is <b>Daily</b> or <b>Weekly</b>.</div>
+                        <div class="help-step"><b>3.</b> Choose a pastel color for a new category.</div>
+                        <div class="help-step"><b>4.</b> Enter the exact task name and register it.</div>
+                        <p>Existing categories can be renamed, recolored, switched between Daily/Weekly, reordered, or removed. Tasks can also be dragged to reorder them.</p>
+                        <div class="help-callout"><b>Important:</b> Daily/Weekly classification affects reset behavior and weekly completion calculations, so this is an administrative feature.</div>
+                    </section>
+                    <section class="help-topic" data-help-topic="views">
+                        <h4>Universal View vs Personal View</h4>
+                        <p><b>🌍 Universal View</b> shows the active rosters together. Use it when organizing parties or checking guild-wide progress.</p>
+                        <p><b>👤 Personal View</b> filters the board to the roster associated with your selected identity.</p>
+                        <div class="help-callout"><b>Nothing is copied or separated.</b> Personal View is only a filter on the same shared data.</div>
+                        <p>To switch, click the view button. Universal and Personal View can be toggled back and forth at any time.</p>
+                    </section>
+                    <section class="help-topic" data-help-topic="tracker">
+                        <h4>Tracker & Bounty Checker</h4>
+                        <p>Use the checkbox to record a completed task. Uncheck it if it was marked by mistake.</p>
+                        <h5>Bounty workflow</h5>
+                        <p>For a dungeon you want to use for a Unique+ bounty, <b>right-click the dungeon cell</b>. It becomes <b>🎯 Marked</b> and the system places that dungeon into the first available bounty target slot.</p>
+                        <p>When you later complete the marked dungeon, checking it can automatically complete the linked bounty slot.</p>
+                        <h5>Right-click states</h5>
+                        <p>Right-click cycles through the special states: <b>Open → 🎯 Marked → 🔄 Reset → N/A → Open</b>.</p>
+                        <p><b>N/A</b> means the task does not apply to that character, and N/A tasks are excluded from the weekly completion-rate calculation.</p>
+                        <div class="help-callout"><b>Easy rule:</b> left-click to record completion. Right-click when you need to mark, reset, or exclude a task.</div>
+                    </section>
+                    <section class="help-topic" data-help-topic="analytics">
+                        <h4>Roster Analytics</h4>
+                        <p>Analytics uses archived weekly records to show each character's recent activity and areas that may need attention.</p>
+                        <h5>5-Week Trend</h5>
+                        <p>Shows the most recent weekly completion percentages available for that character.</p>
+                        <h5>Loot-Weighted Priorities</h5>
+                        <p>The system looks at missed dungeons, how often they were missed, N/A history, and the configured loot weight. It then surfaces up to three priority dungeons.</p>
+                        <div class="help-callout"><b>Think of it as a planning aid.</b> It is there to highlight what may be worth completing, not to replace the actual tracker.</div>
+                    </section>
+                    <section class="help-topic" data-help-topic="weights">
+                        <h4>Loot Weights</h4>
+                        <p>Every weekly task can be assigned a weight from <b>1 to 5</b>:</p>
+                        <p><b>1 = Minor</b> · <b>2 = Low</b> · <b>3 = Medium</b> · <b>4 = High</b> · <b>5 = Critical</b></p>
+                        <p>These weights affect how strongly missed content contributes to the Analytics priority score.</p>
+                        <p>Open <b>Loot Weights</b>, choose the desired number for each task, then press <b>Save Weights</b>. <b>Reset Defaults</b> restores the predefined settings.</p>
+                        <div class="help-callout"><b>Weights do not change completion.</b> They only change how Analytics evaluates missed content.</div>
+                    </section>
+                    <section class="help-topic" data-help-topic="salary">
+                        <h4>Salary Calculator</h4>
+                        <p>Use <b>🧮 Salary Calc</b> when splitting party income.</p>
+                        <p>Enter the <b>Total Party Income</b>, <b>Party Size</b>, <b>Total Seal Stamps Used</b>, <b>Stamp Comp. Rate</b>, and <b>Salary Holder Cut</b>.</p>
+                        <p>The calculator shows:</p>
+                        <p><b>Gross Income − Salary Holder Cut − Seal Stamp Cost = Net Income Pool</b></p>
+                        <p>The Net Income Pool is then divided by the party size to show the <b>Payout per member</b>.</p>
+                        <div class="help-callout"><b>Tip:</b> enter the actual numbers from the party run and use the displayed payout. The calculator updates automatically as you type.</div>
+                    </section>
+                </div>
+            </div>
+            <div class="modal-actions" style="justify-content:flex-end;">
+                <button class="btn btn-secondary" type="button" onclick="closeModal('help-modal')">Close</button>
+            </div>
         </div>
     </div>
 
@@ -1382,9 +1498,19 @@
         async function createNewCloudBin() { const key = document.getElementById('cloud-api-key').value.trim(); if (!key) return showCloudMessage('Paste API key first.', true); showCloudMessage('Creating...'); try { const res = await fetch(`${JSONBIN_ROOT}/b`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders({binId:'', apiKey:key}) }, body: JSON.stringify(cloudData) }); if (!res.ok) throw new Error(`Create failed (${res.status})`); const id = (await res.json()).metadata?.id; document.getElementById('cloud-bin-id').value = id; localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId: id, apiKey: key })); showCloudMessage(`Created. ID: ${id}`); await forceSync(true); } catch (e) { showCloudMessage(e.message, true); } }
         function clearCloudSettings() { if (!confirm('Remove cloud settings?')) return; localStorage.removeItem(CLOUD_CONFIG_KEY); loadCloudForm(); setStatus('⚪ Local mode'); showCloudMessage('Cleared.'); }
         function openCloudModal() { loadCloudForm(); document.getElementById('cloud-modal-message').style.display = 'none'; openModal('cloud-modal'); }
+        function openHelpModal(topic = 'start') {
+            showHelpTopic(topic);
+            openModal('help-modal');
+        }
+
+        function showHelpTopic(topic) {
+            document.querySelectorAll('.help-topic').forEach(el => el.classList.toggle('active', el.dataset.helpTopic === topic));
+            document.querySelectorAll('.help-nav button[data-help-target]').forEach(btn => btn.classList.toggle('active', btn.dataset.helpTarget === topic));
+        }
+
         function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeRegistrationPage(); closeDungeonPage(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 </body>
 </html>
