@@ -15,38 +15,265 @@
             align-items: center;
         }
 
-        /* Controls */
+        /* Header / Toolbar */
         .controls {
             width: 100%;
             max-width: 1600px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 24px;
+            margin-bottom: 18px;
+            padding: 10px 0 12px;
+            border-bottom: 1px solid #34343f;
         }
 
-        .btn {
-            padding: 10px 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 260px;
+        }
+        .brand-area img {
+            height: 54px !important;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.22));
+        }
+        .system-status {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 150px;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            gap: 7px;
+            padding: 5px 9px;
+            border: 1px solid #393944;
+            border-radius: 999px;
+            background: #25252f;
+            color: #c8c8d2;
+            font-size: 0.76rem;
+            white-space: nowrap;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #55d68a;
+            box-shadow: 0 0 10px rgba(85,214,138,0.42);
+            flex: 0 0 auto;
+        }
+        .controls .btn {
+            padding: 9px 14px;
+            min-height: 38px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.05px;
+            border: 1px solid transparent;
+            border-radius: 7px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: transform 0.16s ease, filter 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+            white-space: nowrap;
+        }
+        .controls .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .control-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 7px;
+            flex: 1;
+            min-width: 0;
+        }
+        .toolbar-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px;
+            border: 1px solid #30303a;
+            border-radius: 9px;
+            background: #24242d;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.025);
+        }
+        .toolbar-label {
+            padding: 0 5px 0 7px;
+            color: #8f8f9d;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            user-select: none;
+        }
+        .toolbar-divider {
+            width: 1px;
+            height: 28px;
+            background: #3a3a45;
+            margin: 0 2px;
+        }
+        .identity-select {
+            min-width: 168px;
+            background: #1d1d25 !important;
+            color: #d6f4df !important;
+            border-color: #39634a !important;
+        }
+        .btn-sync { background-color: #3d9b66; color: white; }
+        .btn-sync:hover { background-color: #348859; }
+        .btn-estate { background-color: #b97b2d; color: white; }
+        .btn-estate:hover { background-color: #a66c24; }
+        .btn-view-toggle { background-color: #5b45a7; color: white; }
+        .btn-view-toggle:hover { filter: brightness(1.08); }
+        .btn-view-toggle.personal-active { background-color: #3f80dc; }
+        .btn-cloud { background-color: #466f98; color: #fff; }
+        .btn-cloud:hover { background-color: #3d6388; }
+        .btn-weights { background-color: #7759a0; color: #fff; }
+        .btn-weights:hover { background-color: #694d8f; }
+        .btn-roster { background-color: #9a704c; color: #fff; }
+        .btn-roster:hover { background-color: #895f40; }
+        .btn-dungeon { background-color: #56765a; color: #fff; }
+        .btn-dungeon:hover { background-color: #4a674e; }
+        .btn-secondary { background-color: #4a4a57; color: #fff; }
+        .btn-secondary:hover { background-color: #565665; }
+        .btn-danger { background-color: #9b4545; color: #fff; }
+        .btn-danger:hover { background-color: #833939; }
+        .btn-ledger { border-color: #c58b39 !important; }
+        .btn-salary { background-color: #454853; color: #fff; }
+        .help-btn {
+            width: 38px;
+            min-width: 38px;
+            height: 38px;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            background: #323640;
+            border-color: #5a5f6d !important;
+            color: #f3f4f6;
+            font-size: 1rem !important;
+        }
+        .help-btn:hover { background: #414653; }
+        .sync-status { display: none; }
+
+        @media (max-width: 1050px) {
+            .controls { align-items: flex-start; }
+            .brand-area { min-width: 220px; }
+            .toolbar-row { justify-content: flex-start; }
+            .control-actions { align-items: flex-start; }
+        }
+        @media (max-width: 760px) {
+            .controls { flex-direction: column; gap: 10px; }
+            .brand-area, .control-actions { width: 100%; }
+            .control-actions { align-items: stretch; }
+            .toolbar-row { justify-content: flex-start; }
+            .toolbar-group { flex-wrap: wrap; }
         }
 
-        .btn-sync { background-color: #4CAF50; color: white; }
-        .btn-sync:hover { background-color: #45a049; }
-        .btn-estate { background-color: #d29034; color: white; }
-        .btn-estate:hover { background-color: #b87c2b; }
-        
-        .btn-view-toggle { background-color: #8b5cf6; color: white; transition: all 0.2s; }
-        .btn-view-toggle:hover { filter: brightness(1.1); }
-        .btn-view-toggle.personal-active { background-color: #3b82f6; }
 
-        .sync-status {
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-right: 15px;
+        /* Side Tools Drawer */
+        .controls { position: relative; z-index: 30; }
+        .control-actions { display: flex; align-items: center; justify-content: flex-end; flex-direction: row; gap: 10px; flex: 1; min-width: 0; }
+        .topbar-player { display: flex; align-items: center; gap: 8px; }
+        .roster-filter-top {
+            display: inline-block;
+            min-width: 148px;
+            background: #24242d !important;
+            color: #d9d9e2 !important;
+            border-color: #40404b !important;
+        }
+        .menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 8px 13px;
+            border: 1px solid #414652;
+            border-radius: 9px;
+            background: #262933;
+            color: #f4f5f7;
+            font: inherit;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform .16s ease, background .16s ease, border-color .16s ease;
+        }
+        .menu-toggle:hover { transform: translateY(-1px); background: #30333e; border-color: #596073; }
+        .menu-icon { font-size: 1rem; line-height: 1; }
+        .menu-toggle-label { letter-spacing: .03em; }
+        .tool-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(340px, 88vw);
+            height: 100vh;
+            z-index: 1001;
+            background: linear-gradient(180deg, #23242d 0%, #1f2028 100%);
+            border-left: 1px solid #424652;
+            box-shadow: -18px 0 45px rgba(0,0,0,.45);
+            transform: translateX(105%);
+            transition: transform .22s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-drawer.open { transform: translateX(0); }
+        .tool-drawer-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 20px 18px;
+            border-bottom: 1px solid #353844;
+        }
+        .drawer-kicker { font-size: .62rem; font-weight: 900; letter-spacing: .18em; color: #7f8797; }
+        .drawer-title { font-size: 1.2rem; font-weight: 800; margin-top: 2px; }
+        .drawer-close {
+            width: 34px; height: 34px; border-radius: 8px; border: 1px solid #444956;
+            background: #2c2f3a; color: #d7dae1; cursor: pointer; font-size: 1.35rem; line-height: 1;
+        }
+        .drawer-close:hover { background: #383c48; }
+        .drawer-content { padding: 12px 14px 28px; overflow-y: auto; }
+        .drawer-section { padding: 10px 0 14px; border-bottom: 1px solid #30333d; }
+        .drawer-section:last-child { border-bottom: 0; }
+        .drawer-section-title { padding: 0 7px 7px; font-size: .65rem; text-transform: uppercase; letter-spacing: .15em; font-weight: 900; color: #818898; }
+        .drawer-item {
+            width: 100%; display: flex; align-items: center; gap: 11px; text-align: left;
+            padding: 11px 10px; margin: 3px 0; border: 1px solid transparent; border-radius: 9px;
+            background: transparent; color: #eef0f4; cursor: pointer; transition: background .14s ease, border-color .14s ease, transform .14s ease;
+        }
+        .drawer-item:hover { background: #2c2f3a; border-color: #404551; transform: translateX(-2px); }
+        .drawer-item strong { display: block; font-size: .82rem; }
+        .drawer-item small { display: block; margin-top: 2px; color: #8e95a4; font-size: .68rem; }
+        .drawer-icon { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 28px; border-radius: 7px; background: #2d303a; font-size: .92rem; }
+        .drawer-item-gold .drawer-icon { background: #3d3120; }
+        .drawer-item-brown .drawer-icon { background: #3c3028; }
+        .drawer-item-green .drawer-icon { background: #28362c; }
+        .drawer-item-purple .drawer-icon { background: #302a3b; }
+        .drawer-item-help .drawer-icon { background: #293944; font-weight: 900; }
+        .drawer-help-section { padding-bottom: 0; }
+        .drawer-scrim {
+            position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.44);
+            opacity: 0; pointer-events: none; transition: opacity .2s ease;
+        }
+        .drawer-scrim.open { opacity: 1; pointer-events: auto; }
+        body.drawer-open { overflow: hidden; }
+
+        @media (max-width: 900px) {
+            .topbar-player { flex-wrap: wrap; justify-content: flex-end; }
+            .roster-filter-top { min-width: 132px; }
+        }
+        @media (max-width: 760px) {
+            .controls { flex-direction: column; gap: 10px; }
+            .brand-area, .control-actions { width: 100%; }
+            .control-actions { justify-content: space-between; }
+            .topbar-player { justify-content: flex-start; }
+            .roster-filter-top { min-width: 0; flex: 1; }
+            .menu-toggle { margin-left: auto; }
         }
 
         /* Responsive Table Wrapper */
@@ -148,14 +375,6 @@
         
         .dev-controls { margin-top: 30px; border-top: 1px solid #444; padding-top: 20px; text-align: center; }
 
-        /* Toolbar */
-        .control-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; }
-        .btn-cloud { background-color: #4f7cac; color: #fff; } .btn-cloud:hover { background-color: #416b96; }
-        .btn-weights { background-color: #8d6cab; color: #fff; } .btn-weights:hover { background-color: #775992; }
-        .btn-roster { background-color: #b1784c; color: #fff; } .btn-roster:hover { background-color: #96643f; }
-        .btn-dungeon { background-color: #6a8c6a; color: #fff; } .btn-dungeon:hover { background-color: #557555; }
-        .btn-secondary { background-color: #555; color: #fff; } .btn-secondary:hover { background-color: #666; }
-        .btn-danger { background-color: #9b4545; color: #fff; } .btn-danger:hover { background-color: #833939; }
 
         /* Modals */
         .modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, 0.72); }
@@ -230,29 +449,68 @@
 <body>
 
     <div class="controls">
-        <div>
-            <img src="Guild Banner.png" alt="Pantheon" style="height: 50px; vertical-align: middle; margin-right: 20px;">
-            <span class="sync-status" id="sync-status">🟢 Loading Database...</span>
+        <div class="brand-area">
+            <img src="Guild Banner.png" alt="Pantheon Guild">
+            <div class="system-status">
+                <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Loading Database...</span></div>
+            </div>
         </div>
+
         <div class="control-actions">
-            <select id="user-identity" class="btn" style="background-color: #2b2b36; color: #b5e5c5; border: 1px solid #4CAF50; cursor: pointer;" onchange="saveIdentity()">
-                <option value="">👤 Who are you?</option>
-            </select><button class="mini-help" type="button" title="Getting Started" onclick="openHelpModal('start')">?</button>
-            <button id="mode-toggle-btn" class="btn btn-view-toggle" type="button" onclick="togglePersonalView()">🌍 Universal View</button><button class="mini-help" type="button" title="Universal vs Personal View" onclick="openHelpModal('views')">?</button>
-            <select id="roster-filter" class="btn" style="background-color: #393946; color: white; border: 1px solid #555; cursor: pointer; display: none;" onchange="applyRosterFilter()">
-                <option value="all">👁️ Show All Rosters</option>
-            </select>
-            <!-- Specific visibility buttons -->
-            <button id="btn-ledger" class="btn btn-estate" type="button" onclick="openScholarModal()" style="display: none;">💰 Ledger</button>
-            <button class="btn btn-secondary" type="button" onclick="openSalaryModal()">🧮 Salary Calc</button><button class="mini-help" type="button" title="Salary Calculator" onclick="openHelpModal('salary')">?</button>
-            <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Now</button>
-            <button class="btn btn-cloud" type="button" onclick="openCloudModal()">Cloud Setup</button>
-            <button class="btn btn-dungeon" type="button" onclick="openDungeonPage()">Dungeon Registration</button><button class="mini-help" type="button" title="Dungeon Registration" onclick="openHelpModal('dungeons')">?</button>
-            <button class="btn btn-roster" type="button" onclick="openRegistrationPage()">Roster Registration</button><button class="mini-help" type="button" title="Roster Registration" onclick="openHelpModal('registration')">?</button>
-            <button class="btn btn-weights" type="button" onclick="openWeightsModal()">Loot Weights</button><button class="mini-help" type="button" title="Loot Weights" onclick="openHelpModal('weights')">?</button>
-            <button class="btn help-btn" type="button" onclick="openHelpModal('start')">❔ Help</button>
+            <div class="topbar-player">
+                <select id="user-identity" class="btn identity-select" onchange="saveIdentity()">
+                    <option value="">👤 Who are you?</option>
+                </select>
+                <button id="mode-toggle-btn" class="btn btn-view-toggle" type="button" onclick="togglePersonalView()">🌍 Universal View</button>
+                <select id="roster-filter" class="btn roster-filter-top" onchange="applyRosterFilter()">
+                    <option value="all">👁️ All Rosters</option>
+                </select>
+                <button class="mini-help" type="button" title="Personal & Universal View Guide" onclick="openHelpModal('view')">?</button>
+            </div>
+            <button class="menu-toggle" id="menu-toggle" type="button" onclick="toggleSideMenu()" aria-expanded="false" aria-controls="tool-drawer">
+                <span class="menu-icon">☰</span>
+                <span class="menu-toggle-label">Tools</span>
+            </button>
         </div>
     </div>
+
+    <aside class="tool-drawer" id="tool-drawer" aria-hidden="true">
+        <div class="tool-drawer-head">
+            <div>
+                <div class="drawer-kicker">PANTHEON</div>
+                <div class="drawer-title">Guild Tools</div>
+            </div>
+            <button class="drawer-close" type="button" onclick="toggleSideMenu(false)" aria-label="Close tools">×</button>
+        </div>
+
+        <div class="drawer-content">
+            <div class="drawer-section">
+                <div class="drawer-section-title">Party</div>
+                <button class="drawer-item drawer-item-gold" type="button" onclick="openScholarModal()"><span class="drawer-icon">💰</span><span><strong>Ledger</strong><small>Shared salary records</small></span></button>
+                <button class="drawer-item" type="button" onclick="openSalaryModal()"><span class="drawer-icon">🧮</span><span><strong>Salary Calculator</strong><small>Split party income</small></span></button>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-section-title">System</div>
+                <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
+                <button class="drawer-item" type="button" onclick="openCloudModal()"><span class="drawer-icon">☁</span><span><strong>Cloud Setup</strong><small>Configure shared storage</small></span></button>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-section-title">Manage</div>
+                <button class="drawer-item drawer-item-brown" type="button" onclick="openRegistrationPage()"><span class="drawer-icon">🧾</span><span><strong>Roster Registration</strong><small>Add and organize characters</small></span></button>
+                <button class="drawer-item drawer-item-green" type="button" onclick="openDungeonPage()"><span class="drawer-icon">🏰</span><span><strong>Dungeon Registration</strong><small>Manage tracked content</small></span></button>
+                <button class="drawer-item drawer-item-purple" type="button" onclick="openWeightsModal()"><span class="drawer-icon">🎁</span><span><strong>Loot Weights</strong><small>Adjust priority weighting</small></span></button>
+            </div>
+
+            <div class="drawer-section drawer-help-section">
+                <div class="drawer-section-title">Help</div>
+                <button class="drawer-item drawer-item-help" type="button" onclick="openHelpModal('start')"><span class="drawer-icon">?</span><span><strong>Tracker Guide</strong><small>How everything works</small></span></button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="drawer-scrim" id="drawer-scrim" onclick="toggleSideMenu(false)"></div>
 
     <div class="table-responsive">
         <table id="dn-tracker">
@@ -1508,9 +1766,23 @@
             document.querySelectorAll('.help-nav button[data-help-target]').forEach(btn => btn.classList.toggle('active', btn.dataset.helpTarget === topic));
         }
 
+
+        function toggleSideMenu(force) {
+            const drawer = document.getElementById('tool-drawer');
+            const scrim = document.getElementById('drawer-scrim');
+            const btn = document.getElementById('menu-toggle');
+            if (!drawer || !scrim || !btn) return;
+            const shouldOpen = typeof force === 'boolean' ? force : !drawer.classList.contains('open');
+            drawer.classList.toggle('open', shouldOpen);
+            scrim.classList.toggle('open', shouldOpen);
+            document.body.classList.toggle('drawer-open', shouldOpen);
+            drawer.setAttribute('aria-hidden', String(!shouldOpen));
+            btn.setAttribute('aria-expanded', String(shouldOpen));
+        }
+
         function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeRegistrationPage(); closeDungeonPage(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 </body>
 </html>
