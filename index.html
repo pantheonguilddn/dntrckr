@@ -1114,7 +1114,7 @@
                     <section class="help-topic" data-help-topic="versions">
                         <h4>Version History</h4>
                         <p>Use <b>🕘 Version History</b> before major roster reorganizations, resets, or other risky changes. Press <b>Push Version</b> and give it a clear name.</p>
-                        <p>Restore points are saved using JSONBin's version control. The tracker also creates automatic checkpoints during normal syncing. When you restore one, the current live state is saved first as a safety version, then the selected version becomes the new live state.</p>
+                        <p>Restore points are saved using JSONBin's version control. The tracker versions only shared, global-impact changes such as roster / character structure, dungeon structure, Job / Role settings, loot weights, and the shared split-party setting. Routine tracker checkmarks, notes, salary logs, and Team Builder slot assignments do not create versions. A refresh also detects a global change made on another PC and preserves it as a version. When you restore one, the current live state is saved first as a safety version, then the selected version becomes the new live state.</p>
                         <div class="help-callout"><b>Best practice:</b> push a version before large cleanups. Example: “Before roster cleanup · Oct 4”.</div>
                     </section>
                     <section class="help-topic" data-help-topic="salary">
@@ -1138,7 +1138,7 @@
     <div class="modal-overlay hidden" id="version-history-modal" role="dialog" aria-label="Version History">
         <div class="modal-card version-modal">
             <h3>🕘 Pantheon Version History</h3>
-            <div class="modal-note">This is the tracker equivalent of a Google Sheets restore point. The tracker also creates an automatic versioned checkpoint about every 15 minutes while changes are being synced. Push a named version before a large roster cleanup, reset, class rebalance, or other risky change. JSONBin supports up to 1000 saved versions.</div>
+            <div class="modal-note">This is the tracker equivalent of Google Sheets version history, but focused on <b>global-impact changes</b>. Versions are created automatically when shared roster / dungeon / class-role / loot configuration changes happen or are detected during refresh. Routine tracker checkmarks, notes, salary logs, and Team Builder slot edits do not create versions. You can still Push Version manually before a major operation. JSONBin supports up to 1000 saved versions.</div>
             <div class="version-toolbar">
                 <div class="version-toolbar-left">
                     <input id="version-label-input" class="version-label-input" maxlength="120" placeholder="Version name · e.g. Before roster cleanup">
@@ -1153,7 +1153,7 @@
             </div>
             <div id="version-history-status" class="version-status">Checking version history...</div>
             <div id="version-history-list" class="version-list" style="margin-top:12px;"><div class="version-empty">No version history loaded yet.</div></div>
-            <div class="version-note"><b>Recommended workflow:</b> before doing something risky, click <b>Push Version</b>. Give it a useful name. If something goes wrong, open Version History and restore that version. A safety copy of the current live state is created before every restore.</div>
+            <div class="version-note"><b>Automatic protection:</b> the tracker keeps a baseline and automatically versions changes that can affect every user, such as adding/removing/reordering characters or dungeons and changing shared Job/Role settings. A refresh also detects global changes made elsewhere and creates a version when needed. A safety copy of the current live state is created before every restore.</div>
         </div>
     </div>
 
@@ -1261,10 +1261,9 @@
         // ==========================================
         // ☁️ APP CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 15; 
+        const APP_SCHEMA_VERSION = 16; 
         const MAX_ARCHIVE_WEEKS = 12;
-        const AUTO_VERSION_INTERVAL_MS = 15 * 60 * 1000;
-        const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
+                const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
@@ -1451,7 +1450,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, versioningEnabled: true } },
+                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', versioningEnabled: true } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -1630,6 +1629,8 @@
                 lastCheckpointLabel: String(vc.lastCheckpointLabel || '').slice(0,120),
                 lastCheckpointKind: String(vc.lastCheckpointKind || ''),
                 lastVersionedWriteAt: Number(vc.lastVersionedWriteAt) || 0,
+                lastGlobalSignature: String(vc.lastGlobalSignature || ''),
+                globalBaselineSignature: String(vc.globalBaselineSignature || ''),
                 versioningEnabled: vc.versioningEnabled !== false
             };
 
@@ -1712,6 +1713,8 @@
             const lvc = safeObject(local.settings.versionControl), rvc = safeObject(remote.settings.versionControl);
             merged.settings.versionControl = (Number(lvc.lastCheckpointAt)||0) >= (Number(rvc.lastCheckpointAt)||0) ? { ...lvc } : { ...rvc };
             merged.settings.versionControl.lastVersionedWriteAt = Math.max(Number(lvc.lastVersionedWriteAt)||0, Number(rvc.lastVersionedWriteAt)||0);
+            merged.settings.versionControl.lastGlobalSignature = (Number(lvc.lastCheckpointAt)||0) >= (Number(rvc.lastCheckpointAt)||0) ? String(lvc.lastGlobalSignature||'') : String(rvc.lastGlobalSignature||'');
+            merged.settings.versionControl.globalBaselineSignature = String(rvc.globalBaselineSignature || lvc.globalBaselineSignature || '');
             merged.syncInfo = (Number(safeObject(local.syncInfo).at)||0) >= (Number(safeObject(remote.syncInfo).at)||0) ? local.syncInfo : remote.syncInfo;
 
             new Set([...Object.keys(local.cells), ...Object.keys(remote.cells)]).forEach(char => {
@@ -1788,27 +1791,208 @@
             await forceSync(false);
         }
 
+        function getGlobalImpactSnapshot(data = cloudData) {
+            const settings = data.settings || {};
+            const rosters = cloneRosters(settings.rosters || []).map(r => ({ id:r.id, name:r.name, color:r.color, characters:[...r.characters] }));
+            const categories = cloneCategories(settings.categories || []).map(c => ({ id:c.id, group:c.group, name:c.name, color:c.color, tasks:[...c.tasks] }));
+            const characterJobs = normalizeCharacterJobs(settings.characterJobs || {});
+            const jobProfiles = normalizeJobProfiles(settings.jobProfiles || {});
+            const lootWeights = {};
+            Object.keys(settings.lootWeights || {}).sort().forEach(k => { lootWeights[k] = clampWeight(settings.lootWeights[k]); });
+            return {
+                rosters,
+                categories,
+                characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])),
+                jobProfiles: Object.fromEntries(JOB_ORDER.map(k => [k, jobProfiles[k]])),
+                lootWeights,
+                splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic
+            };
+        }
+
+        function getGlobalImpactSignature(data = cloudData) {
+            return JSON.stringify(getGlobalImpactSnapshot(data));
+        }
+
+        function getLastSeenGlobalSignature() {
+            return String(localStorage.getItem('pantheon-last-global-impact-signature') || '');
+        }
+
+        function setLastSeenGlobalSignature(sig) {
+            if (sig) localStorage.setItem('pantheon-last-global-impact-signature', sig);
+        }
+
+        function getLastGlobalChangeLabel(data = cloudData) {
+            return String(versionControlState(data).lastCheckpointLabel || '');
+        }
+
+        async function putVersionedRecord(record, kind, label, signature) {
+            const config = getCloudConfig();
+            const now = Date.now();
+            const vc = versionControlState(record);
+            record.settings.versionControl = {
+                ...vc,
+                lastCheckpointAt: now,
+                lastCheckpointBy: versionIdentityLabel(),
+                lastCheckpointLabel: String(label || 'Global change').slice(0,120),
+                lastCheckpointKind: String(kind || 'global-change'),
+                lastVersionedWriteAt: now,
+                lastGlobalSignature: String(signature || getGlobalImpactSignature(record)),
+                globalBaselineSignature: String(vc.globalBaselineSignature || signature || getGlobalImpactSignature(record)),
+                versioningEnabled: true
+            };
+            record.updatedAt = now;
+            const opId = `vwrite-${deviceId}-${now}-${Math.random().toString(36).slice(2,8)}`;
+            record.syncInfo = { operationId: opId, by: deviceId, at: now };
+            const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, {
+                method:'PUT',
+                headers:{'Content-Type':'application/json','X-Bin-Versioning':'true',...authHeaders(config)},
+                body:JSON.stringify(record)
+            });
+            if (!res.ok) throw new Error(`Versioned update failed (${res.status})`);
+            const latest = normalizeData(await fetchRemoteRecord(config));
+            return { latest, opId };
+        }
+
+        async function ensureGlobalHistoryBaseline(remote) {
+            const sig = getGlobalImpactSignature(remote);
+            const vc = versionControlState(remote);
+            if (vc.globalBaselineSignature === sig && vc.lastGlobalSignature === sig) return remote;
+            // The baseline is the first known state under the new global-change history system.
+            // Older JSONBin versions are left untouched; future recovery points begin here.
+            const copy = normalizeData(remote);
+            copy.settings.versionControl = {
+                ...vc,
+                globalBaselineSignature: sig,
+                lastGlobalSignature: sig,
+                lastCheckpointAt: Date.now(),
+                lastCheckpointBy: versionIdentityLabel(),
+                lastCheckpointLabel: 'Baseline · Global Change History',
+                lastCheckpointKind: 'global-baseline',
+                lastVersionedWriteAt: Date.now(),
+                versioningEnabled: true
+            };
+            const result = await putVersionedRecord(copy, 'global-baseline', 'Baseline · Global Change History', sig);
+            return result.latest;
+        }
+
+        async function snapshotUnexpectedGlobalChange(remote) {
+            const sig = getGlobalImpactSignature(remote);
+            const vc = versionControlState(remote);
+            const lastGlobalSig = String(vc.lastGlobalSignature || '');
+            const seen = getLastSeenGlobalSignature();
+            if (!seen) {
+                setLastSeenGlobalSignature(lastGlobalSig || sig);
+                return remote;
+            }
+            if (sig === seen || (lastGlobalSig && lastGlobalSig === sig)) {
+                setLastSeenGlobalSignature(sig);
+                return remote;
+            }
+            // A legacy/older client or an otherwise unversioned global change happened elsewhere.
+            // Preserve the state now so the next rollback point definitely exists.
+            const label = `Global change detected during refresh · ${versionIdentityLabel()}`;
+            const copy = normalizeData(remote);
+            const result = await putVersionedRecord(copy, 'global-change', label, sig);
+            setLastSeenGlobalSignature(sig);
+            return result.latest;
+        }
+
+        let pendingGlobalChangeLabel = '';
+        let pendingGlobalChangeRequestedAt = 0;
+
+        async function prepareGlobalChange(label) {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return false;
+            }
+            if (window.__pantheonGlobalChangeBusy || window.__pantheonVersionWriteBusy) return false;
+            window.__pantheonGlobalChangeBusy = true;
+            clearTimeout(autoSyncTimer);
+            try {
+                setStatus(`🟡 Protecting shared change: ${label}...`);
+                let remote = normalizeData(await fetchRemoteRecord(getCloudConfig()));
+                remote = await ensureGlobalHistoryBaseline(remote);
+                const currentSig = getGlobalImpactSignature(remote);
+                const lastSig = String(versionControlState(remote).lastGlobalSignature || '');
+                if (currentSig !== lastSig) {
+                    const beforeLabel = `Before ${String(label || 'global change').slice(0,100)}`;
+                    remote = (await putVersionedRecord(normalizeData(remote), 'global-before', beforeLabel, currentSig)).latest;
+                    setLastSeenGlobalSignature(currentSig);
+                }
+                pendingGlobalChangeLabel = String(label || 'Global change').slice(0,120);
+                pendingGlobalChangeRequestedAt = Date.now();
+                cloudData = remote;
+                persistLocalData();
+                setStatus(`🟢 Protected: ${pendingGlobalChangeLabel}`);
+                return true;
+            } catch (err) {
+                setStatus(`🔴 Could not protect change: ${err.message}`);
+                alert(`The shared change was not started because a recovery point could not be secured.\n\n${err.message}`);
+                return false;
+            } finally {
+                window.__pantheonGlobalChangeBusy = false;
+            }
+        }
+
+        async function commitPendingGlobalChange(remote, candidate, label) {
+            const signature = getGlobalImpactSignature(candidate);
+            const remoteSignature = getGlobalImpactSignature(remote);
+            if (signature === remoteSignature) return { latest: remote, versioned:false };
+            const vc = versionControlState(candidate);
+            candidate.settings.versionControl = {
+                ...vc,
+                lastCheckpointAt: Date.now(),
+                lastCheckpointBy: versionIdentityLabel(),
+                lastCheckpointLabel: String(label || 'Global change').slice(0,120),
+                lastCheckpointKind: 'global-change',
+                lastVersionedWriteAt: Date.now(),
+                lastGlobalSignature: signature,
+                globalBaselineSignature: String(vc.globalBaselineSignature || getGlobalImpactSignature(remote)),
+                versioningEnabled: true
+            };
+            const result = await putVersionedRecord(candidate, 'global-change', label, signature);
+            setLastSeenGlobalSignature(getGlobalImpactSignature(result.latest));
+            return { latest: result.latest, versioned:true };
+        }
+
         async function forceSync(showSuccess = false) {
             if (!hasCloudConfig()) { persistLocalData(); setStatus('⚪ Saved locally'); if(showSuccess)openCloudModal(); return; }
-            if (syncInProgress) { syncRequestedWhileBusy = true; return; }
-            if (window.__pantheonVersionWriteBusy) return;
+            if (syncInProgress || window.__pantheonVersionWriteBusy || window.__pantheonGlobalChangeBusy) { syncRequestedWhileBusy = true; return; }
             syncInProgress = true; setStatus('🟡 Merging Cloud Data...');
             const config = getCloudConfig();
             try {
                 for (let attempt = 1; attempt <= 3; attempt++) {
-                    const remote = normalizeData(await fetchRemoteRecord(config));
+                    let remote = normalizeData(await fetchRemoteRecord(config));
+                    // On first use, establish one baseline. On refresh, detect global changes that
+                    // were made by another PC/client and snapshot them before normal merging continues.
+                    if (!versionControlState(remote).globalBaselineSignature) remote = await ensureGlobalHistoryBaseline(remote);
+                    remote = await snapshotUnexpectedGlobalChange(remote);
                     let candidate = mergeData(cloudData, remote);
                     const now = Date.now();
                     const opId = `sync-${deviceId}-${now}-${Math.random().toString(36).slice(2,8)}`;
-                    const lastVersionedWriteAt = Number(versionControlState(remote).lastVersionedWriteAt) || 0;
-                    const shouldAutoVersion = now - lastVersionedWriteAt >= AUTO_VERSION_INTERVAL_MS;
-                    if (shouldAutoVersion) {
-                        candidate.settings.versionControl = { ...versionControlState(candidate), lastCheckpointAt:now, lastCheckpointBy:versionIdentityLabel(), lastCheckpointLabel:`Automatic checkpoint · ${versionIdentityLabel()}`, lastCheckpointKind:'auto', lastVersionedWriteAt:now, versioningEnabled:true };
-                    }
                     candidate.updatedAt = now;
                     candidate.syncInfo = { operationId:opId, by:deviceId, at:now };
 
-                    const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, { method:'PUT', headers:{ 'Content-Type':'application/json', ...(shouldAutoVersion ? {'X-Bin-Versioning':'true'} : {}), ...authHeaders(config) }, body:JSON.stringify(candidate) });
+                    const label = pendingGlobalChangeLabel;
+                    const globalChanged = getGlobalImpactSignature(candidate) !== getGlobalImpactSignature(remote);
+                    const headers = { 'Content-Type':'application/json', ...authHeaders(config) };
+                    if (label && globalChanged) headers['X-Bin-Versioning'] = 'true';
+                    if (label && globalChanged) {
+                        candidate.settings.versionControl = {
+                            ...versionControlState(candidate),
+                            lastCheckpointAt: now,
+                            lastCheckpointBy: versionIdentityLabel(),
+                            lastCheckpointLabel: label,
+                            lastCheckpointKind: 'global-change',
+                            lastVersionedWriteAt: now,
+                            lastGlobalSignature: getGlobalImpactSignature(candidate),
+                            globalBaselineSignature: String(versionControlState(candidate).globalBaselineSignature || getGlobalImpactSignature(remote)),
+                            versioningEnabled: true
+                        };
+                    }
+
+                    const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, { method:'PUT', headers, body:JSON.stringify(candidate) });
                     if (!res.ok) throw new Error(`Update failed (${res.status})`);
 
                     const latest = normalizeData(await fetchRemoteRecord(config));
@@ -1816,6 +2000,11 @@
                     if (latestOp === opId) {
                         cloudData = latest;
                         delete cloudData.syncInfo;
+                        if (label && globalChanged) {
+                            setLastSeenGlobalSignature(getGlobalImpactSignature(latest));
+                            pendingGlobalChangeLabel = '';
+                            pendingGlobalChangeRequestedAt = 0;
+                        }
                         persistLocalData();
                         refreshTrackerUI();
                         setStatus(showSuccess ? '🟢 Cloud Sync Complete' : '🟢 Database Synced');
@@ -1923,7 +2112,7 @@
             const label = vc.lastCheckpointLabel || 'Legacy / unnamed version';
             const by = vc.lastCheckpointBy ? `by ${vc.lastCheckpointBy}` : 'author unknown';
             const when = versionTimestamp(vc.lastCheckpointAt);
-            const kind = vc.lastCheckpointKind === 'manual' ? '<span class="version-badge">PUSHED VERSION</span>' : (vc.lastCheckpointKind === 'auto-safety' ? '<span class="version-badge">AUTO SAFETY</span>' : (vc.lastCheckpointKind === 'auto' ? '<span class="version-badge">AUTO</span>' : (vc.lastCheckpointKind === 'restore' ? '<span class="version-badge">RESTORED</span>' : '')));
+            const kind = vc.lastCheckpointKind === 'manual' ? '<span class="version-badge">PUSHED VERSION</span>' : (vc.lastCheckpointKind === 'global-change' ? '<span class="version-badge">GLOBAL CHANGE</span>' : (vc.lastCheckpointKind === 'global-before' ? '<span class="version-badge">BEFORE CHANGE</span>' : (vc.lastCheckpointKind === 'global-baseline' ? '<span class="version-badge">BASELINE</span>' : (vc.lastCheckpointKind === 'auto-safety' ? '<span class="version-badge">AUTO SAFETY</span>' : (vc.lastCheckpointKind === 'restore' ? '<span class="version-badge">RESTORED</span>' : '')))));
             return `<div class="version-row"><div class="version-number">v${row.version}</div><div class="version-main"><strong>${escapeHTML(label)}${kind}</strong><small>${escapeHTML(by)} · ${escapeHTML(when)}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion(${row.version})">Download</button><button class="btn btn-danger" type="button" onclick="restoreHistoryVersion(${row.version})">Restore</button></div></div>`;
         }
 
@@ -1934,8 +2123,8 @@
                 if (showStatus) statusEl.textContent = 'Loading recent versions...';
                 const countPayload = await versionApi(`/b/${encodeURIComponent(getCloudConfig().binId)}/versions/count`);
                 versionHistoryCount = Number(countPayload?.metadata?.versionCount)||0;
-                if (!versionHistoryCount) { statusEl.textContent='No JSONBin versions exist yet. The first automatic checkpoint will appear during syncing, or you can Push Version now.'; listEl.innerHTML='<div class="version-empty">No restore points yet.</div>'; return; }
-                const maxRows = Math.min(25, versionHistoryCount), first = Math.max(1, versionHistoryCount-maxRows+1);
+                if (!versionHistoryCount) { statusEl.textContent='No global-change versions exist yet. The tracker will create a baseline on first sync, then version only changes that affect all users. You can also Push Version now.'; listEl.innerHTML='<div class="version-empty">No restore points yet.</div>'; return; }
+                const maxRows = Math.min(50, versionHistoryCount), first = Math.max(1, versionHistoryCount-maxRows+1);
                 const versions = Array.from({length:maxRows}, (_,i)=>first+i).reverse();
                 listEl.innerHTML='<div class="version-empty">Loading versions...</div>';
                 const fetched = await Promise.all(versions.map(async version => { try { return {version, record:await fetchVersionRecord(version), ok:true}; } catch(err) { return {version, ok:false, error:err.message}; } }));
@@ -1975,13 +2164,13 @@
                 setStatus(`🟡 Creating safety version before restoring v${version}...`);
                 const current=normalizeData(await fetchRemoteRecord(config));
                 const safety=JSON.parse(JSON.stringify(current));
-                safety.settings.versionControl={...versionControlState(safety),lastCheckpointAt:Date.now(),lastCheckpointBy:versionIdentityLabel(),lastCheckpointLabel:`Safety copy before restoring v${version}`,lastCheckpointKind:'restore-safety',lastVersionedWriteAt:Date.now(),versioningEnabled:true};
+                safety.settings.versionControl={...versionControlState(safety),lastCheckpointAt:Date.now(),lastCheckpointBy:versionIdentityLabel(),lastCheckpointLabel:`Safety copy before restoring v${version}`,lastCheckpointKind:'restore-safety',lastVersionedWriteAt:Date.now(),lastGlobalSignature:getGlobalImpactSignature(safety),globalBaselineSignature:String(versionControlState(safety).globalBaselineSignature||getGlobalImpactSignature(safety)),versioningEnabled:true};
                 safety.updatedAt=Date.now();
                 const safetyRes=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Bin-Versioning':'true',...authHeaders(config)},body:JSON.stringify(safety)});
                 if(!safetyRes.ok) throw new Error(`Safety version failed (${safetyRes.status})`);
 
                 const selected=await fetchVersionRecord(version);
-                selected.settings.versionControl={...versionControlState(selected),lastCheckpointAt:Date.now(),lastCheckpointBy:versionIdentityLabel(),lastCheckpointLabel:`Restored from v${version}`,lastCheckpointKind:'restore',lastVersionedWriteAt:Date.now(),versioningEnabled:true};
+                selected.settings.versionControl={...versionControlState(selected),lastCheckpointAt:Date.now(),lastCheckpointBy:versionIdentityLabel(),lastCheckpointLabel:`Restored from v${version}`,lastCheckpointKind:'restore',lastVersionedWriteAt:Date.now(),lastGlobalSignature:getGlobalImpactSignature(selected),globalBaselineSignature:String(versionControlState(selected).globalBaselineSignature||getGlobalImpactSignature(selected)),versioningEnabled:true};
                 selected.updatedAt=Date.now();
                 setStatus(`🟡 Restoring v${version}...`);
                 const writeRes=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Bin-Versioning':'true',...authHeaders(config)},body:JSON.stringify(selected)});
@@ -2269,8 +2458,8 @@
             getAllKnownCharacterNames().forEach(c => weeklyTaskNames.forEach(t => { const s = getCellState(c, t); if(s!=='open'&&s!=='excluded') setCellState(c, t, 'open', ts); }));
         }
 
-        async function manualDailyReset() { if (!confirm('Force Daily Reset?')) return; if (!(await createSafetyCheckpointIfNeeded('Before manual daily reset'))) return; executeDailyReset(); cloudData.lastDailyReset = getTargetResetTimeUTC(false); applyBoardState(); triggerAutoSync(); }
-        async function manualWeeklyReset() { if (!confirm('Force Weekly Archive?')) return; if (!(await createSafetyCheckpointIfNeeded('Before manual weekly archive / reset'))) return; const rk = Math.max(Date.now(), getTargetResetTimeUTC(true)); executeWeeklyReset(rk); cloudData.lastWeeklyReset = rk; applyBoardState(); renderAnalytics(); triggerAutoSync(); }
+        async function manualDailyReset() { if (!confirm('Force Daily Reset?')) return; executeDailyReset(); cloudData.lastDailyReset = getTargetResetTimeUTC(false); applyBoardState(); triggerAutoSync(); }
+        async function manualWeeklyReset() { if (!confirm('Force Weekly Archive?')) return; const rk = Math.max(Date.now(), getTargetResetTimeUTC(true)); executeWeeklyReset(rk); cloudData.lastWeeklyReset = rk; applyBoardState(); renderAnalytics(); triggerAutoSync(); }
 
         function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
         function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
@@ -2369,8 +2558,21 @@
             document.getElementById('weight-editor').innerHTML = weeklyTaskNames.map(t => `<div class="weight-row"><div>${escapeHTML(t)}</div><select data-weight-task="${escapeHTML(t)}">${[1,2,3,4,5].map(w=>`<option value="${w}" ${w===getLootWeight(t)?'selected':''}>${w}</option>`).join('')}</select><div class="weight-label" data-weight-label="${escapeHTML(t)}">${['Minor','Low','Medium','High','Critical'][getLootWeight(t)-1]}</div></div>`).join('');
             document.querySelectorAll('select[data-weight-task]').forEach(sel => sel.addEventListener('change', () => { const l = document.querySelector(`[data-weight-label="${CSS.escape(sel.dataset.weightTask)}"]`); if(l) l.textContent = ['Minor','Low','Medium','High','Critical'][sel.value-1]; }));
         }
-        function saveLootWeights() { const ts = Date.now(); document.querySelectorAll('select[data-weight-task]').forEach(sel => { cloudData.settings.lootWeights[sel.dataset.weightTask] = clampWeight(sel.value); cloudData.settings.lootWeightUpdatedAt[sel.dataset.weightTask] = ts; }); renderAnalytics(); triggerAutoSync(); closeModal('weights-modal'); }
-        function resetLootWeights() { if (!confirm('Reset?')) return; const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(DEFAULT_LOOT_WEIGHTS[t]||3); cloudData.settings.lootWeightUpdatedAt[t] = ts; }); buildLootWeightEditor(); renderAnalytics(); triggerAutoSync(); }
+        async function saveLootWeights() {
+            const next = { ...(cloudData.settings.lootWeights || {}) };
+            document.querySelectorAll('select[data-weight-task]').forEach(sel => { next[sel.dataset.weightTask] = clampWeight(sel.value); });
+            const same = weeklyTaskNames.every(t => clampWeight(next[t]) === clampWeight(cloudData.settings.lootWeights[t]));
+            if (same) { closeModal('weights-modal'); return; }
+            if (!(await prepareGlobalChange('Update Loot Weights'))) return;
+            const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(next[t]); cloudData.settings.lootWeightUpdatedAt[t] = ts; });
+            renderAnalytics(); triggerAutoSync(); closeModal('weights-modal');
+        }
+        async function resetLootWeights() {
+            if (!confirm('Reset?')) return;
+            if (!(await prepareGlobalChange('Reset Loot Weights'))) return;
+            const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(DEFAULT_LOOT_WEIGHTS[t]||3); cloudData.settings.lootWeightUpdatedAt[t] = ts; });
+            buildLootWeightEditor(); renderAnalytics(); triggerAutoSync();
+        }
         function openWeightsModal() { buildLootWeightEditor(); openModal('weights-modal'); }
 
         // --- Drag & Drop Variables ---
@@ -2397,23 +2599,56 @@
             else { const r = findRoster(document.getElementById('registration-roster-select').value); if(r) document.getElementById('registration-color').value=r.color; document.getElementById('registration-color').disabled=true; }
         }
 
-        function registerCharacter() {
+        async function registerCharacter() {
             const v = document.getElementById('registration-character-name').value.trim(); if(!v) return alert('Enter character name.');
             if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === v.toLowerCase()))) return alert('Character exists.');
             const job = document.getElementById('registration-job')?.value || '';
             if (!job) return alert("Choose the character's Class / Job. Team Builder uses this to determine roles and raid position.");
-            let r; if (document.getElementById('registration-roster-select').value === '__new__') { const n = document.getElementById('registration-owner-name').value.trim(); if(!n) return alert('Enter owner.'); r = { id: `roster-${Date.now().toString(36)}`, name: n.slice(0,30), color: normalizeColor(document.getElementById('registration-color').value), characters: [] }; getRosters().push(r); }
-            else r = findRoster(document.getElementById('registration-roster-select').value);
-            const name = v.slice(0,40); r.characters.push(name);
+            const rosterChoice = document.getElementById('registration-roster-select').value;
+            const ownerName = document.getElementById('registration-owner-name')?.value.trim() || '';
+            const color = normalizeColor(document.getElementById('registration-color')?.value, '#7aa2f7');
+            const name = v.slice(0,40);
+            if (rosterChoice === '__new__' && !ownerName) return alert('Enter owner.');
+            if (!(await prepareGlobalChange(`Add character ${name}`))) return;
+            // Re-check after refreshing to the latest shared state.
+            if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === name.toLowerCase()))) return alert('Character was already added by another device.');
+            let r;
+            if (rosterChoice === '__new__') {
+                r = { id: `roster-${Date.now().toString(36)}`, name: ownerName.slice(0,30), color, characters: [] };
+                getRosters().push(r);
+            } else {
+                r = findRoster(rosterChoice);
+                if (!r) return alert('That owner group no longer exists. Refresh the tracker and try again.');
+            }
+            r.characters.push(name);
             cloudData.settings.characterJobs[name] = { job, updatedAt: Date.now(), deviceId };
             touchRosterSettings(); document.getElementById('registration-character-name').value='';
             if (document.getElementById('registration-job')) document.getElementById('registration-job').value='';
             refreshTrackerUI(); document.getElementById('registration-roster-select').value = r.id; handleRegistrationRosterChange(false); triggerAutoSync();
         }
 
-        function saveRosterGroup(id) { const r = findRoster(id); if(r) { r.name = document.querySelector(`[data-roster-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || r.name; r.color = normalizeColor(document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`).value, r.color); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); } }
-        async function removeCharacterFromRoster(id, n) { const r = findRoster(id); if(!r || !confirm(`Remove ${n}?`)) return; if (!(await createSafetyCheckpointIfNeeded(`Before removing ${n}`))) return; r.characters = r.characters.filter(c => c !== n); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); }
-        async function removeRosterGroup(id) { if(!confirm('Remove group?')) return; const r = findRoster(id); if (!r) return; if (!(await createSafetyCheckpointIfNeeded(`Before removing roster ${r.name}`))) return; cloudData.settings.rosters = getRosters().filter(item => item.id !== id); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync(); }
+        async function saveRosterGroup(id) {
+            const r = findRoster(id); if (!r) return;
+            const name = document.querySelector(`[data-roster-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || r.name;
+            const color = normalizeColor(document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`).value, r.color);
+            if (!(await prepareGlobalChange(`Update roster ${r.name}`))) return;
+            const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
+            latest.name = name; latest.color = color; touchRosterSettings(); refreshTrackerUI(); triggerAutoSync();
+        }
+        async function removeCharacterFromRoster(id, n) {
+            const r = findRoster(id); if(!r || !confirm(`Remove ${n}?`)) return;
+            if (!(await prepareGlobalChange(`Remove character ${n}`))) return;
+            const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
+            latest.characters = latest.characters.filter(c => c !== n); delete cloudData.settings.characterJobs[n];
+            touchRosterSettings(); refreshTrackerUI(); triggerAutoSync();
+        }
+        async function removeRosterGroup(id) {
+            if(!confirm('Remove group?')) return; const r = findRoster(id); if (!r) return;
+            if (!(await prepareGlobalChange(`Remove roster ${r.name}`))) return;
+            const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
+            latest.characters.forEach(n => { delete cloudData.settings.characterJobs[n]; });
+            cloudData.settings.rosters = getRosters().filter(item => item.id !== id); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync();
+        }
         
         function getCategories() { return cloudData.settings.categories; }
         function findCategory(id) { return getCategories().find(c => c.id === id); }
@@ -2460,17 +2695,51 @@
             }
         }
 
-        function registerDungeonTask() {
+        async function registerDungeonTask() {
             const v = document.getElementById('reg-dungeon-task-name').value.trim(); if(!v) return alert('Enter task name.');
             if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === v.toLowerCase()))) return alert('Task exists.');
-            let c; if (document.getElementById('reg-dungeon-cat-select').value === '__new__') { const n = document.getElementById('reg-dungeon-cat-name').value.trim(); if(!n) return alert('Enter category.'); c = { id: `cat-${Date.now().toString(36)}`, group: document.getElementById('reg-dungeon-cat-group').value, name: n.slice(0,30), color: normalizeColor(document.getElementById('reg-dungeon-color').value, '#ffffff'), tasks: [] }; getCategories().push(c); }
-            else c = findCategory(document.getElementById('reg-dungeon-cat-select').value);
-            c.tasks.push(v.slice(0,40)); touchCategorySettings(); document.getElementById('reg-dungeon-task-name').value=''; refreshTrackerUI(); document.getElementById('reg-dungeon-cat-select').value = c.id; handleDungeonCatChange(false); triggerAutoSync();
+            const catChoice = document.getElementById('reg-dungeon-cat-select').value;
+            const newCatName = document.getElementById('reg-dungeon-cat-name')?.value.trim() || '';
+            const newCatGroup = document.getElementById('reg-dungeon-cat-group')?.value || 'Weeklies';
+            const newCatColor = normalizeColor(document.getElementById('reg-dungeon-color')?.value, '#ffffff');
+            const taskName = v.slice(0,40);
+            if (catChoice === '__new__' && !newCatName) return alert('Enter category.');
+            if (!(await prepareGlobalChange(`Add dungeon task ${taskName}`))) return;
+            if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === taskName.toLowerCase()))) return alert('Task was already added by another device.');
+            let c;
+            if (catChoice === '__new__') {
+                c = { id: `cat-${Date.now().toString(36)}`, group: newCatGroup, name: newCatName.slice(0,30), color: newCatColor, tasks: [] };
+                getCategories().push(c);
+            } else {
+                c = findCategory(catChoice);
+                if (!c) return alert('That category no longer exists. Refresh the tracker and try again.');
+            }
+            c.tasks.push(taskName); touchCategorySettings(); document.getElementById('reg-dungeon-task-name').value=''; refreshTrackerUI(); document.getElementById('reg-dungeon-cat-select').value = c.id; handleDungeonCatChange(false); triggerAutoSync();
         }
         
-        function saveCategoryGroup(id) { const c = findCategory(id); if(c) { c.name = document.querySelector(`[data-cat-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || c.name; c.color = normalizeColor(document.querySelector(`[data-cat-color="${CSS.escape(id)}"]`).value, '#ffffff'); c.group = document.querySelector(`[data-cat-group="${CSS.escape(id)}"]`).value; touchCategorySettings(); refreshTrackerUI(); triggerAutoSync(); } }
-        function removeTaskFromCategory(id, t) { const c = findCategory(id); if(c && confirm(`Remove ${t}?`)) { c.tasks = c.tasks.filter(n => n !== t); touchCategorySettings(); refreshTrackerUI(); triggerAutoSync(); } }
-        function removeCategoryGroup(id) { if(confirm('Remove category?')) { cloudData.settings.categories = getCategories().filter(c => c.id !== id); touchCategorySettings(); refreshTrackerUI(); triggerAutoSync(); } }
+        async function saveCategoryGroup(id) {
+            const c = findCategory(id); if(!c) return;
+            const name = document.querySelector(`[data-cat-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || c.name;
+            const color = normalizeColor(document.querySelector(`[data-cat-color="${CSS.escape(id)}"]`).value, '#ffffff');
+            const group = document.querySelector(`[data-cat-group="${CSS.escape(id)}"]`).value;
+            if (!(await prepareGlobalChange(`Update dungeon category ${c.name}`))) return;
+            const latest = findCategory(id); if (!latest) return alert('Category no longer exists. Refresh and try again.');
+            latest.name = name; latest.color = color; latest.group = group; touchCategorySettings(); refreshTrackerUI(); triggerAutoSync();
+        }
+        async function removeTaskFromCategory(id, t) {
+            const c = findCategory(id); if(c && confirm(`Remove ${t}?`)) {
+                if (!(await prepareGlobalChange(`Remove dungeon task ${t}`))) return;
+                const latest = findCategory(id); if (!latest) return alert('Category no longer exists. Refresh and try again.');
+                latest.tasks = latest.tasks.filter(n => n !== t); touchCategorySettings(); refreshTrackerUI(); triggerAutoSync();
+            }
+        }
+        async function removeCategoryGroup(id) {
+            if(!confirm('Remove category?')) return;
+            const c = findCategory(id); if (!c) return;
+            if (!(await prepareGlobalChange(`Remove dungeon category ${c.name}`))) return;
+            const latest = findCategory(id); if (!latest) return alert('Category no longer exists. Refresh and try again.');
+            cloudData.settings.categories = getCategories().filter(c => c.id !== id); touchCategorySettings(); refreshTrackerUI(); triggerAutoSync();
+        }
 
         // --- Drag and Drop Handlers ---
         function attachDragDropListeners() {
@@ -2483,21 +2752,25 @@
                 chip.addEventListener('dragend', () => { chip.classList.remove('dragging'); document.querySelectorAll('.character-chip').forEach(c => c.classList.remove('drag-over')); });
                 chip.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; chip.classList.add('drag-over'); });
                 chip.addEventListener('dragleave', () => chip.classList.remove('drag-over'));
-                chip.addEventListener('drop', e => {
+                chip.addEventListener('drop', async e => {
                     e.preventDefault(); chip.classList.remove('drag-over');
                     if (!dragSrcData || dragSrcData.type !== chip.dataset.type || dragSrcData.parent !== chip.dataset.parent) return;
                     const tgtIdx = parseInt(chip.dataset.index, 10);
                     if (dragSrcData.index === tgtIdx) return;
 
                     if (dragSrcData.type === 'roster') {
-                        const r = findRoster(dragSrcData.parent);
-                        const item = r.characters.splice(dragSrcData.index, 1)[0];
-                        r.characters.splice(tgtIdx, 0, item);
+                        const r = findRoster(dragSrcData.parent); if (!r) return;
+                        if (!(await prepareGlobalChange(`Reorder roster ${r.name}`))) return;
+                        const latest = findRoster(dragSrcData.parent); if (!latest) return;
+                        const item = latest.characters.splice(dragSrcData.index, 1)[0];
+                        latest.characters.splice(Math.min(tgtIdx, latest.characters.length), 0, item);
                         touchRosterSettings(); renderRosterRegistration();
                     } else if (dragSrcData.type === 'dungeon') {
-                        const c = findCategory(dragSrcData.parent);
-                        const item = c.tasks.splice(dragSrcData.index, 1)[0];
-                        c.tasks.splice(tgtIdx, 0, item);
+                        const c = findCategory(dragSrcData.parent); if (!c) return;
+                        if (!(await prepareGlobalChange(`Reorder dungeon tasks in ${c.name}`))) return;
+                        const latest = findCategory(dragSrcData.parent); if (!latest) return;
+                        const item = latest.tasks.splice(dragSrcData.index, 1)[0];
+                        latest.tasks.splice(Math.min(tgtIdx, latest.tasks.length), 0, item);
                         touchCategorySettings(); renderDungeonRegistration();
                     }
                     refreshTrackerUI(); triggerAutoSync();
@@ -2506,20 +2779,22 @@
             // Allow dropping at the end of the container
             document.querySelectorAll('.character-chip-list').forEach(list => {
                 list.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
-                list.addEventListener('drop', e => {
+                list.addEventListener('drop', async e => {
                     e.preventDefault(); if (e.target !== list || !dragSrcData) return;
                     const lType = list.dataset.dragList, lParent = list.dataset.parentId;
                     if (dragSrcData.type !== lType || dragSrcData.parent !== lParent) return;
                     
                     if (lType === 'roster') {
-                        const r = findRoster(lParent);
-                        if(dragSrcData.index === r.characters.length - 1) return;
-                        r.characters.push(r.characters.splice(dragSrcData.index, 1)[0]);
+                        const r = findRoster(lParent); if (!r || dragSrcData.index === r.characters.length - 1) return;
+                        if (!(await prepareGlobalChange(`Reorder roster ${r.name}`))) return;
+                        const latest = findRoster(lParent); if (!latest || dragSrcData.index >= latest.characters.length) return;
+                        latest.characters.push(latest.characters.splice(dragSrcData.index, 1)[0]);
                         touchRosterSettings(); renderRosterRegistration();
                     } else {
-                        const c = findCategory(lParent);
-                        if(dragSrcData.index === c.tasks.length - 1) return;
-                        c.tasks.push(c.tasks.splice(dragSrcData.index, 1)[0]);
+                        const c = findCategory(lParent); if (!c || dragSrcData.index === c.tasks.length - 1) return;
+                        if (!(await prepareGlobalChange(`Reorder dungeon tasks in ${c.name}`))) return;
+                        const latest = findCategory(lParent); if (!latest || dragSrcData.index >= latest.tasks.length) return;
+                        latest.tasks.push(latest.tasks.splice(dragSrcData.index, 1)[0]);
                         touchCategorySettings(); renderDungeonRegistration();
                     }
                     refreshTrackerUI(); triggerAutoSync();
@@ -2533,9 +2808,13 @@
         function allRegisteredCharacters() { return flattenRosters(cloudData.settings.rosters); }
         function getCharacterJob(name) { return cloudData.settings.characterJobs?.[name]?.job || ''; }
 
-        function setCharacterJob(name, job) {
+        async function setCharacterJob(name, job) {
+            if (!JOB_DATABASE[job]) return;
+            const current = getCharacterJob(name);
+            if (current === job) return;
+            if (!(await prepareGlobalChange(`Set Job for ${name}`))) return;
             if (!cloudData.settings.characterJobs) cloudData.settings.characterJobs = {};
-            cloudData.settings.characterJobs[name] = { job: JOB_DATABASE[job] ? job : '', updatedAt: Date.now(), deviceId };
+            cloudData.settings.characterJobs[name] = { job, updatedAt: Date.now(), deviceId };
             cloudData.updatedAt = Date.now();
             updateClassSetupSummary();
             renderClassSetup();
@@ -2612,7 +2891,7 @@
             }).join('');
         }
 
-        function saveRoleConfig() {
+        async function saveRoleConfig() {
             const next = normalizeJobProfiles(cloudData.settings.jobProfiles);
             document.querySelectorAll('[data-job-field][data-job]').forEach(el => {
                 const job = el.dataset.job, field = el.dataset.jobField;
@@ -2624,6 +2903,10 @@
                 next[job].secondaryRoles = [...document.querySelectorAll(`input[data-role-job="${CSS.escape(job)}"][data-role-name]`)]
                     .filter(input => input.checked).map(input => input.dataset.roleName);
             });
+            if (JSON.stringify(normalizeJobProfiles(cloudData.settings.jobProfiles)) === JSON.stringify(normalizeJobProfiles(next))) {
+                closeModal('role-config-modal'); return;
+            }
+            if (!(await prepareGlobalChange('Update Job / Role settings'))) return;
             updateJobProfiles(next);
             renderTeamBuilder();
             renderClassSetup();
@@ -2631,8 +2914,9 @@
             closeModal('role-config-modal');
         }
 
-        function resetRoleConfig() {
+        async function resetRoleConfig() {
             if (!confirm('Reset all Job role settings to the built-in defaults?')) return;
+            if (!(await prepareGlobalChange('Reset Job / Role settings'))) return;
             updateJobProfiles(DEFAULT_JOB_PROFILES);
             renderRoleConfig();
             renderTeamBuilder();
@@ -2693,9 +2977,14 @@
             return !!cloudData.settings?.teamBuilder?.splitPartyMechanic;
         }
 
-        function saveSplitPartyMechanic() {
+        async function saveSplitPartyMechanic() {
             if (!cloudData.settings?.teamBuilder) return;
             const checked = document.getElementById('split-party-mechanic')?.checked !== false;
+            if (checked === getSplitPartyMechanic()) return;
+            if (!(await prepareGlobalChange(`Set Split Party Mechanic ${checked ? 'ON' : 'OFF'}`))) {
+                const box = document.getElementById('split-party-mechanic'); if (box) box.checked = getSplitPartyMechanic();
+                return;
+            }
             const now = Date.now();
             cloudData.settings.teamBuilder.splitPartyMechanic = checked;
             cloudData.settings.teamBuilder.splitPartyUpdatedAt = now;
@@ -3059,7 +3348,6 @@
 
         async function resetTeamsForNewWeek() {
             if (!confirm('Clear both teams for a new week?')) return;
-            if (!(await createSafetyCheckpointIfNeeded('Before resetting Team Builder'))) return;
             const now = Date.now();
             ['team1','team2'].forEach(k => {
                 const t = getTeamState(k);
