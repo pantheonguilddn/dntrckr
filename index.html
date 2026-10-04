@@ -699,7 +699,7 @@
                 <div class="drawer-section-title">System</div>
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
                 <button class="drawer-item" type="button" onclick="openCloudModal()"><span class="drawer-icon">☁</span><span><strong>Cloud Setup</strong><small>Configure shared storage</small></span></button>
-                <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Save restore points & recover safely</small></span></button>
+                <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Savepoints & undo global changes</small></span></button>
             </div>
 
             <div class="drawer-section">
@@ -1113,8 +1113,8 @@
                     </section>
                     <section class="help-topic" data-help-topic="versions">
                         <h4>Version History</h4>
-                        <p>Use <b>🕘 Version History</b> before major roster reorganizations, resets, or other risky changes. Press <b>Push Version</b> and give it a clear name.</p>
-                        <p>Restore points are saved using JSONBin's version control. The tracker versions only shared, global-impact changes such as roster / character structure, dungeon structure, Job / Role settings, loot weights, and the shared split-party setting. Routine tracker checkmarks, notes, salary logs, and Team Builder slot assignments do not create versions. A refresh also detects a global change made on another PC and preserves it as a version. When you restore one, the current live state is saved first as a safety version, then the selected version becomes the new live state.</p>
+                        <p>Use <b>🕘 Version History</b> to see protected global changes. You can also press <b>Push Version</b> to mark a savepoint.</p>
+                        <p>The tracker keeps a compact shared revision journal in the normal database. The tracker versions only shared, global-impact changes such as roster / character structure, dungeon structure, Job / Role settings, loot weights, and the shared split-party setting. Routine tracker checkmarks, notes, salary logs, and Team Builder slot assignments do not create versions. A refresh also detects a global change made on another PC and preserves it as a version. When you restore one, the current live state is saved first as a safety version, then the selected version becomes the new live state.</p>
                         <div class="help-callout"><b>Best practice:</b> push a version before large cleanups. Example: “Before roster cleanup · Oct 4”.</div>
                     </section>
                     <section class="help-topic" data-help-topic="salary">
@@ -1138,7 +1138,7 @@
     <div class="modal-overlay hidden" id="version-history-modal" role="dialog" aria-label="Version History">
         <div class="modal-card version-modal">
             <h3>🕘 Pantheon Version History</h3>
-            <div class="modal-note">This is the tracker equivalent of Google Sheets version history, but focused on <b>global-impact changes</b>. Versions are created automatically when shared roster / dungeon / class-role / loot configuration changes happen or are detected during refresh. Routine tracker checkmarks, notes, salary logs, and Team Builder slot edits do not create versions. You can still Push Version manually before a major operation. Shared restore points are stored in the tracker itself.</div>
+            <div class="modal-note">This is the tracker equivalent of Google Sheets revision history, focused on <b>global-impact changes</b> and kept deliberately small. Revisions are created automatically for shared roster / dungeon / class-role / loot configuration changes and detected external global changes. Routine tracker checkmarks, notes, salary logs, and Team Builder slot edits do not create versions. You can still Push Version manually before a major operation. Only small global-change diffs are stored, not full database snapshots.</div>
             <div class="version-toolbar">
                 <div class="version-toolbar-left">
                     <input id="version-label-input" class="version-label-input" maxlength="120" placeholder="Version name · e.g. Before roster cleanup">
@@ -1261,7 +1261,7 @@
         // ==========================================
         // ☁️ APP CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 16; 
+        const APP_SCHEMA_VERSION = 17; 
         const MAX_ARCHIVE_WEEKS = 12;
                 const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
@@ -1437,10 +1437,6 @@
         let syncInProgress = false;
         let syncRequestedWhileBusy = false;
         let activeRosterFilter = 'all'; 
-        // Pending label for a protected global change that is about to be synced.
-        // These are runtime-only values; the actual restore point is stored in cloudData.
-        let pendingGlobalChangeLabel = '';
-        let pendingGlobalChangeRequestedAt = 0;
         let isAnalyticsVisible = true;
         let isPersonalView = false;
         const deviceId = getOrCreateDeviceId();
@@ -1636,16 +1632,8 @@
                 lastVersionedWriteAt: Number(vc.lastVersionedWriteAt) || 0,
                 lastGlobalSignature: String(vc.lastGlobalSignature || ''),
                 globalBaselineSignature: String(vc.globalBaselineSignature || ''),
-                versioningEnabled: vc.versioningEnabled !== false,
-                history: historySource.map(entry => ({
-                    id: String(entry?.id || ''),
-                    at: Number(entry?.at) || 0,
-                    by: String(entry?.by || ''),
-                    label: String(entry?.label || '').slice(0,120),
-                    kind: String(entry?.kind || 'global-change'),
-                    signature: String(entry?.signature || ''),
-                    snapshot: safeObject(entry?.snapshot)
-                })).filter(entry => entry.id && entry.at && Object.keys(entry.snapshot).length).sort((a,b) => b.at-a.at).slice(0,25)
+                versioningEnabled: true,
+                history: historySource.map(entry => normalizeVersionEntry(entry)).filter(Boolean)
             };
 
             norm.scholarship = JSON.parse(JSON.stringify(safeObject(source.scholarship)));
@@ -1810,6 +1798,21 @@
             try { return JSON.parse(JSON.stringify(value)); } catch (e) { return {}; }
         }
 
+        // ==========================================================
+        // 🕘 COMPACT GLOBAL REVISION JOURNAL
+        // ==========================================================
+        // JSONBin Free limits records to 100 KB. The previous recovery
+        // system stored full snapshots inside the main record, which
+        // made the database too large and could block ordinary syncing.
+        // This version stores only small BEFORE/AFTER diffs for changes
+        // that affect every user.
+        const VERSION_HISTORY_MAX = 60;
+        const VERSION_HISTORY_BYTE_BUDGET = 7000;
+        const SAFE_MAIN_RECORD_BYTES = 96000;
+
+        let pendingGlobalChangeLabel = '';
+        let pendingGlobalBeforeSnapshot = null;
+
         function getGlobalImpactSnapshot(data = cloudData) {
             const settings = data.settings || {};
             const rosters = cloneRosters(settings.rosters || []).map(r => ({ id:r.id, name:r.name, color:r.color, characters:[...r.characters] }));
@@ -1828,253 +1831,178 @@
             };
         }
 
-        function getGlobalImpactSignature(data = cloudData) {
-            return JSON.stringify(getGlobalImpactSnapshot(data));
+        function getGlobalImpactSignature(data = cloudData) { return JSON.stringify(getGlobalImpactSnapshot(data)); }
+        function sameValue(a,b) { try { return JSON.stringify(a === undefined ? null : a) === JSON.stringify(b === undefined ? null : b); } catch (e) { return false; } }
+        function mapById(items) { const map = new Map(); for (const item of Array.isArray(items) ? items : []) if (item?.id) map.set(String(item.id), item); return map; }
+
+        function diffObjectMaps(beforeObj, afterObj) {
+            const out=[], b=safeObject(beforeObj), a=safeObject(afterObj);
+            const keys=[...new Set([...Object.keys(b),...Object.keys(a)])].sort();
+            for(const key of keys){
+                const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null;
+                const av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;
+                if(!sameValue(bv,av)) out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});
+            }
+            return out;
         }
 
-        function mergeVersionHistory(localHistory, remoteHistory) {
-            const map = new Map();
-            for (const entry of [...(Array.isArray(localHistory)?localHistory:[]), ...(Array.isArray(remoteHistory)?remoteHistory:[])]) {
-                if (!entry || !entry.id || !entry.snapshot) continue;
-                const clean = {
-                    id:String(entry.id), at:Number(entry.at)||0, by:String(entry.by||''),
-                    label:String(entry.label||'Global change').slice(0,120), kind:String(entry.kind||'global-change'),
-                    signature:String(entry.signature||''), snapshot:cloneDataObject(entry.snapshot)
+        function diffGlobalImpact(before, after) {
+            const b=safeObject(before), a=safeObject(after);
+            const patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
+            const bR=mapById(b.rosters),aR=mapById(a.rosters);
+            for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){
+                const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;
+                if(!sameValue(bv,av)) patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});
+            }
+            const bC=mapById(b.categories),aC=mapById(a.categories);
+            for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){
+                const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;
+                if(!sameValue(bv,av)) patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});
+            }
+            patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);
+            patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
+            const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);
+            for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){
+                const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;
+                if(!sameValue(bv,av)) patch.lootWeights.push({key,before:bv,after:av});
+            }
+            if(b.splitPartyMechanic!==a.splitPartyMechanic) patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
+            return patch;
+        }
+
+        function patchIsEmpty(p) { return !p || (!p.rosters?.length && !p.categories?.length && !p.characterJobs?.length && !p.jobProfiles?.length && !p.lootWeights?.length && !p.splitPartyMechanic); }
+
+        function normalizeVersionEntry(entry) {
+            if(!entry || !entry.id) return null;
+            const base={id:String(entry.id),at:Number(entry.at)||0,by:String(entry.by||''),label:String(entry.label||'Global change').slice(0,120),kind:String(entry.kind||'global-change'),signature:String(entry.signature||'')};
+            if(entry.patch && typeof entry.patch==='object'){
+                const p=entry.patch;
+                base.patch={
+                    rosters:Array.isArray(p.rosters)?p.rosters.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
+                    categories:Array.isArray(p.categories)?p.categories.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
+                    characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
+                    jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
+                    lootWeights:Array.isArray(p.lootWeights)?p.lootWeights.map(x=>({key:String(x.key||''),before:x.before==null?null:Number(x.before),after:x.after==null?null:Number(x.after)})).filter(x=>x.key):[],
+                    splitPartyMechanic:p.splitPartyMechanic && typeof p.splitPartyMechanic==='object' ? {before:!!p.splitPartyMechanic.before,after:!!p.splitPartyMechanic.after}:null
                 };
-                const existing = map.get(clean.id);
-                if (!existing || clean.at > existing.at) map.set(clean.id, clean);
+            }else if(entry.kind==='marker' || entry.kind==='manual'){
+                base.kind='marker';
+            }else{
+                // Intentionally discard old v13-v16 full snapshots. They are
+                // incompatible with the free 100 KB record limit.
+                return null;
             }
-            return [...map.values()].sort((a,b)=>b.at-a.at).slice(0,25);
+            return base;
         }
 
-        function versionControlState(data = cloudData) {
-            const vc = safeObject(data.settings?.versionControl);
-            return { ...vc, history: Array.isArray(vc.history) ? vc.history : [] };
+        function trimVersionHistory(history){
+            let arr=(Array.isArray(history)?history:[]).map(normalizeVersionEntry).filter(Boolean).sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)).slice(0,VERSION_HISTORY_MAX);
+            while(arr.length>1 && JSON.stringify(arr).length>VERSION_HISTORY_BYTE_BUDGET) arr.pop();
+            return arr;
         }
 
-        function versionIdentityLabel() {
-            const identity = document.getElementById('user-identity')?.value || localStorage.getItem(IDENTITY_KEY) || '';
-            if (!identity) return deviceId;
-            const roster = cloudData.settings?.rosters?.find(r => r.id === identity);
-            return roster?.name || identity;
-        }
-
-        function versionTimestamp(ms) {
-            if (!ms) return 'Timestamp unavailable';
-            try { return new Date(Number(ms)).toLocaleString(); } catch (e) { return 'Timestamp unavailable'; }
-        }
-
-        function addSharedRestorePoint(data, label, kind='global-change', source=data) {
-            const now = Date.now();
-            const snapshot = cloneDataObject(getGlobalImpactSnapshot(source));
-            const signature = JSON.stringify(snapshot);
-            const vc = versionControlState(data);
-            const history = Array.isArray(vc.history) ? vc.history : [];
-            const recentDuplicate = history.find(entry => entry.signature === signature && entry.label === String(label || '').slice(0,120) && now - Number(entry.at||0) < 5000);
-            if (!recentDuplicate) {
-                history.unshift({
-                    id:`rev-${now}-${deviceId}-${Math.random().toString(36).slice(2,8)}`,
-                    at:now,
-                    by:versionIdentityLabel(),
-                    label:String(label || 'Global change').slice(0,120),
-                    kind:String(kind || 'global-change'),
-                    signature,
-                    snapshot
-                });
+        function mergeVersionHistory(localHistory, remoteHistory){
+            const map=new Map();
+            for(const raw of [...(Array.isArray(localHistory)?localHistory:[]),...(Array.isArray(remoteHistory)?remoteHistory:[])]){
+                const clean=normalizeVersionEntry(raw);if(!clean)continue;
+                const existing=map.get(clean.id);if(!existing || clean.at>existing.at)map.set(clean.id,clean);
             }
-            data.settings.versionControl = {
-                ...vc,
-                history: mergeVersionHistory(history, []),
-                lastCheckpointAt:now,
-                lastCheckpointBy:versionIdentityLabel(),
-                lastCheckpointLabel:String(label || 'Global change').slice(0,120),
-                lastCheckpointKind:String(kind || 'global-change'),
-                lastVersionedWriteAt:now,
-                lastGlobalSignature:getGlobalImpactSignature(data),
-                globalBaselineSignature:String(vc.globalBaselineSignature || signature),
-                versioningEnabled:true
-            };
-            return data;
-        }
-
-        function getLastSeenGlobalSignature() {
-            return String(localStorage.getItem('pantheon-last-global-impact-signature') || '');
-        }
-
-        function setLastSeenGlobalSignature(sig) {
-            if (sig) localStorage.setItem('pantheon-last-global-impact-signature', sig);
-        }
-
-        function prepareGlobalChange(label) {
-            if (!hasCloudConfig()) {
-                alert('Connect to the shared Cloud database first.');
-                openCloudModal();
-                return Promise.resolve(false);
+            // Same global result + same kind can be detected by multiple PCs.
+            // Keep one journal entry instead of duplicating it.
+            const unique=[];const seen=new Set();
+            for(const e of [...map.values()].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0))){
+                const key=e.kind==='marker'?`marker:${e.id}`:`change:${e.kind}:${e.signature}`;
+                if(seen.has(key))continue;seen.add(key);unique.push(e);
             }
-            if (window.__pantheonGlobalChangeBusy || window.__pantheonVersionWriteBusy) return Promise.resolve(false);
-            window.__pantheonGlobalChangeBusy = true;
-            clearTimeout(autoSyncTimer);
-            return (async () => {
-                try {
-                    setStatus(`🟡 Saving restore point: ${label}...`);
-                    const remote = normalizeData(await fetchRemoteRecord(getCloudConfig()));
-                    const protectedState = mergeData(remote, cloudData);
-                    const currentSig = getGlobalImpactSignature(protectedState);
-                    const vc = versionControlState(remote);
-                    if (!vc.history.length || currentSig !== String(vc.lastGlobalSignature || '')) {
-                        addSharedRestorePoint(protectedState, `Before ${String(label || 'global change').slice(0,100)}`, 'before-change', protectedState);
-                    }
-                    protectedState.settings.versionControl.lastGlobalSignature = currentSig;
-                    protectedState.settings.versionControl.globalBaselineSignature = String(vc.globalBaselineSignature || currentSig);
-                    protectedState.updatedAt = Date.now();
-                    protectedState.syncInfo = { operationId:`prechange-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`, by:deviceId, at:Date.now() };
-                    const protectRes = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(getCloudConfig().binId)}`, {
-                        method:'PUT', headers:{'Content-Type':'application/json',...authHeaders(getCloudConfig())}, body:JSON.stringify(protectedState)
-                    });
-                    if (!protectRes.ok) {
-                        const detail = await protectRes.text().catch(()=> '');
-                        throw new Error(`Restore point save failed (${protectRes.status})${detail ? `: ${detail.slice(0,300)}` : ''}`);
-                    }
-                    const protectedRemote = normalizeData((await protectRes.json()).record || protectedState);
-                    delete protectedRemote.syncInfo;
-                    cloudData = protectedRemote;
-                    persistLocalData();
-                    setLastSeenGlobalSignature(currentSig);
-                    pendingGlobalChangeLabel = String(label || 'Global change').slice(0,120);
-                    pendingGlobalChangeRequestedAt = Date.now();
-                    setStatus(`🟢 Restore point secured: ${pendingGlobalChangeLabel}`);
-                    return true;
-                } catch (err) {
-                    setStatus(`🔴 Could not secure restore point: ${err.message}`);
-                    alert(`The shared change was not started because a restore point could not be secured.\n\n${err.message}`);
-                    return false;
-                } finally {
-                    window.__pantheonGlobalChangeBusy = false;
-                }
-            })();
+            return trimVersionHistory(unique);
         }
 
-        async function snapshotUnexpectedGlobalChange(remote) {
-            const remoteSig = getGlobalImpactSignature(remote);
-            const seen = getLastSeenGlobalSignature();
-            if (!seen) {
-                setLastSeenGlobalSignature(remoteSig);
-                return remote;
+        function versionControlState(data=cloudData){const vc=safeObject(data.settings?.versionControl);return {...vc,history:trimVersionHistory(vc.history)};}
+        function versionIdentityLabel(){const identity=document.getElementById('user-identity')?.value||localStorage.getItem(IDENTITY_KEY)||'';if(!identity)return deviceId;const roster=cloudData.settings?.rosters?.find(r=>r.id===identity);return roster?.name||identity;}
+        function versionTimestamp(ms){if(!ms)return 'Timestamp unavailable';try{return new Date(Number(ms)).toLocaleString();}catch(e){return 'Timestamp unavailable';}}
+
+        function appendVersionEntry(data,label,kind,patch,signature){
+            if(patchIsEmpty(patch) && kind!=='marker')return false;
+            const vc=versionControlState(data), now=Date.now();
+            if(kind!=='marker' && signature){
+                const dup=vc.history.find(e=>e.kind===kind && e.signature===String(signature||''));
+                if(dup)return false;
             }
-            if (remoteSig === seen) return remote;
-            // Another client changed a shared/global structure. Keep the last locally-known
-            // global state as the recoverable "before" point, then continue normal merging.
-            try {
-                const localSig = getGlobalImpactSignature(cloudData);
-                if (localSig !== remoteSig) {
-                    const copy = normalizeData(remote);
-                    addSharedRestorePoint(copy, `Before external global change · ${versionIdentityLabel()}`, 'before-external-change', cloudData);
-                    const config = getCloudConfig();
-                    const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, {
-                        method:'PUT', headers:{'Content-Type':'application/json',...authHeaders(config)}, body:JSON.stringify(copy)
-                    });
-                    if (res.ok) {
-                        setLastSeenGlobalSignature(remoteSig);
-                        return normalizeData((await res.json()).record || copy);
-                    }
-                }
-            } catch (e) { /* best-effort protection; normal sync still proceeds */ }
-            setLastSeenGlobalSignature(remoteSig);
-            return remote;
+            const entry={id:`rev-${now}-${deviceId}-${Math.random().toString(36).slice(2,8)}`,at:now,by:versionIdentityLabel(),label:String(label||'Global change').slice(0,120),kind:String(kind||'global-change'),signature:String(signature||'')};
+            if(kind!=='marker')entry.patch=patch;
+            vc.history=mergeVersionHistory(vc.history,[entry]);
+            vc.lastCheckpointAt=now;vc.lastCheckpointBy=entry.by;vc.lastCheckpointLabel=entry.label;vc.lastCheckpointKind=entry.kind;vc.lastVersionedWriteAt=now;vc.lastGlobalSignature=signature||getGlobalImpactSignature(data);vc.globalBaselineSignature=String(vc.globalBaselineSignature||signature||getGlobalImpactSignature(data));vc.versioningEnabled=true;
+            data.settings.versionControl=vc;return true;
         }
 
-        function forceSync(showSuccess = false) {
-            if (!hasCloudConfig()) { persistLocalData(); setStatus('⚪ Saved locally'); if(showSuccess)openCloudModal(); return; }
-            if (syncInProgress || window.__pantheonVersionWriteBusy || window.__pantheonGlobalChangeBusy) { syncRequestedWhileBusy = true; return; }
-            syncInProgress = true; setStatus('🟡 Merging Cloud Data...');
-            const config = getCloudConfig();
-            (async () => {
-                try {
-                    for (let attempt=1; attempt<=3; attempt++) {
-                        let remote = normalizeData(await fetchRemoteRecord(config));
-                        remote = await snapshotUnexpectedGlobalChange(remote);
-                        let candidate = mergeData(cloudData, remote);
-                        const now=Date.now();
-                        const opId=`sync-${deviceId}-${now}-${Math.random().toString(36).slice(2,8)}`;
-                        candidate.updatedAt=now;
-                        candidate.syncInfo={operationId:opId,by:deviceId,at:now};
-
-                        const label=pendingGlobalChangeLabel;
-                        const globalChanged=getGlobalImpactSignature(candidate)!==getGlobalImpactSignature(remote);
-                        if (label && globalChanged) {
-                            const vc=versionControlState(candidate);
-                            candidate.settings.versionControl={
-                                ...vc,
-                                lastCheckpointAt:now,
-                                lastCheckpointBy:versionIdentityLabel(),
-                                lastCheckpointLabel:label,
-                                lastCheckpointKind:'global-change',
-                                lastVersionedWriteAt:now,
-                                lastGlobalSignature:getGlobalImpactSignature(candidate),
-                                globalBaselineSignature:String(vc.globalBaselineSignature || getGlobalImpactSignature(remote)),
-                                versioningEnabled:true
-                            };
-                        }
-
-                        const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{
-                            method:'PUT', headers:{'Content-Type':'application/json',...authHeaders(config)}, body:JSON.stringify(candidate)
-                        });
-                        if(!res.ok){
-                            const detail=await res.text().catch(()=> '');
-                            throw new Error(`Update failed (${res.status})${detail ? `: ${detail.slice(0,300)}` : ''}`);
-                        }
-                        const latest=normalizeData((await res.json()).record || await fetchRemoteRecord(config));
-                        const latestOp=String(safeObject(latest.syncInfo).operationId || '');
-                        if(latestOp===opId){
-                            cloudData=latest; delete cloudData.syncInfo;
-                            setLastSeenGlobalSignature(getGlobalImpactSignature(latest));
-                            if(label && globalChanged){ pendingGlobalChangeLabel=''; pendingGlobalChangeRequestedAt=0; }
-                            persistLocalData(); refreshTrackerUI();
-                            setStatus(showSuccess?'🟢 Cloud Sync Complete':'🟢 Database Synced');
-                            return;
-                        }
-                        cloudData=mergeData(candidate,latest); delete cloudData.syncInfo;
-                        setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
-                    }
-                    throw new Error('Cloud changed during sync. Please press Sync Now again; no intentional restore was performed.');
-                } catch(err){ persistLocalData(); setStatus(`🔴 Sync Failed: ${err.message}`); }
-                finally { syncInProgress=false; if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);} }
-            })();
+        function setPendingGlobalChange(label){
+            const text=String(label||'Global change').slice(0,120);
+            if(!pendingGlobalBeforeSnapshot)pendingGlobalBeforeSnapshot=cloneDataObject(getGlobalImpactSnapshot(cloudData));
+            pendingGlobalChangeLabel=pendingGlobalChangeLabel ? `${pendingGlobalChangeLabel} + ${text}`.slice(0,120) : text;
         }
 
-        let versionHistoryCount=0;
-        let versionHistoryRows=[];
+        function prepareGlobalChange(label){
+            if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return Promise.resolve(false);}
+            // Critical change: this function never performs a separate cloud write.
+            // The core operation is always allowed to continue.
+            setPendingGlobalChange(label);return Promise.resolve(true);
+        }
 
-        function getSharedHistory(data=cloudData){ return Array.isArray(data.settings?.versionControl?.history) ? [...data.settings.versionControl.history].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)) : []; }
+        function clearPendingGlobalChange(){pendingGlobalChangeLabel='';pendingGlobalBeforeSnapshot=null;}
+
+        function snapshotUnexpectedGlobalChange(remote){
+            const remoteSig=getGlobalImpactSignature(remote),seen=String(localStorage.getItem('pantheon-last-global-impact-signature')||'');
+            if(!seen){localStorage.setItem('pantheon-last-global-impact-signature',remoteSig);return {externalPatch:null};}
+            if(remoteSig===seen || pendingGlobalBeforeSnapshot)return {externalPatch:null};
+            const before=cloneDataObject(getGlobalImpactSnapshot(cloudData)),after=cloneDataObject(getGlobalImpactSnapshot(remote));
+            const patch=diffGlobalImpact(before,after);
+            return {externalPatch:patchIsEmpty(patch)?null:patch};
+        }
+
+        function getLastSeenGlobalSignature(){return String(localStorage.getItem('pantheon-last-global-impact-signature')||'');}
+        function setLastSeenGlobalSignature(sig){if(sig)localStorage.setItem('pantheon-last-global-impact-signature',sig);}
+
+        function candidateByteSize(data){try{return new Blob([JSON.stringify(data)]).size;}catch(e){return JSON.stringify(data).length;}}
+        function fitCandidateUnderFreeLimit(candidate){
+            candidate.settings.versionControl.history=trimVersionHistory(candidate.settings.versionControl.history);
+            if(candidateByteSize(candidate)<=SAFE_MAIN_RECORD_BYTES)return candidate;
+            // Trim the optional journal first. The tracker itself must never be
+            // blocked by the optional recovery feature.
+            const h=candidate.settings.versionControl.history;
+            while(h.length && candidateByteSize(candidate)>SAFE_MAIN_RECORD_BYTES)h.pop();
+            return candidate;
+        }
+
+        function summarizePatch(p){
+            if(!p)return 'No protected changes';
+            const bits=[];if(p.rosters?.length)bits.push(`Roster ${p.rosters.length}`);if(p.categories?.length)bits.push(`Dungeon ${p.categories.length}`);if(p.characterJobs?.length)bits.push(`Jobs ${p.characterJobs.length}`);if(p.jobProfiles?.length)bits.push(`Role settings ${p.jobProfiles.length}`);if(p.lootWeights?.length)bits.push(`Loot weights ${p.lootWeights.length}`);if(p.splitPartyMechanic)bits.push('Split Party');return bits.join(' · ')||'No protected changes';
+        }
 
         function versionRowHtml(row,index){
-            const entry=row.entry;
-            if(!entry) return '';
-            const kind = entry.kind==='manual' ? '<span class="version-badge">PUSHED VERSION</span>' : (entry.kind==='before-change' ? '<span class="version-badge">BEFORE CHANGE</span>' : (entry.kind==='before-external-change' ? '<span class="version-badge">EXTERNAL CHANGE</span>' : (entry.kind==='restore-safety' ? '<span class="version-badge">SAFETY COPY</span>' : '')));
-            return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')}${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button><button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Restore</button></div></div>`;
+            const entry=row.entry;if(!entry)return '';
+            const kind=entry.kind==='marker'?'<span class="version-badge">SAVEPOINT</span>':(entry.kind==='before-external-change'?'<span class="version-badge">EXTERNAL CHANGE</span>':'<span class="version-badge">GLOBAL CHANGE</span>');
+            const action=entry.patch?`<button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Marker</span>';
+            return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')} ${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}${entry.patch?` · ${escapeHTML(summarizePatch(entry.patch))}`:''}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button>${action}</div></div>`;
         }
 
-        function createVersionCheckpoint(customLabel=''){
+        function getSharedHistory(data=cloudData){return trimVersionHistory(data.settings?.versionControl?.history||[]);}
+        let versionHistoryCount=0;let versionHistoryRows=[];
+
+        async function createVersionCheckpoint(customLabel=''){
             if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}
-            if(window.__pantheonVersionWriteBusy)return;
-            window.__pantheonVersionWriteBusy=true; clearTimeout(autoSyncTimer);
-            const label=String(customLabel || document.getElementById('version-label-input')?.value || '').trim() || `Manual restore point · ${versionIdentityLabel()}`;
-            (async()=>{
-                try{
-                    setStatus('🟡 Saving restore point...');
-                    const remote=normalizeData(await fetchRemoteRecord(getCloudConfig()));
-                    const candidate=mergeData(cloudData,remote);
-                    addSharedRestorePoint(candidate,label,'manual',candidate);
-                    candidate.updatedAt=Date.now();
-                    const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(getCloudConfig().binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(candidate)});
-                    if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Restore point failed (${res.status})${detail ? `: ${detail.slice(0,300)}` : ''}`);}
-                    cloudData=normalizeData((await res.json()).record || candidate); persistLocalData();
-                    const input=document.getElementById('version-label-input'); if(input) input.value='';
-                    await loadVersionHistory(false);
-                    setStatus(`🟢 Restore point saved · ${label}`);
-                }catch(err){setStatus(`🔴 Restore point failed: ${err.message}`);alert(`Restore point failed: ${err.message}`);}
-                finally{window.__pantheonVersionWriteBusy=false;}
-            })();
+            if(window.__pantheonVersionWriteBusy)return;window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);
+            const label=String(customLabel||document.getElementById('version-label-input')?.value||'').trim()||`Savepoint · ${versionIdentityLabel()}`;
+            try{
+                setStatus('🟡 Marking savepoint...');
+                const remote=normalizeData(await fetchRemoteRecord(getCloudConfig()));
+                const candidate=mergeData(cloudData,remote);
+                appendVersionEntry(candidate,label,'marker',null,getGlobalImpactSignature(candidate));candidate.updatedAt=Date.now();
+                const send=fitCandidateUnderFreeLimit(candidate);
+                const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(getCloudConfig().binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(send)});
+                if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Savepoint failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                const input=document.getElementById('version-label-input');if(input)input.value='';await loadVersionHistory(false);setStatus(`🟢 Savepoint marked · ${label}`);
+            }catch(err){setStatus(`🔴 Savepoint failed: ${err.message}`);alert(`Savepoint failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}
         }
 
         async function loadVersionHistory(showStatus=true){
@@ -2082,76 +2010,98 @@
             const statusEl=document.getElementById('version-history-status'),listEl=document.getElementById('version-history-list');
             try{
                 const remote=normalizeData(await fetchRemoteRecord(getCloudConfig()));
-                const merged=mergeData(cloudData,remote);
-                const rows=getSharedHistory(merged);
-                versionHistoryCount=rows.length;
-                versionHistoryRows=rows.map((entry,index)=>({entry,index}));
-                if(!rows.length){statusEl.textContent='No shared restore points yet. Push one before a major roster/dungeon change.';listEl.innerHTML='<div class="version-empty">No restore points yet.</div>';return;}
-                statusEl.textContent=`Showing ${rows.length} shared restore point${rows.length===1?'':'s'}.`;
-                listEl.innerHTML=versionHistoryRows.map((row,i)=>versionRowHtml(row,i)).join('');
-            }catch(err){statusEl.textContent=`❌ ${err.message}`;listEl.innerHTML='<div class="version-empty">Could not load restore points.</div>';}
+                const rows=getSharedHistory(remote);versionHistoryCount=rows.length;versionHistoryRows=rows.map((entry,index)=>({entry,index}));
+                if(!rows.length){statusEl.textContent='No shared global-change history yet.';listEl.innerHTML='<div class="version-empty">No savepoints or protected changes yet.</div>';return;}
+                statusEl.textContent=`Showing ${rows.length} shared revision${rows.length===1?'':'s'}.`;listEl.innerHTML=versionHistoryRows.map((row,i)=>versionRowHtml(row,i)).join('');
+            }catch(err){statusEl.textContent=`❌ ${err.message}`;listEl.innerHTML='<div class="version-empty">Could not load revision history.</div>';}
         }
 
-        function loadSpecificVersion(){
-            const n=Number(document.getElementById('version-jump-input')?.value);
-            if(!Number.isInteger(n)||n<1||n>versionHistoryCount){alert(`Enter a valid restore point number between 1 and ${versionHistoryCount||1}.`);return;}
-            const row=versionHistoryRows[n-1];
-            if(!row){alert('Restore point not found. Refresh the list and try again.');return;}
-            const listEl=document.getElementById('version-history-list');
-            const statusEl=document.getElementById('version-history-status');
-            listEl.innerHTML=versionRowHtml(row,n-1);
-            statusEl.textContent=`Loaded restore point R${String(n).padStart(2,'0')}: ${row.entry.label}`;
-        }
-
-        function getHistoryEntryById(id){ return getSharedHistory(cloudData).find(e=>e.id===id) || null; }
+        function loadSpecificVersion(){const n=Number(document.getElementById('version-jump-input')?.value);if(!Number.isInteger(n)||n<1||n>versionHistoryCount){alert(`Enter a valid revision number between 1 and ${versionHistoryCount||1}.`);return;}const row=versionHistoryRows[n-1];if(!row){alert('Revision not found. Refresh the list and try again.');return;}document.getElementById('version-history-list').innerHTML=versionRowHtml(row,n-1);document.getElementById('version-history-status').textContent=`Loaded revision R${String(n).padStart(2,'0')}: ${row.entry.label}`;}
+        function getHistoryEntryById(id){return getSharedHistory(cloudData).find(e=>e.id===id)||null;}
 
         function downloadHistoryVersion(id){
-            const entry=getHistoryEntryById(id);
-            if(!entry){alert('Restore point not found.');return;}
-            const payload={versionId:entry.id,createdAt:entry.at,createdBy:entry.by,label:entry.label,kind:entry.kind,snapshot:entry.snapshot};
-            const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-            a.href=url;a.download=`pantheon-restore-point-${entry.at}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+            const entry=getHistoryEntryById(id);if(!entry){alert('Revision not found.');return;}
+            const payload={versionId:entry.id,createdAt:entry.at,createdBy:entry.by,label:entry.label,kind:entry.kind,patch:entry.patch||null};
+            const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`pantheon-global-revision-${entry.at}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
         }
 
-        function applyGlobalHistorySnapshot(data,snapshot){
-            const snap=safeObject(snapshot), now=Date.now();
-            if(Array.isArray(snap.rosters)) { data.settings.rosters=cloneRosters(snap.rosters); data.settings.rosterUpdatedAt=now; data.settings.rosterUpdatedBy=deviceId; }
-            if(Array.isArray(snap.categories)) { data.settings.categories=cloneCategories(snap.categories); data.settings.categoriesUpdatedAt=now; data.settings.categoriesUpdatedBy=deviceId; }
-            if(safeObject(snap.characterJobs) && Object.keys(snap.characterJobs).length>=0) {
-                const jobs=normalizeCharacterJobs(snap.characterJobs);
-                Object.values(jobs).forEach(rec=>{ rec.updatedAt=now; rec.deviceId=deviceId; });
-                data.settings.characterJobs=jobs;
-            }
-            if(safeObject(snap.jobProfiles) && Object.keys(snap.jobProfiles).length) { data.settings.jobProfiles=normalizeJobProfiles(snap.jobProfiles); data.settings.jobProfilesUpdatedAt=now; data.settings.jobProfilesUpdatedBy=deviceId; }
-            if(safeObject(snap.lootWeights)) { data.settings.lootWeights={...DEFAULT_LOOT_WEIGHTS,...Object.fromEntries(Object.entries(snap.lootWeights).map(([k,v])=>[k,clampWeight(v)]))}; const times={}; Object.keys(data.settings.lootWeights).forEach(k=>times[k]=now); data.settings.lootWeightUpdatedAt=times; }
-            if(typeof snap.splitPartyMechanic==='boolean') {
-                data.settings.teamBuilder=data.settings.teamBuilder || createEmptyTeamBuilder();
-                data.settings.teamBuilder.splitPartyMechanic=snap.splitPartyMechanic;
-                data.settings.teamBuilder.splitPartyUpdatedAt=now; data.settings.teamBuilder.splitPartyUpdatedBy=deviceId;
-            }
-            data.updatedAt=now;
-            return data;
+        function applyGlobalPatch(data,patch,direction='before'){
+            const p=patch||{},now=Date.now();
+            if(Array.isArray(p.rosters)){for(const item of p.rosters){const value=direction==='before'?item.before:item.after;data.settings.rosters=cloneRosters(data.settings.rosters||[]).filter(r=>r.id!==item.id);if(value)data.settings.rosters.push(cloneDataObject(value));}data.settings.rosters=normalizeRosters(data.settings.rosters);data.settings.rosterUpdatedAt=now;data.settings.rosterUpdatedBy=deviceId;}
+            if(Array.isArray(p.categories)){for(const item of p.categories){const value=direction==='before'?item.before:item.after;data.settings.categories=cloneCategories(data.settings.categories||[]).filter(c=>c.id!==item.id);if(value)data.settings.categories.push(cloneDataObject(value));}data.settings.categories=normalizeCategories(data.settings.categories);data.settings.categoriesUpdatedAt=now;data.settings.categoriesUpdatedBy=deviceId;}
+            if(Array.isArray(p.characterJobs)){const jobs=normalizeCharacterJobs(data.settings.characterJobs||{});for(const item of p.characterJobs){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete jobs[item.key];else jobs[item.key]=cloneDataObject(value);}data.settings.characterJobs=normalizeCharacterJobs(jobs);}
+            if(Array.isArray(p.jobProfiles)){const prof=normalizeJobProfiles(data.settings.jobProfiles||{});for(const item of p.jobProfiles){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete prof[item.key];else prof[item.key]=cloneDataObject(value);}data.settings.jobProfiles=normalizeJobProfiles(prof);data.settings.jobProfilesUpdatedAt=now;data.settings.jobProfilesUpdatedBy=deviceId;}
+            if(Array.isArray(p.lootWeights)){data.settings.lootWeights={...DEFAULT_LOOT_WEIGHTS,...data.settings.lootWeights};for(const item of p.lootWeights){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete data.settings.lootWeights[item.key];else data.settings.lootWeights[item.key]=clampWeight(value);}data.settings.lootWeightUpdatedAt={...safeObject(data.settings.lootWeightUpdatedAt)};for(const item of p.lootWeights)data.settings.lootWeightUpdatedAt[item.key]=now;}
+            if(p.splitPartyMechanic){data.settings.teamBuilder=data.settings.teamBuilder||createEmptyTeamBuilder();data.settings.teamBuilder.splitPartyMechanic=direction==='before'?!!p.splitPartyMechanic.before:!!p.splitPartyMechanic.after;data.settings.teamBuilder.splitPartyUpdatedAt=now;data.settings.teamBuilder.splitPartyUpdatedBy=deviceId;}
+            data.updatedAt=now;return data;
+        }
+
+        function patchConflictsWithCurrent(data,patch,direction='before'){
+            const p=patch||{},conflicts=[];const check=(label,current,expected)=>{if(!sameValue(current,expected))conflicts.push(label);};
+            for(const item of p.rosters||[]){const cur=(data.settings.rosters||[]).find(r=>r.id===item.id)||null;check(`Roster ${item.id}`,cur,direction==='before'?item.after:item.before);}
+            for(const item of p.categories||[]){const cur=(data.settings.categories||[]).find(c=>c.id===item.id)||null;check(`Category ${item.id}`,cur,direction==='before'?item.after:item.before);}
+            const jobs=safeObject(data.settings.characterJobs);for(const item of p.characterJobs||[]){check(`Job ${item.key}`,Object.prototype.hasOwnProperty.call(jobs,item.key)?jobs[item.key]:undefined,direction==='before'?item.after:item.before);}
+            const prof=safeObject(data.settings.jobProfiles);for(const item of p.jobProfiles||[]){check(`Profile ${item.key}`,Object.prototype.hasOwnProperty.call(prof,item.key)?prof[item.key]:undefined,direction==='before'?item.after:item.before);}
+            const weights=safeObject(data.settings.lootWeights);for(const item of p.lootWeights||[]){check(`Loot weight ${item.key}`,Object.prototype.hasOwnProperty.call(weights,item.key)?weights[item.key]:undefined,direction==='before'?item.after:item.before);}
+            if(p.splitPartyMechanic)check('Split Party Mechanic',!!data.settings.teamBuilder?.splitPartyMechanic,direction==='before'?!!p.splitPartyMechanic.after:!!p.splitPartyMechanic.before);
+            return conflicts;
         }
 
         async function restoreHistoryVersion(id){
-            if(!hasCloudConfig() || window.__pantheonVersionWriteBusy)return;
-            if(!confirm('Restore this shared restore point? A safety copy of the current global state will be saved first. Routine tracker checkmarks and notes are not overwritten.')) return;
+            if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;
+            if(!confirm('Undo this global change? Routine tracker checkmarks, notes, salary logs, and Team Builder slots will not be changed.'))return;
             window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);
             try{
-                const config=getCloudConfig();
-                const current=normalizeData(await fetchRemoteRecord(config));
-                const entry=mergeVersionHistory(current.settings.versionControl.history,cloudData.settings.versionControl.history).find(e=>e.id===id);
-                if(!entry) throw new Error('Restore point not found in the current shared history.');
-                const currentSnapshot=getGlobalImpactSnapshot(current);
-                addSharedRestorePoint(current,`Safety copy before restoring ${entry.label}`,'restore-safety',current);
-                let restored=applyGlobalHistorySnapshot(current,entry.snapshot);
-                addSharedRestorePoint(restored,`Restored from ${entry.label}`,'restore',restored);
-                const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(restored)});
-                if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Restore failed (${res.status})${detail ? `: ${detail.slice(0,300)}` : ''}`);}
-                cloudData=normalizeData((await res.json()).record || restored);persistLocalData();refreshTrackerUI();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
-                setStatus(`🟢 Restored: ${entry.label}`);await loadVersionHistory(false);
-            }catch(err){setStatus(`🔴 Restore failed: ${err.message}`);alert(`Restore failed: ${err.message}`);}
-            finally{window.__pantheonVersionWriteBusy=false;}
+                const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));
+                const entry=getSharedHistory(current).find(e=>e.id===id);if(!entry||!entry.patch)throw new Error('This entry is a savepoint marker and cannot be undone directly.');
+                const conflicts=patchConflictsWithCurrent(current,entry.patch,'before');
+                if(conflicts.length&&!confirm(`The affected item(s) changed after this revision (${conflicts.length} conflict${conflicts.length===1?'':'s'}).\n\nProceed anyway?`))return;
+                const beforeRestore=cloneDataObject(getGlobalImpactSnapshot(current));
+                const restored=applyGlobalPatch(current,entry.patch,'before');
+                const afterRestore=cloneDataObject(getGlobalImpactSnapshot(restored));
+                const safetyPatch=diffGlobalImpact(afterRestore,beforeRestore);
+                appendVersionEntry(restored,`Safety before undo · ${entry.label}`,'global-change',safetyPatch,getGlobalImpactSignature(restored));
+                restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});
+                if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Undo failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));setStatus(`🟢 Undid: ${entry.label}`);await loadVersionHistory(false);
+            }catch(err){setStatus(`🔴 Undo failed: ${err.message}`);alert(`Undo failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}
+        }
+
+        // Normal sync. The recovery journal is optional; it can never block this path.
+        function forceSync(showSuccess = false){
+            if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return;}
+            if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return;}
+            syncInProgress=true;setStatus('🟡 Merging Cloud Data...');const config=getCloudConfig();
+            (async()=>{
+                try{
+                    for(let attempt=1;attempt<=3;attempt++){
+                        const remote=normalizeData(await fetchRemoteRecord(config));
+                        const ext=snapshotUnexpectedGlobalChange(remote);
+                        let candidate=mergeData(cloudData,remote);
+                        const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
+                        if(pendingGlobalBeforeSnapshot){
+                            const patch=diffGlobalImpact(pendingGlobalBeforeSnapshot,localAfter);
+                            if(!patchIsEmpty(patch))setVersionJournalForCandidate(candidate,`Before ${pendingGlobalChangeLabel}`,'global-change',patch,getGlobalImpactSignature(candidate));
+                        }else if(ext.externalPatch){
+                            setVersionJournalForCandidate(candidate,'Before external global change','before-external-change',ext.externalPatch,getGlobalImpactSignature(candidate));
+                        }
+                        candidate.updatedAt=Date.now();candidate.syncInfo={operationId:`sync-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,by:deviceId,at:Date.now()};candidate=fitCandidateUnderFreeLimit(candidate);
+                        const opId=candidate.syncInfo.operationId;
+                        const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(candidate)});
+                        if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                        const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));
+                        const latestOp=String(safeObject(latest.syncInfo).operationId||'');
+                        if(latestOp===opId){cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();refreshTrackerUI();setStatus(showSuccess?'🟢 Cloud Sync Complete':'🟢 Database Synced');return;}
+                        cloudData=mergeData(cloudData,latest);delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
+                    }
+                    throw new Error('Cloud changed during sync. Please press Sync Now again.');
+                }catch(err){persistLocalData();setStatus(`🔴 Sync Failed: ${err.message}`);}
+                finally{syncInProgress=false;if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}}
+            })();
+        }
+
+        function setVersionJournalForCandidate(candidate,patch,label,kind='global-change'){
+            if(!patch||patchIsEmpty(patch))return false;appendVersionEntry(candidate,label,kind,patch,getGlobalImpactSignature(candidate));candidate.settings.versionControl.history=trimVersionHistory(candidate.settings.versionControl.history);return true;
         }
 
         function openVersionHistoryModal(){toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
