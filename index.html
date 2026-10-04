@@ -621,6 +621,27 @@
             .team-run-type { flex:1; }
         }
 
+
+        .recovery-modal-card { max-width: 1100px; }
+        .recovery-modal-card .recovery-warning { border-left: 4px solid #b85b5b; background: #302126; padding: 12px; border-radius: 7px; margin-bottom: 14px; color: #e7d6d8; line-height: 1.45; }
+        .recovery-modal-card .recovery-info { border-left: 4px solid #4f7cac; background: #202731; padding: 12px; border-radius: 7px; margin-bottom: 14px; color: #c8d2df; line-height: 1.45; }
+        .recovery-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:end; margin:12px 0; }
+        .recovery-field { display:flex; flex-direction:column; gap:5px; min-width:130px; }
+        .recovery-field label { margin:0; }
+        .recovery-table-wrap { max-height: 330px; overflow:auto; border:1px solid #3d3d47; border-radius:8px; }
+        .recovery-table { width:100%; border-collapse:collapse; font-size:.8rem; }
+        .recovery-table th, .recovery-table td { padding:8px 9px; border-bottom:1px solid #383842; text-align:left; vertical-align:top; }
+        .recovery-table th { position:sticky; top:0; background:#262630; color:#aaa; z-index:1; }
+        .recovery-row-match { background:rgba(80,140,100,.10); }
+        .recovery-row-selected { outline:2px solid #8fb4ff; outline-offset:-2px; }
+        .recovery-pills { display:flex; gap:4px; flex-wrap:wrap; }
+        .recovery-pill { display:inline-block; padding:2px 7px; border:1px solid #555; border-radius:999px; font-size:.71rem; }
+        .recovery-pill.good { border-color:#6f9f7d; color:#bfe3cb; }
+        .recovery-snapshot { background:#17171d; border:1px solid #3d3d47; border-radius:8px; padding:10px; max-height:170px; overflow:auto; white-space:pre-wrap; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:.74rem; color:#c7c9d0; }
+        .recovery-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+        .recovery-danger-btn { background:#6a3a3a !important; border-color:#9c5555 !important; }
+        .recovery-primary-btn { background:#365d45 !important; border-color:#4f8a67 !important; }
+        @media (max-width:760px){ .recovery-toolbar{align-items:stretch}.recovery-field{flex:1}.recovery-modal-card{max-width:calc(100vw - 24px)} }
     </style>
 </head>
 <body>
@@ -678,6 +699,7 @@
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
                 <button class="drawer-item" type="button" onclick="openCloudModal()"><span class="drawer-icon">☁</span><span><strong>Cloud Setup</strong><small>Configure shared storage</small></span></button>
                 <button class="drawer-item" type="button" onclick="restoreConsolidatedKrukRosters()"><span class="drawer-icon">🔧</span><span><strong>Repair Kruk Rosters</strong><small>Merge (Kruk) groups into their owners</small></span></button>
+                <button class="drawer-item" type="button" onclick="openStateRecoveryModal()"><span class="drawer-icon">🛟</span><span><strong>State Recovery</strong><small>Recover older Jurai / Arcy data</small></span></button>
             </div>
 
             <div class="drawer-section">
@@ -1101,6 +1123,43 @@
             </div>
             <div class="modal-actions" style="justify-content:flex-end;">
                 <button class="btn btn-secondary" type="button" onclick="closeModal('help-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- State Recovery Modal -->
+    <div class="modal-overlay hidden" id="state-recovery-modal" role="dialog" aria-modal="true" aria-labelledby="state-recovery-title">
+        <div class="modal-card recovery-modal-card">
+            <h3 id="state-recovery-title">🛟 Pantheon State Recovery</h3>
+            <div class="modal-note">Recover an older JSONBin snapshot without relying on another member's browser. The recommended recovery only restores Jurai / Arcy-related characters and activity, then keeps the Kruk roster consolidation.</div>
+            <div class="recovery-warning"><strong>Pause normal tracker edits while recovering.</strong><br>Do not make tracker changes from this page until the recovery is finished. A safety copy of the current live database is created with JSONBin versioning before any recovery write.</div>
+
+            <div class="recovery-info" id="state-recovery-status">Ready. Click <strong>Check Version Count</strong> to see whether historical JSONBin versions are available.</div>
+
+            <div class="recovery-toolbar">
+                <div class="recovery-field"><label for="state-recovery-from">From version</label><input id="state-recovery-from" type="number" min="1" value="1"></div>
+                <div class="recovery-field"><label for="state-recovery-to">To version</label><input id="state-recovery-to" type="number" min="1" value="50"></div>
+                <button class="btn btn-sync" type="button" onclick="checkStateRecoveryVersions()">Check Version Count</button>
+                <button class="btn btn-secondary" type="button" onclick="scanStateRecoveryVersions()">Scan History</button>
+                <button class="btn btn-secondary" type="button" onclick="readCurrentStateRecoveryLatest()">Read Current State</button>
+            </div>
+
+            <div id="state-recovery-results" class="recovery-table-wrap">
+                <div style="padding:14px;color:#8f93a0;">No versions scanned yet.</div>
+            </div>
+
+            <div style="margin-top:14px;">
+                <div style="font-weight:700;margin-bottom:7px;">Selected Snapshot</div>
+                <div id="state-recovery-selected" class="recovery-snapshot">Select a historical version above.</div>
+            </div>
+
+            <div class="recovery-actions">
+                <button class="btn btn-sync" type="button" onclick="downloadSelectedStateRecovery()">Download Selected JSON</button>
+                <button class="btn recovery-primary-btn" type="button" onclick="recoverStateTargeted()">Recover Jurai / Arcy Into Live</button>
+                <button class="btn btn-secondary" type="button" onclick="recoverStateMerge()">Merge Selected Snapshot Into Live</button>
+                <button class="btn recovery-danger-btn" type="button" onclick="recoverStateReplace()">Replace Live With Snapshot</button>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('state-recovery-modal')">Close</button>
             </div>
         </div>
     </div>
@@ -1842,8 +1901,434 @@
             }
         }
 
+
+
+        // ==========================================
+        // 🛟 STATE RECOVERY: JURAI / ARCY
+        // ==========================================
+        let stateRecoverySelectedVersion = null;
+        let stateRecoverySelectedRecord = null;
+        let stateRecoveryRows = [];
+
+        function stateRecoveryEscape(value) {
+            return String(value ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+
+        function stateRecoveryFormatTime(value) {
+            const n = Number(value) || 0;
+            return n ? new Date(n).toLocaleString() : '—';
+        }
+
+        function stateRecoveryRosterPeople(record) {
+            const rosters = Array.isArray(record?.settings?.rosters) ? record.settings.rosters : [];
+            return rosters.map(r => ({
+                name: String(r?.name || ''),
+                id: String(r?.id || ''),
+                chars: Array.isArray(r?.characters) ? r.characters.map(String) : []
+            }));
+        }
+
+        function stateRecoveryTargetPeople(record) {
+            return stateRecoveryRosterPeople(record).filter(r => /jurai|arcy/i.test(r.name) || r.chars.some(c => /jurai|arcy/i.test(c)));
+        }
+
+        function stateRecoveryTargetCharacters(record) {
+            return new Set(stateRecoveryTargetPeople(record).flatMap(r => r.chars).map(c => c.toLowerCase()));
+        }
+
+        function stateRecoverySummary(record) {
+            const rosters = stateRecoveryRosterPeople(record);
+            const targets = stateRecoveryTargetPeople(record);
+            const chars = rosters.flatMap(r => r.chars);
+            const cells = safeObject(record?.cells);
+            const cellCount = Object.values(cells).reduce((n, m) => n + Object.keys(safeObject(m)).length, 0);
+            const teamBuilder = record?.settings?.teamBuilder;
+            const teamSlots = teamBuilder ? [...(teamBuilder.team1?.slots || []), ...(teamBuilder.team2?.slots || [])].filter(s => s?.character).map(s => String(s.character)) : [];
+            return {
+                updatedAt: Number(record?.updatedAt) || 0,
+                rosters: rosters.length,
+                characters: chars,
+                cellCount,
+                teamSlots,
+                targets
+            };
+        }
+
+        function stateRecoveryPreview(record) {
+            const targets = stateRecoveryTargetPeople(record);
+            if (!targets.length) return 'No roster or character name matching Jurai / Arcy was found in this snapshot.';
+            return targets.map(r => `${r.name}: ${r.chars.join(', ') || 'no characters'}`).join('\n');
+        }
+
+        function stateRecoveryApi(path, options = {}) {
+            const config = getCloudConfig();
+            return fetch(`${JSONBIN_ROOT}${path}`, {
+                ...options,
+                headers: { ...(options.headers || {}), ...authHeaders(config) },
+                cache: 'no-store'
+            }).then(async response => {
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(payload.message || `Recovery request failed (${response.status})`);
+                return payload;
+            });
+        }
+
+        function stateRecoveryDownload(record, filename) {
+            try {
+                const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (e) {
+                console.warn('State recovery backup download failed:', e);
+            }
+        }
+
+        function renderStateRecoverySelected(record, version) {
+            const el = document.getElementById('state-recovery-selected');
+            if (!el) return;
+            const s = stateRecoverySummary(record);
+            el.textContent = `Version ${version}\nUpdated: ${stateRecoveryFormatTime(s.updatedAt)}\nJurai / Arcy:\n${stateRecoveryPreview(record)}\n\nCharacters: ${s.characters.length}\nCells with stored data: ${s.cellCount}\nTeam Builder slots: ${s.teamSlots.length}`;
+            document.querySelectorAll('#state-recovery-results tr[data-recovery-version]').forEach(tr => {
+                tr.classList.toggle('recovery-row-selected', Number(tr.dataset.recoveryVersion) === Number(version));
+            });
+        }
+
+        async function selectStateRecoveryVersion(version) {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            try {
+                setStatus('🟡 Reading historical recovery snapshot...');
+                const cached = stateRecoveryRows.find(row => Number(row.version) === Number(version));
+                const payload = cached?.record || (await stateRecoveryApi(`/b/${encodeURIComponent(getCloudConfig().binId)}/${version}`));
+                stateRecoverySelectedVersion = Number(version);
+                stateRecoverySelectedRecord = normalizeData(payload.record || payload);
+                renderStateRecoverySelected(stateRecoverySelectedRecord, stateRecoverySelectedVersion);
+                document.getElementById('state-recovery-status').textContent = `Selected version ${version}. Review it before choosing a recovery action.`;
+                setStatus('🟢 Historical snapshot selected');
+            } catch (err) {
+                document.getElementById('state-recovery-selected').textContent = `Failed to read version ${version}: ${err.message}`;
+                setStatus(`🔴 Recovery read failed: ${err.message}`);
+            }
+        }
+
+        async function checkStateRecoveryVersions() {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            try {
+                setStatus('🟡 Checking JSONBin version history...');
+                const payload = await stateRecoveryApi(`/b/${encodeURIComponent(getCloudConfig().binId)}/versions/count`);
+                const count = Number(payload.metadata?.versionCount) || 0;
+                document.getElementById('state-recovery-to').value = Math.max(1, Math.min(count || 50, 200));
+                document.getElementById('state-recovery-status').textContent = count
+                    ? `JSONBin reports ${count} historical version${count === 1 ? '' : 's'}. Scan the range below for the snapshot containing Jurai / Arcy's data.`
+                    : 'JSONBin reports no historical versions. If you know versioning was not enabled previously, the browser-local recovery route would be needed instead.';
+                setStatus(count ? `🟢 ${count} historical versions available` : '🟡 No historical versions reported');
+            } catch (err) {
+                document.getElementById('state-recovery-status').textContent = `Could not read version count: ${err.message}`;
+                setStatus(`🔴 Version count failed: ${err.message}`);
+            }
+        }
+
+        async function readCurrentStateRecoveryLatest() {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            try {
+                setStatus('🟡 Reading current live state...');
+                const payload = await stateRecoveryApi(`/b/${encodeURIComponent(getCloudConfig().binId)}/latest`);
+                const record = normalizeData(payload.record || payload);
+                document.getElementById('state-recovery-status').textContent = `Current live state\nUpdated: ${stateRecoveryFormatTime(record.updatedAt)}\nJurai / Arcy: ${stateRecoveryTargetPeople(record).length ? stateRecoveryPreview(record) : 'none detected'}`;
+                setStatus('🟢 Current state loaded');
+            } catch (err) {
+                setStatus(`🔴 Current state read failed: ${err.message}`);
+            }
+        }
+
+        async function scanStateRecoveryVersions() {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            let from = Math.max(1, Number(document.getElementById('state-recovery-from').value) || 1);
+            let to = Math.max(from, Number(document.getElementById('state-recovery-to').value) || from);
+            if (to - from > 199) {
+                to = from + 199;
+                document.getElementById('state-recovery-to').value = to;
+            }
+            clearTimeout(autoSyncTimer);
+            try {
+                setStatus(`🟡 Scanning versions ${from}–${to}...`);
+                const rows = [];
+                let next = from;
+                const workers = [];
+                async function worker() {
+                    while (next <= to) {
+                        const version = next++;
+                        try {
+                            const payload = await stateRecoveryApi(`/b/${encodeURIComponent(getCloudConfig().binId)}/${version}`);
+                            const record = normalizeData(payload.record || payload);
+                            const summary = stateRecoverySummary(record);
+                            rows.push({ version, record, summary });
+                        } catch (err) {
+                            rows.push({ version, record: null, error: err.message, summary: { updatedAt:0,rosters:0,characters:[],cellCount:0,teamSlots:[],targets:[] } });
+                        }
+                    }
+                }
+                for (let i = 0; i < 8; i++) workers.push(worker());
+                await Promise.all(workers);
+                rows.sort((a,b) => b.version - a.version);
+                stateRecoveryRows = rows;
+                const body = rows.map(row => {
+                    const match = row.summary.targets.length;
+                    const targetNames = row.summary.targets.map(r => `<span class="recovery-pill good">${stateRecoveryEscape(r.name)} (${r.chars.length})</span>`).join(' ');
+                    return `<tr data-recovery-version="${row.version}" class="${match ? 'recovery-row-match' : ''}"><td><button class="btn btn-secondary" type="button" style="padding:4px 8px;" onclick="selectStateRecoveryVersion(${row.version})">v${row.version}</button></td><td>${stateRecoveryEscape(stateRecoveryFormatTime(row.summary.updatedAt))}</td><td>${targetNames || '—'}</td><td>${row.summary.characters.length}</td><td>${row.summary.cellCount}</td><td>${row.summary.teamSlots.length}</td><td>${row.error ? `<span style="color:#ef9a9a;">${stateRecoveryEscape(row.error)}</span>` : 'OK'}</td></tr>`;
+                }).join('');
+                document.getElementById('state-recovery-results').innerHTML = `<table class="recovery-table"><thead><tr><th>Version</th><th>Updated</th><th>Jurai / Arcy</th><th>Characters</th><th>Cells</th><th>Team Slots</th><th>Status</th></tr></thead><tbody>${body}</tbody></table>`;
+                document.getElementById('state-recovery-status').textContent = `Finished scanning ${from}–${to}. Green rows contain a Jurai / Arcy roster or character name.`;
+                setStatus('🟢 Recovery history scan complete');
+            } catch (err) {
+                document.getElementById('state-recovery-status').textContent = `Recovery scan failed: ${err.message}`;
+                setStatus(`🔴 Recovery scan failed: ${err.message}`);
+            }
+        }
+
+        function mergeRecoveryHistoryForTargets(out, source, targetChars) {
+            out.history = safeObject(out.history);
+            for (const [char, value] of Object.entries(safeObject(source.history))) {
+                if (!targetChars.has(String(char).toLowerCase())) continue;
+                if (!out.history[char]) out.history[char] = JSON.parse(JSON.stringify(value));
+            }
+        }
+
+        function mergeRecoveryArchivesForTargets(out, source, targetChars) {
+            out.weeklyArchive = safeObject(out.weeklyArchive);
+            for (const [weekKey, srcArchive] of Object.entries(safeObject(source.weeklyArchive))) {
+                const src = safeObject(srcArchive);
+                const hasTargetRate = Object.keys(safeObject(src.rates)).some(name => targetChars.has(String(name).toLowerCase()));
+                const hasTargetState = Object.keys(safeObject(src.states)).some(name => targetChars.has(String(name).toLowerCase()));
+                if (!hasTargetRate && !hasTargetState) continue;
+                const dst = out.weeklyArchive[weekKey] && typeof out.weeklyArchive[weekKey] === 'object' ? out.weeklyArchive[weekKey] : { createdAt: Number(src.createdAt)||0, taskOrder: Array.isArray(src.taskOrder) ? [...src.taskOrder] : [], rates:{}, states:{} };
+                dst.rates = safeObject(dst.rates); dst.states = safeObject(dst.states);
+                for (const [name, rate] of Object.entries(safeObject(src.rates))) if (targetChars.has(String(name).toLowerCase()) && dst.rates[name] == null) dst.rates[name] = rate;
+                for (const [name, state] of Object.entries(safeObject(src.states))) if (targetChars.has(String(name).toLowerCase()) && dst.states[name] == null) dst.states[name] = state;
+                if (!dst.taskOrder?.length && Array.isArray(src.taskOrder)) dst.taskOrder = [...src.taskOrder];
+                out.weeklyArchive[weekKey] = dst;
+            }
+            trimWeeklyArchive(out);
+        }
+
+        function mergeRecoveryTargetRosterSettings(out, source, targetPeople) {
+            out.settings = out.settings || {};
+            const currentRosters = Array.isArray(out.settings.rosters) ? JSON.parse(JSON.stringify(out.settings.rosters)) : [];
+            const sourceRosters = Array.isArray(source.settings?.rosters) ? source.settings.rosters : [];
+            const targetNames = new Set(targetPeople.map(r => String(r.name || '').toLowerCase()));
+            for (const sourceRoster of sourceRosters) {
+                const rosterName = String(sourceRoster?.name || '').trim();
+                const sourceChars = Array.isArray(sourceRoster?.characters) ? sourceRoster.characters.map(String) : [];
+                const matchedByName = targetNames.has(rosterName.toLowerCase());
+                const matchedChars = sourceChars.filter(c => stateRecoveryTargetCharacters(source).has(c.toLowerCase()));
+                if (!matchedByName && !matchedChars.length) continue;
+                let targetRoster = currentRosters.find(r => String(r?.id || '') === String(sourceRoster?.id || ''));
+                if (!targetRoster) targetRoster = currentRosters.find(r => String(r?.name || '').trim().toLowerCase() === rosterName.toLowerCase());
+                if (!targetRoster) {
+                    currentRosters.push(JSON.parse(JSON.stringify(sourceRoster)));
+                    continue;
+                }
+                const existing = new Set((Array.isArray(targetRoster.characters) ? targetRoster.characters : []).map(c => String(c).toLowerCase()));
+                const addChars = matchedByName ? sourceChars : matchedChars;
+                targetRoster.characters = Array.isArray(targetRoster.characters) ? targetRoster.characters : [];
+                for (const char of addChars) if (!existing.has(String(char).toLowerCase())) { targetRoster.characters.push(char); existing.add(String(char).toLowerCase()); }
+            }
+            out.settings.rosters = currentRosters;
+            out.settings.rosterUpdatedAt = Math.max(Number(out.settings.rosterUpdatedAt)||0, Date.now());
+            out.settings.rosterUpdatedBy = 'state-recovery';
+        }
+
+        function mergeRecoveryTargetTeamBuilder(out, source, targetChars) {
+            out.settings = out.settings || {};
+            const localTB = normalizeTeamBuilder(out.settings.teamBuilder);
+            const sourceTB = normalizeTeamBuilder(source.settings?.teamBuilder);
+            ['team1','team2'].forEach(team => {
+                for (let i = 0; i < 8; i++) {
+                    const src = sourceTB[team]?.slots?.[i];
+                    if (!src?.character || !targetChars.has(String(src.character).toLowerCase())) continue;
+                    localTB[team].slots[i] = compareTeamSlot(localTB[team].slots[i], src);
+                }
+            });
+            out.settings.teamBuilder = localTB;
+        }
+
+        function buildTargetedRecoveryState(current, source) {
+            const out = normalizeData(current);
+            const src = normalizeData(source);
+            const targetPeople = stateRecoveryTargetPeople(src);
+            const targetChars = stateRecoveryTargetCharacters(src);
+            out.cells = safeObject(out.cells);
+            for (const [char, tasks] of Object.entries(safeObject(src.cells))) {
+                if (!targetChars.has(String(char).toLowerCase())) continue;
+                out.cells[char] = safeObject(out.cells[char]);
+                for (const [task, cell] of Object.entries(safeObject(tasks))) {
+                    out.cells[char][task] = compareCellRecords(out.cells[char][task], cell);
+                }
+            }
+            mergeRecoveryHistoryForTargets(out, src, targetChars);
+            mergeRecoveryArchivesForTargets(out, src, targetChars);
+            mergeRecoveryTargetRosterSettings(out, src, targetPeople);
+            mergeRecoveryTargetTeamBuilder(out, src, targetChars);
+            out.settings.rosters = consolidateRecoveryKrukRosters(out.settings.rosters);
+            out.schemaVersion = Math.max(Number(out.schemaVersion)||0, APP_SCHEMA_VERSION);
+            out.updatedAt = Date.now();
+            return out;
+        }
+
+        function buildMergedRecoveryState(current, source) {
+            const out = mergeData(normalizeData(current), normalizeData(source));
+            out.settings.rosters = consolidateRecoveryKrukRosters(out.settings.rosters);
+            out.schemaVersion = Math.max(Number(out.schemaVersion)||0, APP_SCHEMA_VERSION);
+            out.updatedAt = Date.now();
+            return out;
+        }
+
+        function consolidateRecoveryKrukRosters(rosters) {
+            const out = Array.isArray(rosters) ? JSON.parse(JSON.stringify(rosters)) : [];
+            const aliases = [['Cheean (Kruk)', 'Cheean'], ['Bio (Kruk)', 'Bio']];
+            for (const [from, to] of aliases) {
+                const fromRoster = out.find(r => String(r?.name || '').trim().toLowerCase() === from.toLowerCase());
+                const toRoster = out.find(r => String(r?.name || '').trim().toLowerCase() === to.toLowerCase());
+                if (!fromRoster || !toRoster) continue;
+                const seen = new Set((Array.isArray(toRoster.characters) ? toRoster.characters : []).map(c => String(c).toLowerCase()));
+                toRoster.characters = Array.isArray(toRoster.characters) ? toRoster.characters : [];
+                for (const char of Array.isArray(fromRoster.characters) ? fromRoster.characters : []) if (!seen.has(String(char).toLowerCase())) { toRoster.characters.push(char); seen.add(String(char).toLowerCase()); }
+                const idx = out.indexOf(fromRoster); if (idx >= 0) out.splice(idx, 1);
+            }
+            return out;
+        }
+
+        async function writeStateRecovery(mode) {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            if (!stateRecoverySelectedRecord || stateRecoverySelectedVersion == null) {
+                alert('Select a historical version first.');
+                return;
+            }
+            if (window.__pantheonRecoveryInProgress) return;
+            const config = getCloudConfig();
+            window.__pantheonRecoveryInProgress = true;
+            clearTimeout(autoSyncTimer);
+            try {
+                setStatus('🟡 Reading current live state for recovery...');
+                const livePayload = await stateRecoveryApi(`/b/${encodeURIComponent(config.binId)}/latest`);
+                const current = normalizeData(livePayload.record || livePayload);
+                const source = normalizeData(stateRecoverySelectedRecord);
+                const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+                stateRecoveryDownload(current, `pantheon-before-state-recovery-${stamp}.json`);
+
+                let candidate;
+                let actionLabel;
+                if (mode === 'targeted') {
+                    candidate = buildTargetedRecoveryState(current, source);
+                    actionLabel = 'RECOVER JURAI / ARCY';
+                } else if (mode === 'merge') {
+                    candidate = buildMergedRecoveryState(current, source);
+                    actionLabel = 'MERGE SNAPSHOT';
+                } else {
+                    candidate = JSON.parse(JSON.stringify(source));
+                    candidate.settings = candidate.settings || {};
+                    candidate.settings.rosters = consolidateRecoveryKrukRosters(candidate.settings.rosters);
+                    candidate.updatedAt = Date.now();
+                    candidate.schemaVersion = Math.max(Number(candidate.schemaVersion)||0, APP_SCHEMA_VERSION);
+                    actionLabel = 'REPLACE LIVE';
+                }
+
+                const targetPreview = mode === 'targeted' ? stateRecoveryPreview(source) : `Selected historical version: ${stateRecoverySelectedVersion}`;
+                if (!confirm(`${actionLabel}\n\n${targetPreview}\n\nA safety copy of the current live database will be written with JSONBin versioning enabled before the recovered state is written.\n\nContinue?`)) return;
+
+                setStatus('🟡 Creating safety version of the current live state...');
+                await stateRecoveryApi(`/b/${encodeURIComponent(config.binId)}`, {
+                    method:'PUT',
+                    headers:{'Content-Type':'application/json','X-Bin-Versioning':'true'},
+                    body:JSON.stringify(current)
+                });
+
+                setStatus(`🟡 Writing ${actionLabel.toLowerCase()}...`);
+                const writePayload = await stateRecoveryApi(`/b/${encodeURIComponent(config.binId)}`, {
+                    method:'PUT',
+                    headers:{'Content-Type':'application/json','X-Bin-Versioning':'true'},
+                    body:JSON.stringify(candidate)
+                });
+
+                const afterPayload = await stateRecoveryApi(`/b/${encodeURIComponent(config.binId)}/latest`);
+                cloudData = normalizeData(afterPayload.record || afterPayload);
+                persistLocalData();
+                refreshTrackerUI();
+                const afterSummary = stateRecoverySummary(cloudData);
+                document.getElementById('state-recovery-status').textContent = `✅ ${actionLabel} complete.\n\nJurai / Arcy now:\n${stateRecoveryPreview(cloudData)}\n\nA safety copy was created before the write. The current tracker view has been refreshed.`;
+                setStatus('🟢 State recovery complete');
+                if (writePayload) void writePayload;
+            } catch (err) {
+                console.error(err);
+                setStatus(`🔴 State recovery failed: ${err.message}`);
+                alert(`State recovery failed: ${err.message}`);
+            } finally {
+                window.__pantheonRecoveryInProgress = false;
+            }
+        }
+
+        function openStateRecoveryModal() {
+            toggleSideMenu(false);
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            stateRecoverySelectedVersion = null;
+            stateRecoverySelectedRecord = null;
+            stateRecoveryRows = [];
+            document.getElementById('state-recovery-selected').textContent = 'Select a historical version above.';
+            document.getElementById('state-recovery-results').innerHTML = '<div style="padding:14px;color:#8f93a0;">No versions scanned yet.</div>';
+            document.getElementById('state-recovery-status').textContent = 'Checking JSONBin version history...';
+            openModal('state-recovery-modal');
+            checkStateRecoveryVersions();
+        }
+
+        function downloadSelectedStateRecovery() {
+            if (!stateRecoverySelectedRecord || stateRecoverySelectedVersion == null) {
+                alert('Select a historical version first.');
+                return;
+            }
+            stateRecoveryDownload(stateRecoverySelectedRecord, `pantheon-version-${stateRecoverySelectedVersion}.json`);
+        }
+
+        function recoverStateTargeted() { writeStateRecovery('targeted'); }
+        function recoverStateMerge() { writeStateRecovery('merge'); }
+        function recoverStateReplace() { writeStateRecovery('replace'); }
+
         function setStatus(msg) { document.getElementById('sync-status').textContent = msg; }
-        function triggerAutoSync() { persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
+        function triggerAutoSync() {
+            persistLocalData();
+            if (window.__pantheonRecoveryInProgress) return;
+            setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally');
+            clearTimeout(autoSyncTimer);
+            autoSyncTimer = setTimeout(() => forceSync(false), 800);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadCloudForm();
@@ -2976,7 +3461,7 @@
 
         function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('state-recovery-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 </body>
 </html>
