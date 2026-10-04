@@ -1437,6 +1437,10 @@
         let syncInProgress = false;
         let syncRequestedWhileBusy = false;
         let activeRosterFilter = 'all'; 
+        // Pending label for a protected global change that is about to be synced.
+        // These are runtime-only values; the actual restore point is stored in cloudData.
+        let pendingGlobalChangeLabel = '';
+        let pendingGlobalChangeRequestedAt = 0;
         let isAnalyticsVisible = true;
         let isPersonalView = false;
         const deviceId = getOrCreateDeviceId();
