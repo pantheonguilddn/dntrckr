@@ -1907,14 +1907,11 @@
                 const clean=normalizeVersionEntry(raw);if(!clean)continue;
                 const existing=map.get(clean.id);if(!existing || clean.at>existing.at)map.set(clean.id,clean);
             }
-            // Same global result + same kind can be detected by multiple PCs.
-            // Keep one journal entry instead of duplicating it.
-            const unique=[];const seen=new Set();
-            for(const e of [...map.values()].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0))){
-                const key=e.kind==='marker'?`marker:${e.id}`:`change:${e.kind}:${e.signature}`;
-                if(seen.has(key))continue;seen.add(key);unique.push(e);
-            }
-            return trimVersionHistory(unique);
+            // Never collapse separate real-world changes just because they happen
+            // to produce the same final state. For example, adding LittleAndy,
+            // removing LittleAndy, then adding LittleAndy again must remain three
+            // separate audit entries. IDs are the only de-duplication key.
+            return trimVersionHistory([...map.values()].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)));
         }
 
         function versionControlState(data=cloudData){const vc=safeObject(data.settings?.versionControl);return {...vc,history:trimVersionHistory(vc.history)};}
@@ -2005,15 +2002,36 @@
             }catch(err){setStatus(`🔴 Savepoint failed: ${err.message}`);alert(`Savepoint failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}
         }
 
+        function renderVersionHistoryRows(data, sourceLabel='local'){
+            const statusEl=document.getElementById('version-history-status'),listEl=document.getElementById('version-history-list');
+            if(!statusEl||!listEl)return;
+            const rows=getSharedHistory(data);versionHistoryCount=rows.length;versionHistoryRows=rows.map((entry,index)=>({entry,index}));
+            if(!rows.length){statusEl.textContent=sourceLabel==='local'?'No revision history cached on this device yet.':'No shared global-change history yet.';listEl.innerHTML='<div class="version-empty">No savepoints or protected changes yet.</div>';return;}
+            statusEl.textContent=`Showing ${rows.length} revision${rows.length===1?'':'s'}${sourceLabel==='local'?' · cached locally':''}.`;listEl.innerHTML=versionHistoryRows.map((row,i)=>versionRowHtml(row,i)).join('');
+        }
+
         async function loadVersionHistory(showStatus=true){
             if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');return;}
-            const statusEl=document.getElementById('version-history-status'),listEl=document.getElementById('version-history-list');
+            const statusEl=document.getElementById('version-history-status');
+            // Render what this browser already knows immediately. A temporary
+            // network failure must never turn the history window into a blank box.
+            renderVersionHistoryRows(cloudData,'local');
             try{
                 const remote=normalizeData(await fetchRemoteRecord(getCloudConfig()));
-                const rows=getSharedHistory(remote);versionHistoryCount=rows.length;versionHistoryRows=rows.map((entry,index)=>({entry,index}));
-                if(!rows.length){statusEl.textContent='No shared global-change history yet.';listEl.innerHTML='<div class="version-empty">No savepoints or protected changes yet.</div>';return;}
-                statusEl.textContent=`Showing ${rows.length} shared revision${rows.length===1?'':'s'}.`;listEl.innerHTML=versionHistoryRows.map((row,i)=>versionRowHtml(row,i)).join('');
-            }catch(err){statusEl.textContent=`❌ ${err.message}`;listEl.innerHTML='<div class="version-empty">Could not load revision history.</div>';}
+                // Merge the remote journal into the local cached state without
+                // changing the live tracker itself.
+                cloudData.settings.versionControl.history=mergeVersionHistory(
+                    cloudData.settings.versionControl.history,
+                    remote.settings.versionControl.history
+                );
+                persistLocalData();
+                renderVersionHistoryRows(cloudData,'shared');
+            }catch(err){
+                if(statusEl){
+                    const msg=String(err?.message||err);
+                    statusEl.textContent=`⚠ Showing cached revision history · Cloud refresh failed: ${msg}`;
+                }
+            }
         }
 
         function loadSpecificVersion(){const n=Number(document.getElementById('version-jump-input')?.value);if(!Number.isInteger(n)||n<1||n>versionHistoryCount){alert(`Enter a valid revision number between 1 and ${versionHistoryCount||1}.`);return;}const row=versionHistoryRows[n-1];if(!row){alert('Revision not found. Refresh the list and try again.');return;}document.getElementById('version-history-list').innerHTML=versionRowHtml(row,n-1);document.getElementById('version-history-status').textContent=`Loaded revision R${String(n).padStart(2,'0')}: ${row.entry.label}`;}
@@ -2567,7 +2585,7 @@
         }
         async function removeCharacterFromRoster(id, n) {
             const r = findRoster(id); if(!r || !confirm(`Remove ${n}?`)) return;
-            if (!(await prepareGlobalChange(`Remove character ${n}`))) return;
+            if (!(await prepareGlobalChange(`Removed ${n} from ${r.name}`))) return;
             const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
             latest.characters = latest.characters.filter(c => c !== n); delete cloudData.settings.characterJobs[n];
             touchRosterSettings(); refreshTrackerUI(); triggerAutoSync();
