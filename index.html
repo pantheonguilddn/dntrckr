@@ -1981,7 +1981,7 @@
         function versionRowHtml(row,index){
             const entry=row.entry;if(!entry)return '';
             const kind=entry.kind==='marker'?'<span class="version-badge">SAVEPOINT</span>':(entry.kind==='before-external-change'?'<span class="version-badge">EXTERNAL CHANGE</span>':'<span class="version-badge">GLOBAL CHANGE</span>');
-            const action=entry.patch?`<button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Marker</span>';
+            const action=entry.patch?`<button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Logged</span>';
             return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')} ${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}${entry.patch?` · ${escapeHTML(summarizePatch(entry.patch))}`:''}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button>${action}</div></div>`;
         }
 
@@ -2081,7 +2081,12 @@
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
                         if(pendingGlobalBeforeSnapshot){
                             const patch=diffGlobalImpact(pendingGlobalBeforeSnapshot,localAfter);
-                            if(!patchIsEmpty(patch))setVersionJournalForCandidate(candidate,`Before ${pendingGlobalChangeLabel}`,'global-change',patch,getGlobalImpactSignature(candidate));
+                            if(!patchIsEmpty(patch)){
+                                setVersionJournalForCandidate(candidate, pendingGlobalChangeLabel, 'global-change', patch, getGlobalImpactSignature(candidate));
+                            }else if(pendingGlobalChangeLabel){
+                                // Even if a merge normalizes away the structural diff, keep a lightweight audit entry.
+                                appendVersionEntry(candidate, pendingGlobalChangeLabel, 'marker', null, getGlobalImpactSignature(candidate));
+                            }
                         }else if(ext.externalPatch){
                             setVersionJournalForCandidate(candidate,'Before external global change','before-external-change',ext.externalPatch,getGlobalImpactSignature(candidate));
                         }
@@ -2532,7 +2537,9 @@
             const color = normalizeColor(document.getElementById('registration-color')?.value, '#7aa2f7');
             const name = v.slice(0,40);
             if (rosterChoice === '__new__' && !ownerName) return alert('Enter owner.');
-            if (!(await prepareGlobalChange(`Add character ${name}`))) return;
+            const selectedRoster = rosterChoice === '__new__' ? null : findRoster(rosterChoice);
+            const targetOwner = selectedRoster?.name || ownerName.slice(0,30) || 'new roster';
+            if (!(await prepareGlobalChange(`Added ${name} to ${targetOwner}`))) return;
             // Re-check after refreshing to the latest shared state.
             if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === name.toLowerCase()))) return alert('Character was already added by another device.');
             let r;
