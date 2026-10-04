@@ -677,6 +677,7 @@
                 <div class="drawer-section-title">System</div>
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
                 <button class="drawer-item" type="button" onclick="openCloudModal()"><span class="drawer-icon">☁</span><span><strong>Cloud Setup</strong><small>Configure shared storage</small></span></button>
+                <button class="drawer-item" type="button" onclick="restoreConsolidatedKrukRosters()"><span class="drawer-icon">🔧</span><span><strong>Repair Kruk Rosters</strong><small>Merge (Kruk) groups into their owners</small></span></button>
             </div>
 
             <div class="drawer-section">
@@ -1120,6 +1121,9 @@
                 <button class="btn btn-secondary" type="button" onclick="closeModal('cloud-modal')">Close</button>
             </div>
             <div id="cloud-modal-message" class="modal-note" style="display:none;"></div>
+            <div style="margin-top:14px;padding:12px;border:1px solid #66543a;border-radius:8px;background:#27241f;color:#d8d0c4;font-size:.82rem;line-height:1.45;">
+                <strong style="color:#f1d7a6;">Recovery tool:</strong> <em>Repair Kruk Rosters</em> backs up the current cloud record, then merges any <b>(Kruk)</b> owner groups into their matching owner group and removes the duplicate (Kruk) groups. Use this only when no one else is editing the tracker.
+            </div>
         </div>
     </div>
 
@@ -1735,6 +1739,107 @@
                 setStatus(showSuccess ? '🟢 Cloud Sync Complete' : '🟢 Database Synced');
             } catch (err) { persistLocalData(); setStatus(`🔴 Sync Failed: ${err.message}`); } 
             finally { syncInProgress = false; if (syncRequestedWhileBusy) { syncRequestedWhileBusy = false; setTimeout(() => forceSync(false), 150); } }
+        }
+
+        function downloadRecoveryBackup(record) {
+            try {
+                const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `pantheon-before-kruk-repair-${stamp}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (e) {
+                console.warn('Recovery backup download failed:', e);
+            }
+        }
+
+        async function restoreConsolidatedKrukRosters() {
+            if (!hasCloudConfig()) {
+                alert('Connect to the shared Cloud database first.');
+                openCloudModal();
+                return;
+            }
+            if (!confirm('This will back up the current cloud record, merge every "(Kruk)" roster into its matching owner roster, and remove the duplicate (Kruk) groups.\n\nMake sure nobody else is editing the tracker while this runs. Continue?')) return;
+
+            clearTimeout(autoSyncTimer);
+            const config = getCloudConfig();
+            setStatus('🟡 Preparing roster recovery...');
+            try {
+                const remote = await fetchRemoteRecord(config);
+                const backup = JSON.parse(JSON.stringify(remote));
+                downloadRecoveryBackup(backup);
+
+                const data = normalizeData(remote);
+                const rosters = Array.isArray(data.settings?.rosters) ? data.settings.rosters : [];
+                let changed = false;
+                const removedIds = new Set();
+
+                for (const kruk of [...rosters]) {
+                    if (!/\s*\(Kruk\)\s*$/i.test(String(kruk?.name || ''))) continue;
+                    const targetName = String(kruk.name).replace(/\s*\(Kruk\)\s*$/i, '').trim();
+                    let target = rosters.find(r => r !== kruk && String(r?.name || '').trim().toLowerCase() === targetName.toLowerCase() && !/\s*\(Kruk\)\s*$/i.test(String(r?.name || '')));
+
+                    if (!target) {
+                        kruk.name = targetName || kruk.name;
+                        target = kruk;
+                        changed = true;
+                    }
+
+                    if (target !== kruk) {
+                        const existing = new Set((Array.isArray(target.characters) ? target.characters : []).map(n => String(n).trim().toLowerCase()));
+                        for (const char of Array.isArray(kruk.characters) ? kruk.characters : []) {
+                            const clean = String(char || '').trim();
+                            if (clean && !existing.has(clean.toLowerCase())) {
+                                target.characters = Array.isArray(target.characters) ? target.characters : [];
+                                target.characters.push(clean);
+                                existing.add(clean.toLowerCase());
+                                changed = true;
+                            }
+                        }
+                        removedIds.add(kruk.id);
+                        changed = true;
+                    }
+                }
+
+                if (removedIds.size) data.settings.rosters = rosters.filter(r => !removedIds.has(r.id));
+                if (!changed) {
+                    cloudData = data;
+                    persistLocalData();
+                    refreshTrackerUI();
+                    setStatus('🟢 No (Kruk) roster groups needed repair');
+                    alert('No duplicate (Kruk) roster groups were found. Your current roster layout was not changed. A backup of the current cloud record was still downloaded.');
+                    return;
+                }
+
+                const now = Date.now();
+                data.schemaVersion = Math.max(Number(data.schemaVersion) || 0, APP_SCHEMA_VERSION);
+                data.settings.rosterUpdatedAt = now;
+                data.settings.rosterUpdatedBy = deviceId;
+                data.updatedAt = now;
+
+                const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders(config) },
+                    body: JSON.stringify(data)
+                });
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(payload.message || `Roster repair failed (${res.status})`);
+
+                cloudData = normalizeData(payload.record || data);
+                persistLocalData();
+                refreshTrackerUI();
+                setStatus('🟢 Kruk roster layout restored');
+                alert('Roster recovery complete. The current cloud record was backed up, then the (Kruk) groups were merged into their matching owner groups.');
+            } catch (err) {
+                console.error(err);
+                setStatus(`🔴 Recovery Failed: ${err.message}`);
+                alert(`Recovery failed: ${err.message}`);
+            }
         }
 
         function setStatus(msg) { document.getElementById('sync-status').textContent = msg; }
