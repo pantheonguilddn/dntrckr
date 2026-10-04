@@ -1138,22 +1138,22 @@
     <div class="modal-overlay hidden" id="version-history-modal" role="dialog" aria-label="Version History">
         <div class="modal-card version-modal">
             <h3>🕘 Pantheon Version History</h3>
-            <div class="modal-note">This is the tracker equivalent of Google Sheets revision history, focused on <b>global-impact changes</b> and kept deliberately small. Revisions are created automatically for shared roster / dungeon / class-role / loot configuration changes and detected external global changes. Routine tracker checkmarks, notes, salary logs, and Team Builder slot edits do not create versions. You can still Push Version manually before a major operation. Only small global-change diffs are stored, not full database snapshots.</div>
+            <div class="modal-note">This is the tracker equivalent of Google Sheets revision history, focused only on <b>global-impact changes</b>. The revision journal is stored in a separate small JSONBin so the main tracker database can never be bloated or blocked by version history. Routine checkmarks, notes, salary logs, and Team Builder slot edits do not create revisions.</div>
             <div class="version-toolbar">
                 <div class="version-toolbar-left">
                     <input id="version-label-input" class="version-label-input" maxlength="120" placeholder="Version name · e.g. Before roster cleanup">
                     <button class="btn btn-cloud" type="button" onclick="createVersionCheckpoint()">💾 Push Version</button>
+                    <button class="btn btn-secondary" type="button" onclick="initializeRevisionJournal()">🛠 Setup Shared Journal</button>
                 </div>
                 <div class="version-toolbar-right">
-                    <input id="version-jump-input" class="version-jump-input" type="number" min="1" step="1" placeholder="Restore #">
-                    <button class="btn btn-secondary" type="button" onclick="loadSpecificVersion()">Load</button>
                     <button class="btn btn-sync" type="button" onclick="loadVersionHistory()">↻ Refresh</button>
                     <button class="btn btn-secondary" type="button" onclick="closeModal('version-history-modal')">Close</button>
                 </div>
             </div>
-            <div id="version-history-status" class="version-status">Checking version history...</div>
-            <div id="version-history-list" class="version-list" style="margin-top:12px;"><div class="version-empty">No version history loaded yet.</div></div>
-            <div class="version-note"><b>Automatic protection:</b> the tracker saves restore points before shared roster / dungeon / class-role / loot changes and can also detect a shared global change made on another PC. A safety copy of the current global state is created before every restore. Routine tracker activity is not versioned.</div>
+            <div id="version-history-status" class="version-status">Checking shared revision journal...</div>
+            <div id="revision-journal-info" class="version-note" style="margin-top:8px;">Shared journal: not initialized.</div>
+            <div id="version-history-list" class="version-list" style="margin-top:12px;"><div class="version-empty">No revision history loaded yet.</div></div>
+            <div class="version-note"><b>Automatic protection:</b> adding/removing/reorganizing characters, rosters, dungeons, Jobs / Role settings, loot weights, and the shared split-party setting are logged. The actual tracker sync never depends on the revision journal succeeding.</div>
         </div>
     </div>
 
@@ -1261,7 +1261,7 @@
         // ==========================================
         // ☁️ APP CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 17; 
+        const APP_SCHEMA_VERSION = 18; 
         const MAX_ARCHIVE_WEEKS = 12;
                 const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
@@ -1450,7 +1450,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', versioningEnabled: true, history: [] } },
+                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -1632,6 +1632,9 @@
                 lastVersionedWriteAt: Number(vc.lastVersionedWriteAt) || 0,
                 lastGlobalSignature: String(vc.lastGlobalSignature || ''),
                 globalBaselineSignature: String(vc.globalBaselineSignature || ''),
+                revisionBinId: String(vc.revisionBinId || ''),
+                revisionBinUpdatedAt: Number(vc.revisionBinUpdatedAt) || 0,
+                revisionBinUpdatedBy: String(vc.revisionBinUpdatedBy || ''),
                 versioningEnabled: true,
                 history: historySource.map(entry => normalizeVersionEntry(entry)).filter(Boolean)
             };
@@ -1717,7 +1720,21 @@
             merged.settings.versionControl.lastVersionedWriteAt = Math.max(Number(lvc.lastVersionedWriteAt)||0, Number(rvc.lastVersionedWriteAt)||0);
             merged.settings.versionControl.lastGlobalSignature = (Number(lvc.lastCheckpointAt)||0) >= (Number(rvc.lastCheckpointAt)||0) ? String(lvc.lastGlobalSignature||'') : String(rvc.lastGlobalSignature||'');
             merged.settings.versionControl.globalBaselineSignature = String(rvc.globalBaselineSignature || lvc.globalBaselineSignature || '');
-            merged.settings.versionControl.history = mergeVersionHistory(lvc.history, rvc.history);
+            const lrb = String(lvc.revisionBinId || ''), rrb = String(rvc.revisionBinId || '');
+            const lrbAt = Number(lvc.revisionBinUpdatedAt)||0, rrbAt = Number(rvc.revisionBinUpdatedAt)||0;
+            if (lrb || rrb) {
+                const rbSrc = lrbAt >= rrbAt ? lvc : rvc;
+                merged.settings.versionControl.revisionBinId = String(rbSrc.revisionBinId || lrb || rrb || '');
+                merged.settings.versionControl.revisionBinUpdatedAt = Math.max(lrbAt, rrbAt);
+                merged.settings.versionControl.revisionBinUpdatedBy = String(rbSrc.revisionBinUpdatedBy || '');
+            } else {
+                merged.settings.versionControl.revisionBinId = '';
+                merged.settings.versionControl.revisionBinUpdatedAt = 0;
+                merged.settings.versionControl.revisionBinUpdatedBy = '';
+            }
+            // v20 moves the revision journal out of the main tracker record.
+            // Keep legacy history readable for migration, but do not merge/store it here.
+            merged.settings.versionControl.history = [];
             merged.syncInfo = (Number(safeObject(local.syncInfo).at)||0) >= (Number(safeObject(remote.syncInfo).at)||0) ? local.syncInfo : remote.syncInfo;
 
             new Set([...Object.keys(local.cells), ...Object.keys(remote.cells)]).forEach(char => {
@@ -1792,6 +1809,8 @@
             refreshTrackerUI();
             if (!hasCloudConfig()) return setStatus('⚪ Local mode — click Cloud Setup');
             await forceSync(false);
+            const rb = String(cloudData.settings?.versionControl?.revisionBinId || '');
+            if (rb) setRevisionBinIdLocal(rb);
         }
 
         function cloneDataObject(value) {
@@ -1799,19 +1818,40 @@
         }
 
         // ==========================================================
-        // 🕘 COMPACT GLOBAL REVISION JOURNAL
+        // 🕘 SHARED GLOBAL REVISION JOURNAL (SEPARATE BIN)
         // ==========================================================
-        // JSONBin Free limits records to 100 KB. The previous recovery
-        // system stored full snapshots inside the main record, which
-        // made the database too large and could block ordinary syncing.
-        // This version stores only small BEFORE/AFTER diffs for changes
-        // that affect every user.
-        const VERSION_HISTORY_MAX = 60;
-        const VERSION_HISTORY_BYTE_BUDGET = 7000;
+        // v20 keeps the core tracker in the existing main bin and puts
+        // revision history in a separate tiny JSONBin. This avoids the
+        // 100 KB Free-plan limit of the main tracker record and, most
+        // importantly, a journal failure can NEVER block a normal sync.
+        const VERSION_HISTORY_MAX = 120;
+        const REVISION_JOURNAL_LOCAL_KEY = 'pantheon-revision-journal-cache-v1';
+        const REVISION_QUEUE_LOCAL_KEY = 'pantheon-revision-queue-v1';
+        const REVISION_BIN_NAME = 'Pantheon DN Revision Journal';
+        const REVISION_JOURNAL_BYTE_BUDGET = 85000;
         const SAFE_MAIN_RECORD_BYTES = 96000;
 
         let pendingGlobalChangeLabel = '';
         let pendingGlobalBeforeSnapshot = null;
+        let revisionJournalCache = [];
+        let versionHistoryCount = 0;
+        let versionHistoryRows = [];
+
+        function getRevisionBinId(data=cloudData){
+            return String(data?.settings?.versionControl?.revisionBinId || localStorage.getItem('pantheon-revision-bin-id-v1') || '').trim();
+        }
+        function setRevisionBinIdLocal(id){if(id)localStorage.setItem('pantheon-revision-bin-id-v1',String(id));}
+        function loadRevisionQueue(){try{const q=JSON.parse(localStorage.getItem(REVISION_QUEUE_LOCAL_KEY)||'[]');return Array.isArray(q)?q.filter(Boolean):[];}catch(e){return [];}}
+        function saveRevisionQueue(q){try{localStorage.setItem(REVISION_QUEUE_LOCAL_KEY,JSON.stringify((Array.isArray(q)?q:[]).slice(-30)));}catch(e){}}
+        function loadRevisionJournalCache(){try{const q=JSON.parse(localStorage.getItem(REVISION_JOURNAL_LOCAL_KEY)||'[]');revisionJournalCache=trimRevisionJournal(Array.isArray(q)?q:[]);}catch(e){revisionJournalCache=[];}return revisionJournalCache;}
+        function saveRevisionJournalCache(q){revisionJournalCache=trimRevisionJournal(q);try{localStorage.setItem(REVISION_JOURNAL_LOCAL_KEY,JSON.stringify(revisionJournalCache));}catch(e){}return revisionJournalCache;}
+
+        function candidateByteSize(data){try{return new Blob([JSON.stringify(data)]).size;}catch(e){return JSON.stringify(data).length;}}
+        function fitCandidateUnderFreeLimit(candidate){
+            // Never store revision history in the core tracker record.
+            if(candidate?.settings?.versionControl){candidate.settings.versionControl.history=[];}
+            return candidate;
+        }
 
         function getGlobalImpactSnapshot(data = cloudData) {
             const settings = data.settings || {};
@@ -1821,227 +1861,160 @@
             const jobProfiles = normalizeJobProfiles(settings.jobProfiles || {});
             const lootWeights = {};
             Object.keys(settings.lootWeights || {}).sort().forEach(k => { lootWeights[k] = clampWeight(settings.lootWeights[k]); });
-            return {
-                rosters,
-                categories,
-                characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])),
-                jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])),
-                lootWeights,
-                splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic
-            };
+            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
         }
-
         function getGlobalImpactSignature(data = cloudData) { return JSON.stringify(getGlobalImpactSnapshot(data)); }
-        function sameValue(a,b) { try { return JSON.stringify(a === undefined ? null : a) === JSON.stringify(b === undefined ? null : b); } catch (e) { return false; } }
-        function mapById(items) { const map = new Map(); for (const item of Array.isArray(items) ? items : []) if (item?.id) map.set(String(item.id), item); return map; }
-
-        function diffObjectMaps(beforeObj, afterObj) {
-            const out=[], b=safeObject(beforeObj), a=safeObject(afterObj);
-            const keys=[...new Set([...Object.keys(b),...Object.keys(a)])].sort();
-            for(const key of keys){
-                const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null;
-                const av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;
-                if(!sameValue(bv,av)) out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});
-            }
-            return out;
-        }
-
-        function diffGlobalImpact(before, after) {
-            const b=safeObject(before), a=safeObject(after);
-            const patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
-            const bR=mapById(b.rosters),aR=mapById(a.rosters);
-            for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){
-                const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;
-                if(!sameValue(bv,av)) patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});
-            }
-            const bC=mapById(b.categories),aC=mapById(a.categories);
-            for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){
-                const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;
-                if(!sameValue(bv,av)) patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});
-            }
-            patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);
-            patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
-            const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);
-            for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){
-                const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;
-                if(!sameValue(bv,av)) patch.lootWeights.push({key,before:bv,after:av});
-            }
-            if(b.splitPartyMechanic!==a.splitPartyMechanic) patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
+        function sameValue(a,b){try{return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b);}catch(e){return false;}}
+        function mapById(items){const map=new Map();for(const item of Array.isArray(items)?items:[])if(item?.id)map.set(String(item.id),item);return map;}
+        function diffObjectMaps(beforeObj,afterObj){const out=[],b=safeObject(beforeObj),a=safeObject(afterObj);for(const key of [...new Set([...Object.keys(b),...Object.keys(a)])].sort()){const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null,av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;if(!sameValue(bv,av))out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});}return out;}
+        function diffGlobalImpact(before,after){
+            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
+            const bR=mapById(b.rosters),aR=mapById(a.rosters);for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;if(!sameValue(bv,av))patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
+            const bC=mapById(b.categories),aC=mapById(a.categories);for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;if(!sameValue(bv,av))patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
+            patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
+            const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;if(!sameValue(bv,av))patch.lootWeights.push({key,before:bv,after:av});}
+            if(b.splitPartyMechanic!==a.splitPartyMechanic)patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
             return patch;
         }
+        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.splitPartyMechanic);}
 
-        function patchIsEmpty(p) { return !p || (!p.rosters?.length && !p.categories?.length && !p.characterJobs?.length && !p.jobProfiles?.length && !p.lootWeights?.length && !p.splitPartyMechanic); }
-
-        function normalizeVersionEntry(entry) {
-            if(!entry || !entry.id) return null;
-            const base={id:String(entry.id),at:Number(entry.at)||0,by:String(entry.by||''),label:String(entry.label||'Global change').slice(0,120),kind:String(entry.kind||'global-change'),signature:String(entry.signature||'')};
-            if(entry.patch && typeof entry.patch==='object'){
-                const p=entry.patch;
-                base.patch={
-                    rosters:Array.isArray(p.rosters)?p.rosters.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
-                    categories:Array.isArray(p.categories)?p.categories.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
-                    characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
-                    jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
-                    lootWeights:Array.isArray(p.lootWeights)?p.lootWeights.map(x=>({key:String(x.key||''),before:x.before==null?null:Number(x.before),after:x.after==null?null:Number(x.after)})).filter(x=>x.key):[],
-                    splitPartyMechanic:p.splitPartyMechanic && typeof p.splitPartyMechanic==='object' ? {before:!!p.splitPartyMechanic.before,after:!!p.splitPartyMechanic.after}:null
-                };
-            }else if(entry.kind==='marker' || entry.kind==='manual'){
-                base.kind='marker';
-            }else{
-                // Intentionally discard old v13-v16 full snapshots. They are
-                // incompatible with the free 100 KB record limit.
-                return null;
-            }
-            return base;
+        function normalizeRevisionEntry(entry){
+            if(!entry||!entry.id)return null;
+            const e={id:String(entry.id),at:Number(entry.at)||0,by:String(entry.by||''),label:String(entry.label||'Global change').slice(0,140),kind:String(entry.kind||'global-change'),signature:String(entry.signature||'')};
+            if(entry.patch&&typeof entry.patch==='object'){const p=entry.patch;e.patch={
+                rosters:Array.isArray(p.rosters)?p.rosters.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
+                categories:Array.isArray(p.categories)?p.categories.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
+                characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
+                jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
+                lootWeights:Array.isArray(p.lootWeights)?p.lootWeights.map(x=>({key:String(x.key||''),before:x.before==null?null:Number(x.before),after:x.after==null?null:Number(x.after)})).filter(x=>x.key):[],
+                splitPartyMechanic:p.splitPartyMechanic&&typeof p.splitPartyMechanic==='object'?{before:!!p.splitPartyMechanic.before,after:!!p.splitPartyMechanic.after}:null
+            };}
+            return e;
         }
-
-        function trimVersionHistory(history){
-            let arr=(Array.isArray(history)?history:[]).map(normalizeVersionEntry).filter(Boolean).sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)).slice(0,VERSION_HISTORY_MAX);
-            while(arr.length>1 && JSON.stringify(arr).length>VERSION_HISTORY_BYTE_BUDGET) arr.pop();
+        function trimRevisionJournal(history){
+            const map=new Map();for(const raw of Array.isArray(history)?history:[]){const e=normalizeRevisionEntry(raw);if(e)map.set(e.id,e);}
+            let arr=[...map.values()].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)).slice(0,VERSION_HISTORY_MAX);
+            while(arr.length>1&&JSON.stringify({revisions:arr}).length>REVISION_JOURNAL_BYTE_BUDGET)arr.pop();
             return arr;
         }
+        function mergeRevisionJournal(localHistory,remoteHistory){return trimRevisionJournal([...(Array.isArray(localHistory)?localHistory:[]),...(Array.isArray(remoteHistory)?remoteHistory:[])]);}
 
-        function mergeVersionHistory(localHistory, remoteHistory){
-            const map=new Map();
-            for(const raw of [...(Array.isArray(localHistory)?localHistory:[]),...(Array.isArray(remoteHistory)?remoteHistory:[])]){
-                const clean=normalizeVersionEntry(raw);if(!clean)continue;
-                const existing=map.get(clean.id);if(!existing || clean.at>existing.at)map.set(clean.id,clean);
-            }
-            // Never collapse separate real-world changes just because they happen
-            // to produce the same final state. For example, adding LittleAndy,
-            // removing LittleAndy, then adding LittleAndy again must remain three
-            // separate audit entries. IDs are the only de-duplication key.
-            return trimVersionHistory([...map.values()].sort((a,b)=>(Number(b.at)||0)-(Number(a.at)||0)));
-        }
-
-        function versionControlState(data=cloudData){const vc=safeObject(data.settings?.versionControl);return {...vc,history:trimVersionHistory(vc.history)};}
         function versionIdentityLabel(){const identity=document.getElementById('user-identity')?.value||localStorage.getItem(IDENTITY_KEY)||'';if(!identity)return deviceId;const roster=cloudData.settings?.rosters?.find(r=>r.id===identity);return roster?.name||identity;}
         function versionTimestamp(ms){if(!ms)return 'Timestamp unavailable';try{return new Date(Number(ms)).toLocaleString();}catch(e){return 'Timestamp unavailable';}}
+        function makeRevisionEntry(label,kind,patch,signature){
+            return {id:`rev-${Date.now()}-${deviceId}-${Math.random().toString(36).slice(2,8)}`,at:Date.now(),by:versionIdentityLabel(),label:String(label||'Global change').slice(0,140),kind:String(kind||'global-change'),signature:String(signature||''),...(patch?{patch}: {})};
+        }
+        function queueRevisionEntry(entry){if(!entry)return;const q=loadRevisionQueue();if(!q.some(e=>e?.id===entry.id))q.push(entry);saveRevisionQueue(q);}
 
-        function appendVersionEntry(data,label,kind,patch,signature){
-            if(patchIsEmpty(patch) && kind!=='marker')return false;
-            const vc=versionControlState(data), now=Date.now();
-            if(kind!=='marker' && signature){
-                const dup=vc.history.find(e=>e.kind===kind && e.signature===String(signature||''));
-                if(dup)return false;
+        function describeGlobalPatch(p){
+            const labels=[];
+            for(const item of p?.rosters||[]){const b=item.before,a=item.after; if(!b&&a){labels.push(`Added roster ${a.name}`);continue;} if(b&&!a){labels.push(`Removed roster ${b.name}`);continue;} if(b&&a){const bc=new Set(b.characters||[]),ac=new Set(a.characters||[]),added=[...(ac)].filter(x=>!bc.has(x)),removed=[...(bc)].filter(x=>!ac.has(x));if(added.length===1)labels.push(`Added ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed ${removed[0]} from ${b.name}`);else if(String(b.name)!==String(a.name))labels.push(`Renamed roster ${b.name} → ${a.name}`);else labels.push(`Updated roster ${a.name}`);}}
+            for(const item of p?.categories||[]){const b=item.before,a=item.after;if(!b&&a){labels.push(`Added dungeon category ${a.name}`);continue;}if(b&&!a){labels.push(`Removed dungeon category ${b.name}`);continue;}if(b&&a){const bt=new Set(b.tasks||[]),at=new Set(a.tasks||[]),added=[...(at)].filter(x=>!bt.has(x)),removed=[...(bt)].filter(x=>!at.has(x));if(added.length===1)labels.push(`Added dungeon task ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed dungeon task ${removed[0]} from ${b.name}`);else labels.push(`Updated dungeon category ${a.name}`);}}
+            for(const item of p?.characterJobs||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Set Job for ${item.key} to ${a.job||'Unassigned'}`);else if(b&&!a)labels.push(`Cleared Job for ${item.key}`);else labels.push(`Changed Job for ${item.key} to ${a?.job||'Unassigned'}`);}
+            if(p?.jobProfiles?.length)labels.push('Updated Job / Role settings');
+            if(p?.lootWeights?.length)labels.push('Updated Loot Weights');
+            if(p?.splitPartyMechanic)labels.push(`Set Split Party Mechanic ${p.splitPartyMechanic.after?'ON':'OFF'}`);
+            return labels.join(' + ')||'Global change';
+        }
+
+        function getGlobalImpactSnapshotForJournal(data=cloudData){return getGlobalImpactSnapshot(data);}
+
+        async function fetchRevisionJournal(id=getRevisionBinId()){
+            if(!id)throw new Error('Shared revision journal is not initialized.');
+            const config=getCloudConfig();
+            const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(id)}/latest`,{method:'GET',headers:authHeaders(config),cache:'no-store'});
+            const p=await res.json().catch(()=>({}));if(!res.ok)throw new Error(p.message||`Revision journal read failed (${res.status})`);
+            return safeObject(p.record||p);
+        }
+        async function flushRevisionQueue(){
+            const id=getRevisionBinId();if(!id)return false;
+            const queued=loadRevisionQueue();if(!queued.length)return true;
+            for(let attempt=1;attempt<=3;attempt++){
+                try{
+                    const remote=await fetchRevisionJournal(id),remoteRevs=Array.isArray(remote.revisions)?remote.revisions:[];
+                    const merged=mergeRevisionJournal(remoteRevs,queued);const payload={schemaVersion:1,sourceBinId:getCloudConfig().binId,updatedAt:Date.now(),updatedBy:deviceId,revisions:merged};
+                    const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(id)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(payload)});if(!res.ok)throw new Error(`Revision journal update failed (${res.status})`);
+                    const latest=safeObject((await res.json()).record||payload);const latestRevs=Array.isArray(latest.revisions)?latest.revisions:[];
+                    const allPresent=queued.every(q=>latestRevs.some(e=>e.id===q.id));
+                    if(allPresent){saveRevisionJournalCache(latestRevs);const pending=loadRevisionQueue().filter(q=>!queued.some(x=>x.id===q.id));saveRevisionQueue(pending);return true;}
+                }catch(e){if(attempt===3)return false;}
             }
-            const entry={id:`rev-${now}-${deviceId}-${Math.random().toString(36).slice(2,8)}`,at:now,by:versionIdentityLabel(),label:String(label||'Global change').slice(0,120),kind:String(kind||'global-change'),signature:String(signature||'')};
-            if(kind!=='marker')entry.patch=patch;
-            vc.history=mergeVersionHistory(vc.history,[entry]);
-            vc.lastCheckpointAt=now;vc.lastCheckpointBy=entry.by;vc.lastCheckpointLabel=entry.label;vc.lastCheckpointKind=entry.kind;vc.lastVersionedWriteAt=now;vc.lastGlobalSignature=signature||getGlobalImpactSignature(data);vc.globalBaselineSignature=String(vc.globalBaselineSignature||signature||getGlobalImpactSignature(data));vc.versioningEnabled=true;
-            data.settings.versionControl=vc;return true;
+            return false;
+        }
+        async function appendRevisionEntryToJournal(entry){
+            if(!entry)return false;queueRevisionEntry(entry);if(!getRevisionBinId())return false;return await flushRevisionQueue();
         }
 
-        function setPendingGlobalChange(label){
-            const text=String(label||'Global change').slice(0,120);
-            if(!pendingGlobalBeforeSnapshot)pendingGlobalBeforeSnapshot=cloneDataObject(getGlobalImpactSnapshot(cloudData));
-            pendingGlobalChangeLabel=pendingGlobalChangeLabel ? `${pendingGlobalChangeLabel} + ${text}`.slice(0,120) : text;
+        async function initializeRevisionJournal(){
+            if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}
+            if(getRevisionBinId()){alert(`Shared revision journal is already configured.\n\nBin: ${getRevisionBinId()}`);return;}
+            if(window.__pantheonRevisionInitBusy)return;window.__pantheonRevisionInitBusy=true;
+            try{
+                setStatus('🟡 Creating shared revision journal...');
+                const config=getCloudConfig(),remote=normalizeData(await fetchRemoteRecord(config));
+                const existing=String(remote.settings?.versionControl?.revisionBinId||'').trim();
+                let journalId=existing;
+                if(!journalId){
+                    const seed={schemaVersion:1,sourceBinId:config.binId,createdAt:Date.now(),createdBy:versionIdentityLabel(),updatedAt:Date.now(),updatedBy:deviceId,revisions:[]};
+                    const res=await fetch(`${JSONBIN_ROOT}/b`,{method:'POST',headers:{'Content-Type':'application/json','X-Bin-Private':'true','X-Bin-Name':REVISION_BIN_NAME,...authHeaders(config)},body:JSON.stringify(seed)});
+                    const payload=await res.json().catch(()=>({}));if(!res.ok)throw new Error(payload.message||`Journal creation failed (${res.status})`);journalId=String(payload.metadata?.id||'');if(!journalId)throw new Error('Journal was created but no Bin ID was returned.');
+                    const check=normalizeData(await fetchRemoteRecord(config));
+                    const winner=String(check.settings?.versionControl?.revisionBinId||'').trim();
+                    if(winner)journalId=winner;
+                    else{
+                        check.settings.versionControl.revisionBinId=journalId;check.settings.versionControl.revisionBinUpdatedAt=Date.now();check.settings.versionControl.revisionBinUpdatedBy=deviceId;check.settings.versionControl.history=[];check.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(check);const put=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!put.ok)throw new Error(`Main tracker journal-link update failed (${put.status})`);cloudData=normalizeData((await put.json()).record||send);
+                    }
+                }
+                setRevisionBinIdLocal(journalId);cloudData.settings.versionControl.revisionBinId=journalId;cloudData.settings.versionControl.revisionBinUpdatedAt=Date.now();cloudData.settings.versionControl.revisionBinUpdatedBy=deviceId;
+                const legacy=Array.isArray(remote.settings?.versionControl?.history)?remote.settings.versionControl.history.map(normalizeRevisionEntry).filter(Boolean):[];
+                if(legacy.length){for(const e of legacy)queueRevisionEntry(e);await flushRevisionQueue();}
+                loadRevisionJournalCache();await flushRevisionQueue();setStatus('🟢 Shared revision journal ready');await loadVersionHistory(false);
+                const info=document.getElementById('revision-journal-info');if(info)info.textContent=`Shared journal: ${journalId}`;
+            }catch(err){setStatus(`⚠ Revision journal setup failed: ${err.message}`);alert(`Revision journal setup failed:\n${err.message}\n\nThe main tracker was not changed.`);}finally{window.__pantheonRevisionInitBusy=false;}
         }
-
-        function prepareGlobalChange(label){
-            if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return Promise.resolve(false);}
-            // Critical change: this function never performs a separate cloud write.
-            // The core operation is always allowed to continue.
-            setPendingGlobalChange(label);return Promise.resolve(true);
-        }
-
-        function clearPendingGlobalChange(){pendingGlobalChangeLabel='';pendingGlobalBeforeSnapshot=null;}
 
         function snapshotUnexpectedGlobalChange(remote){
-            const remoteSig=getGlobalImpactSignature(remote),seen=String(localStorage.getItem('pantheon-last-global-impact-signature')||'');
-            if(!seen){localStorage.setItem('pantheon-last-global-impact-signature',remoteSig);return {externalPatch:null};}
-            if(remoteSig===seen || pendingGlobalBeforeSnapshot)return {externalPatch:null};
+            const remoteSig=getGlobalImpactSignature(remote),seen=getLastSeenGlobalSignature();
+            if(!seen){setLastSeenGlobalSignature(remoteSig);return {externalPatch:null};}
+            if(remoteSig===seen||pendingGlobalBeforeSnapshot)return {externalPatch:null};
             const before=cloneDataObject(getGlobalImpactSnapshot(cloudData)),after=cloneDataObject(getGlobalImpactSnapshot(remote));
-            const patch=diffGlobalImpact(before,after);
-            return {externalPatch:patchIsEmpty(patch)?null:patch};
+            const patch=diffGlobalImpact(before,after);return {externalPatch:patchIsEmpty(patch)?null:patch};
         }
-
         function getLastSeenGlobalSignature(){return String(localStorage.getItem('pantheon-last-global-impact-signature')||'');}
         function setLastSeenGlobalSignature(sig){if(sig)localStorage.setItem('pantheon-last-global-impact-signature',sig);}
+        function setPendingGlobalChange(label){const text=String(label||'Global change').slice(0,140);if(!pendingGlobalBeforeSnapshot)pendingGlobalBeforeSnapshot=cloneDataObject(getGlobalImpactSnapshot(cloudData));pendingGlobalChangeLabel=pendingGlobalChangeLabel?`${pendingGlobalChangeLabel} + ${text}`.slice(0,140):text;}
+        function prepareGlobalChange(label){if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return Promise.resolve(false);}setPendingGlobalChange(label);return Promise.resolve(true);}
+        function clearPendingGlobalChange(){pendingGlobalChangeLabel='';pendingGlobalBeforeSnapshot=null;}
 
-        function candidateByteSize(data){try{return new Blob([JSON.stringify(data)]).size;}catch(e){return JSON.stringify(data).length;}}
-        function fitCandidateUnderFreeLimit(candidate){
-            candidate.settings.versionControl.history=trimVersionHistory(candidate.settings.versionControl.history);
-            if(candidateByteSize(candidate)<=SAFE_MAIN_RECORD_BYTES)return candidate;
-            // Trim the optional journal first. The tracker itself must never be
-            // blocked by the optional recovery feature.
-            const h=candidate.settings.versionControl.history;
-            while(h.length && candidateByteSize(candidate)>SAFE_MAIN_RECORD_BYTES)h.pop();
-            return candidate;
-        }
-
-        function summarizePatch(p){
-            if(!p)return 'No protected changes';
-            const bits=[];if(p.rosters?.length)bits.push(`Roster ${p.rosters.length}`);if(p.categories?.length)bits.push(`Dungeon ${p.categories.length}`);if(p.characterJobs?.length)bits.push(`Jobs ${p.characterJobs.length}`);if(p.jobProfiles?.length)bits.push(`Role settings ${p.jobProfiles.length}`);if(p.lootWeights?.length)bits.push(`Loot weights ${p.lootWeights.length}`);if(p.splitPartyMechanic)bits.push('Split Party');return bits.join(' · ')||'No protected changes';
-        }
-
-        function versionRowHtml(row,index){
-            const entry=row.entry;if(!entry)return '';
-            const kind=entry.kind==='marker'?'<span class="version-badge">SAVEPOINT</span>':(entry.kind==='before-external-change'?'<span class="version-badge">EXTERNAL CHANGE</span>':'<span class="version-badge">GLOBAL CHANGE</span>');
-            const action=entry.patch?`<button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Logged</span>';
-            return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')} ${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}${entry.patch?` · ${escapeHTML(summarizePatch(entry.patch))}`:''}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button>${action}</div></div>`;
-        }
-
-        function getSharedHistory(data=cloudData){return trimVersionHistory(data.settings?.versionControl?.history||[]);}
-        let versionHistoryCount=0;let versionHistoryRows=[];
+        function versionRowHtml(row,index){const entry=row.entry;if(!entry)return '';const kind=entry.kind==='marker'?'<span class="version-badge">SAVEPOINT</span>':(entry.kind==='before-external-change'?'<span class="version-badge">EXTERNAL CHANGE</span>':'<span class="version-badge">GLOBAL CHANGE</span>');const action=entry.patch?`<button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Logged</span>';return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')} ${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}${entry.patch?` · ${escapeHTML(describePatch(entry.patch))}`:''}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button>${action}</div></div>`;}
+        function describePatch(p){const bits=[];if(p?.rosters?.length)bits.push(`Roster ${p.rosters.length}`);if(p?.categories?.length)bits.push(`Dungeon ${p.categories.length}`);if(p?.characterJobs?.length)bits.push(`Jobs ${p.characterJobs.length}`);if(p?.jobProfiles?.length)bits.push(`Role settings ${p.jobProfiles.length}`);if(p?.lootWeights?.length)bits.push(`Loot weights ${p.lootWeights.length}`);if(p?.splitPartyMechanic)bits.push('Split Party');return bits.join(' · ')||'Global change';}
+        function getSharedHistory(data=cloudData){return trimRevisionJournal(revisionJournalCache);}
 
         async function createVersionCheckpoint(customLabel=''){
             if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}
-            if(window.__pantheonVersionWriteBusy)return;window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);
+            if(!getRevisionBinId()){alert('Set up the Shared Revision Journal first.');return;}
             const label=String(customLabel||document.getElementById('version-label-input')?.value||'').trim()||`Savepoint · ${versionIdentityLabel()}`;
-            try{
-                setStatus('🟡 Marking savepoint...');
-                const remote=normalizeData(await fetchRemoteRecord(getCloudConfig()));
-                const candidate=mergeData(cloudData,remote);
-                appendVersionEntry(candidate,label,'marker',null,getGlobalImpactSignature(candidate));candidate.updatedAt=Date.now();
-                const send=fitCandidateUnderFreeLimit(candidate);
-                const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(getCloudConfig().binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(send)});
-                if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Savepoint failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
-                cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
-                const input=document.getElementById('version-label-input');if(input)input.value='';await loadVersionHistory(false);setStatus(`🟢 Savepoint marked · ${label}`);
-            }catch(err){setStatus(`🔴 Savepoint failed: ${err.message}`);alert(`Savepoint failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}
+            const entry=makeRevisionEntry(label,'marker',null,getGlobalImpactSignature(cloudData));
+            const ok=await appendRevisionEntryToJournal(entry);if(ok){const input=document.getElementById('version-label-input');if(input)input.value='';await loadVersionHistory(false);setStatus(`🟢 Savepoint marked · ${label}`);}else setStatus('⚠ Savepoint queued locally; shared journal update will retry later.');
         }
 
-        function renderVersionHistoryRows(data, sourceLabel='local'){
-            const statusEl=document.getElementById('version-history-status'),listEl=document.getElementById('version-history-list');
-            if(!statusEl||!listEl)return;
-            const rows=getSharedHistory(data);versionHistoryCount=rows.length;versionHistoryRows=rows.map((entry,index)=>({entry,index}));
-            if(!rows.length){statusEl.textContent=sourceLabel==='local'?'No revision history cached on this device yet.':'No shared global-change history yet.';listEl.innerHTML='<div class="version-empty">No savepoints or protected changes yet.</div>';return;}
+        function renderVersionHistoryRows(data,sourceLabel='local'){
+            const statusEl=document.getElementById('version-history-status'),listEl=document.getElementById('version-history-list');if(!statusEl||!listEl)return;
+            const rows=getSharedHistory();versionHistoryCount=rows.length;versionHistoryRows=rows.map((entry,index)=>({entry,index}));
+            const info=document.getElementById('revision-journal-info');if(info)info.textContent=getRevisionBinId()?`Shared journal: ${getRevisionBinId()}`:'Shared journal: not initialized.';
+            if(!rows.length){statusEl.textContent='No shared global-change history yet.';listEl.innerHTML='<div class="version-empty">No savepoints or protected changes yet.</div>';return;}
             statusEl.textContent=`Showing ${rows.length} revision${rows.length===1?'':'s'}${sourceLabel==='local'?' · cached locally':''}.`;listEl.innerHTML=versionHistoryRows.map((row,i)=>versionRowHtml(row,i)).join('');
         }
 
         async function loadVersionHistory(showStatus=true){
             if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');return;}
-            const statusEl=document.getElementById('version-history-status');
-            // Render what this browser already knows immediately. A temporary
-            // network failure must never turn the history window into a blank box.
-            renderVersionHistoryRows(cloudData,'local');
-            try{
-                const remote=normalizeData(await fetchRemoteRecord(getCloudConfig()));
-                // Merge the remote journal into the local cached state without
-                // changing the live tracker itself.
-                cloudData.settings.versionControl.history=mergeVersionHistory(
-                    cloudData.settings.versionControl.history,
-                    remote.settings.versionControl.history
-                );
-                persistLocalData();
-                renderVersionHistoryRows(cloudData,'shared');
-            }catch(err){
-                if(statusEl){
-                    const msg=String(err?.message||err);
-                    statusEl.textContent=`⚠ Showing cached revision history · Cloud refresh failed: ${msg}`;
-                }
-            }
+            loadRevisionJournalCache();renderVersionHistoryRows(cloudData,'local');
+            const id=getRevisionBinId();if(!id){const statusEl=document.getElementById('version-history-status');if(statusEl)statusEl.textContent='Shared revision journal not initialized. Click “Setup Shared Journal” once.';return;}
+            try{const remote=await fetchRevisionJournal(id);saveRevisionJournalCache(remote.revisions||[]);await flushRevisionQueue();renderVersionHistoryRows(cloudData,'shared');}catch(err){const statusEl=document.getElementById('version-history-status');if(statusEl)statusEl.textContent=`⚠ Showing cached revision history · Journal refresh failed: ${String(err?.message||err)}`;}
         }
-
-        function loadSpecificVersion(){const n=Number(document.getElementById('version-jump-input')?.value);if(!Number.isInteger(n)||n<1||n>versionHistoryCount){alert(`Enter a valid revision number between 1 and ${versionHistoryCount||1}.`);return;}const row=versionHistoryRows[n-1];if(!row){alert('Revision not found. Refresh the list and try again.');return;}document.getElementById('version-history-list').innerHTML=versionRowHtml(row,n-1);document.getElementById('version-history-status').textContent=`Loaded revision R${String(n).padStart(2,'0')}: ${row.entry.label}`;}
-        function getHistoryEntryById(id){return getSharedHistory(cloudData).find(e=>e.id===id)||null;}
-
-        function downloadHistoryVersion(id){
-            const entry=getHistoryEntryById(id);if(!entry){alert('Revision not found.');return;}
-            const payload={versionId:entry.id,createdAt:entry.at,createdBy:entry.by,label:entry.label,kind:entry.kind,patch:entry.patch||null};
-            const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`pantheon-global-revision-${entry.at}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-        }
+        function loadSpecificVersion(){alert('Use the Undo button on the revision you want. Revisions are no longer tied to the main tracker record.');}
+        function getHistoryEntryById(id){return getSharedHistory().find(e=>e.id===id)||null;}
+        function downloadHistoryVersion(id){const entry=getHistoryEntryById(id);if(!entry){alert('Revision not found. Refresh the list and try again.');return;}const payload={versionId:entry.id,createdAt:entry.at,createdBy:entry.by,label:entry.label,kind:entry.kind,patch:entry.patch||null};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`pantheon-global-revision-${entry.at}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
         function applyGlobalPatch(data,patch,direction='before'){
             const p=patch||{},now=Date.now();
@@ -2053,7 +2026,6 @@
             if(p.splitPartyMechanic){data.settings.teamBuilder=data.settings.teamBuilder||createEmptyTeamBuilder();data.settings.teamBuilder.splitPartyMechanic=direction==='before'?!!p.splitPartyMechanic.before:!!p.splitPartyMechanic.after;data.settings.teamBuilder.splitPartyUpdatedAt=now;data.settings.teamBuilder.splitPartyUpdatedBy=deviceId;}
             data.updatedAt=now;return data;
         }
-
         function patchConflictsWithCurrent(data,patch,direction='before'){
             const p=patch||{},conflicts=[];const check=(label,current,expected)=>{if(!sameValue(current,expected))conflicts.push(label);};
             for(const item of p.rosters||[]){const cur=(data.settings.rosters||[]).find(r=>r.id===item.id)||null;check(`Roster ${item.id}`,cur,direction==='before'?item.after:item.before);}
@@ -2061,31 +2033,25 @@
             const jobs=safeObject(data.settings.characterJobs);for(const item of p.characterJobs||[]){check(`Job ${item.key}`,Object.prototype.hasOwnProperty.call(jobs,item.key)?jobs[item.key]:undefined,direction==='before'?item.after:item.before);}
             const prof=safeObject(data.settings.jobProfiles);for(const item of p.jobProfiles||[]){check(`Profile ${item.key}`,Object.prototype.hasOwnProperty.call(prof,item.key)?prof[item.key]:undefined,direction==='before'?item.after:item.before);}
             const weights=safeObject(data.settings.lootWeights);for(const item of p.lootWeights||[]){check(`Loot weight ${item.key}`,Object.prototype.hasOwnProperty.call(weights,item.key)?weights[item.key]:undefined,direction==='before'?item.after:item.before);}
-            if(p.splitPartyMechanic)check('Split Party Mechanic',!!data.settings.teamBuilder?.splitPartyMechanic,direction==='before'?!!p.splitPartyMechanic.after:!!p.splitPartyMechanic.before);
-            return conflicts;
+            if(p.splitPartyMechanic)check('Split Party Mechanic',!!data.settings.teamBuilder?.splitPartyMechanic,direction==='before'?!!p.splitPartyMechanic.after:!!p.splitPartyMechanic.before);return conflicts;
         }
 
         async function restoreHistoryVersion(id){
-            if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;
+            if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}
             if(!confirm('Undo this global change? Routine tracker checkmarks, notes, salary logs, and Team Builder slots will not be changed.'))return;
             window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);
             try{
-                const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));
-                const entry=getSharedHistory(current).find(e=>e.id===id);if(!entry||!entry.patch)throw new Error('This entry is a savepoint marker and cannot be undone directly.');
-                const conflicts=patchConflictsWithCurrent(current,entry.patch,'before');
-                if(conflicts.length&&!confirm(`The affected item(s) changed after this revision (${conflicts.length} conflict${conflicts.length===1?'':'s'}).\n\nProceed anyway?`))return;
-                const beforeRestore=cloneDataObject(getGlobalImpactSnapshot(current));
-                const restored=applyGlobalPatch(current,entry.patch,'before');
-                const afterRestore=cloneDataObject(getGlobalImpactSnapshot(restored));
-                const safetyPatch=diffGlobalImpact(afterRestore,beforeRestore);
-                appendVersionEntry(restored,`Safety before undo · ${entry.label}`,'global-change',safetyPatch,getGlobalImpactSignature(restored));
-                restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});
-                if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Undo failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(Array.isArray(journal.revisions)?journal.revisions:[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry||!entry.patch)throw new Error('This entry is a savepoint marker and cannot be undone directly.');
+                const conflicts=patchConflictsWithCurrent(current,entry.patch,'before');if(conflicts.length&&!confirm(`The affected item(s) changed after this revision (${conflicts.length} conflict${conflicts.length===1?'':'s'}).\n\nProceed anyway?`))return;
+                const beforeRestore=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,entry.patch,'before');const afterRestore=cloneDataObject(getGlobalImpactSnapshot(restored));restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();
+                const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Undo failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                const safetyPatch=diffGlobalImpact(afterRestore,beforeRestore);if(!patchIsEmpty(safetyPatch)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before undo · ${entry.label}`,'global-change',safetyPatch,getGlobalImpactSignature(restored)));}
                 cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));setStatus(`🟢 Undid: ${entry.label}`);await loadVersionHistory(false);
             }catch(err){setStatus(`🔴 Undo failed: ${err.message}`);alert(`Undo failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}
         }
 
-        // Normal sync. The recovery journal is optional; it can never block this path.
+        // Normal sync. The revision journal is a separate best-effort service.
+        // The main tracker sync succeeds independently of journal availability.
         function forceSync(showSuccess = false){
             if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return;}
             if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return;}
@@ -2096,35 +2062,30 @@
                         const remote=normalizeData(await fetchRemoteRecord(config));
                         const ext=snapshotUnexpectedGlobalChange(remote);
                         let candidate=mergeData(cloudData,remote);
+                        let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
                         if(pendingGlobalBeforeSnapshot){
                             const patch=diffGlobalImpact(pendingGlobalBeforeSnapshot,localAfter);
-                            if(!patchIsEmpty(patch)){
-                                setVersionJournalForCandidate(candidate, pendingGlobalChangeLabel, 'global-change', patch, getGlobalImpactSignature(candidate));
-                            }else if(pendingGlobalChangeLabel){
-                                // Even if a merge normalizes away the structural diff, keep a lightweight audit entry.
-                                appendVersionEntry(candidate, pendingGlobalChangeLabel, 'marker', null, getGlobalImpactSignature(candidate));
-                            }
-                        }else if(ext.externalPatch){
-                            setVersionJournalForCandidate(candidate,'Before external global change','before-external-change',ext.externalPatch,getGlobalImpactSignature(candidate));
+                            if(!patchIsEmpty(patch))queuedEntries.push(makeRevisionEntry(pendingGlobalChangeLabel||describeGlobalPatch(patch),'global-change',patch,getGlobalImpactSignature(candidate)));
+                            else if(pendingGlobalChangeLabel)queuedEntries.push(makeRevisionEntry(pendingGlobalChangeLabel,'marker',null,getGlobalImpactSignature(candidate)));
                         }
-                        candidate.updatedAt=Date.now();candidate.syncInfo={operationId:`sync-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,by:deviceId,at:Date.now()};candidate=fitCandidateUnderFreeLimit(candidate);
-                        const opId=candidate.syncInfo.operationId;
-                        const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(candidate)});
-                        if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
-                        const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));
-                        const latestOp=String(safeObject(latest.syncInfo).operationId||'');
-                        if(latestOp===opId){cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();refreshTrackerUI();setStatus(showSuccess?'🟢 Cloud Sync Complete':'🟢 Database Synced');return;}
+                        if(ext.externalPatch){queuedEntries.push(makeRevisionEntry(describeGlobalPatch(ext.externalPatch),'before-external-change',ext.externalPatch,getGlobalImpactSignature(candidate)));}
+                        candidate.updatedAt=Date.now();candidate.syncInfo={operationId:`sync-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,by:deviceId,at:Date.now()};candidate.settings.versionControl.history=[];const send=fitCandidateUnderFreeLimit(candidate);const opId=candidate.syncInfo.operationId;
+                        const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                        const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
+                        if(latestOp===opId){
+                            cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();refreshTrackerUI();
+                            // Revision logging happens after the core sync and can fail safely.
+                            if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
+                            const flushed=await flushRevisionQueue();
+                            setStatus(showSuccess?'🟢 Cloud Sync Complete':(flushed||!queuedEntries.length?'🟢 Database Synced':'🟢 Database Synced · Revision log pending'));return;
+                        }
                         cloudData=mergeData(cloudData,latest);delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
                     }
                     throw new Error('Cloud changed during sync. Please press Sync Now again.');
                 }catch(err){persistLocalData();setStatus(`🔴 Sync Failed: ${err.message}`);}
                 finally{syncInProgress=false;if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}}
             })();
-        }
-
-        function setVersionJournalForCandidate(candidate,patch,label,kind='global-change'){
-            if(!patch||patchIsEmpty(patch))return false;appendVersionEntry(candidate,label,kind,patch,getGlobalImpactSignature(candidate));candidate.settings.versionControl.history=trimVersionHistory(candidate.settings.versionControl.history);return true;
         }
 
         function openVersionHistoryModal(){toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
