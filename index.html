@@ -1114,7 +1114,7 @@
                     <section class="help-topic" data-help-topic="versions">
                         <h4>Version History</h4>
                         <p>Use <b>🕘 Version History</b> to see protected global changes. You can also press <b>Push Version</b> to mark a savepoint.</p>
-                        <p>The tracker keeps a compact shared revision journal in the normal database. The tracker versions only shared, global-impact changes such as roster / character structure, dungeon structure, Job / Role settings, loot weights, and the shared split-party setting. Routine tracker checkmarks, notes, salary logs, and Team Builder slot assignments do not create versions. A refresh also detects a global change made on another PC and preserves it as a version. When you restore one, the current live state is saved first as a safety version, then the selected version becomes the new live state.</p>
+                        <p>The tracker keeps a compact shared revision journal in the normal database. The tracker versions only shared, global-impact changes such as roster / character structure, dungeon structure, Job / Role settings, loot weights, and the shared split-party setting. Routine tracker checkmarks, notes, salary logs, and Team Builder slot assignments do not create versions. The PC that makes a supported global change records the revision; refreshing another PC does not create a duplicate or fake revision. When you restore one, the current live state is saved first as a safety version, then the selected version becomes the new live state.</p>
                         <div class="help-callout"><b>Best practice:</b> push a version before large cleanups. Example: “Before roster cleanup · Oct 4”.</div>
                     </section>
                     <section class="help-topic" data-help-topic="salary">
@@ -1153,7 +1153,7 @@
             <div id="version-history-status" class="version-status">Checking shared revision journal...</div>
             <div id="revision-journal-info" class="version-note" style="margin-top:8px;">Shared journal: not initialized.</div>
             <div id="version-history-list" class="version-list" style="margin-top:12px;"><div class="version-empty">No revision history loaded yet.</div></div>
-            <div class="version-note"><b>Automatic protection:</b> adding/removing/reorganizing characters, rosters, dungeons, Jobs / Role settings, loot weights, and the shared split-party setting are logged. The actual tracker sync never depends on the revision journal succeeding.</div>
+            <div class="version-note"><b>Automatic protection:</b> adding/removing/reorganizing characters, rosters, dungeons, Jobs / Role settings, loot weights, and the shared split-party setting are logged by the PC that makes the change. The actual tracker sync never depends on the revision journal succeeding.</div>
         </div>
     </div>
 
@@ -1820,7 +1820,7 @@
         // ==========================================================
         // 🕘 SHARED GLOBAL REVISION JOURNAL (SEPARATE BIN)
         // ==========================================================
-        // v20 keeps the core tracker in the existing main bin and puts
+        // v21 keeps the core tracker in the existing main bin and puts
         // revision history in a separate tiny JSONBin. This avoids the
         // 100 KB Free-plan limit of the main tracker record and, most
         // importantly, a journal failure can NEVER block a normal sync.
@@ -1974,11 +1974,14 @@
         }
 
         function snapshotUnexpectedGlobalChange(remote){
-            const remoteSig=getGlobalImpactSignature(remote),seen=getLastSeenGlobalSignature();
-            if(!seen){setLastSeenGlobalSignature(remoteSig);return {externalPatch:null};}
-            if(remoteSig===seen||pendingGlobalBeforeSnapshot)return {externalPatch:null};
-            const before=cloneDataObject(getGlobalImpactSnapshot(cloudData)),after=cloneDataObject(getGlobalImpactSnapshot(remote));
-            const patch=diffGlobalImpact(before,after);return {externalPatch:patchIsEmpty(patch)?null:patch};
+            // v21: do NOT manufacture an "external change" revision merely because
+            // this browser's cached state differs from the current cloud state.
+            // Refreshing/opening the tracker is read/sync activity, not a user edit.
+            // All supported global-impact editors already call prepareGlobalChange()
+            // before making a real change, so their revision is recorded by the device
+            // that actually made the change. This eliminates false history entries
+            // caused by stale local caches, older tracker builds, or roster drift.
+            return {externalPatch:null};
         }
         function getLastSeenGlobalSignature(){return String(localStorage.getItem('pantheon-last-global-impact-signature')||'');}
         function setLastSeenGlobalSignature(sig){if(sig)localStorage.setItem('pantheon-last-global-impact-signature',sig);}
@@ -2060,7 +2063,10 @@
                 try{
                     for(let attempt=1;attempt<=3;attempt++){
                         const remote=normalizeData(await fetchRemoteRecord(config));
-                        const ext=snapshotUnexpectedGlobalChange(remote);
+                        // Refresh/sync itself does not create a revision. Only an
+                        // explicit global-impact edit (prepared by prepareGlobalChange)
+                        // is versioned.
+                        const ext={externalPatch:null};
                         let candidate=mergeData(cloudData,remote);
                         let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
@@ -2069,7 +2075,8 @@
                             if(!patchIsEmpty(patch))queuedEntries.push(makeRevisionEntry(pendingGlobalChangeLabel||describeGlobalPatch(patch),'global-change',patch,getGlobalImpactSignature(candidate)));
                             else if(pendingGlobalChangeLabel)queuedEntries.push(makeRevisionEntry(pendingGlobalChangeLabel,'marker',null,getGlobalImpactSignature(candidate)));
                         }
-                        if(ext.externalPatch){queuedEntries.push(makeRevisionEntry(describeGlobalPatch(ext.externalPatch),'before-external-change',ext.externalPatch,getGlobalImpactSignature(candidate)));}
+                        // Intentionally no external-change revision here. If another PC
+                        // made a supported global change, that PC records it when it saves.
                         candidate.updatedAt=Date.now();candidate.syncInfo={operationId:`sync-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,by:deviceId,at:Date.now()};candidate.settings.versionControl.history=[];const send=fitCandidateUnderFreeLimit(candidate);const opId=candidate.syncInfo.operationId;
                         const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
