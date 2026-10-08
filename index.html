@@ -3337,6 +3337,10 @@
             stage.style.color='#eef0f4';
             stage.style.fontFamily='Arial, sans-serif';
 
+            const shareStyle=document.createElement('style');
+            shareStyle.textContent='.team-table th,.team-table td{ text-align:center !important; vertical-align:middle !important; } .team-table select{ text-align:center !important; text-align-last:center !important; }';
+            stage.appendChild(shareStyle);
+
             const heading=document.createElement('div');
             heading.style.marginBottom='18px';
             heading.innerHTML=`<div style="font-size:26px;font-weight:900;letter-spacing:.01em;">⚔ PANTHEON TEAM SETUP · ${escapeHTML(fmt.label)}</div><div style="margin-top:5px;font-size:13px;color:#9ba2b0;">Local build · registered roster data</div>`;
@@ -3352,10 +3356,31 @@
                 const clone=card.cloneNode(true);
                 clone.querySelectorAll('.share-ignore').forEach(el=>el.remove());
                 clone.querySelectorAll('button').forEach(el=>el.remove());
+
+                // The live builder keeps a slot-number column and a final remove-action column.
+                // Those are controls for the interactive UI, not part of the shareable setup.
+                clone.querySelectorAll('tr').forEach(row=>{
+                    row.firstElementChild?.remove();
+                    row.lastElementChild?.remove();
+                });
+
+                // Center the share image content so labels, selections, badges and owner chips
+                // line up cleanly inside their columns.
+                clone.querySelectorAll('th, td').forEach(cell=>{
+                    cell.style.textAlign='center';
+                    cell.style.verticalAlign='middle';
+                });
                 clone.querySelectorAll('select').forEach(sel=>{
-                    const value = teamKey ? getTeamState(teamKey).slots[Number(sel.closest('tr')?.querySelector('.team-slot')?.textContent||1)-1]?.character : '';
-                    // Keep the already-rendered visual state of native selects without allowing interaction.
                     sel.style.pointerEvents='none';
+                    sel.style.textAlign='center';
+                    sel.style.textAlignLast='center';
+                });
+                clone.querySelectorAll('.team-character-select, .team-class-select').forEach(sel=>{
+                    sel.style.textAlign='center';
+                    sel.style.textAlignLast='center';
+                });
+                clone.querySelectorAll('.owner-chip, .team-badge, .team-job').forEach(el=>{
+                    el.style.justifyContent='center';
                 });
                 clone.style.margin='0';
                 clone.style.width='100%';
