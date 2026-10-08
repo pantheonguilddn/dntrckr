@@ -805,7 +805,7 @@
             <section class="team-card" id="team-card-team1">
                 <div class="team-card-head">
                     <div><div class="team-card-title">TEAM 1</div><div class="team-card-sub" id="team1-sub">4 Man Normal · 0 / 4 filled</div></div>
-                    <div class="team-card-actions">
+                    <div class="team-card-actions share-ignore">
                         <button class="team-mini-btn" type="button" onclick="shareTeamAsImage('team1')">📸 Share</button>
                         <button class="team-mini-btn" type="button" onclick="clearTeam('team1')">Clear</button>
                     </div>
@@ -822,7 +822,7 @@
             <section class="team-card" id="team-card-team2">
                 <div class="team-card-head">
                     <div><div class="team-card-title">TEAM 2</div><div class="team-card-sub" id="team2-sub">4 Man Normal · 0 / 4 filled</div></div>
-                    <div class="team-card-actions">
+                    <div class="team-card-actions share-ignore">
                         <button class="team-mini-btn" type="button" onclick="shareTeamAsImage('team2')">📸 Share</button>
                         <button class="team-mini-btn" type="button" onclick="clearTeam('team2')">Clear</button>
                     </div>
@@ -3291,81 +3291,130 @@
             updateClassSetupSummary();
         }
 
-        function getShareFont() { return '14px Arial, sans-serif'; }
-        function measureCanvasText(ctx, text, maxWidth) {
-            let value = String(text || '');
-            if (ctx.measureText(value).width <= maxWidth) return value;
-            while (value.length > 3 && ctx.measureText(value + '…').width > maxWidth) value = value.slice(0, -1);
-            return value + '…';
-        }
-        function drawTeamTableToCanvas(ctx, teamKey, x, y, width) {
-            const team = getTeamState(teamKey), fmt = TEAM_FORMATS[getTeamFormat()];
-            const title = teamKey === 'team1' ? 'TEAM 1' : 'TEAM 2';
-            const rows = team.slots.slice(0, fmt.size).map((slot, i) => {
-                const char = slot.character || '';
-                const job = getCharacterJob(char), meta = getJobMeta(job);
-                const owner = allRegisteredCharacters().find(c => c.name === char)?.rosterName || '';
-                return {
-                    n: String(i + 1), character: char || 'Empty Slot', className: meta?.className || '—', job: job || '—',
-                    position: meta?.raidPosition || '—', dps: meta && jobHasRole(meta,'DPS') && meta.damageType ? meta.damageType : '—', owner: owner || '—'
-                };
+        async function loadHtml2Canvas() {
+            if (window.html2canvas) return window.html2canvas;
+            if (window._pantheonHtml2CanvasPromise) return window._pantheonHtml2CanvasPromise;
+            window._pantheonHtml2CanvasPromise = new Promise((resolve, reject) => {
+                const existing = document.getElementById('pantheon-html2canvas');
+                if (existing) {
+                    existing.addEventListener('load', () => resolve(window.html2canvas), { once:true });
+                    existing.addEventListener('error', reject, { once:true });
+                    return;
+                }
+                const script = document.createElement('script');
+                script.id = 'pantheon-html2canvas';
+                script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+                script.onload = () => window.html2canvas ? resolve(window.html2canvas) : reject(new Error('html2canvas unavailable'));
+                script.onerror = () => reject(new Error('Could not load screenshot renderer'));
+                document.head.appendChild(script);
             });
-            const cols = [34, 170, 120, 138, 128, 92, 120];
-            const scale = Math.min(1, (width - 24) / cols.reduce((a,b)=>a+b,0));
-            const cw = cols.map(v => v * scale);
-            const rowH = 32, headH = 42;
-            ctx.fillStyle = '#22242b'; ctx.fillRect(x, y, width, headH);
-            ctx.fillStyle = '#f4f5f7'; ctx.font = '700 18px Arial, sans-serif'; ctx.fillText(`${title} · ${fmt.label}`, x+12, y+27);
-            y += headH;
-            const headers = ['#','Character','Class','Job','Raid Position','DPS Type','Owner'];
-            let cx = x;
-            headers.forEach((h,i)=>{ ctx.fillStyle='#30333b'; ctx.fillRect(cx,y,cw[i],rowH); ctx.strokeStyle='#464a55'; ctx.strokeRect(cx,y,cw[i],rowH); ctx.fillStyle='#dce0e8'; ctx.font='700 12px Arial, sans-serif'; ctx.fillText(h,cx+7,y+20); cx+=cw[i]; });
-            y += rowH;
-            rows.forEach((r,idx)=>{
-                let cx=x; const bg=idx%2?'#2a2d34':'#26292f';
-                const vals=[r.n,r.character,r.className,r.job,r.position,r.dps,r.owner];
-                vals.forEach((v,i)=>{ ctx.fillStyle=bg; ctx.fillRect(cx,y,cw[i],rowH); ctx.strokeStyle='#41454e'; ctx.strokeRect(cx,y,cw[i],rowH); ctx.fillStyle='#eef0f4'; ctx.font=(i===1?'600 ':'')+'12px Arial, sans-serif'; ctx.fillText(measureCanvasText(ctx,v,cw[i]-14),cx+7,y+20); cx+=cw[i]; });
-                y += rowH;
+            return window._pantheonHtml2CanvasPromise;
+        }
+
+        function getShareIdentity() {
+            return localStorage.getItem(IDENTITY_KEY) || document.getElementById('user-identity')?.value || 'Unknown';
+        }
+
+        function getShareTimestamp() {
+            try {
+                return new Intl.DateTimeFormat(undefined, { dateStyle:'medium', timeStyle:'short' }).format(new Date());
+            } catch (_) {
+                return new Date().toLocaleString();
+            }
+        }
+
+        function buildShareStage(teamKeys=['team1','team2']) {
+            const fmt = TEAM_FORMATS[getTeamFormat()];
+            const stage = document.createElement('div');
+            stage.style.position='fixed';
+            stage.style.left='-100000px';
+            stage.style.top='0';
+            stage.style.zIndex='-1';
+            stage.style.width = teamKeys.length > 1 ? '1520px' : '1040px';
+            stage.style.padding='28px';
+            stage.style.boxSizing='border-box';
+            stage.style.background='#17191e';
+            stage.style.color='#eef0f4';
+            stage.style.fontFamily='Arial, sans-serif';
+
+            const heading=document.createElement('div');
+            heading.style.marginBottom='18px';
+            heading.innerHTML=`<div style="font-size:26px;font-weight:900;letter-spacing:.01em;">⚔ PANTHEON TEAM SETUP · ${escapeHTML(fmt.label)}</div><div style="margin-top:5px;font-size:13px;color:#9ba2b0;">Local build · registered roster data</div>`;
+            stage.appendChild(heading);
+
+            const grid=document.createElement('div');
+            grid.style.display='grid';
+            grid.style.gridTemplateColumns = teamKeys.length > 1 ? '1fr 1fr' : '1fr';
+            grid.style.gap='18px';
+            teamKeys.forEach(teamKey=>{
+                const card=document.getElementById(`team-card-${teamKey}`);
+                if(!card) return;
+                const clone=card.cloneNode(true);
+                clone.querySelectorAll('.share-ignore').forEach(el=>el.remove());
+                clone.querySelectorAll('button').forEach(el=>el.remove());
+                clone.querySelectorAll('select').forEach(sel=>{
+                    const value = teamKey ? getTeamState(teamKey).slots[Number(sel.closest('tr')?.querySelector('.team-slot')?.textContent||1)-1]?.character : '';
+                    // Keep the already-rendered visual state of native selects without allowing interaction.
+                    sel.style.pointerEvents='none';
+                });
+                clone.style.margin='0';
+                clone.style.width='100%';
+                grid.appendChild(clone);
             });
-            const summary = buildTeamSummary(teamKey);
-            const members = rows.filter(r => r.character !== 'Empty Slot').length;
-            const items=[['DPS',summary.DPS],['Heal',summary.Heal],['Tank',summary.Tank],['Utility',summary.Utility],['Support',summary.Support],['Debuff',summary.Debuff],['Mobility',summary.Mobility],['Beyond Time',summary['Beyond Time']],['Highlander',summary.Highlander]];
-            const warning = getTeamCompositionMessages(teamKey);
-            ctx.fillStyle='#1d2026'; ctx.fillRect(x,y,width,52);
-            ctx.fillStyle='#bfc4cf'; ctx.font='600 12px Arial, sans-serif'; ctx.fillText(`Coverage · ${members} / ${fmt.size}`,x+10,y+18);
-            let sx=x+120; items.forEach(([k,v])=>{ const txt=`${k} ${v}`; ctx.fillStyle=v?'#d9dee7':'#777d88'; ctx.font='11px Arial, sans-serif'; ctx.fillText(txt,sx,y+18); sx += ctx.measureText(txt).width+12; });
-            if (warning.length){ ctx.fillStyle='#ffcf87'; ctx.font='700 11px Arial, sans-serif'; ctx.fillText(`⚠ ${warning.join(' · ')}`,x+10,y+38); }
-            return y+52;
+            stage.appendChild(grid);
+
+            const balance = document.getElementById('team-balance-panel');
+            if(balance && !balance.classList.contains('hidden') && teamKeys.length>1){
+                const bc=balance.cloneNode(true);
+                bc.style.marginTop='18px';
+                stage.appendChild(bc);
+            }
+
+            const footer=document.createElement('div');
+            footer.style.marginTop='16px';
+            footer.style.paddingTop='10px';
+            footer.style.borderTop='1px solid #3a3d46';
+            footer.style.fontSize='11px';
+            footer.style.color='#858c9d';
+            footer.textContent=`Screenshot by ${getShareIdentity()} · ${getShareTimestamp()}`;
+            stage.appendChild(footer);
+            document.body.appendChild(stage);
+            return stage;
         }
-        function makeTeamShareCanvas(teamKeys=['team1','team2']) {
-            const fmt=TEAM_FORMATS[getTeamFormat()];
-            const width=1540, padding=28, gap=22;
-            const teamHeight = 42 + 32 + (fmt.size*32) + 52;
-            const balanceH = (getTeamFormat()==='8HC' && getSplitPartyMechanic()) ? 88 : 0;
-            const titleH=88;
-            const height=padding+titleH+teamHeight*teamKeys.length+gap*(teamKeys.length-1)+balanceH+padding;
-            const canvas=document.createElement('canvas'); canvas.width=width*2; canvas.height=height*2;
-            const ctx=canvas.getContext('2d'); ctx.scale(2,2); ctx.fillStyle='#17191e'; ctx.fillRect(0,0,width,height);
-            ctx.fillStyle='#f4f5f7'; ctx.font='800 26px Arial, sans-serif'; ctx.fillText(`⚔ PANTHEON TEAM SETUP · ${fmt.label}`,padding,padding+28);
-            ctx.fillStyle='#9ba2b0'; ctx.font='13px Arial, sans-serif'; ctx.fillText('Local build · generated from the current registered roster',padding,padding+52);
-            let y=padding+titleH; teamKeys.forEach((k,idx)=>{ y=drawTeamTableToCanvas(ctx,k,padding,y,width-padding*2); if(idx<teamKeys.length-1)y+=gap; });
-            if(balanceH){ const a=getTeamDpsBalance('team1'), b=getTeamDpsBalance('team2'); ctx.fillStyle='#20232a'; ctx.fillRect(padding,y+10,width-padding*2,balanceH-10); ctx.fillStyle='#dfe3ea'; ctx.font='700 14px Arial, sans-serif'; ctx.fillText('8 Man Hardcore · DPS Balance',padding+12,y+34); ctx.fillStyle='#aeb5c1'; ctx.font='12px Arial, sans-serif'; ctx.fillText(`Team 1 · Physical ${a.Physical} · Magical ${a.Magical}`,padding+12,y+56); ctx.fillText(`Team 2 · Physical ${b.Physical} · Magical ${b.Magical}`,padding+300,y+56); ctx.fillText(`Combined · Physical ${a.Physical+b.Physical} · Magical ${a.Magical+b.Magical}`,padding+600,y+56); }
-            return canvas;
-        }
-        async function shareCanvasImage(canvas, filename='pantheon-team-setup.png') {
-            return new Promise(resolve=>canvas.toBlob(async blob=>{
-                try {
-                    if (blob && navigator.clipboard?.write && window.ClipboardItem) {
+
+        async function copyDomAsImage(teamKeys=['team1','team2'], filename='pantheon-team-setup.png') {
+            const stage=buildShareStage(teamKeys);
+            try {
+                const html2canvas=await loadHtml2Canvas();
+                const canvas=await html2canvas(stage,{backgroundColor:'#17191e',scale:2,useCORS:true,logging:false,allowTaint:false});
+                const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+                if(!blob) throw new Error('PNG creation failed');
+                if(navigator.clipboard?.write && window.ClipboardItem){
+                    try{
                         await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-                        alert('Team setup image copied to clipboard.'); resolve(true); return;
-                    }
-                } catch (_) {}
-                if(blob){ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); alert('Your browser blocked image clipboard access, so the team setup image was saved as a PNG instead.'); }
-                resolve(false);
-            },'image/png'));
+                        alert('The exact Team Builder table was copied as an image. Paste it directly into Discord.');
+                        return true;
+                    }catch(_){/* fall through to download */}
+                }
+                const url=URL.createObjectURL(blob), a=document.createElement('a');
+                a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(()=>URL.revokeObjectURL(url),1000);
+                alert('The Team Builder image was saved as a PNG because direct clipboard image access was blocked by the browser.');
+                return false;
+            } finally {
+                stage.remove();
+            }
         }
-        async function shareTeamAsImage(teamKey){ const canvas=makeTeamShareCanvas([teamKey]); await shareCanvasImage(canvas,`pantheon-${teamKey}-setup.png`); }
-        async function shareTeamBuilderAsImage(){ const canvas=makeTeamShareCanvas(['team1','team2']); await shareCanvasImage(canvas,'pantheon-team-setup.png'); }
+
+        async function shareTeamAsImage(teamKey){
+            try { await copyDomAsImage([teamKey],`pantheon-${teamKey}-setup.png`); }
+            catch (err) { alert(`Screenshot failed: ${err.message}`); }
+        }
+
+        async function shareTeamBuilderAsImage(){
+            try { await copyDomAsImage(['team1','team2'],'pantheon-team-setup.png'); }
+            catch (err) { alert(`Screenshot failed: ${err.message}`); }
+        }
 
         async function resetTeamsForNewWeek() {
             if (!confirm('Clear both teams for a new week?')) return;
