@@ -3338,7 +3338,7 @@
             stage.style.fontFamily='Arial, sans-serif';
 
             const shareStyle=document.createElement('style');
-            shareStyle.textContent='.team-table th,.team-table td{ text-align:center !important; vertical-align:middle !important; } .team-table select{ text-align:center !important; text-align-last:center !important; }';
+            shareStyle.textContent='.team-table th,.team-table td{ text-align:center !important; vertical-align:middle !important; } .team-table select{ text-align:center !important; text-align-last:center !important; } .share-static-select{display:flex;align-items:center;justify-content:center;width:100%;min-height:38px;box-sizing:border-box;padding:7px 8px;border:1px solid #444854;border-radius:7px;background:#1a1c23;color:#edf0f4;font:inherit;font-size:.74rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .share-static-select.class-filter{font-size:.72rem;}';
             stage.appendChild(shareStyle);
 
             const heading=document.createElement('div');
@@ -3370,14 +3370,16 @@
                     cell.style.textAlign='center';
                     cell.style.verticalAlign='middle';
                 });
+                // Native <select> controls are notoriously rendered inconsistently by html2canvas,
+                // which can vertically clip their text. Replace them with static, visually-matching
+                // fields containing the currently displayed option text for a clean screenshot.
                 clone.querySelectorAll('select').forEach(sel=>{
-                    sel.style.pointerEvents='none';
-                    sel.style.textAlign='center';
-                    sel.style.textAlignLast='center';
-                });
-                clone.querySelectorAll('.team-character-select, .team-class-select').forEach(sel=>{
-                    sel.style.textAlign='center';
-                    sel.style.textAlignLast='center';
+                    const staticBox=document.createElement('div');
+                    const selected=sel.options?.[sel.selectedIndex];
+                    staticBox.className='share-static-select' + (sel.classList.contains('team-class-select') ? ' class-filter' : '');
+                    staticBox.textContent=selected ? selected.textContent.trim() : '';
+                    staticBox.title=staticBox.textContent;
+                    sel.replaceWith(staticBox);
                 });
                 clone.querySelectorAll('.owner-chip, .team-badge, .team-job').forEach(el=>{
                     el.style.justifyContent='center';
