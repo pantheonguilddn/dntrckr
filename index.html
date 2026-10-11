@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon DN Tracker & Analytics</title>
+    <title>Pantheon Tools v1.4.0</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1161,14 +1161,17 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3.9</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.4.0</span></div>
                 <ul>
+                    <li><strong>Clean first launch:</strong> a fresh browser starts without preloaded guild members, characters, or tracker task categories. Shared guild data is loaded only after the user connects through Cloud Setup.</li>
+                    <li><strong>Safe first cloud connection:</strong> when there is no meaningful local tracker data, the connected cloud database is treated as authoritative. A blank new install will not overwrite an existing guild roster or task setup during the first sync.</li>
+                    <li><strong>Offline behavior:</strong> without a cloud connection, changes made by the user remain local to that browser and are not sent to the shared guild database.</li>
+                </ul>
+                <details class="welcome-previous-release"><summary>Earlier update highlights (v1.3.9–v1.3.3)</summary><ul>
                     <li><strong>Default landing checkbox alignment:</strong> the checkbox now lines up cleanly with its label, including when the text wraps.</li>
                     <li><strong>Overview behind tool dialogs:</strong> Salary Calculator and Help &amp; Guide opened from Welcome now display the Overview page behind the dialog instead of Tracker.</li>
                     <li><strong>Return to Welcome:</strong> closing Salary Calculator or Help after opening it from Welcome or an Overview shortcut brings you back to the Welcome popup.</li>
                     <li><strong>Change startup destination anytime:</strong> the side menu now has Set Default Landing Page, so you can change or clear your saved landing page without refreshing.</li>
-                </ul>
-                <details class="welcome-previous-release"><summary>Earlier update highlights (v1.3.8–v1.3.3)</summary><ul>
                     <li><strong>Quick card copy:</strong> click the overlapping-squares icon beside any card name to copy the exact name for the in-game Trading House.</li>
                     <li><strong>Simpler Card Database:</strong> removed Compare and its related controls and help text. Full five-rarity details remain available by opening a card.</li>
                     <li><strong>Card Database layout:</strong> Desired character stat groups use wider columns, and long checkbox labels wrap inside their own boxes instead of overlapping the results table.</li>
@@ -1672,24 +1675,6 @@
             'Abyssal Mire': 4, 'Dark Banquet (Lv 50)': 4, 'Dragon Fellowship': 4
         };
 
-        const DEFAULT_ROSTERS = [
-            { id: 'cho', name: 'Cho', color: '#b4a7d6', characters: ['Rhaeala', 'Mysteln', 'Vulcureon', 'Vaelyth', 'Diabolina'] },
-            { id: 'cheean', name: 'Cheean', color: '#ffd966', characters: ['iD0ntHeal', 'CheanPT', 'xNocturne', 'RinPT', 'RANKET'] },
-            { id: 'bio', name: 'Bio', color: '#9fc5e8', characters: ['Biofrost', 'iTwoeye', 'Lunaprix'] },
-            { id: 'kruk-cheean', name: 'Cheean (Kruk)', color: '#e69138', characters: ['Kruknaks', 'xAv3n'] },
-            { id: 'kruk-bio', name: 'Bio (Kruk)', color: '#e69138', characters: ['Enodia', 'OnatGaminG', 'Gabkulit'] }
-        ];
-
-        const DEFAULT_CATEGORIES = [
-            { id: 'cat-daily', group: 'Dailies', name: 'Lucky Zone', color: '#ffffff', tasks: ['Lucky Zone'] },
-            { id: 'cat-bounty', group: 'Weeklies', name: 'Bounty Board (Unique+)', color: '#fff2cc', tasks: ['Bounty Claim 1', 'Bounty Claim 2', 'Bounty Claim 3', 'Bounty Claim 4', 'Bounty Claim 5', 'Bounty Claim 6'] },
-            { id: 'cat-mounts', group: 'Weeklies', name: 'Mounts & Special Skills', color: '#d9ead3', tasks: ['Lower Nests (Hell)', '4-Man Challenge Nests', 'Apocalypse Challenge'] },
-            { id: 'cat-essence', group: 'Weeklies', name: 'Essence of Life', color: '#c9daf8', tasks: ['Sea Dragon Core', 'Green Dragon (Normal)', 'Green Dragon (Classic)', 'Desert Dragon Memoria I', 'Desert Dragon Memoria II', 'Desert Dragon Memoria III', 'Desert Dragon Memoria IV'] },
-            { id: 'cat-lv60', group: 'Weeklies', name: 'Lv60 Nests', color: '#f8cbad', tasks: ['Typhoon Kim Nest (Normal)', 'Typhoon Kim Nest (Hell)', 'Professor K Nest (Hell)'] },
-            { id: 'cat-raids', group: 'Weeklies', name: 'Raids', color: '#d9d2e9', tasks: ['Green Dragon (Hardcore)', 'Desert Dragon (Classic)', 'Desert Dragon (Hardcore)'] },
-            { id: 'cat-special', group: 'Weeklies', name: 'Special Dungeons', color: '#d0e0e3', tasks: ['Abyssal Mire', 'Dark Banquet (Lv 50)', 'Dragon Fellowship'] }
-        ];
-
         // ===== Class / Job metadata used by Team Builder =====
         const JOB_DATABASE = {
             'Adept':         { className: 'Academic',   role: 'DPS / Utility',                raidPosition: 'DPS', damageType: 'Magical' },
@@ -1838,7 +1823,7 @@
         }
 
 
-        let characters = flattenRosters(DEFAULT_ROSTERS);
+        let characters = []; // Populated only from local user data or a connected cloud database.
         let weeklyTaskNames = [];
         let autoSyncTimer;
         let syncInProgress = false;
@@ -1858,7 +1843,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -1870,7 +1855,7 @@
         function normalizeColor(value, fallback = '#7aa2f7') { const color = String(value || '').trim(); return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback; }
 
         function normalizeRosters(value) {
-            const source = Array.isArray(value) ? value : DEFAULT_ROSTERS;
+            const source = Array.isArray(value) ? value : [];
             const seenCharacters = new Set();
             return source.map((roster, index) => {
                 const id = String(roster?.id || `roster-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '');
@@ -1900,7 +1885,7 @@
         }
 
         function normalizeCategories(value) {
-            const source = Array.isArray(value) && value.length > 0 ? value : DEFAULT_CATEGORIES;
+            const source = Array.isArray(value) ? value : [];
             const seenTasks = new Set();
             return source.map((cat, index) => {
                 const id = String(cat?.id || `cat-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '');
@@ -2033,13 +2018,13 @@
             const sets = safeObject(source.settings);
             norm.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sets.lootWeights) };
             norm.settings.lootWeightUpdatedAt = safeObject(sets.lootWeightUpdatedAt);
-            norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : cloneRosters(DEFAULT_ROSTERS);
+            norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : [];
             norm.settings.rosterUpdatedAt = Number(sets.rosterUpdatedAt) || 0;
             norm.settings.rosterUpdatedBy = String(sets.rosterUpdatedBy || '');
             norm.settings.memberDirectory = normalizeMemberDirectory(sets.memberDirectory);
             norm.settings.memberDirectoryUpdatedAt = Number(sets.memberDirectoryUpdatedAt) || 0;
             norm.settings.memberDirectoryUpdatedBy = String(sets.memberDirectoryUpdatedBy || '');
-            norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : cloneCategories(DEFAULT_CATEGORIES);
+            norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : [];
             norm.settings.categoriesUpdatedAt = Number(sets.categoriesUpdatedAt) || 0;
             norm.settings.categoriesUpdatedBy = String(sets.categoriesUpdatedBy || '');
             norm.settings.characterJobs = normalizeCharacterJobs(sets.characterJobs);
@@ -2080,7 +2065,47 @@
         }
 
         function ensureCellMap(data, charName) { if (!data.cells[charName]) data.cells[charName] = {}; return data.cells[charName]; }
-        function loadLocalData() { try { const raw = localStorage.getItem(LOCAL_DATA_KEY) || localStorage.getItem(LEGACY_LOCAL_DATA_KEY); return raw ? normalizeData(JSON.parse(raw)) : createEmptyData(); } catch (e) { return createEmptyData(); } }
+        function hasActualTrackerActivity(data) {
+            const cells = safeObject(data?.cells);
+            const hasCells = Object.values(cells).some(tasks => Object.keys(safeObject(tasks)).length > 0);
+            const hasLogs = Object.values(safeObject(data?.scholarship)).some(player => Object.keys(safeObject(player?.logs)).length > 0);
+            const settings = safeObject(data?.settings);
+            const team = normalizeTeamBuilder(settings.teamBuilder);
+            const hasTeamAssignments = ['team1', 'team2'].some(key => team[key].slots.some(slot => String(slot.character || '').trim()));
+            return hasCells || hasLogs || Object.keys(safeObject(data?.history)).length > 0 || Object.keys(safeObject(data?.weeklyArchive)).length > 0 ||
+                normalizeMemberDirectory(settings.memberDirectory).length > 0 || Object.keys(safeObject(settings.characterJobs)).length > 0 || hasTeamAssignments ||
+                (Number(settings.rosterUpdatedAt) || 0) > 0 || (Number(settings.categoriesUpdatedAt) || 0) > 0 || (Number(settings.memberDirectoryUpdatedAt) || 0) > 0 ||
+                (Number(settings.jobProfilesUpdatedAt) || 0) > 0 || Object.keys(safeObject(settings.lootWeightUpdatedAt)).length > 0 ||
+                (Number(settings.teamBuilder?.formatUpdatedAt) || 0) > 0 || (Number(settings.teamBuilder?.splitPartyUpdatedAt) || 0) > 0;
+        }
+        function legacyStarterSignature(value) {
+            const text = JSON.stringify(Array.isArray(value) ? value : []);
+            let hash = 2166136261;
+            for (let i = 0; i < text.length; i++) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+            return (hash >>> 0).toString(16).padStart(8, '0');
+        }
+        function stripUnmodifiedStarterData(data) {
+            const settings = safeObject(data?.settings);
+            if (hasActualTrackerActivity(data)) return data;
+            const isBundledRoster = legacyStarterSignature(settings.rosters) === '79b175a0';
+            const isBundledCategories = legacyStarterSignature(settings.categories) === '4e756205';
+            if (!isBundledRoster || !isBundledCategories) return data;
+            data.settings.rosters = []; data.settings.categories = [];
+            data.settings.rosterUpdatedAt = 0; data.settings.rosterUpdatedBy = '';
+            data.settings.categoriesUpdatedAt = 0; data.settings.categoriesUpdatedBy = '';
+            data.settings.characterJobs = {};
+            return data;
+        }
+        function loadLocalData() {
+            try {
+                const raw = localStorage.getItem(LOCAL_DATA_KEY) || localStorage.getItem(LEGACY_LOCAL_DATA_KEY);
+                if (!raw) return createEmptyData();
+                const data = stripUnmodifiedStarterData(normalizeData(JSON.parse(raw)));
+                // Save the migration so a previously-seen starter screen becomes genuinely blank on this browser too.
+                try { localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(data)); localStorage.removeItem(LEGACY_LOCAL_DATA_KEY); } catch (_) {}
+                return data;
+            } catch (e) { return createEmptyData(); }
+        }
         function persistLocalData() { cloudData.schemaVersion = APP_SCHEMA_VERSION; cloudData.updatedAt = Date.now(); localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(cloudData)); }
         function getCloudConfig() { try { const c = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{}'); return { binId: String(c.binId || '').trim(), apiKey: String(c.apiKey || '').trim() }; } catch (e) { return { binId: '', apiKey: '' }; } }
         function hasCloudConfig() { const c = getCloudConfig(); return Boolean(c.binId && c.apiKey); }
@@ -2507,6 +2532,7 @@
             if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return;}
             if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return;}
             syncInProgress=true;setStatus('🟡 Merging Cloud Data...');const config=getCloudConfig();
+            const hasMeaningfulLocalData = hasActualTrackerActivity(cloudData) || cloudData.settings.rosters.length > 0 || cloudData.settings.categories.length > 0;
             (async()=>{
                 try{
                     for(let attempt=1;attempt<=3;attempt++){
@@ -2515,7 +2541,7 @@
                         // explicit global-impact edit (prepared by prepareGlobalChange)
                         // is versioned.
                         const ext={externalPatch:null};
-                        let candidate=mergeData(cloudData,remote);
+                        let candidate=hasMeaningfulLocalData?mergeData(cloudData,remote):remote;
                         let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
                         if(pendingGlobalBeforeSnapshot){
@@ -4310,7 +4336,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.3.9';
+        const PANTHEON_TOOLS_VERSION = 'v1.4.0';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
