@@ -470,7 +470,7 @@
         .app-page { width: 100%; max-width: 1600px; }
         .overview-page { padding: 4px 0 34px; }
         .overview-hero { padding: 18px; border:1px solid #383d49; border-radius:12px; background:linear-gradient(135deg,#272a35,#1d2028); margin-bottom:14px; }
-        .overview-banner, .welcome-banner { display:block; width:100%; max-height:230px; object-fit:cover; object-position:center; border:1px solid #3d424f; border-radius:9px; background:#202029; margin:0 0 17px; }
+        .overview-banner, .welcome-banner { display:block; width:100%; height:auto; max-height:none; object-fit:contain; object-position:center; border:1px solid #3d424f; border-radius:9px; background:#202029; margin:0 0 17px; }
         .overview-hero h1 { margin:0 0 8px; color:#f2f4fa; font-size:clamp(1.5rem,3vw,2.15rem); letter-spacing:-.025em; }
         .overview-hero p { margin:0; max-width:850px; color:#b0b6c5; line-height:1.6; font-size:.88rem; }
         .overview-section-title { margin:22px 0 10px; color:#aab2c2; font-size:.72rem; text-transform:uppercase; letter-spacing:.14em; }
@@ -792,7 +792,7 @@
         .card-wiki-batch-row strong { display:block; color:#e5e8f0; font-size:.76rem; }
         .card-wiki-batch-row small { display:block; margin-top:3px; color:#9299a9; font-size:.65rem; }
         .welcome-modal { width:min(820px,95vw) !important; max-width:820px; max-height:88vh; overflow-y:auto; }
-        .welcome-modal .welcome-banner { max-height:125px; margin-bottom:10px; }
+        .welcome-modal .welcome-banner { height:auto; max-height:none; object-fit:contain; margin-bottom:10px; }
         .welcome-modal .welcome-whats-new { margin:9px 0 11px; padding:11px 13px; }
         .welcome-modal .welcome-shortcuts { margin:10px 0; }
         .welcome-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:14px 0; }
@@ -807,7 +807,7 @@
         .welcome-check { display:flex; align-items:flex-start; gap:8px; margin:9px 0; color:#d1d6e0; font-size:.72rem; cursor:pointer; }
         .welcome-check input { margin-top:2px; }
         @media(max-width:900px) { .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media(max-width:640px) { .welcome-shortcuts,.overview-tools-grid { grid-template-columns:1fr; } .overview-banner,.welcome-banner { max-height:145px; } }
+        @media(max-width:640px) { .welcome-shortcuts,.overview-tools-grid { grid-template-columns:1fr; } .overview-banner,.welcome-banner { width:100%; height:auto; max-height:none; object-fit:contain; } }
 
     </style>
 </head>
@@ -1125,9 +1125,10 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3.3</span></div>
                 <ul>
                     <li><strong>Pantheon Tools overview:</strong> the guild banner, Discord invite, and a guide to the available tools.</li>
+                    <li><strong>Guild banner scaling:</strong> the welcome popup and Overview now display the full banner image without cropping.</li>
                     <li><strong>Cleaner navigation:</strong> removed the redundant Overview/Tracker top tabs. Use the Overview tool cards or the side menu to open a tool.</li>
                     <li><strong>Quick Builds now use OR matching:</strong> Magic returns cards with MATK or INT or Final Damage; Physical returns cards with PATK or STR or AGI or Final Damage; Defensive returns cards with Defense or Magic Defense or VIT or Max HP.</li>
                     <li><strong>Local card updates:</strong> Card Database batches and the Member Roster stay in this browser and do not write to the shared tracker.</li>
