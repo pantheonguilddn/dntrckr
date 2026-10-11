@@ -813,8 +813,9 @@
         .welcome-default-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0; }
         .welcome-default-row label { color:#bfc5d2; font-size:.72rem; }
         .welcome-default-row select { max-width:310px; }
-        .welcome-check { display:flex; align-items:flex-start; gap:8px; margin:9px 0; color:#d1d6e0; font-size:.72rem; cursor:pointer; }
-        .welcome-check input { margin-top:2px; }
+        .welcome-check { display:grid; grid-template-columns:14px minmax(0,1fr); align-items:start; column-gap:9px; margin:9px 0; color:#d1d6e0; font-size:.72rem; line-height:1.5; cursor:pointer; }
+        .welcome-check input { width:14px; height:14px; margin:2px 0 0; justify-self:start; flex:none; }
+        .welcome-check span { min-width:0; }
         @media(max-width:900px) { .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media(max-width:640px) { .welcome-shortcuts,.overview-tools-grid { grid-template-columns:1fr; } .overview-banner,.welcome-banner { width:100%; height:auto; max-height:none; object-fit:contain; } }
 
@@ -876,6 +877,7 @@
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
                 <button class="drawer-item" type="button" onclick="openCloudModal()"><span class="drawer-icon">☁</span><span><strong>Cloud Setup</strong><small>Configure shared storage</small></span></button>
                 <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Savepoints & undo global changes</small></span></button>
+                <button class="drawer-item" type="button" onclick="openLandingSettings()"><span class="drawer-icon">⌂</span><span><strong>Set Default Landing Page</strong><small>Change startup destination anytime</small></span></button>
             </div>
 
             <div class="drawer-section">
@@ -1128,17 +1130,47 @@
         </div>
     </div>
 
+    <div class="modal-overlay hidden" id="landing-settings-modal" role="dialog" aria-modal="true" aria-label="Default Landing Page Settings">
+        <div class="modal-card">
+            <h3>⌂ Set Default Landing Page</h3>
+            <div class="modal-note">Choose where Pantheon Tools should open the next time you refresh or reopen it. This preference is saved locally and changing it will not navigate away from your current page.</div>
+            <div class="registration-form" style="margin-top:16px;">
+                <label for="landing-settings-choice">Startup destination</label>
+                <select id="landing-settings-choice">
+                    <option value="overview">Overview</option>
+                    <option value="tracker-universal">Tracker · Universal View</option>
+                    <option value="tracker-personal">Tracker · Personal View</option>
+                    <option value="team-builder">Team Builder</option>
+                    <option value="card-database">Card Database</option>
+                    <option value="member-roster">Member Roster</option>
+                    <option value="salary">Salary Calculator</option>
+                </select>
+                <label class="welcome-check"><input id="landing-settings-enabled" type="checkbox"><span>Use this selection as my default landing page.</span></label>
+                <div id="landing-settings-status" class="modal-note" aria-live="polite">No default is saved. Overview will open by default.</div>
+            </div>
+            <div class="modal-actions" style="margin-top:18px;">
+                <button class="btn btn-secondary" type="button" onclick="clearLandingSettings()">Clear Default</button>
+                <button class="btn btn-cloud" type="button" onclick="saveLandingSettings()">Save Preference</button>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('landing-settings-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Welcome to Pantheon Tools">
         <div class="modal-card wide-modal welcome-modal">
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3.6</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3.9</span></div>
                 <ul>
+                    <li><strong>Default landing checkbox alignment:</strong> the checkbox now lines up cleanly with its label, including when the text wraps.</li>
+                    <li><strong>Overview behind tool dialogs:</strong> Salary Calculator and Help &amp; Guide opened from Welcome now display the Overview page behind the dialog instead of Tracker.</li>
+                    <li><strong>Return to Welcome:</strong> closing Salary Calculator or Help after opening it from Welcome or an Overview shortcut brings you back to the Welcome popup.</li>
+                    <li><strong>Change startup destination anytime:</strong> the side menu now has Set Default Landing Page, so you can change or clear your saved landing page without refreshing.</li>
+                </ul>
+                <details class="welcome-previous-release"><summary>Earlier update highlights (v1.3.8–v1.3.3)</summary><ul>
                     <li><strong>Quick card copy:</strong> click the overlapping-squares icon beside any card name to copy the exact name for the in-game Trading House.</li>
                     <li><strong>Simpler Card Database:</strong> removed Compare and its related controls and help text. Full five-rarity details remain available by opening a card.</li>
-                </ul>
-                <details class="welcome-previous-release"><summary>Earlier update highlights (v1.3.4–v1.3.3)</summary><ul>
                     <li><strong>Card Database layout:</strong> Desired character stat groups use wider columns, and long checkbox labels wrap inside their own boxes instead of overlapping the results table.</li>
                     <li><strong>Overview and navigation:</strong> the guild banner, Discord invite, tool overview, and default landing behavior.</li>
                     <li><strong>Pantheon Tools overview:</strong> the guild banner, Discord invite, and a guide to the available tools.</li>
@@ -4278,8 +4310,9 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.3.2';
+        const PANTHEON_TOOLS_VERSION = 'v1.3.9';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
+        let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
             const url = String(PANTHEON_DISCORD_URL || '').trim();
             const valid = /^https:\/\/(?:discord\.gg\/[A-Za-z0-9-]+|discord\.com\/invite\/[A-Za-z0-9-]+)/i.test(url);
@@ -4296,6 +4329,12 @@
             if (destination === 'team-builder') { showAppPage('team-builder'); return; }
             if (destination === 'card-database') { showAppPage('card-wiki'); return; }
             if (destination === 'member-roster') { showAppPage('member-roster'); return; }
+            if (destination === 'salary') {
+                if (isPersonalView) togglePersonalView();
+                showAppPage('overview');
+                openSalaryModal();
+                return;
+            }
             showAppPage('tracker');
             if (destination === 'tracker-personal') {
                 const identity = localStorage.getItem(IDENTITY_KEY) || '';
@@ -4308,8 +4347,64 @@
                 return;
             }
             if (isPersonalView) togglePersonalView();
-            if (destination === 'salary') openSalaryModal();
         }
+        function landingChoiceLabel(choice) {
+            const labels = {
+                overview: 'Overview',
+                'tracker-universal': 'Tracker · Universal View',
+                'tracker-personal': 'Tracker · Personal View',
+                'team-builder': 'Team Builder',
+                'card-database': 'Card Database',
+                'member-roster': 'Member Roster',
+                salary: 'Salary Calculator'
+            };
+            return labels[choice] || 'Overview';
+        }
+        function openLandingSettings() {
+            toggleSideMenu(false);
+            let saved = '';
+            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
+            const valid = LANDING_OPTIONS.includes(saved);
+            const select = document.getElementById('landing-settings-choice');
+            const enabled = document.getElementById('landing-settings-enabled');
+            const status = document.getElementById('landing-settings-status');
+            if (select) select.value = valid ? saved : 'overview';
+            if (enabled) enabled.checked = valid;
+            if (status) status.textContent = valid
+                ? 'Current default: ' + landingChoiceLabel(saved) + '. Save another destination or clear the default.'
+                : 'No default is saved. Overview will open by default.';
+            openModal('landing-settings-modal');
+        }
+        function saveLandingSettings() {
+            const enabled = !!document.getElementById('landing-settings-enabled')?.checked;
+            const choice = document.getElementById('landing-settings-choice')?.value || 'overview';
+            const status = document.getElementById('landing-settings-status');
+            try {
+                if (enabled) localStorage.setItem(LANDING_PREFERENCE_KEY, LANDING_OPTIONS.includes(choice) ? choice : 'overview');
+                else localStorage.removeItem(LANDING_PREFERENCE_KEY);
+            } catch (e) {
+                if (status) status.textContent = 'Your browser could not save this preference. Check local storage permissions and try again.';
+                return;
+            }
+            if (status) status.textContent = enabled
+                ? 'Saved. ' + landingChoiceLabel(choice) + ' will open next time. Your current page has not changed.'
+                : 'Default cleared. Overview will open next time. Your current page has not changed.';
+        }
+        function clearLandingSettings() {
+            try { localStorage.removeItem(LANDING_PREFERENCE_KEY); }
+            catch (e) {
+                const status = document.getElementById('landing-settings-status');
+                if (status) status.textContent = 'Your browser could not clear this preference. Check local storage permissions and try again.';
+                return;
+            }
+            const select = document.getElementById('landing-settings-choice');
+            const enabled = document.getElementById('landing-settings-enabled');
+            if (select) select.value = 'overview';
+            if (enabled) enabled.checked = false;
+            const status = document.getElementById('landing-settings-status');
+            if (status) status.textContent = 'Default cleared. Overview will open next time. Your current page has not changed.';
+        }
+
         function applySavedLandingPage() {
             let saved = '';
             try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
@@ -4339,7 +4434,9 @@
                 else { localStorage.removeItem(LANDING_PREFERENCE_KEY); const checkbox = document.getElementById('welcome-default-enabled'); if (checkbox) checkbox.checked = false; }
             } catch (e) { alert('Your browser could not save this preference.'); return; }
             closeModal('welcome-modal');
-            applyLandingChoice(save ? choice : 'overview');
+            const destination = save ? choice : 'overview';
+            returnToWelcomeAfterShortcutModal = destination === 'salary';
+            applyLandingChoice(destination);
         }
         function continueFromWelcome() {
             const enabled = !!document.getElementById('welcome-default-enabled')?.checked;
@@ -4349,11 +4446,24 @@
                 else localStorage.removeItem(LANDING_PREFERENCE_KEY);
             } catch (e) { alert('Your browser could not save this preference.'); return; }
             closeModal('welcome-modal');
-            applyLandingChoice(enabled ? choice : 'overview');
+            const destination = enabled ? choice : 'overview';
+            returnToWelcomeAfterShortcutModal = destination === 'salary';
+            applyLandingChoice(destination);
         }
         function runWelcomeShortcut(choice) {
             closeModal('welcome-modal');
-            if (choice === 'help') { showAppPage('tracker'); openHelpModal('start'); return; }
+            returnToWelcomeAfterShortcutModal = false;
+            closeModal('salary-modal');
+            closeModal('help-modal');
+            toggleSideMenu(false);
+            if (choice === 'help' || choice === 'salary') {
+                showAppPage('overview');
+                returnToWelcomeAfterShortcutModal = true;
+                if (choice === 'help') openHelpModal('start');
+                else openSalaryModal();
+                return;
+            }
+            returnToWelcomeAfterShortcutModal = false;
             applyLandingChoice(choice);
         }
         document.getElementById('card-wiki-batch-list')?.addEventListener('click', event => {
@@ -4429,8 +4539,15 @@
         }
         function closeModal(id) {
             const modal = document.getElementById(id);
+            const wasOpen = !!modal && !modal.classList.contains('hidden');
+            const returnToWelcome = wasOpen && (id === 'help-modal' || id === 'salary-modal') && returnToWelcomeAfterShortcutModal;
             modal?.classList.add('hidden');
             if (id === 'welcome-modal') document.body.classList.remove('welcome-modal-open');
+            if (returnToWelcome) {
+                returnToWelcomeAfterShortcutModal = false;
+                showAppPage('overview');
+                openModal('welcome-modal');
+            }
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
