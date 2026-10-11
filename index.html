@@ -466,27 +466,29 @@
         .help-topic .help-callout { margin: 12px 0; padding: 10px 12px; border-left: 4px solid #5d8ca7; background: #20202a; color: #ddd; }
         .help-step { margin: 6px 0; }
         @media (max-width: 780px) { .help-layout { grid-template-columns: 1fr; } .help-nav { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        /* ===== Page Navigation ===== */
-        .page-nav-wrap {
-            width: 100%; max-width: 1600px; margin: -2px auto 18px;
-            display: flex; justify-content: center;
-        }
-        .page-nav {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px; border: 1px solid #343742; border-radius: 11px;
-            background: #24262f; box-shadow: 0 5px 18px rgba(0,0,0,.18);
-        }
-        .page-nav button {
-            min-width: 150px; padding: 9px 16px; border: 0; border-radius: 8px;
-            background: transparent; color: #9ea4b4; font: inherit; font-size: .8rem;
-            font-weight: 850; cursor: pointer; transition: background .16s ease, color .16s ease, transform .16s ease;
-        }
-        .page-nav button:hover { color: #e9ecf2; }
-        .page-nav button.active { background: #3b3f4d; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.22); }
-        .page-nav button:active { transform: translateY(1px); }
-
         .app-page.hidden-page { display: none !important; }
         .app-page { width: 100%; max-width: 1600px; }
+        .overview-page { padding: 4px 0 34px; }
+        .overview-hero { padding: 18px; border:1px solid #383d49; border-radius:12px; background:linear-gradient(135deg,#272a35,#1d2028); margin-bottom:14px; }
+        .overview-banner, .welcome-banner { display:block; width:100%; max-height:230px; object-fit:cover; object-position:center; border:1px solid #3d424f; border-radius:9px; background:#202029; margin:0 0 17px; }
+        .overview-hero h1 { margin:0 0 8px; color:#f2f4fa; font-size:clamp(1.5rem,3vw,2.15rem); letter-spacing:-.025em; }
+        .overview-hero p { margin:0; max-width:850px; color:#b0b6c5; line-height:1.6; font-size:.88rem; }
+        .overview-section-title { margin:22px 0 10px; color:#aab2c2; font-size:.72rem; text-transform:uppercase; letter-spacing:.14em; }
+        .overview-tools-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+        .overview-tool-card { display:flex; flex-direction:column; align-items:flex-start; gap:7px; min-height:130px; padding:14px; border:1px solid #383d49; border-radius:10px; background:#252832; color:#edf0f6; text-align:left; cursor:pointer; }
+        .overview-tool-card:hover { border-color:#7aa2f7; background:#2b303c; }
+        .overview-tool-card strong { font-size:.85rem; }
+        .overview-tool-card span { color:#a1a8b8; font-size:.72rem; line-height:1.5; }
+        .overview-footer { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:15px; padding:13px 15px; border:1px solid #383d49; border-radius:10px; background:#20222a; }
+        .overview-footer p { margin:0; color:#a1a8b8; font-size:.73rem; line-height:1.5; }
+        .discord-notice { color:#a1a8b8; font-size:.7rem; line-height:1.5; }
+        body.welcome-modal-open { overflow:hidden; }
+        .welcome-whats-new { margin:13px 0 15px; padding:14px 16px; border:1px solid #526788; border-left:4px solid #8eace0; border-radius:10px; background:linear-gradient(135deg,#252f40,#20242e); }
+        .welcome-whats-new-head { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+        .welcome-whats-new h4 { margin:0; color:#f1f4fb; font-size:.95rem; }
+        .release-version { display:inline-flex; align-items:center; border:1px solid #647fa8; border-radius:999px; padding:3px 9px; color:#dbe7ff; background:#2d3a50; font-size:.68rem; font-weight:900; letter-spacing:.04em; }
+        .welcome-whats-new ul { margin:0; padding-left:19px; color:#c3cada; font-size:.73rem; line-height:1.55; }
+        .welcome-whats-new li + li { margin-top:4px; }
 
         /* ===== Team Builder ===== */
         .team-builder-header {
@@ -636,7 +638,6 @@
         .role-check:has(input:checked) { border-color:#65718a; background:#303441; color:#fff; }
         @media (max-width: 1080px) { .team-builder-grid { grid-template-columns:1fr; } }
         @media (max-width: 760px) {
-            .page-nav button { min-width:120px; }
             .team-builder-header { align-items:flex-start; flex-direction:column; }
             .team-card-head { align-items:flex-start; flex-direction:column; }
             .team-card-actions { width:100%; }
@@ -697,10 +698,10 @@
         .card-wiki-compare-table td { padding:9px 10px; border-bottom:1px solid #30333d; color:#cdd2dd; }
         .card-wiki-compare-table td:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
         @media (max-width: 1050px) { .card-wiki-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .card-wiki-controls { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media (max-width: 640px) { .card-wiki-grid { grid-template-columns:1fr; } .card-wiki-controls { grid-template-columns:1fr; } .page-nav { flex-wrap:wrap; justify-content:center; } .page-nav button { min-width:110px; padding:9px 10px; } }
+        @media (max-width: 640px) { .card-wiki-grid { grid-template-columns:1fr; } .card-wiki-controls { grid-template-columns:1fr; } }
 
 
-        /* ===== Card Build Finder: multi-stat search results ===== */
+        /* ===== Card Database: multi-stat search results ===== */
         .card-wiki-controls { grid-template-columns:minmax(220px,2fr) repeat(3,minmax(160px,1fr)); }
         .card-wiki-stat-panel { border:1px solid #363944; border-radius:11px; background:#23252d; padding:13px; margin:0 0 13px; }
         .card-wiki-stat-panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
@@ -715,12 +716,12 @@
         .card-wiki-stat-group-title { color:#edf0f6; font-size:.73rem; font-weight:900; letter-spacing:.07em; }
         .card-wiki-stat-group-subtitle { color:#858fa2; font-size:.62rem; font-weight:750; text-align:right; }
         .card-wiki-stat-group-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
-        .card-wiki-stat-option { display:flex; align-items:center; gap:6px; min-width:0; padding:7px 8px; background:#252832; border:1px solid #424653; border-radius:8px; color:#c7ccda; font-size:.68rem; line-height:1.3; cursor:pointer; user-select:none; }
+        .card-wiki-stat-option { display:flex; align-items:center; gap:6px; min-width:0; width:100%; padding:7px 8px; background:#252832; border:1px solid #424653; border-radius:8px; color:#c7ccda; font-size:.69rem; line-height:1.3; cursor:pointer; user-select:none; }
         .card-wiki-stat-option span { min-width:0; overflow-wrap:anywhere; }
-        .card-wiki-stat-option input { flex:0 0 auto; }
         .card-wiki-stat-option:has(input:checked) { background:#29384b; border-color:#739bd0; color:#f2f6ff; box-shadow:inset 0 0 0 1px rgba(115,155,208,.16); }
         .card-wiki-stat-option input { margin:0; accent-color:#7aa2f7; }
         @media (max-width:1100px) { .card-wiki-stat-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width:900px) { .card-wiki-stat-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:640px) { .card-wiki-stat-options { grid-template-columns:1fr; } }
         .card-wiki-selected-stats { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:10px; min-height:25px; }
         .card-wiki-selected-tag { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid #6488b5; border-radius:999px; color:#e6f0ff; background:#29384b; font-size:.69rem; font-weight:800; cursor:pointer; }
@@ -729,43 +730,37 @@
         .card-wiki-preset-head { margin-bottom:10px; }
         .card-wiki-preset-head h3 { margin:0; font-size:.9rem; color:#eef1f7; }
         .card-wiki-preset-head p { margin:4px 0 0; color:#9299a9; font-size:.72rem; }
-        .card-wiki-presets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
-        .card-wiki-preset { display:flex; align-items:center; gap:9px; min-width:0; padding:11px 12px; border:1px solid #424653; border-radius:9px; background:#1d1f26; cursor:pointer; }
-        .card-wiki-preset:has(input:checked) { background:#29384b; border-color:#739bd0; box-shadow:inset 3px 0 #7aa2f7; }
+        .card-wiki-presets { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+        .card-wiki-preset { display:flex; align-items:center; gap:8px; min-width:0; padding:10px; border:1px solid #424653; border-radius:8px; background:#1d1f26; color:#c7ccda; cursor:pointer; }
+        .card-wiki-preset:has(input:checked) { background:#29384b; border-color:#739bd0; color:#f2f6ff; box-shadow:inset 3px 0 #739bd0; }
         .card-wiki-preset input { flex:0 0 auto; margin:0; accent-color:#7aa2f7; }
         .card-wiki-preset span { display:flex; flex-direction:column; gap:3px; min-width:0; }
-        .card-wiki-preset strong { font-size:.75rem; color:#f2f6ff; }
-        .card-wiki-preset small { color:#9299a9; font-size:.63rem; line-height:1.35; }
-        .card-wiki-compare-help { margin-top:5px; color:#858c9c; font-size:.68rem; line-height:1.4; }
-        .member-directory-header { display:flex; justify-content:space-between; align-items:flex-end; gap:18px; flex-wrap:wrap; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #353844; }
-        .member-directory-header h2 { margin:0; font-size:1.45rem; }
-        .member-directory-header p { margin:5px 0 0; color:#9299a9; font-size:.82rem; max-width:680px; }
-        .member-directory-kicker { margin-bottom:8px; color:#7aa2f7; font-size:.63rem; font-weight:900; letter-spacing:.17em; }
-        .member-directory-form-panel { padding:15px; margin-bottom:14px; border:1px solid #363944; border-radius:11px; background:#23252d; }
-        .member-directory-form-panel h3 { margin:0; font-size:.9rem; }
-        .member-directory-form-panel p { margin:4px 0 12px; color:#9299a9; font-size:.72rem; }
+        .card-wiki-preset strong { font-size:.75rem; }
+        .card-wiki-preset small { color:#9299a9; font-size:.62rem; line-height:1.35; }
+        .card-wiki-compare-help { margin:5px 0 0; color:#9299a9; font-size:.68rem; line-height:1.4; }
+        .member-directory-panel { margin-bottom:14px; padding:14px; border:1px solid #363944; border-radius:11px; background:#23252d; }
+        .member-directory-panel h3 { margin:0; font-size:.95rem; }
+        .member-directory-panel p { margin:4px 0 12px; color:#9299a9; font-size:.72rem; }
         .member-directory-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:end; }
-        .member-directory-form label,.member-directory-toolbar label { display:flex; flex-direction:column; gap:6px; color:#a8afbd; font-size:.68rem; font-weight:800; }
-        .member-directory-form input,.member-directory-toolbar input { width:100%; min-width:0; min-height:36px; padding:8px 10px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
-        .member-directory-form-actions { display:flex; gap:7px; flex-wrap:wrap; }
-        .member-directory-toolbar { display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin:14px 0 10px; }
-        .member-directory-toolbar label { width:min(440px,100%); }
-        #member-directory-count { padding-bottom:10px; color:#9299a9; font-size:.7rem; white-space:nowrap; }
+        .member-directory-field { display:flex; flex-direction:column; gap:6px; color:#bfc5d2; font-size:.68rem; font-weight:800; }
+        .member-directory-field input { width:100%; min-width:0; box-sizing:border-box; min-height:36px; padding:8px 9px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
+        .member-directory-actions { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
+        .member-directory-toolbar { display:flex; justify-content:space-between; align-items:end; gap:12px; flex-wrap:wrap; margin:12px 0; }
+        .member-directory-search { width:min(440px,100%); }
+        .member-directory-count { color:#9299a9; font-size:.7rem; padding-bottom:8px; }
         .member-directory-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-        .member-directory-card { min-width:0; padding:13px; border:1px solid #383c48; border-radius:10px; background:linear-gradient(110deg,#272a34,#20222a); }
-        .member-directory-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-        .member-directory-name { margin:0; font-size:.86rem; font-weight:850; overflow-wrap:anywhere; color:#eef1f7; }
-        .member-directory-meta { margin-top:4px; color:#9299a9; font-size:.66rem; overflow-wrap:anywhere; }
-        .member-directory-actions { display:flex; gap:5px; flex:0 0 auto; }
-        .member-directory-actions .btn { padding:6px 8px; font-size:.65rem; }
-        .member-directory-char-heading { margin:12px 0 7px; color:#858c9c; font-size:.61rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
-        .member-directory-chars { display:flex; flex-wrap:wrap; gap:6px; }
-        .member-directory-char { padding:5px 8px; border:1px solid #424653; border-radius:7px; background:#252832; color:#c7ccda; font-size:.68rem; overflow-wrap:anywhere; }
-        .member-directory-empty { padding:30px 16px; text-align:center; border:1px dashed #414652; border-radius:10px; color:#9299a9; }
-        .member-directory-note { margin-top:13px; color:#858c9c; font-size:.68rem; line-height:1.45; }
-        @media(max-width:1100px){.card-wiki-presets{grid-template-columns:repeat(3,minmax(0,1fr))}.member-directory-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-        @media(max-width:780px){.member-directory-form{grid-template-columns:1fr}.member-directory-list{grid-template-columns:1fr}}
-        @media(max-width:640px){.card-wiki-presets{grid-template-columns:1fr}.card-wiki-stat-options{grid-template-columns:1fr}.member-directory-toolbar{align-items:stretch;flex-direction:column}.member-directory-toolbar label{width:100%}}
+        .member-directory-card { min-width:0; padding:13px; border:1px solid #3a3e49; border-radius:10px; background:#1d1f26; }
+        .member-directory-card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:9px; }
+        .member-directory-name { margin:0; font-size:.9rem; overflow-wrap:anywhere; }
+        .member-directory-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:5px; }
+        .member-directory-badge { display:inline-flex; border:1px solid #424653; border-radius:999px; padding:3px 7px; color:#aeb5c4; font-size:.61rem; font-weight:800; }
+        .member-directory-note { margin-top:5px; color:#aeb5c4; font-size:.68rem; overflow-wrap:anywhere; }
+        .member-directory-chars-title { margin:12px 0 6px; color:#858fa2; font-size:.62rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+        .member-directory-chars { display:flex; gap:6px; flex-wrap:wrap; }
+        .member-directory-char { max-width:100%; overflow-wrap:anywhere; border:1px solid #424653; border-radius:7px; padding:5px 7px; background:#252832; color:#c7ccda; font-size:.68rem; }
+        .member-directory-empty { padding:24px 14px; border:1px dashed #424653; border-radius:10px; color:#9299a9; text-align:center; font-size:.75rem; }
+        @media (max-width:1100px) { .card-wiki-presets { grid-template-columns:repeat(2,minmax(0,1fr)); } .member-directory-form { grid-template-columns:repeat(2,minmax(0,1fr)); } .member-directory-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width:640px) { .card-wiki-presets,.member-directory-form,.member-directory-list { grid-template-columns:1fr; } }
         .card-wiki-result-list { display:flex; flex-direction:column; gap:8px; }
         .card-wiki-result-row { display:grid; grid-template-columns:minmax(220px,1.1fr) minmax(240px,2fr) auto; align-items:center; gap:13px; width:100%; min-width:0; padding:12px 14px; box-sizing:border-box; border:1px solid #383c48; border-radius:10px; background:linear-gradient(110deg,#272a34,#20222a); color:#eceff5; cursor:pointer; text-align:left; transition:border-color .12s ease,background .12s ease; }
         .card-wiki-result-row:hover { border-color:#77839a; background:#292c36; }
@@ -786,6 +781,33 @@
         .card-wiki-result-row.is-comparing { border-color:#7aa2f7; box-shadow:inset 3px 0 #7aa2f7; }
         @media (max-width:900px) { .card-wiki-result-row { grid-template-columns:minmax(0,1fr) auto; } .card-wiki-result-stats { grid-column:1/-1; grid-row:2; } .card-wiki-result-actions { grid-column:2; grid-row:1; } }
         @media (max-width:640px) { .card-wiki-controls { grid-template-columns:1fr; } .card-wiki-result-row { grid-template-columns:minmax(0,1fr); } .card-wiki-result-actions { grid-column:1; grid-row:auto; flex-direction:row; align-items:center; justify-content:space-between; } .card-wiki-result-stats { grid-column:1; grid-row:auto; } .card-wiki-stat-tools { width:100%; } .card-wiki-stat-search { width:100%; } }
+        .card-batch-modal { max-width:900px; }
+        .card-batch-form { display:grid; gap:11px; margin-top:14px; }
+        .card-batch-form label { display:flex; flex-direction:column; gap:7px; color:#bfc5d2; font-size:.72rem; font-weight:800; }
+        .card-batch-form input,.card-batch-form textarea,.welcome-default select { width:100%; box-sizing:border-box; padding:9px 10px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; }
+        .card-batch-form textarea { min-height:170px; resize:vertical; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:.7rem; line-height:1.5; }
+        .card-batch-actions { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+        .card-wiki-batch-list { display:grid; gap:8px; }
+        .card-wiki-batch-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid #3d414d; border-radius:8px; background:#20222a; }
+        .card-wiki-batch-row strong { display:block; color:#e5e8f0; font-size:.76rem; }
+        .card-wiki-batch-row small { display:block; margin-top:3px; color:#9299a9; font-size:.65rem; }
+        .welcome-modal { width:min(820px,95vw) !important; max-width:820px; max-height:88vh; overflow-y:auto; }
+        .welcome-modal .welcome-banner { max-height:125px; margin-bottom:10px; }
+        .welcome-modal .welcome-whats-new { margin:9px 0 11px; padding:11px 13px; }
+        .welcome-modal .welcome-shortcuts { margin:10px 0; }
+        .welcome-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:14px 0; }
+        .welcome-shortcuts button { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; text-align:left; padding:12px; border:1px solid #414653; border-radius:9px; background:#20222a; color:#e5e8f0; cursor:pointer; }
+        .welcome-shortcuts button:hover { border-color:#7aa2f7; background:#272e3b; }
+        .welcome-shortcuts strong { font-size:.77rem; }
+        .welcome-shortcuts span { color:#9299a9; font-size:.66rem; line-height:1.45; }
+        .welcome-default { margin-top:14px; padding:13px; border:1px solid #373b46; border-radius:10px; background:#20222a; }
+        .welcome-default-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0; }
+        .welcome-default-row label { color:#bfc5d2; font-size:.72rem; }
+        .welcome-default-row select { max-width:310px; }
+        .welcome-check { display:flex; align-items:flex-start; gap:8px; margin:9px 0; color:#d1d6e0; font-size:.72rem; cursor:pointer; }
+        .welcome-check input { margin-top:2px; }
+        @media(max-width:900px) { .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media(max-width:640px) { .welcome-shortcuts,.overview-tools-grid { grid-template-columns:1fr; } .overview-banner,.welcome-banner { max-height:145px; } }
 
     </style>
 </head>
@@ -831,8 +853,7 @@
                 <div class="drawer-section-title">Pages</div>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('tracker'); toggleSideMenu(false)"><span class="drawer-icon">📋</span><span><strong>Tracker</strong><small>Daily & weekly board</small></span></button>
                 <button class="drawer-item" type="button" onclick="showAppPage('team-builder'); toggleSideMenu(false)"><span class="drawer-icon">⚔</span><span><strong>Team Builder</strong><small>Build two parties</small></span></button>
-                <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('card-wiki'); toggleSideMenu(false)"><span class="drawer-icon">🃏</span><span><strong>Card Build Finder</strong><small>Find cards for character builds</small></span></button>
-                <button class="drawer-item drawer-item-green" type="button" onclick="showAppPage('member-roster'); toggleSideMenu(false)"><span class="drawer-icon">👥</span><span><strong>Member Roster</strong><small>Guild directory by owner</small></span></button>
+                <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('card-wiki'); toggleSideMenu(false)"><span class="drawer-icon">🃏</span><span><strong>Card Database</strong><small>Find cards for character builds</small></span></button>
             </div>
 
             <div class="drawer-section">
@@ -850,7 +871,7 @@
 
             <div class="drawer-section">
                 <div class="drawer-section-title">Manage</div>
-                <button class="drawer-item drawer-item-brown" type="button" onclick="openRegistrationPage()"><span class="drawer-icon">🧾</span><span><strong>Roster Registration</strong><small>Add and organize characters</small></span></button>
+                <button class="drawer-item drawer-item-brown" type="button" onclick="openRegistrationPage()"><span class="drawer-icon">🧾</span><span><strong>Tracker Registration</strong><small>Add and organize characters</small></span></button>
                 <button class="drawer-item drawer-item-green" type="button" onclick="openDungeonPage()"><span class="drawer-icon">🏰</span><span><strong>Dungeon Registration</strong><small>Manage tracked content</small></span></button>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="openWeightsModal()"><span class="drawer-icon">🎁</span><span><strong>Loot Weights</strong><small>Adjust priority weighting</small></span></button>
             </div>
@@ -864,14 +885,27 @@
 
     <div class="drawer-scrim" id="drawer-scrim" onclick="toggleSideMenu(false)"></div>
 
-    <div class="page-nav-wrap">
-        <nav class="page-nav" aria-label="Pantheon Pages">
-            <button id="page-tab-tracker" class="active" type="button" onclick="showAppPage('tracker')">📋 Tracker</button>
-            <button id="page-tab-team-builder" type="button" onclick="showAppPage('team-builder')">⚔ Team Builder</button>
-        </nav>
-    </div>
 
-    <main id="tracker-page" class="app-page">
+    <main id="overview-page" class="app-page overview-page">
+        <section class="overview-hero">
+            <img class="overview-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
+            <div class="drawer-kicker">PANTHEON GUILD TOOLS</div>
+            <h1>Welcome to Pantheon Tools</h1>
+            <p>Your home for Dragon Nest guild coordination. Track daily and weekly progress, register characters, build raid parties, browse card stats, maintain the member directory, and calculate party income. Choose a tool below to get started.</p>
+        </section>
+        <div class="overview-section-title">Available tools</div>
+        <section class="overview-tools-grid" aria-label="Pantheon tool overview">
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-universal')"><strong>📋 Tracker & Bounties</strong><span>Review daily and weekly tasks, bounty targets and notes, analytics, and guild progress. Switch between Universal and Personal View.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('team-builder')"><strong>⚔ Team Builder</strong><span>Build raid parties from tracker-registered characters, check party roles, configure class capabilities, and share setups.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('card-database')"><strong>🃏 Card Database</strong><span>Filter monster cards by level range and desired stats. Quick Builds return cards with any one of the preset stats. Card batches stay local.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('member-roster')"><strong>👥 Member Roster</strong><span>Maintain the guild directory, including members who have not registered characters for Tracker or Team Builder.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><strong>🧮 Salary Calculator</strong><span>Calculate and split party income using the available calculator.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('help')"><strong>❔ Help & Guide</strong><span>Open the relevant guides for Tracker, Team Builder, Card Database, and roster workflows.</span></button>
+        </section>
+        <div class="overview-footer"><a id="overview-discord-link" class="btn btn-cloud" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a><p>Quick tip: save a default landing page in the welcome screen if you normally use only one tool.</p></div>
+    </main>
+
+    <main id="tracker-page" class="app-page hidden-page">
     <div class="table-responsive">
         <table id="dn-tracker">
             <colgroup id="table-colgroup"></colgroup>
@@ -993,35 +1027,34 @@
         </div>
 
         <div class="team-builder-bottom">
-            <strong>How it works:</strong> Characters come from Roster Registration. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
+            <strong>How it works:</strong> Characters come from Tracker Registration. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
         </div>
     </main>
 
     <main id="card-wiki-page" class="app-page hidden-page">
         <div class="card-wiki-header">
             <div>
-                <h2>🃏 Card Build Finder <button class="mini-help" type="button" title="Card Build Finder guide" onclick="alert('Choose a level cap, select one or more desired stats, and the list will show cards providing any selected stat. Choose All selected if you only want cards that contain every selected stat.')">?</button></h2>
+                <h2>🃏 Card Database <button class="mini-help" type="button" title="Card Database guide" onclick="openHelpModal('card-database')">?</button></h2>
                 <p>Find monster cards for a character build by level cap and desired stats. Nest names are intentionally hidden to keep the results focused on build choices.</p>
             </div>
-            <div class="builder-header-actions"><span class="local-only-badge">REFERENCE DATA · LOCAL / READ-ONLY</span></div>
+            <div class="builder-header-actions"><span class="local-only-badge">REFERENCE DATA · LOCAL ONLY · <span id="card-wiki-count">91 cards</span></span><button class="btn btn-secondary" type="button" onclick="openCardWikiBatches()">🗂 Manage Card Batches</button></div>
         </div>
         <div class="card-wiki-controls">
             <label class="card-wiki-field">Search card<input id="card-wiki-search" type="search" placeholder="Monster name or card number…" oninput="renderCardWiki()" autocomplete="off"></label>
-            <label class="card-wiki-field">Level cap<select id="card-wiki-level-cap" onchange="renderCardWiki()">
-                <option value="40">Level 40 · Sea Dragon and below</option>
-                <option value="50">Level 50 · Green Dragon and below</option>
-                <option value="60">Level 60 · Desert Dragon and below</option>
-                <option value="70" selected>Level 70 · Black Dragon and below</option>
+            <label class="card-wiki-field">Level range<select id="card-wiki-level-cap" onchange="renderCardWiki()">
+                <option value="70" selected>Level 70 and below</option>
+                <option value="50-60">Level 50 - 60</option>
+                <option value="40-50">Level 40 - 50</option>
             </select></label>
             <label class="card-wiki-field">Display stat values at<select id="card-wiki-preview-rarity" onchange="renderCardWiki()"><option value="0">Magic</option><option value="1">Rare</option><option value="2">Epic</option><option value="3">Unique</option><option value="4" selected>Legend</option></select></label>
             <label class="card-wiki-field">Sort results<select id="card-wiki-sort" onchange="renderCardWiki()"><option value="number">Card Number</option><option value="name">Name A–Z</option><option value="match">Most desired stats matched</option></select></label>
         </div>
-        <section class="card-wiki-preset-panel">
-            <div class="card-wiki-preset-head"><div><h3>Quick build filters</h3><p>One click selects the core stats and requires every selected stat to appear on the card.</p></div></div>
+        <section class="card-wiki-preset-panel" aria-label="Quick build filters">
+            <div class="card-wiki-preset-head"><h3>Quick build filters</h3><p>Quick Builds use OR matching: a card appears if it has any one of the preset stats. You can still adjust the checkboxes afterward.</p></div>
             <div class="card-wiki-presets" id="card-wiki-presets">
-                <label class="card-wiki-preset"><input type="checkbox" data-card-preset="magic"><span><strong>Magic</strong><small>MATK · INT · Final Damage</small></span></label>
-                <label class="card-wiki-preset"><input type="checkbox" data-card-preset="physical"><span><strong>Physical</strong><small>PATK · STR · AGI · Final Damage</small></span></label>
-                <label class="card-wiki-preset"><input type="checkbox" data-card-preset="defensive"><span><strong>Defensive</strong><small>DEF · MDEF · VIT · Max HP</small></span></label>
+                <label class="card-wiki-preset"><input type="checkbox" data-card-wiki-preset="magic" onchange="applyCardWikiPreset('magic',this.checked)"><span><strong>Magic</strong><small>MATK · INT · FD</small></span></label>
+                <label class="card-wiki-preset"><input type="checkbox" data-card-wiki-preset="physical" onchange="applyCardWikiPreset('physical',this.checked)"><span><strong>Physical</strong><small>PATK · STR · AGI · FD</small></span></label>
+                <label class="card-wiki-preset"><input type="checkbox" data-card-wiki-preset="defensive" onchange="applyCardWikiPreset('defensive',this.checked)"><span><strong>Defensive</strong><small>DEF · MDEF · VIT · HP</small></span></label>
             </div>
         </section>
         <section class="card-wiki-stat-panel">
@@ -1029,7 +1062,7 @@
                 <div><h3>Desired character stats</h3><p>Select multiple stats. By default, results include cards that provide <b>any</b> selected stat. Nest names are not shown.</p></div>
                 <div class="card-wiki-stat-tools">
                     <label class="card-wiki-field" style="display:flex;flex-direction:row;align-items:center;gap:7px;white-space:nowrap;color:#c1c7d3;">Match
-                        <select id="card-wiki-match-mode" onchange="cardWikiActivePreset='';renderCardWikiPresetChecks();renderCardWiki()"><option value="any">Any selected</option><option value="all">All selected</option></select>
+                        <select id="card-wiki-match-mode" onchange="renderCardWiki()"><option value="any">Any selected</option><option value="all">All selected</option></select>
                     </label>
                     <input class="card-wiki-stat-search" id="card-wiki-stat-search" type="search" placeholder="Find a stat (ATK, DEF, VIT…)" oninput="renderCardWikiStatOptions()" autocomplete="off">
                     <button class="btn btn-secondary" type="button" onclick="clearCardWikiStatFilters()">Clear stats</button>
@@ -1039,7 +1072,7 @@
             <div id="card-wiki-selected-stats" class="card-wiki-selected-stats"><span class="card-wiki-selected-none">No desired stats selected. Choose stats above to narrow the card list.</span></div>
         </section>
         <div class="card-wiki-summary">
-            <div><span id="card-wiki-result-count">Loading cards…</span><div class="card-wiki-compare-help">Compare selects 2–3 cards and shows their stat values side by side at the chosen rarity. It does not change the filters.</div></div>
+            <div><span id="card-wiki-result-count">Loading cards…</span><p class="card-wiki-compare-help">Compare shows 2–3 selected cards side by side at the chosen rarity, with each stat in its own row. Use it to compare candidates; it does not change the filters.</p></div>
             <div class="card-wiki-summary-actions">
                 <button class="btn btn-secondary" id="card-wiki-compare-button" type="button" onclick="openCardWikiComparison()" disabled>Compare (0/3)</button>
                 <button class="btn btn-secondary" type="button" onclick="clearCardWikiFilters()">Reset all filters</button>
@@ -1052,21 +1085,73 @@
     </main>
 
     <main id="member-roster-page" class="app-page hidden-page">
-        <div class="member-directory-header"><div><div class="member-directory-kicker">GUILD DIRECTORY</div><h2>Member Roster</h2><p>One list of guild members grouped by owner. Members can appear here without registering characters in the tracker.</p></div><span class="local-only-badge">SHARED GUILD DIRECTORY</span></div>
-        <section class="member-directory-form-panel">
+        <div class="team-builder-header">
+            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p>A shared guild member directory. Add everyone here, then register only the characters whose progress should appear in Tracker and Team Builder.</p></div>
+            <div class="builder-header-actions"><span class="local-only-badge">SHARED WHEN CLOUD IS CONNECTED</span></div>
+        </div>
+        <section class="member-directory-panel">
             <h3 id="member-directory-form-title">Add a guild member</h3>
-            <p>Character names are optional. Use commas to separate multiple names.</p>
-            <form id="member-directory-form" class="member-directory-form">
-                <label>Member / owner<input id="member-directory-name" type="text" maxlength="60" placeholder="e.g. Vulcureon" required></label>
-                <label>Characters (optional)<input id="member-directory-characters" type="text" maxlength="500" placeholder="e.g. Vulcureon, Mysteln"></label>
-                <label>Role / notes (optional)<input id="member-directory-note" type="text" maxlength="180" placeholder="e.g. Raid lead, returning member"></label>
-                <div class="member-directory-form-actions"><button class="btn btn-primary" id="member-directory-submit" type="submit">Add member</button><button class="btn btn-secondary" id="member-directory-cancel" type="button" hidden>Cancel edit</button></div>
+            <p>Add members here first. Characters listed as aliases do not automatically enter the Tracker or Team Builder; use Tracker Registration to opt in each character.</p>
+            <form id="member-directory-form" class="member-directory-form" onsubmit="saveMemberDirectoryForm(event)">
+                <label class="member-directory-field">Member / owner name<input id="member-directory-name" type="text" maxlength="60" placeholder="Member name" required></label>
+                <label class="member-directory-field">Other characters / aliases (optional)<input id="member-directory-characters" type="text" maxlength="1000" placeholder="Unregistered names or aliases"></label>
+                <label class="member-directory-field">Role / notes (optional)<input id="member-directory-note" type="text" maxlength="160" placeholder="e.g. Returning member, raid lead"></label>
+                <div class="member-directory-actions"><button id="member-directory-submit" class="btn btn-roster" type="submit">Add member</button><button id="member-directory-cancel" class="btn btn-secondary" type="button" onclick="resetMemberDirectoryForm()" hidden>Cancel edit</button></div>
             </form>
         </section>
-        <div class="member-directory-toolbar"><label>Search members or characters<input id="member-directory-search" type="search" placeholder="Search directory…" autocomplete="off"></label><span id="member-directory-count"></span></div>
+        <div class="member-directory-toolbar"><input id="member-directory-search" class="card-wiki-stat-search member-directory-search" type="search" placeholder="Search members, characters, or notes…" oninput="renderMemberDirectory()" autocomplete="off"><span id="member-directory-count" class="member-directory-count"></span></div>
         <section id="member-directory-list" class="member-directory-list" aria-live="polite"></section>
-        <p class="member-directory-note">Registered owners and their tracker characters appear automatically. Additional members and optional characters are stored in the shared guild database and do not require a tracker registration.</p>
+        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the shared member directory. Add people here even if they do not track progress. To make a character appear in the Tracker and Team Builder, register that character under the correct owner through Tracker Registration. Member and alias entries sync when Cloud is configured.</div>
     </main>
+
+    <div class="modal-overlay hidden" id="card-wiki-batches-modal" role="dialog" aria-modal="true" aria-label="Manage Card Batches">
+        <div class="modal-card wide-modal card-batch-modal">
+            <h3>🗂 Manage Card Batches</h3>
+            <div class="modal-note">Import future card updates locally. Saved batches stay on this browser and are never synced to the guild tracker.</div>
+            <form id="card-wiki-batch-form" class="card-batch-form" onsubmit="importCardWikiBatch(event)">
+                <label>Batch name<input id="card-wiki-batch-name" maxlength="100" placeholder="e.g. Level 80 card update" required></label>
+                <label>Cards JSON<textarea id="card-wiki-batch-json" rows="8" placeholder='Paste a JSON array of cards. Example: [{"number":92,"name":"Example Card","nest":"New Card Pool","levelCap":70,"stats":[{"name":"Magic Attk","values":[1,2,3,4,5]}]}]' required></textarea></label>
+                <div class="modal-note">Each stat needs five numeric values in this order: Magic, Rare, Epic, Unique, Legend. Card numbers must be unique across the built-in database and saved batches.</div>
+                <div class="card-batch-actions"><button class="btn btn-cloud" type="submit">Import Batch</button><button class="btn btn-secondary" type="button" onclick="exportCardWikiBatches()">Export Saved Batches</button></div>
+            </form>
+            <h4 style="margin:18px 0 8px;">Saved local batches</h4>
+            <div id="card-wiki-batch-list" class="card-wiki-batch-list"></div>
+            <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="closeModal('card-wiki-batches-modal')">Close</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Welcome to Pantheon Tools">
+        <div class="modal-card wide-modal welcome-modal">
+            <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
+            <h3>🏛 Welcome to Pantheon Tools</h3>
+            <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3</span></div>
+                <ul>
+                    <li><strong>Pantheon Tools overview:</strong> the guild banner, Discord invite, and a guide to the available tools.</li>
+                    <li><strong>Cleaner navigation:</strong> removed the redundant Overview/Tracker top tabs. Use the Overview tool cards or the side menu to open a tool.</li>
+                    <li><strong>Quick Builds now use OR matching:</strong> Magic returns cards with MATK or INT or Final Damage; Physical returns cards with PATK or STR or AGI or Final Damage; Defensive returns cards with Defense or Magic Defense or VIT or Max HP.</li>
+                    <li><strong>Local card updates:</strong> Card Database batches and the Member Roster stay in this browser and do not write to the shared tracker.</li>
+                </ul>
+            </section>
+            <div class="modal-note">Choose a shortcut to open a tool, or save a default landing page below. Without a saved default, the Overview page is the starting page.</div>
+            <div class="overview-footer" style="margin-top:0"><a id="welcome-discord-link" class="btn btn-cloud" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a></div>
+            <div class="welcome-shortcuts">
+                <button type="button" onclick="runWelcomeShortcut('tracker-universal')"><strong>📋 Tracker</strong><span>Check daily and weekly progress, bounty targets, and analytics.</span></button>
+                <button type="button" onclick="runWelcomeShortcut('team-builder')"><strong>⚔ Team Builder</strong><span>Build raid parties using tracker-registered characters.</span></button>
+                <button type="button" onclick="runWelcomeShortcut('card-database')"><strong>🃏 Card Database</strong><span>Filter card stats and manage personal card batches locally.</span></button>
+                <button type="button" onclick="runWelcomeShortcut('member-roster')"><strong>👥 Member Roster</strong><span>Keep a directory of guild members, including non-tracker users.</span></button>
+                <button type="button" onclick="runWelcomeShortcut('salary')"><strong>🧮 Salary Calculator</strong><span>Calculate and split party income.</span></button>
+                <button type="button" onclick="runWelcomeShortcut('help')"><strong>❔ Help & Guide</strong><span>Open instructions for the tools and their workflows.</span></button>
+            </div>
+            <div class="welcome-default">
+                <h4 style="margin:0;">Choose a default landing page</h4>
+                <div class="welcome-default-row"><label for="welcome-default-landing">Open by default</label><select id="welcome-default-landing"><option value="overview">Overview</option><option value="tracker-universal">Tracker · Universal View</option><option value="tracker-personal">Tracker · Personal View</option><option value="team-builder">Team Builder</option><option value="card-database">Card Database</option><option value="member-roster">Member Roster</option><option value="salary">Salary Calculator</option></select></div>
+                <label class="welcome-check"><input id="welcome-default-enabled" type="checkbox"><span>Use this selection whenever I refresh or reopen the tracker.</span></label>
+                <div class="modal-note">Personal View needs an identity selected in the top bar. If no identity is saved, the tracker opens in Universal View instead.</div>
+                <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="saveWelcomeDefault(false)">Don't save a default</button><button class="btn btn-cloud" type="button" onclick="saveWelcomeDefault(true)">Save Default</button><button class="btn btn-secondary" type="button" onclick="continueFromWelcome()">Continue</button></div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal-overlay hidden card-wiki-detail-modal" id="card-wiki-detail-modal" role="dialog" aria-label="Monster Card Details">
         <div class="modal-card wide-modal">
@@ -1259,12 +1344,14 @@
             <div class="help-layout">
                 <div class="help-nav">
                     <button type="button" data-help-target="start" onclick="showHelpTopic('start')">Getting Started</button>
-                    <button type="button" data-help-target="registration" onclick="showHelpTopic('registration')">Roster Registration</button>
+                    <button type="button" data-help-target="registration" onclick="showHelpTopic('registration')">Tracker Registration</button>
                     <button type="button" data-help-target="dungeons" onclick="showHelpTopic('dungeons')">Dungeon Registration</button>
                     <button type="button" data-help-target="views" onclick="showHelpTopic('views')">Universal / Personal</button>
                     <button type="button" data-help-target="tracker" onclick="showHelpTopic('tracker')">Tracker & Bounty</button>
                     <button type="button" data-help-target="analytics" onclick="showHelpTopic('analytics')">Roster Analytics</button>
                     <button type="button" data-help-target="weights" onclick="showHelpTopic('weights')">Loot Weights</button>
+                    <button type="button" data-help-target="card-database" onclick="showHelpTopic('card-database')">Card Database</button>
+                    <button type="button" data-help-target="member-roster" onclick="showHelpTopic('member-roster')">Member Roster</button>
                     <button type="button" data-help-target="team-builder" onclick="showHelpTopic('team-builder')">Team Builder</button>
                     <button type="button" data-help-target="versions" onclick="showHelpTopic('versions')">Version History</button>
                     <button type="button" data-help-target="salary" onclick="showHelpTopic('salary')">Salary Calculator</button>
@@ -1277,8 +1364,8 @@
                         <p><b>Universal View</b> is for seeing the guild-wide board. <b>Personal View</b> is for focusing on your own roster.</p>
                     </section>
                     <section class="help-topic" data-help-topic="registration">
-                        <h4>Roster Registration</h4>
-                        <p>Use <b>Roster Registration</b> to add characters and maintain the owner/character groups shown across the tracker.</p>
+                        <h4>Tracker Registration</h4>
+                        <p>Use <b>Tracker Registration</b> to opt characters into progress tracking under a member/owner from Member Roster. Characters registered here become available to both the tracker and Team Builder.</p>
                         <div class="help-step"><b>1.</b> Choose an existing owner, or choose <b>＋ Create new group</b>.</div>
                         <div class="help-step"><b>2.</b> Enter the exact in-game character name.</div>
                         <div class="help-step"><b>3.</b> Select the character's <b>Class / Job</b>.</div>
@@ -1306,7 +1393,7 @@
                     </section>
                     <section class="help-topic" data-help-topic="tracker">
                         <h4>Tracker & Bounty Checker</h4>
-                        <p>Use the checkbox to record a completed task. Uncheck it if it was marked by mistake.</p>
+                        <p>Use the checkbox to record a completed task. Uncheck it if it was marked by mistake. The weekly reset archives progress, resets weekly states, and clears bounty target text for a clean new week.</p>
                         <h5>Bounty workflow</h5>
                         <p>For a dungeon you want to use for a Unique+ bounty, <b>right-click the dungeon cell</b>. It becomes <b>🎯 Marked</b> and the system places that dungeon into the first available bounty target slot.</p>
                         <p>When you later complete the marked dungeon, checking it can automatically complete the linked bounty slot.</p>
@@ -1332,9 +1419,25 @@
                         <p>Open <b>Loot Weights</b>, choose the desired number for each task, then press <b>Save Weights</b>. <b>Reset Defaults</b> restores the predefined settings.</p>
                         <div class="help-callout"><b>Weights do not change completion.</b> They only change how Analytics evaluates missed content.</div>
                     </section>
+                    <section class="help-topic" data-help-topic="card-database">
+                        <h4>Card Database</h4>
+                        <p>Card Database is a local reference tool. Its filters and personal card batches stay in this browser and never add traffic or data to the guild's shared tracker database.</p>
+                        <h5>Filter cards for a build</h5>
+                        <p>Choose <b>Level 70 and below</b>, <b>Level 50 - 60</b>, or <b>Level 40 - 50</b>. Select Magic, Physical, or Defensive to set a starter group of stats, or check stats manually. <b>All selected</b> means every chosen stat must be on the same card; <b>Any selected</b> only needs one.</p>
+                        <p>The Defensive group contains Defense, Magic Def, Vit, and Max HP. Choose Magic, Rare, Epic, Unique, or Legend to preview those values. Open a card for its full five-rarity table. Compare displays the selected rarity side by side; it does not calculate combined equipped-card totals.</p>
+                        <h5>Import future card updates</h5>
+                        <p>Click <b>Manage Card Batches</b>, name the update, and paste a JSON array. Every card requires a unique number, name, nest or pool label, a valid level cap (40, 50, 60, or 70), and stats. Each stat requires five numeric values in Magic, Rare, Epic, Unique, Legend order. Export your local batches as a backup before changing browsers or clearing site data.</p>
+                    </section>
+                    <section class="help-topic" data-help-topic="member-roster">
+                        <h4>Member Roster</h4>
+                        <p>Use Member Roster as the guild's member directory. Add people whether or not they use the tracker. Existing registered owners are shown automatically, alongside anyone added to the directory.</p>
+                        <h5>How it connects</h5>
+                        <p>Add or maintain the member/owner here first. The optional character/alias field is directory information only. To make a character eligible for the Tracker and Team Builder, open <b>Tracker Registration</b>, choose that owner under Member Roster, and register the character with its Class / Job. Team Builder reads from the registered tracker characters, so directory-only entries do not appear as selectable combatants.</p>
+                        <p>When Cloud is configured, member names and notes are shared with the guild. Card Database data and card batches are not part of that sync.</p>
+                    </section>
                     <section class="help-topic" data-help-topic="team-builder">
                         <h4>Team Builder</h4>
-                        <p>Team Builder is the second page of the tracker. It uses the characters registered in Roster Registration.</p>
+                        <p>Team Builder is the second page of the tracker. It uses the characters registered in Tracker Registration.</p>
                         <h5>Set each character's Job</h5>
                         <p>Open <b>Configure Classes</b> and choose the correct Job. The Class, Raid Position, and default DPS side are filled automatically from the guild's Job list. The Class dropdown can also be used first to narrow the character list.</p>
                         <h5>Choose a Party Format</h5>
@@ -1436,10 +1539,10 @@
         </div>
     </div>
 
-    <!-- Roster Registration Modal -->
+    <!-- Tracker Registration Modal -->
     <div class="modal-overlay hidden" id="roster-modal" role="dialog">
         <div class="modal-card wide-modal">
-            <h3>🧾 Roster Registration</h3>
+            <h3>🧾 Tracker Registration</h3>
             <div class="modal-note">Drag and drop chips to reorder them. Removing a character hides it from the tracker but keeps its historical analytics.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
@@ -1507,7 +1610,7 @@
         // ==========================================
         // ☁️ APP CONFIGURATION
         // ==========================================
-        const APP_SCHEMA_VERSION = 19; 
+        const APP_SCHEMA_VERSION = 20; 
         const MAX_ARCHIVE_WEEKS = 12;
                 const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
@@ -1724,19 +1827,6 @@
         }
 
         function cloneRosters(rosters) { return (Array.isArray(rosters) ? rosters : []).map(r => ({ id: String(r.id || ''), name: String(r.name || ''), color: String(r.color || '#7aa2f7'), characters: Array.isArray(r.characters) ? [...r.characters] : [] })); }
-        function normalizeMemberDirectory(value) {
-            const source = Array.isArray(value) ? value : [], ids = new Set(), names = new Set(), out = [];
-            source.forEach((entry, index) => {
-                const name = String(entry?.name || '').trim().slice(0,60);
-                if (!name || names.has(name.toLowerCase())) return;
-                let id = String(entry?.id || `member-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80) || `member-${index}`;
-                if (ids.has(id)) id = `${id}-${index}`;
-                ids.add(id); names.add(name.toLowerCase());
-                const characters = [...new Set((Array.isArray(entry?.characters)?entry.characters:[]).map(x=>String(x||'').trim().slice(0,60)).filter(Boolean))].slice(0,30);
-                out.push({id,name,characters,note:String(entry?.note||'').trim().slice(0,180)});
-            });
-            return out;
-        }
         function cloneCategories(categories) { return (Array.isArray(categories) ? categories : []).map(c => ({ id: String(c.id || ''), group: String(c.group || 'Weeklies'), name: String(c.name || ''), color: String(c.color || '#ffffff'), tasks: Array.isArray(c.tasks) ? [...c.tasks] : [] })); }
         function normalizeColor(value, fallback = '#7aa2f7') { const color = String(value || '').trim(); return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback; }
 
@@ -1756,6 +1846,20 @@
             });
         }
         
+        function normalizeMemberDirectory(value) {
+            const source = Array.isArray(value) ? value : [];
+            const seen = new Set();
+            return source.map((member, index) => {
+                const name = String(member?.name || '').trim().slice(0, 60);
+                const key = name.toLowerCase();
+                if (!name || seen.has(key)) return null;
+                seen.add(key);
+                const characters = [...new Set((Array.isArray(member?.characters) ? member.characters : []).map(x => String(x || '').trim().slice(0, 40)).filter(Boolean))].slice(0, 100);
+                const id = String(member?.id || `member-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '') || `member-${index}`;
+                return { id, name, characters, note: String(member?.note || '').trim().slice(0, 160) };
+            }).filter(Boolean);
+        }
+
         function normalizeCategories(value) {
             const source = Array.isArray(value) && value.length > 0 ? value : DEFAULT_CATEGORIES;
             const seenTasks = new Set();
@@ -2042,11 +2146,12 @@
             merged.settings.rosters = cloneRosters(rSrc.rosters);
             merged.settings.rosterUpdatedAt = rSrc.rosterUpdatedAt; merged.settings.rosterUpdatedBy = rSrc.rosterUpdatedBy;
 
-            const lmTime = Number(local.settings.memberDirectoryUpdatedAt)||0, rmTime = Number(remote.settings.memberDirectoryUpdatedAt)||0;
-            const mSrc = (lmTime > rmTime || (lmTime === rmTime && String(local.settings.memberDirectoryUpdatedBy) >= String(remote.settings.memberDirectoryUpdatedBy))) ? local.settings : remote.settings;
-            merged.settings.memberDirectory = normalizeMemberDirectory(mSrc.memberDirectory);
-            merged.settings.memberDirectoryUpdatedAt = mSrc.memberDirectoryUpdatedAt; merged.settings.memberDirectoryUpdatedBy = mSrc.memberDirectoryUpdatedBy;
-            
+            const lmdTime = Number(local.settings.memberDirectoryUpdatedAt) || 0, rmdTime = Number(remote.settings.memberDirectoryUpdatedAt) || 0;
+            const mdSrc = (lmdTime > rmdTime || (lmdTime === rmdTime && String(local.settings.memberDirectoryUpdatedBy) >= String(remote.settings.memberDirectoryUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.memberDirectory = normalizeMemberDirectory(mdSrc.memberDirectory);
+            merged.settings.memberDirectoryUpdatedAt = Math.max(lmdTime, rmdTime);
+            merged.settings.memberDirectoryUpdatedBy = String(mdSrc.memberDirectoryUpdatedBy || '');
+
             const lcTime = Number(local.settings.categoriesUpdatedAt) || 0, rcTime = Number(remote.settings.categoriesUpdatedAt) || 0;
             const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
             merged.settings.categories = cloneCategories(cSrc.categories);
@@ -2144,36 +2249,33 @@
         function getGlobalImpactSnapshot(data = cloudData) {
             const settings = data.settings || {};
             const rosters = cloneRosters(settings.rosters || []).map(r => ({ id:r.id, name:r.name, color:r.color, characters:[...r.characters] }));
-            const memberDirectory = normalizeMemberDirectory(settings.memberDirectory || []).map(m => ({ id:m.id, name:m.name, characters:[...m.characters], note:m.note }));
             const categories = cloneCategories(settings.categories || []).map(c => ({ id:c.id, group:c.group, name:c.name, color:c.color, tasks:[...c.tasks] }));
             const characterJobs = normalizeCharacterJobs(settings.characterJobs || {});
             const jobProfiles = normalizeJobProfiles(settings.jobProfiles || {});
             const lootWeights = {};
             Object.keys(settings.lootWeights || {}).sort().forEach(k => { lootWeights[k] = clampWeight(settings.lootWeights[k]); });
-            return { rosters, memberDirectory, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
+            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
         }
         function getGlobalImpactSignature(data = cloudData) { return JSON.stringify(getGlobalImpactSnapshot(data)); }
         function sameValue(a,b){try{return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b);}catch(e){return false;}}
         function mapById(items){const map=new Map();for(const item of Array.isArray(items)?items:[])if(item?.id)map.set(String(item.id),item);return map;}
         function diffObjectMaps(beforeObj,afterObj){const out=[],b=safeObject(beforeObj),a=safeObject(afterObj);for(const key of [...new Set([...Object.keys(b),...Object.keys(a)])].sort()){const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null,av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;if(!sameValue(bv,av))out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});}return out;}
         function diffGlobalImpact(before,after){
-            const b=safeObject(before),a=safeObject(after),patch={rosters:[],memberDirectory:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
+            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
             const bR=mapById(b.rosters),aR=mapById(a.rosters);for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;if(!sameValue(bv,av))patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
-            const bM=mapById(b.memberDirectory),aM=mapById(a.memberDirectory);for(const id of [...new Set([...bM.keys(),...aM.keys()])].sort()){const bv=bM.has(id)?bM.get(id):null,av=aM.has(id)?aM.get(id):null;if(!sameValue(bv,av))patch.memberDirectory.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             const bC=mapById(b.categories),aC=mapById(a.categories);for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;if(!sameValue(bv,av))patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
             const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;if(!sameValue(bv,av))patch.lootWeights.push({key,before:bv,after:av});}
             if(b.splitPartyMechanic!==a.splitPartyMechanic)patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
             return patch;
         }
-        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.memberDirectory?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.splitPartyMechanic);}
+        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.splitPartyMechanic);}
 
         function normalizeRevisionEntry(entry){
             if(!entry||!entry.id)return null;
             const e={id:String(entry.id),at:Number(entry.at)||0,by:String(entry.by||''),label:String(entry.label||'Global change').slice(0,140),kind:String(entry.kind||'global-change'),signature:String(entry.signature||'')};
             if(entry.patch&&typeof entry.patch==='object'){const p=entry.patch;e.patch={
                 rosters:Array.isArray(p.rosters)?p.rosters.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
-                memberDirectory:Array.isArray(p.memberDirectory)?p.memberDirectory.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
                 categories:Array.isArray(p.categories)?p.categories.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
                 characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
                 jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
@@ -2200,7 +2302,6 @@
         function describeGlobalPatch(p){
             const labels=[];
             for(const item of p?.rosters||[]){const b=item.before,a=item.after; if(!b&&a){labels.push(`Added roster ${a.name}`);continue;} if(b&&!a){labels.push(`Removed roster ${b.name}`);continue;} if(b&&a){const bc=new Set(b.characters||[]),ac=new Set(a.characters||[]),added=[...(ac)].filter(x=>!bc.has(x)),removed=[...(bc)].filter(x=>!ac.has(x));if(added.length===1)labels.push(`Added ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed ${removed[0]} from ${b.name}`);else if(String(b.name)!==String(a.name))labels.push(`Renamed roster ${b.name} → ${a.name}`);else labels.push(`Updated roster ${a.name}`);}}
-            for(const item of p?.memberDirectory||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Added member ${a.name}`);else if(b&&!a)labels.push(`Removed member ${b.name}`);else if(b&&a)labels.push(`Updated member ${a.name}`);}
             for(const item of p?.categories||[]){const b=item.before,a=item.after;if(!b&&a){labels.push(`Added dungeon category ${a.name}`);continue;}if(b&&!a){labels.push(`Removed dungeon category ${b.name}`);continue;}if(b&&a){const bt=new Set(b.tasks||[]),at=new Set(a.tasks||[]),added=[...(at)].filter(x=>!bt.has(x)),removed=[...(bt)].filter(x=>!at.has(x));if(added.length===1)labels.push(`Added dungeon task ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed dungeon task ${removed[0]} from ${b.name}`);else labels.push(`Updated dungeon category ${a.name}`);}}
             for(const item of p?.characterJobs||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Set Job for ${item.key} to ${a.job||'Unassigned'}`);else if(b&&!a)labels.push(`Cleared Job for ${item.key}`);else labels.push(`Changed Job for ${item.key} to ${a?.job||'Unassigned'}`);}
             if(p?.jobProfiles?.length)labels.push('Updated Job / Role settings');
@@ -2323,14 +2424,13 @@
             box.innerHTML=html;openModal('revision-detail-modal');
         }
 
-        async function recoverPatchSlice(id,type,itemId,direction){if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);try{const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(journal.revisions||[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry?.patch?.[type])throw new Error('Revision detail not found.');const item=(entry.patch[type]||[]).find(x=>(x.id||x.key)===itemId);if(!item)throw new Error('Selected item not found.');const one={rosters:[],memberDirectory:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};one[type]=[item];if(direction!=='before'&&direction!=='after')throw new Error('Invalid recovery direction.');const expected=direction==='before'?item.after:item.before;let cur=null;if(type==='rosters')cur=(current.settings.rosters||[]).find(x=>x.id===item.id)||null;else if(type==='memberDirectory')cur=(current.settings.memberDirectory||[]).find(x=>x.id===item.id)||null;else if(type==='categories')cur=(current.settings.categories||[]).find(x=>x.id===item.id)||null;if(!sameValue(cur,expected)&&!confirm('This item has changed since this revision. Recover it anyway?'))return;const beforeSnap=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,one,direction);restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok)throw new Error(`Recovery failed (${res.status})`);cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));const afterSnap=cloneDataObject(getGlobalImpactSnapshot(cloudData));const safety=diffGlobalImpact(afterSnap,beforeSnap);if(!patchIsEmpty(safety)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before selective recovery · ${entry.label}`,'global-change',safety,getGlobalImpactSignature(cloudData)));}setStatus(`🟢 Recovered ${type==='rosters'?'roster':'dungeon category'} from ${direction} state`);closeModal('revision-detail-modal');refreshTrackerUI();await loadVersionHistory(false);}catch(err){setStatus(`🔴 Recovery failed: ${err.message}`);alert(`Recovery failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}}
+        async function recoverPatchSlice(id,type,itemId,direction){if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);try{const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(journal.revisions||[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry?.patch?.[type])throw new Error('Revision detail not found.');const item=(entry.patch[type]||[]).find(x=>(x.id||x.key)===itemId);if(!item)throw new Error('Selected item not found.');const one={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};one[type]=[item];if(direction!=='before'&&direction!=='after')throw new Error('Invalid recovery direction.');const expected=direction==='before'?item.after:item.before;let cur=null;if(type==='rosters')cur=(current.settings.rosters||[]).find(x=>x.id===item.id)||null;else if(type==='categories')cur=(current.settings.categories||[]).find(x=>x.id===item.id)||null;if(!sameValue(cur,expected)&&!confirm('This item has changed since this revision. Recover it anyway?'))return;const beforeSnap=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,one,direction);restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok)throw new Error(`Recovery failed (${res.status})`);cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));const afterSnap=cloneDataObject(getGlobalImpactSnapshot(cloudData));const safety=diffGlobalImpact(afterSnap,beforeSnap);if(!patchIsEmpty(safety)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before selective recovery · ${entry.label}`,'global-change',safety,getGlobalImpactSignature(cloudData)));}setStatus(`🟢 Recovered ${type==='rosters'?'roster':'dungeon category'} from ${direction} state`);closeModal('revision-detail-modal');refreshTrackerUI();await loadVersionHistory(false);}catch(err){setStatus(`🔴 Recovery failed: ${err.message}`);alert(`Recovery failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}}
         function recoverRosterFromRevision(id,itemId,direction){return recoverPatchSlice(id,'rosters',itemId,direction);}
         function recoverCategoryFromRevision(id,itemId,direction){return recoverPatchSlice(id,'categories',itemId,direction);}
 
         function applyGlobalPatch(data,patch,direction='before'){
             const p=patch||{},now=Date.now();
             if(Array.isArray(p.rosters)){for(const item of p.rosters){const value=direction==='before'?item.before:item.after;data.settings.rosters=cloneRosters(data.settings.rosters||[]).filter(r=>r.id!==item.id);if(value)data.settings.rosters.push(cloneDataObject(value));}data.settings.rosters=normalizeRosters(data.settings.rosters);data.settings.rosterUpdatedAt=now;data.settings.rosterUpdatedBy=deviceId;}
-            if(Array.isArray(p.memberDirectory)){for(const item of p.memberDirectory){const value=direction==='before'?item.before:item.after;data.settings.memberDirectory=normalizeMemberDirectory(data.settings.memberDirectory||[]).filter(m=>m.id!==item.id);if(value)data.settings.memberDirectory.push(cloneDataObject(value));}data.settings.memberDirectory=normalizeMemberDirectory(data.settings.memberDirectory);data.settings.memberDirectoryUpdatedAt=now;data.settings.memberDirectoryUpdatedBy=deviceId;}
             if(Array.isArray(p.categories)){for(const item of p.categories){const value=direction==='before'?item.before:item.after;data.settings.categories=cloneCategories(data.settings.categories||[]).filter(c=>c.id!==item.id);if(value)data.settings.categories.push(cloneDataObject(value));}data.settings.categories=normalizeCategories(data.settings.categories);data.settings.categoriesUpdatedAt=now;data.settings.categoriesUpdatedBy=deviceId;}
             if(Array.isArray(p.characterJobs)){const jobs=normalizeCharacterJobs(data.settings.characterJobs||{});for(const item of p.characterJobs){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete jobs[item.key];else jobs[item.key]=cloneDataObject(value);}data.settings.characterJobs=normalizeCharacterJobs(jobs);}
             if(Array.isArray(p.jobProfiles)){const prof=normalizeJobProfiles(data.settings.jobProfiles||{});for(const item of p.jobProfiles){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete prof[item.key];else prof[item.key]=cloneDataObject(value);}data.settings.jobProfiles=normalizeJobProfiles(prof);data.settings.jobProfilesUpdatedAt=now;data.settings.jobProfilesUpdatedBy=deviceId;}
@@ -2341,7 +2441,6 @@
         function patchConflictsWithCurrent(data,patch,direction='before'){
             const p=patch||{},conflicts=[];const check=(label,current,expected)=>{if(!sameValue(current,expected))conflicts.push(label);};
             for(const item of p.rosters||[]){const cur=(data.settings.rosters||[]).find(r=>r.id===item.id)||null;check(`Roster ${item.id}`,cur,direction==='before'?item.after:item.before);}
-            for(const item of p.memberDirectory||[]){const cur=(data.settings.memberDirectory||[]).find(m=>m.id===item.id)||null;check(`Member ${item.id}`,cur,direction==='before'?item.after:item.before);}
             for(const item of p.categories||[]){const cur=(data.settings.categories||[]).find(c=>c.id===item.id)||null;check(`Category ${item.id}`,cur,direction==='before'?item.after:item.before);}
             const jobs=safeObject(data.settings.characterJobs);for(const item of p.characterJobs||[]){check(`Job ${item.key}`,Object.prototype.hasOwnProperty.call(jobs,item.key)?jobs[item.key]:undefined,direction==='before'?item.after:item.before);}
             const prof=safeObject(data.settings.jobProfiles);for(const item of p.jobProfiles||[]){check(`Profile ${item.key}`,Object.prototype.hasOwnProperty.call(prof,item.key)?prof[item.key]:undefined,direction==='before'?item.after:item.before);}
@@ -2411,20 +2510,16 @@
         function triggerAutoSync() { persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
 
         document.addEventListener('DOMContentLoaded', () => {
+            hydrateCardWikiData();
             loadCloudForm();
             populateRegistrationJobSelect();
-            document.getElementById('card-wiki-presets')?.addEventListener('change', event => {
-            const input=event.target.closest('input[data-card-preset]'); if(input)applyCardWikiPreset(input.dataset.cardPreset,input.checked);
-        });
-        document.getElementById('member-directory-form')?.addEventListener('submit', saveMemberDirectoryEntry);
-        document.getElementById('member-directory-cancel')?.addEventListener('click', resetMemberDirectoryForm);
-        document.getElementById('member-directory-search')?.addEventListener('input', renderMemberDirectory);
-        document.getElementById('member-directory-list')?.addEventListener('click', event => {
-            const edit=event.target.closest('[data-member-edit]'); if(edit){editMemberDirectoryRow(edit.dataset.memberEdit);return;}
-            const remove=event.target.closest('[data-member-remove]'); if(remove)removeMemberDirectoryEntry(remove.dataset.memberRemove);
-        });
-        window.addEventListener('hashchange', handlePageRoute);
-            loadLiveTracker().then(handlePageRoute);
+            window.addEventListener('hashchange', handlePageRoute);
+            loadLiveTracker().then(() => {
+                const routeHash = location.hash;
+                if (['#registration', '#dungeons', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
+                else applySavedLandingPage();
+                initializeWelcomeModal();
+            }).catch(() => { applySavedLandingPage(); initializeWelcomeModal(); });
         });
 
         function rateElementId(charName) { return `rate-${encodeURIComponent(charName)}`; }
@@ -2450,6 +2545,7 @@
             renderAnalytics();
             updateClassSetupSummary();
             renderTeamBuilder();
+            renderMemberDirectory();
         }
 
         function buildTrackerTable() {
@@ -2473,7 +2569,7 @@
                 colgroup.innerHTML = `<col style="width: 80px;"><col style="width: 150px;"><col style="width: 210px;">` + characters.map(() => `<col>`).join('');
             }
             
-            rosterRow.innerHTML = '<th rowspan="2" colspan="3" class="tracker-title">DN Tracker</th>';
+            rosterRow.innerHTML = `<th rowspan="2" colspan="3" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker &amp; Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>`;
             headerRow.innerHTML = '';
             footerRow.innerHTML = '<th colspan="3" class="bg-dark">Weekly Completion Rate</th>';
             tbody.innerHTML = '';
@@ -2694,7 +2790,21 @@
                 trimWeeklyArchive();
             }
             const ts = Date.now();
-            getAllKnownCharacterNames().forEach(c => weeklyTaskNames.forEach(t => { const s = getCellState(c, t); if(s!=='open'&&s!=='excluded') setCellState(c, t, 'open', ts); }));
+            const bountyCategory = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
+            const bountyTasks = new Set(bountyCategory?.tasks || []);
+            getAllKnownCharacterNames().forEach(c => {
+                weeklyTaskNames.forEach(t => {
+                    const s = getCellState(c, t);
+                    if (s !== 'open' && s !== 'excluded') setCellState(c, t, 'open', ts);
+                });
+                // Clear every bounty target field even if an admin has accidentally marked its category as Daily.
+                bountyTasks.forEach(t => {
+                    if (!getCellRecord(c, t).note) return;
+                    setCellNote(c, t, '');
+                    const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(t)}"]`);
+                    if (input) input.value = '';
+                });
+            });
         }
 
         async function manualDailyReset() { if (!confirm('Force Daily Reset?')) return; executeDailyReset(); cloudData.lastDailyReset = getTargetResetTimeUTC(false); applyBoardState(); triggerAutoSync(); }
@@ -2825,17 +2935,40 @@
             const sel = document.getElementById('registration-roster-select'), list = document.getElementById('roster-management-list');
             if(!sel||!list) return;
             populateRegistrationJobSelect();
-            const cur = sel.value; sel.innerHTML = '<option value="__new__">＋ Create new group</option>' + getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
-            sel.value = getRosters().some(r => r.id === cur) ? cur : '__new__'; handleRegistrationRosterChange(false);
+            const cur = sel.value;
+            const trackerOptions = getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
+            const trackerOwnerNames = new Set(getRosters().map(r => r.name.trim().toLowerCase()));
+            const directoryOwners = normalizeMemberDirectory(cloudData.settings.memberDirectory).filter(m => !trackerOwnerNames.has(m.name.trim().toLowerCase()));
+            const directoryOptions = directoryOwners.length ? `<optgroup label="Member Roster · not yet tracking">${directoryOwners.map(m => `<option value="__member__:${escapeHTML(m.id)}">${escapeHTML(m.name)} · Member Roster</option>`).join('')}</optgroup>` : '';
+            sel.innerHTML = '<option value="__new__">＋ Create new group</option>' + trackerOptions + directoryOptions;
+            const validMemberSelection = cur.startsWith('__member__:') && directoryOwners.some(m => `__member__:${m.id}` === cur);
+            sel.value = getRosters().some(r => r.id === cur) || validMemberSelection ? cur : '__new__'; handleRegistrationRosterChange(false);
             list.innerHTML = getRosters().length ? getRosters().map(r => `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><input class="roster-name-input" data-roster-name="${escapeHTML(r.id)}" maxlength="30" value="${escapeHTML(r.name)}"><input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save</button><button class="btn btn-danger" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Remove</button></div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="true" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')">×</button></span>`).join('') : '<div style="color:#aaa;">No characters yet.</div>'}</div></div>`).join('') : '<div style="color:#aaa;">No groups yet.</div>';
             attachDragDropListeners();
         }
 
         function handleRegistrationRosterChange(reset=true) {
-            const isNew = document.getElementById('registration-roster-select').value === '__new__';
-            document.getElementById('registration-new-owner-fields').style.display = isNew ? 'grid' : 'none';
-            if(isNew) { if(reset){ document.getElementById('registration-owner-name').value=''; document.getElementById('registration-color').value='#7aa2f7'; } document.getElementById('registration-color').disabled=false; }
-            else { const r = findRoster(document.getElementById('registration-roster-select').value); if(r) document.getElementById('registration-color').value=r.color; document.getElementById('registration-color').disabled=true; }
+            const choice = document.getElementById('registration-roster-select').value;
+            const isNew = choice === '__new__';
+            const isDirectoryOwner = choice.startsWith('__member__:');
+            const ownerFields = document.getElementById('registration-new-owner-fields');
+            const ownerInput = document.getElementById('registration-owner-name');
+            const colorInput = document.getElementById('registration-color');
+            ownerFields.style.display = isNew ? 'grid' : 'none';
+            if (isNew) {
+                if (reset) { ownerInput.value = ''; colorInput.value = '#7aa2f7'; }
+                colorInput.disabled = false;
+            } else if (isDirectoryOwner) {
+                const id = choice.slice('__member__:'.length);
+                const member = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(m => m.id === id);
+                ownerInput.value = member?.name || '';
+                colorInput.value = '#7aa2f7';
+                colorInput.disabled = true;
+            } else {
+                const r = findRoster(choice);
+                if (r) colorInput.value = r.color;
+                colorInput.disabled = true;
+            }
         }
 
         async function registerCharacter() {
@@ -2844,19 +2977,28 @@
             const job = document.getElementById('registration-job')?.value || '';
             if (!job) return alert("Choose the character's Class / Job. Team Builder uses this to determine roles and raid position.");
             const rosterChoice = document.getElementById('registration-roster-select').value;
-            const ownerName = document.getElementById('registration-owner-name')?.value.trim() || '';
+            const ownerNameInput = document.getElementById('registration-owner-name')?.value.trim() || '';
             const color = normalizeColor(document.getElementById('registration-color')?.value, '#7aa2f7');
             const name = v.slice(0,40);
+            const isDirectoryOwner = rosterChoice.startsWith('__member__:');
+            const selectedDirectoryMember = isDirectoryOwner ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(m => m.id === rosterChoice.slice('__member__:'.length)) : null;
+            const selectedRoster = !isDirectoryOwner && rosterChoice !== '__new__' ? findRoster(rosterChoice) : null;
+            const ownerName = selectedDirectoryMember?.name || ownerNameInput;
             if (rosterChoice === '__new__' && !ownerName) return alert('Enter owner.');
-            const selectedRoster = rosterChoice === '__new__' ? null : findRoster(rosterChoice);
+            if (isDirectoryOwner && !selectedDirectoryMember) return alert('That Member Roster entry no longer exists. Refresh and try again.');
             const targetOwner = selectedRoster?.name || ownerName.slice(0,30) || 'new roster';
             if (!(await prepareGlobalChange(`Added ${name} to ${targetOwner}`))) return;
             // Re-check after refreshing to the latest shared state.
             if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === name.toLowerCase()))) return alert('Character was already added by another device.');
             let r;
-            if (rosterChoice === '__new__') {
-                r = { id: `roster-${Date.now().toString(36)}`, name: ownerName.slice(0,30), color, characters: [] };
-                getRosters().push(r);
+            if (rosterChoice === '__new__' || isDirectoryOwner) {
+                const desiredOwner = ownerName.slice(0,30);
+                const existingOwner = getRosters().find(group => group.name.trim().toLowerCase() === desiredOwner.toLowerCase());
+                if (existingOwner) r = existingOwner;
+                else {
+                    r = { id: `roster-${Date.now().toString(36)}`, name: desiredOwner, color, characters: [] };
+                    getRosters().push(r);
+                }
             } else {
                 r = findRoster(rosterChoice);
                 if (!r) return alert('That owner group no longer exists. Refresh the tracker and try again.');
@@ -3743,12 +3885,13 @@
         let cardWikiActiveDetailNumber = null;
         let cardWikiSelectedStats = [];
         let cardWikiActivePreset = '';
+        let editingMemberDirectoryId = null;
+        let editingMemberDirectoryOriginalName = '';
         const CARD_WIKI_PRESETS = {
-            magic: ['Magic Attk','Int','Final Damage'],
-            physical: ['Attk Power','Str','Agi','Final Damage'],
-            defensive: ['Defense','Magic Def','Vit','Max HP']
+            magic: ['Magic Attk', 'Int', 'Final Damage'],
+            physical: ['Attk Power', 'Str', 'Agi', 'Final Damage'],
+            defensive: ['Defense', 'Magic Def', 'Vit', 'Max HP']
         };
-        let memberDirectoryEditingId = null;
 
         const CARD_WIKI_STAT_LABELS = {
             'Attk Power':'PATK', 'Magic Attk':'MATK', 'Magic Def':'Magic Defense',
@@ -3766,11 +3909,79 @@
             'Desert Dragon Nest':60, 'Guardian Nest':60, 'Mysterious Resting Place (Tomb Invader)':60,
             'Mist Nest':60, 'Black Dragon Nest':70
         };
-        function cardWikiStatLabel(name) { return CARD_WIKI_STAT_LABELS[name] || name; }
-        function cardWikiCardCap(card) { return CARD_WIKI_CAPS[card.nest] || 70; }
-        function cardWikiCapName(cap) {
-            return ({40:'Sea Dragon and below',50:'Green Dragon and below',60:'Desert Dragon and below',70:'Black Dragon and below'})[Number(cap)] || 'Black Dragon and below';
+        const CARD_WIKI_BASE_DATA = CARD_WIKI_DATA.slice();
+        const CARD_WIKI_BATCH_STORAGE_KEY = 'pantheon-card-database-batches-v1';
+        function isValidCardWikiRecord(card) {
+            if (!card || !Number.isInteger(Number(card.number)) || Number(card.number) < 1 || !String(card.name || '').trim() || !String(card.nest || '').trim()) return false;
+            const cap = Number(card.levelCap) || CARD_WIKI_CAPS[card.nest] || 0;
+            if (![40, 50, 60, 70].includes(cap)) return false;
+            if (!Array.isArray(card.stats) || !card.stats.length) return false;
+            return card.stats.every(stat => stat && String(stat.name || '').trim() && Array.isArray(stat.values) && stat.values.length === 5 && stat.values.every(value => Number.isFinite(Number(value))));
         }
+        function loadCardWikiBatches() {
+            let stored;
+            try { stored = JSON.parse(localStorage.getItem(CARD_WIKI_BATCH_STORAGE_KEY) || '[]'); } catch (e) { return []; }
+            if (!Array.isArray(stored)) return [];
+            const usedNumbers = new Set(CARD_WIKI_BASE_DATA.map(card => Number(card.number)));
+            const valid = [];
+            stored.forEach(batch => {
+                if (!batch || typeof batch.id !== 'string' || !String(batch.name || '').trim() || !Array.isArray(batch.cards) || !batch.cards.length) return;
+                const numbers = batch.cards.map(card => Number(card?.number));
+                if (!batch.cards.every(isValidCardWikiRecord) || numbers.some(number => usedNumbers.has(number)) || new Set(numbers).size !== numbers.length) return;
+                numbers.forEach(number => usedNumbers.add(number));
+                valid.push({ id: batch.id, name: String(batch.name).trim(), addedAt: Number(batch.addedAt) || 0, cards: batch.cards.map(card => ({ ...card, number: Number(card.number), levelCap: Number(card.levelCap) || CARD_WIKI_CAPS[card.nest], stats: card.stats.map(stat => ({ name: String(stat.name).trim(), values: stat.values.map(Number) })) })) });
+            });
+            return valid;
+        }
+        let cardWikiBatches = loadCardWikiBatches();
+        function hydrateCardWikiData() {
+            CARD_WIKI_DATA.splice(0, CARD_WIKI_DATA.length, ...CARD_WIKI_BASE_DATA, ...cardWikiBatches.flatMap(batch => batch.cards.map(card => ({ ...card, stats: card.stats.map(stat => ({ ...stat, values: [...stat.values] })) }))));
+            const count = document.getElementById('card-wiki-count');
+            if (count) count.textContent = `${CARD_WIKI_DATA.length} cards`;
+        }
+        function persistCardWikiBatches() {
+            try { localStorage.setItem(CARD_WIKI_BATCH_STORAGE_KEY, JSON.stringify(cardWikiBatches)); return true; }
+            catch (e) { alert('Could not save the batch. Browser storage may be full. Export your batches and free some local storage.'); return false; }
+        }
+        function renderCardWikiBatchList() {
+            const list = document.getElementById('card-wiki-batch-list');
+            if (!list) return;
+            list.innerHTML = cardWikiBatches.length ? cardWikiBatches.map(batch => `<div class="card-wiki-batch-row"><div><strong>${escapeHTML(batch.name)}</strong><small>${batch.cards.length} cards · saved in this browser only</small></div><button class="btn btn-secondary" type="button" data-remove-card-batch="${escapeHTML(batch.id)}">Remove</button></div>`).join('') : '<div class="member-directory-empty">No custom batches yet. Imported card updates will appear here.</div>';
+        }
+        function openCardWikiBatches() { renderCardWikiBatchList(); openModal('card-wiki-batches-modal'); }
+        function importCardWikiBatch(event) {
+            event.preventDefault();
+            const name = document.getElementById('card-wiki-batch-name').value.trim();
+            let parsed;
+            try { parsed = JSON.parse(document.getElementById('card-wiki-batch-json').value); }
+            catch (e) { alert('The JSON is invalid. Check quotes, commas, and brackets.'); return; }
+            const cards = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.cards) ? parsed.cards : null);
+            if (!name || !cards || !cards.length) { alert('Enter a batch name and a non-empty JSON array of cards.'); return; }
+            if (!cards.every(isValidCardWikiRecord)) { alert('Each card needs a unique numeric number, name, nest/pool label, levelCap (40, 50, 60, or 70), and stats. Each stat needs five numeric values.'); return; }
+            const existing = new Set(CARD_WIKI_DATA.map(card => Number(card.number)));
+            const numbers = cards.map(card => Number(card.number));
+            if (numbers.some(number => existing.has(number)) || new Set(numbers).size !== numbers.length) { alert('Card numbers must be unique across the built-in database and all saved batches.'); return; }
+            cardWikiBatches.push({ id: `batch-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`, name, addedAt: Date.now(), cards: cards.map(card => ({ ...card, number: Number(card.number), levelCap: Number(card.levelCap) || CARD_WIKI_CAPS[card.nest], stats: card.stats.map(stat => ({ name: String(stat.name).trim(), values: stat.values.map(Number) })) })) });
+            if (!persistCardWikiBatches()) { cardWikiBatches.pop(); return; }
+            hydrateCardWikiData(); renderCardWikiStatOptions(); renderCardWiki(); renderCardWikiBatchList();
+            document.getElementById('card-wiki-batch-form').reset();
+        }
+        function removeCardWikiBatch(id) {
+            const batch = cardWikiBatches.find(item => item.id === String(id));
+            if (!batch || !confirm(`Remove local batch "${batch.name}"?`)) return;
+            const previousBatches = cardWikiBatches;
+            cardWikiBatches = cardWikiBatches.filter(item => item.id !== String(id));
+            if (!persistCardWikiBatches()) { cardWikiBatches = previousBatches; return; }
+            hydrateCardWikiData(); renderCardWikiStatOptions(); renderCardWiki(); renderCardWikiBatchList();
+        }
+        function exportCardWikiBatches() {
+            const blob = new Blob([JSON.stringify(cardWikiBatches, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob); const link = document.createElement('a');
+            link.href = url; link.download = 'pantheon-card-database-batches.json'; link.click(); URL.revokeObjectURL(url);
+        }
+        function cardWikiStatLabel(name) { return CARD_WIKI_STAT_LABELS[name] || name; }
+        function cardWikiCardCap(card) { return Number(card.levelCap) || CARD_WIKI_CAPS[card.nest] || 70; }
+        function cardWikiCapName(range) { return ({'70':'Level 70 and below','50-60':'Level 50 - 60','40-50':'Level 40 - 50'})[String(range)] || 'Level 70 and below'; }
         function getCardWikiCard(number) { return CARD_WIKI_DATA.find(c => c.number === Number(number)); }
         function cardWikiTierIndex() { return Math.max(0, Math.min(4, Number(document.getElementById('card-wiki-preview-rarity')?.value ?? 4))); }
         function cardWikiRarity() { return CARD_WIKI_RARITIES[cardWikiTierIndex()]; }
@@ -3784,35 +3995,37 @@
             renderCardWikiStatOptions();
             renderCardWiki();
         }
-        function renderCardWikiPresetChecks() {
-            document.querySelectorAll('input[data-card-preset]').forEach(input => { input.checked = input.dataset.cardPreset === cardWikiActivePreset; });
+        function updateCardWikiPresetChecks() {
+            document.querySelectorAll('[data-card-wiki-preset]').forEach(input => { input.checked = input.dataset.cardWikiPreset === cardWikiActivePreset; });
         }
         function applyCardWikiPreset(name, checked) {
             if (checked) {
                 cardWikiActivePreset = name;
                 cardWikiSelectedStats = [...(CARD_WIKI_PRESETS[name] || [])];
-                const mode = document.getElementById('card-wiki-match-mode'); if (mode) mode.value = 'all';
+                const mode = document.getElementById('card-wiki-match-mode'); if (mode) mode.value = 'any';
             } else if (cardWikiActivePreset === name) {
                 cardWikiActivePreset = '';
                 cardWikiSelectedStats = [];
             }
-            renderCardWikiPresetChecks();
+            updateCardWikiPresetChecks();
             renderCardWikiStatOptions();
             renderCardWiki();
         }
         function toggleCardWikiStatFilter(rawName, checked) {
+            cardWikiActivePreset = '';
+            updateCardWikiPresetChecks();
             if (checked) {
                 if (!cardWikiSelectedStats.includes(rawName)) cardWikiSelectedStats.push(rawName);
             } else {
                 cardWikiSelectedStats = cardWikiSelectedStats.filter(s => s !== rawName);
             }
-            cardWikiActivePreset = '';
-            renderCardWikiPresetChecks();
             renderCardWikiStatOptions();
             renderCardWiki();
         }
         function clearCardWikiStatFilters() {
             cardWikiSelectedStats = [];
+            cardWikiActivePreset = '';
+            updateCardWikiPresetChecks();
             const q = document.getElementById('card-wiki-stat-search'); if (q) q.value = '';
             renderCardWikiStatOptions();
             renderCardWiki();
@@ -3820,7 +4033,7 @@
         function cardWikiStatGroupFor(name) {
             if (name === 'Attk Power' || name === 'Magic Attk') return 'offensive';
             if (name === 'Str' || name === 'Agi' || name === 'Int') return 'stats';
-            if (['Defense','Magic Def','Vit','Max HP'].includes(name)) return 'defensive';
+            if (['Defense', 'Magic Def', 'Vit', 'Max HP'].includes(name)) return 'defensive';
             return 'other';
         }
         function renderCardWikiStatOptions() {
@@ -3858,18 +4071,21 @@
             if (statSearch) statSearch.value = '';
             cardWikiSelectedStats = [];
             cardWikiActivePreset = '';
-            renderCardWikiPresetChecks();
+            updateCardWikiPresetChecks();
             renderCardWikiStatOptions();
             renderCardWiki();
         }
         function getFilteredCardWikiCards() {
             const query = (document.getElementById('card-wiki-search')?.value || '').trim().toLowerCase();
-            const maxCap = Number(document.getElementById('card-wiki-level-cap')?.value || 70);
+            const range = document.getElementById('card-wiki-level-cap')?.value || '70';
             const sort = document.getElementById('card-wiki-sort')?.value || 'number';
             const mode = document.getElementById('card-wiki-match-mode')?.value || 'any';
             const selected = [...cardWikiSelectedStats];
             const out = CARD_WIKI_DATA.filter(card => {
-                if (cardWikiCardCap(card) > maxCap) return false;
+                const cap = cardWikiCardCap(card);
+                if (range === '40-50' && (cap < 40 || cap > 50)) return false;
+                if (range === '50-60' && (cap < 50 || cap > 60)) return false;
+                if (range === '70' && cap > 70) return false;
                 const cardStatNames = card.stats.map(s => s.name);
                 const matchedCount = selected.filter(name => cardStatNames.includes(name)).length;
                 if (selected.length && mode === 'all' && matchedCount !== selected.length) return false;
@@ -3891,17 +4107,17 @@
             const grid = document.getElementById('card-wiki-grid'); if (!grid) return;
             const cards = getFilteredCardWikiCards(), tier = cardWikiRarity();
             const result = document.getElementById('card-wiki-result-count');
-            const maxCap = Number(document.getElementById('card-wiki-level-cap')?.value || 70);
+            const range = document.getElementById('card-wiki-level-cap')?.value || '70';
             const mode = document.getElementById('card-wiki-match-mode')?.value || 'any';
             if (result) {
                 const selectedLabels = cardWikiSelectedStats.map(cardWikiStatLabel);
-                const filterText = selectedLabels.length ? `${mode === 'all' ? 'all of' : 'one or more of'} ${selectedLabels.join(' + ')}` : 'all build stats';
-                result.textContent = `${cards.length} cards · Level ${maxCap} cap (${cardWikiCapName(maxCap)}) · ${selectedLabels.length ? `matching ${filterText}` : 'choose desired stats to narrow results'} · ${tier.name} values`;
+                const filterText = selectedLabels.length ? `${mode === 'all' ? 'all of' : 'any of'} ${selectedLabels.join(mode === 'all' ? ' + ' : ' OR ')}` : 'all build stats';
+                result.textContent = `${cards.length} cards · ${cardWikiCapName(range)} · ${selectedLabels.length ? `matching ${filterText}` : 'choose desired stats to narrow results'} · ${tier.name} values`;
             }
             const compareButton = document.getElementById('card-wiki-compare-button');
             if (compareButton) { compareButton.textContent = `Compare (${cardWikiCompareNumbers.length}/3)`; compareButton.disabled = cardWikiCompareNumbers.length < 2; }
             if (!cards.length) {
-                grid.innerHTML = `<div class="card-wiki-empty">No cards match these build filters at Level ${maxCap}. Try changing the desired stats, match mode, or level cap.</div>`;
+                grid.innerHTML = `<div class="card-wiki-empty">No cards match these build filters for ${cardWikiCapName(range)}. Try changing the desired stats, match mode, or level range.</div>`;
                 return;
             }
             grid.innerHTML = cards.map(card => {
@@ -3964,74 +4180,196 @@
         }
 
 
-        // ===== Shared Member Directory (independent of tracked characters) =====
-        function getMemberDirectoryRows() {
-            const rows = new Map();
+        function getMemberDirectoryView() {
+            const map = new Map();
             getRosters().forEach(roster => {
-                const key = roster.name.trim().toLowerCase();
-                rows.set(key, { key, name:roster.name, characters:[...roster.characters], note:'', tracked:true, directoryId:'' });
+                const key = String(roster.name || '').trim().toLowerCase();
+                if (!key) return;
+                const existing = map.get(key);
+                const characters = [...new Set([...(existing?.characters || []), ...(roster.characters || [])])];
+                map.set(key, { ...(existing || {}), id: existing?.id || `tracker-${roster.id}`, name: existing?.name || roster.name, characters, color: roster.color || existing?.color || '#7aa2f7', inTracker: true, rosterId: existing?.rosterId || roster.id, recordId: existing?.recordId || '', note: existing?.note || '' });
             });
             normalizeMemberDirectory(cloudData.settings.memberDirectory).forEach(member => {
-                const key = member.name.trim().toLowerCase(), existing = rows.get(key);
-                if (existing) {
-                    existing.characters = [...new Set([...existing.characters, ...member.characters])];
-                    existing.note = member.note || existing.note;
-                    existing.directoryId = member.id;
-                } else rows.set(key, { key, name:member.name, characters:[...member.characters], note:member.note, tracked:false, directoryId:member.id });
+                const key = member.name.trim().toLowerCase();
+                const existing = map.get(key);
+                const characters = [...new Map([...(existing?.characters || []), ...(member.characters || [])].map(name => [name.toLowerCase(), name])).values()];
+                map.set(key, { ...(existing || {}), id: member.id, name: existing?.name || member.name, characters, color: existing?.color || '#7aa2f7', inTracker: Boolean(existing?.inTracker), recordId: member.id, note: member.note || existing?.note || '' });
             });
-            return [...rows.values()].sort((a,b)=>a.name.localeCompare(b.name));
+            return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
         }
         function renderMemberDirectory() {
             const list = document.getElementById('member-directory-list'); if (!list) return;
-            const q = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
-            const rows = getMemberDirectoryRows().filter(row => [row.name,row.note,...row.characters].join(' ').toLowerCase().includes(q));
-            const memberCount = rows.length, charCount = rows.reduce((n,row)=>n+row.characters.length,0);
-            const count = document.getElementById('member-directory-count'); if (count) count.textContent = `${memberCount} member${memberCount===1?'':'s'} · ${charCount} listed character${charCount===1?'':'s'}`;
-            list.innerHTML = rows.length ? rows.map(row => `<article class="member-directory-card"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(row.name)}</h3><div class="member-directory-meta">${row.tracked?'Tracker registered':'Directory only'}${row.note?' · '+escapeHTML(row.note):''}</div></div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(row.key)}">Edit</button>${row.directoryId?`<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(row.directoryId)}">Remove</button>`:''}</div></div><div class="member-directory-char-heading">Owned characters · ${row.characters.length}</div>${row.characters.length?`<div class="member-directory-chars">${row.characters.map(name=>`<span class="member-directory-char">${escapeHTML(name)}</span>`).join('')}</div>`:'<div class="member-directory-meta">No characters listed. This member does not need a tracker registration.</div>'}</article>`).join('') : '<div class="member-directory-empty"><strong>No matching members.</strong><br>Add a guild member above. Characters are optional.</div>';
+            const query = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
+            const all = getMemberDirectoryView();
+            const members = all.filter(member => [member.name, member.note || '', ...(member.characters || [])].join(' ').toLowerCase().includes(query));
+            const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
+            const independentCount = members.filter(member => !member.inTracker).length;
+            const count = document.getElementById('member-directory-count');
+            if (count) count.textContent = `${members.length} members · ${characterCount} listed characters · ${independentCount} directory-only`;
+            list.innerHTML = members.length ? members.map(member => `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Tracker roster' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${member.recordId ? 'Edit' : 'Add details'}</button>${member.recordId ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId)}" title="Remove this directory entry; registered tracker owners will remain listed">Remove</button>` : ''}</div></div><div class="member-directory-chars-title">Characters / aliases</div>${member.characters.length ? `<div class="member-directory-chars">${member.characters.map(name => `<span class="member-directory-char">${escapeHTML(name)}</span>`).join('')}</div>` : '<div class="member-directory-note">No characters listed. This member does not need to register a character to appear here.</div>'}</article>`).join('') : '<div class="member-directory-empty">No members match that search. Add a member above; characters are optional.</div>';
         }
         function resetMemberDirectoryForm() {
-            memberDirectoryEditingId = null;
+            editingMemberDirectoryId = null;
+            editingMemberDirectoryOriginalName = '';
             document.getElementById('member-directory-form')?.reset();
-            const title=document.getElementById('member-directory-form-title'), submit=document.getElementById('member-directory-submit'), cancel=document.getElementById('member-directory-cancel');
-            if(title)title.textContent='Add a guild member'; if(submit)submit.textContent='Add member'; if(cancel)cancel.hidden=true;
+            document.getElementById('member-directory-form-title').textContent = 'Add a guild member';
+            document.getElementById('member-directory-submit').textContent = 'Add member';
+            document.getElementById('member-directory-cancel').hidden = true;
         }
-        function editMemberDirectoryRow(key) {
-            const row=getMemberDirectoryRows().find(item=>item.key===String(key)); if(!row)return;
-            const saved=normalizeMemberDirectory(cloudData.settings.memberDirectory).find(item=>item.name.trim().toLowerCase()===row.key);
-            memberDirectoryEditingId=saved?.id||'';
-            document.getElementById('member-directory-name').value=row.name;
-            document.getElementById('member-directory-characters').value=(saved?.characters||[]).join(', ');
-            document.getElementById('member-directory-note').value=saved?.note||'';
-            document.getElementById('member-directory-form-title').textContent='Edit guild member';
-            document.getElementById('member-directory-submit').textContent='Save changes';
-            document.getElementById('member-directory-cancel').hidden=false;
-            document.getElementById('member-directory-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+        function startMemberDirectoryEdit(name, recordId = '') {
+            const view = getMemberDirectoryView().find(member => member.name.toLowerCase() === String(name).toLowerCase());
+            const record = recordId ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.id === recordId) : null;
+            if (!view) return;
+            editingMemberDirectoryId = record?.id || null;
+            editingMemberDirectoryOriginalName = view.name;
+            document.getElementById('member-directory-name').value = record?.name || view.name;
+            document.getElementById('member-directory-characters').value = (record?.characters || []).join(', ');
+            document.getElementById('member-directory-note').value = record?.note || view.note || '';
+            document.getElementById('member-directory-form-title').textContent = record ? 'Edit member details' : 'Add details for ' + view.name;
+            document.getElementById('member-directory-submit').textContent = record ? 'Save changes' : 'Add details';
+            document.getElementById('member-directory-cancel').hidden = false;
+            document.getElementById('member-directory-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        async function saveMemberDirectoryEntry(event) {
+        async function saveMemberDirectoryForm(event) {
             event.preventDefault();
-            const name=document.getElementById('member-directory-name').value.trim(); if(!name)return;
-            const characters=[...new Set(document.getElementById('member-directory-characters').value.split(/[,;\n]/).map(x=>x.trim().slice(0,60)).filter(Boolean))].slice(0,30);
-            const note=document.getElementById('member-directory-note').value.trim().slice(0,180);
-            if(!await prepareGlobalChange(`Updated member directory: ${name}`)) return;
-            const existing=normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const priorIndex=existing.findIndex(item=>item.id===memberDirectoryEditingId || item.name.trim().toLowerCase()===name.toLowerCase());
-            if(priorIndex>=0) existing[priorIndex]={...existing[priorIndex],name,characters,note};
-            else existing.push({id:`member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`,name,characters,note});
-            cloudData.settings.memberDirectory=normalizeMemberDirectory(existing);
-            cloudData.settings.memberDirectoryUpdatedAt=Date.now(); cloudData.settings.memberDirectoryUpdatedBy=deviceId; cloudData.updatedAt=Date.now();
-            persistLocalData(); resetMemberDirectoryForm(); renderMemberDirectory(); triggerAutoSync();
+            const name = document.getElementById('member-directory-name').value.trim().slice(0, 60);
+            const characters = [...new Set(document.getElementById('member-directory-characters').value.split(/[,;\n]/).map(value => value.trim().slice(0, 40)).filter(Boolean))];
+            const note = document.getElementById('member-directory-note').value.trim().slice(0, 160);
+            if (!name) return alert('Enter a member or owner name.');
+            if (hasCloudConfig() && !(await prepareGlobalChange(`${editingMemberDirectoryId ? 'Update' : 'Add'} member directory entry: ${name}`))) return;
+            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const sameName = entries.find(member => member.name.toLowerCase() === name.toLowerCase() && member.id !== editingMemberDirectoryId);
+            if (sameName) return alert('That member already has a directory entry. Edit the existing entry instead.');
+            const previousOwnerName = editingMemberDirectoryOriginalName.trim();
+            const matchingTrackerOwner = previousOwnerName ? getRosters().find(group => group.name.trim().toLowerCase() === previousOwnerName.toLowerCase()) : null;
+            if (matchingTrackerOwner && matchingTrackerOwner.name.toLowerCase() !== name.toLowerCase()) {
+                const duplicateTrackerOwner = getRosters().find(group => group.id !== matchingTrackerOwner.id && group.name.trim().toLowerCase() === name.toLowerCase());
+                if (duplicateTrackerOwner) return alert('A tracker roster already uses that owner name. Rename one owner first.');
+                matchingTrackerOwner.name = name.slice(0,30);
+                touchRosterSettings();
+            }
+            if (editingMemberDirectoryId) {
+                const index = entries.findIndex(item => item.id === editingMemberDirectoryId);
+                if (index < 0) return alert('That directory entry no longer exists. Refresh the page and try again.');
+                entries[index] = { ...entries[index], name, characters, note };
+            } else {
+                entries.push({ id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters, note });
+            }
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            cloudData.settings.memberDirectoryUpdatedAt = Date.now();
+            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
+            cloudData.updatedAt = Date.now();
+            triggerAutoSync();
+            resetMemberDirectoryForm();
+            renderMemberDirectory();
         }
         async function removeMemberDirectoryEntry(id) {
-            const entry=normalizeMemberDirectory(cloudData.settings.memberDirectory).find(item=>item.id===String(id));
-            if(!entry||!confirm(`Remove ${entry.name} from the extra member directory? Registered tracker owners will still appear.`))return;
-            if(!await prepareGlobalChange(`Removed member directory entry: ${entry.name}`))return;
-            cloudData.settings.memberDirectory=normalizeMemberDirectory(cloudData.settings.memberDirectory).filter(item=>item.id!==String(id));
-            cloudData.settings.memberDirectoryUpdatedAt=Date.now(); cloudData.settings.memberDirectoryUpdatedBy=deviceId; cloudData.updatedAt=Date.now();
-            persistLocalData(); if(memberDirectoryEditingId===String(id))resetMemberDirectoryForm(); renderMemberDirectory(); triggerAutoSync();
+            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const member = entries.find(item => item.id === id);
+            if (!member || !confirm(`Remove ${member.name} from the member directory? If they have registered tracker characters, that tracker roster will still appear here.`)) return;
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Remove member directory entry: ${member.name}`))) return;
+            cloudData.settings.memberDirectory = entries.filter(item => item.id !== id);
+            cloudData.settings.memberDirectoryUpdatedAt = Date.now();
+            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
+            cloudData.updatedAt = Date.now();
+            triggerAutoSync();
+            renderMemberDirectory();
         }
+        document.getElementById('member-directory-list')?.addEventListener('click', event => {
+            const edit = event.target.closest('[data-member-edit]');
+            if (edit) { startMemberDirectoryEdit(edit.dataset.memberEdit, edit.dataset.memberRecord || ''); return; }
+            const remove = event.target.closest('[data-member-remove]');
+            if (remove) removeMemberDirectoryEntry(remove.dataset.memberRemove);
+        });
+
+        const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
+        const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
+        const PANTHEON_TOOLS_VERSION = 'v1.3.2';
+        const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
+        function configurePantheonDiscordLinks() {
+            const url = String(PANTHEON_DISCORD_URL || '').trim();
+            const valid = /^https:\/\/(?:discord\.gg\/[A-Za-z0-9-]+|discord\.com\/invite\/[A-Za-z0-9-]+)/i.test(url);
+            [['welcome-discord-link','welcome-discord-note'],['overview-discord-link','overview-discord-note']].forEach(([linkId,noteId]) => {
+                const link = document.getElementById(linkId), note = document.getElementById(noteId);
+                if (link) { link.hidden = !valid; if (valid) link.href = url; else link.removeAttribute('href'); }
+                if (note) note.hidden = valid;
+            });
+            document.querySelectorAll('.release-version').forEach(el => { el.textContent = PANTHEON_TOOLS_VERSION; });
+        }
+        function applyLandingChoice(choice) {
+            const destination = LANDING_OPTIONS.includes(choice) ? choice : 'overview';
+            if (destination === 'overview') { showAppPage('overview'); return; }
+            if (destination === 'team-builder') { showAppPage('team-builder'); return; }
+            if (destination === 'card-database') { showAppPage('card-wiki'); return; }
+            if (destination === 'member-roster') { showAppPage('member-roster'); return; }
+            showAppPage('tracker');
+            if (destination === 'tracker-personal') {
+                const identity = localStorage.getItem(IDENTITY_KEY) || '';
+                if (identity && cloudData.settings.rosters.some(r => r.id === identity)) {
+                    const identitySelect = document.getElementById('user-identity');
+                    if (identitySelect) identitySelect.value = identity;
+                    if (!isPersonalView) togglePersonalView();
+                    else { document.getElementById('roster-filter').value = identity; applyRosterFilter(); }
+                } else if (isPersonalView) togglePersonalView();
+                return;
+            }
+            if (isPersonalView) togglePersonalView();
+            if (destination === 'salary') openSalaryModal();
+        }
+        function applySavedLandingPage() {
+            let saved = '';
+            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
+            applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
+        }
+        function initializeWelcomeModal() {
+            let saved = '';
+            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
+            const hasSavedDefault = LANDING_OPTIONS.includes(saved);
+            const choice = hasSavedDefault ? saved : 'overview';
+            const select = document.getElementById('welcome-default-landing');
+            const checkbox = document.getElementById('welcome-default-enabled');
+            if (select) select.value = choice;
+            if (checkbox) checkbox.checked = hasSavedDefault;
+            applyLandingChoice(choice);
+            const modal = document.getElementById('welcome-modal');
+            configurePantheonDiscordLinks();
+            openModal('welcome-modal');
+        }
+        function saveWelcomeDefault(save) {
+            const choice = document.getElementById('welcome-default-landing')?.value || 'tracker-universal';
+            if (save && !document.getElementById('welcome-default-enabled')?.checked) {
+                alert('Tick the checkbox first to save a default landing page.'); return;
+            }
+            try {
+                if (save) localStorage.setItem(LANDING_PREFERENCE_KEY, LANDING_OPTIONS.includes(choice) ? choice : 'overview');
+                else { localStorage.removeItem(LANDING_PREFERENCE_KEY); const checkbox = document.getElementById('welcome-default-enabled'); if (checkbox) checkbox.checked = false; }
+            } catch (e) { alert('Your browser could not save this preference.'); return; }
+            closeModal('welcome-modal');
+            applyLandingChoice(save ? choice : 'overview');
+        }
+        function continueFromWelcome() {
+            const enabled = !!document.getElementById('welcome-default-enabled')?.checked;
+            const choice = document.getElementById('welcome-default-landing')?.value || 'overview';
+            try {
+                if (enabled) localStorage.setItem(LANDING_PREFERENCE_KEY, LANDING_OPTIONS.includes(choice) ? choice : 'overview');
+                else localStorage.removeItem(LANDING_PREFERENCE_KEY);
+            } catch (e) { alert('Your browser could not save this preference.'); return; }
+            closeModal('welcome-modal');
+            applyLandingChoice(enabled ? choice : 'overview');
+        }
+        function runWelcomeShortcut(choice) {
+            closeModal('welcome-modal');
+            if (choice === 'help') { showAppPage('tracker'); openHelpModal('start'); return; }
+            applyLandingChoice(choice);
+        }
+        document.getElementById('card-wiki-batch-list')?.addEventListener('click', event => {
+            const button = event.target.closest('[data-remove-card-batch]');
+            if (button) removeCardWikiBatch(button.dataset.removeCardBatch);
+        });
 
         function showAppPage(page) {
             const pages = {
+                overview: document.getElementById('overview-page'),
                 tracker: document.getElementById('tracker-page'),
                 'team-builder': document.getElementById('team-builder-page'),
                 'card-wiki': document.getElementById('card-wiki-page'),
@@ -4039,9 +4377,6 @@
             };
             if (!pages[page]) page = 'tracker';
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
-            document.getElementById('page-tab-tracker')?.classList.toggle('active', page === 'tracker');
-            document.getElementById('page-tab-team-builder')?.classList.toggle('active', page === 'team-builder');
-            document.getElementById('page-tab-card-wiki')?.classList.toggle('active', page === 'card-wiki');
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
@@ -4094,8 +4429,15 @@
             btn.setAttribute('aria-expanded', String(shouldOpen));
         }
 
-        function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+        function openModal(id) {
+            document.getElementById(id)?.classList.remove('hidden');
+            if (id === 'welcome-modal') document.body.classList.add('welcome-modal-open');
+        }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal?.classList.add('hidden');
+            if (id === 'welcome-modal') document.body.classList.remove('welcome-modal-open');
+        }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 </body>
