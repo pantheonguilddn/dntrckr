@@ -643,6 +643,150 @@
             .team-run-type { flex:1; }
         }
 
+    
+        /* ===== Monster Card Wiki ===== */
+        .card-wiki-header { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-bottom:14px; margin-bottom:14px; border-bottom:1px solid #353844; }
+        .card-wiki-header h2 { margin:0; font-size:1.45rem; }
+        .card-wiki-header p { margin:5px 0 0; color:#858c9c; font-size:.82rem; }
+        .card-wiki-controls { display:grid; grid-template-columns:minmax(220px,2fr) repeat(3,minmax(150px,1fr)); gap:9px; padding:12px; border:1px solid #363944; border-radius:10px; background:#23252d; margin-bottom:12px; }
+        .card-wiki-field { display:flex; flex-direction:column; gap:5px; color:#9ea4b4; font-size:.7rem; font-weight:800; }
+        .card-wiki-field input,.card-wiki-field select { width:100%; min-width:0; box-sizing:border-box; min-height:38px; padding:8px 10px; border:1px solid #474b58; border-radius:8px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
+        .card-wiki-summary { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0 14px; color:#9ea4b4; font-size:.78rem; }
+        .card-wiki-summary-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .card-wiki-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+        .card-wiki-tile { min-width:0; border:1px solid #383c48; border-radius:12px; background:linear-gradient(145deg,#272a34,#20222a); overflow:hidden; transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease; cursor:pointer; }
+        .card-wiki-tile:hover { transform:translateY(-2px); border-color:#666d80; box-shadow:0 7px 20px rgba(0,0,0,.18); }
+        .card-wiki-tile.is-comparing { border-color:#7aa2f7; box-shadow:0 0 0 1px rgba(122,162,247,.25); }
+        .card-wiki-tile-head { display:flex; align-items:flex-start; justify-content:space-between; gap:9px; padding:12px 13px 10px; border-bottom:1px solid #363944; }
+        .card-wiki-card-name { margin:0; color:#f0f2f6; font-size:.92rem; line-height:1.28; overflow-wrap:anywhere; }
+        .card-wiki-card-meta { color:#969dad; font-size:.68rem; margin-top:5px; }
+        .card-wiki-number { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:27px; box-sizing:border-box; padding:0 7px; background:#1b1d24; border:1px solid #414653; border-radius:8px; color:#c5cbd6; font-size:.7rem; font-weight:900; }
+        .card-wiki-tile-body { padding:10px 13px 12px; }
+        .card-wiki-preview-row { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.055); font-size:.73rem; }
+        .card-wiki-preview-row:last-child { border-bottom:0; }
+        .card-wiki-preview-row span:first-child { color:#9fa6b6; min-width:0; overflow-wrap:anywhere; }
+        .card-wiki-preview-row strong { color:#e9ecf2; text-align:right; font-variant-numeric:tabular-nums; }
+        .card-wiki-tile-foot { display:flex; align-items:center; justify-content:space-between; gap:7px; padding:9px 13px; border-top:1px solid #363944; background:rgba(0,0,0,.09); }
+        .card-wiki-tier-pill { display:inline-flex; align-items:center; padding:4px 8px; border:1px solid currentColor; border-radius:999px; font-size:.64rem; font-weight:900; white-space:nowrap; }
+        .card-rarity-magic { color:#62c98a; }
+        .card-rarity-rare { color:#67a9ff; }
+        .card-rarity-epic { color:#f0ac58; }
+        .card-rarity-unique { color:#c5a0ff; }
+        .card-rarity-legend { color:#ff7474; }
+        .card-wiki-compare-check { display:inline-flex; align-items:center; gap:5px; color:#adb4c2; font-size:.68rem; white-space:nowrap; cursor:pointer; }
+        .card-wiki-compare-check input { margin:0; transform:none !important; }
+        .card-wiki-empty { grid-column:1/-1; padding:36px 16px; text-align:center; border:1px dashed #414653; border-radius:12px; color:#939aab; background:#20222a; }
+        .card-wiki-detail-modal .modal-card { width:min(1100px,98vw); }
+        .card-wiki-detail-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+        .card-wiki-detail-heading h3 { margin:0 0 5px; }
+        .card-wiki-table-wrap { overflow:auto; max-height:58vh; border:1px solid #3d404b; border-radius:9px; margin-top:14px; }
+        .card-wiki-stats-table { width:100%; border-collapse:collapse; min-width:650px; font-size:.76rem; }
+        .card-wiki-stats-table th { position:sticky; top:0; z-index:1; padding:10px 11px; background:#20222a; color:#aeb5c4; text-align:right; border-bottom:1px solid #3d404b; white-space:nowrap; }
+        .card-wiki-stats-table th:first-child,.card-wiki-stats-table td:first-child { text-align:left; }
+        .card-wiki-stats-table td { padding:9px 11px; color:#e2e5ec; text-align:right; border-bottom:1px solid #30333d; font-variant-numeric:tabular-nums; }
+        .card-wiki-stats-table tr:last-child td { border-bottom:0; }
+        .card-wiki-stats-table td:first-child { color:#adb4c2; font-weight:750; }
+        .card-wiki-stats-table .tier-magic { color:#62c98a; }
+        .card-wiki-stats-table .tier-rare { color:#67a9ff; }
+        .card-wiki-stats-table .tier-epic { color:#f0ac58; }
+        .card-wiki-stats-table .tier-unique { color:#c5a0ff; }
+        .card-wiki-stats-table .tier-legend { color:#ff7474; }
+        .card-wiki-compare-wrap { overflow:auto; max-height:62vh; border:1px solid #3d404b; border-radius:9px; }
+        .card-wiki-compare-table { width:100%; border-collapse:collapse; min-width:640px; font-size:.75rem; }
+        .card-wiki-compare-table th { position:sticky; top:0; background:#20222a; color:#dce1ea; padding:10px; text-align:left; border-bottom:1px solid #3d404b; }
+        .card-wiki-compare-table td { padding:9px 10px; border-bottom:1px solid #30333d; color:#cdd2dd; }
+        .card-wiki-compare-table td:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
+        @media (max-width: 1050px) { .card-wiki-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .card-wiki-controls { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width: 640px) { .card-wiki-grid { grid-template-columns:1fr; } .card-wiki-controls { grid-template-columns:1fr; } .page-nav { flex-wrap:wrap; justify-content:center; } .page-nav button { min-width:110px; padding:9px 10px; } }
+
+
+        /* ===== Card Build Finder: multi-stat search results ===== */
+        .card-wiki-controls { grid-template-columns:minmax(220px,2fr) repeat(3,minmax(160px,1fr)); }
+        .card-wiki-stat-panel { border:1px solid #363944; border-radius:11px; background:#23252d; padding:13px; margin:0 0 13px; }
+        .card-wiki-stat-panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; }
+        .card-wiki-stat-panel-head h3 { margin:0; font-size:.9rem; color:#eef1f7; }
+        .card-wiki-stat-panel-head p { margin:4px 0 0; color:#9299a9; font-size:.72rem; }
+        .card-wiki-stat-tools { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .card-wiki-stat-tools select,.card-wiki-stat-tools input { min-height:34px; box-sizing:border-box; padding:7px 9px; background:#191b22; color:#e8ebf0; border:1px solid #474b58; border-radius:7px; }
+        .card-wiki-stat-search { width:min(100%,260px); }
+        .card-wiki-stat-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; }
+        .card-wiki-stat-group { min-width:0; border:1px solid #3a3e49; border-radius:10px; padding:10px; background:#1d1f26; }
+        .card-wiki-stat-group-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px; padding-bottom:8px; border-bottom:1px solid #373b46; }
+        .card-wiki-stat-group-title { color:#edf0f6; font-size:.73rem; font-weight:900; letter-spacing:.07em; }
+        .card-wiki-stat-group-subtitle { color:#858fa2; font-size:.62rem; font-weight:750; text-align:right; }
+        .card-wiki-stat-group-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+        .card-wiki-stat-option { display:flex; align-items:center; gap:6px; min-width:0; padding:7px 8px; background:#252832; border:1px solid #424653; border-radius:8px; color:#c7ccda; font-size:.68rem; line-height:1.3; cursor:pointer; user-select:none; }
+        .card-wiki-stat-option span { min-width:0; overflow-wrap:anywhere; }
+        .card-wiki-stat-option input { flex:0 0 auto; }
+        .card-wiki-stat-option:has(input:checked) { background:#29384b; border-color:#739bd0; color:#f2f6ff; box-shadow:inset 0 0 0 1px rgba(115,155,208,.16); }
+        .card-wiki-stat-option input { margin:0; accent-color:#7aa2f7; }
+        @media (max-width:1100px) { .card-wiki-stat-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width:640px) { .card-wiki-stat-options { grid-template-columns:1fr; } }
+        .card-wiki-selected-stats { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:10px; min-height:25px; }
+        .card-wiki-selected-tag { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid #6488b5; border-radius:999px; color:#e6f0ff; background:#29384b; font-size:.69rem; font-weight:800; cursor:pointer; }
+        .card-wiki-selected-none { color:#858c9c; font-size:.72rem; }
+        .card-wiki-preset-panel { border:1px solid #363944; border-radius:11px; background:#23252d; padding:13px; margin:0 0 13px; }
+        .card-wiki-preset-head { margin-bottom:10px; }
+        .card-wiki-preset-head h3 { margin:0; font-size:.9rem; color:#eef1f7; }
+        .card-wiki-preset-head p { margin:4px 0 0; color:#9299a9; font-size:.72rem; }
+        .card-wiki-presets { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+        .card-wiki-preset { display:flex; align-items:center; gap:9px; min-width:0; padding:11px 12px; border:1px solid #424653; border-radius:9px; background:#1d1f26; cursor:pointer; }
+        .card-wiki-preset:has(input:checked) { background:#29384b; border-color:#739bd0; box-shadow:inset 3px 0 #7aa2f7; }
+        .card-wiki-preset input { flex:0 0 auto; margin:0; accent-color:#7aa2f7; }
+        .card-wiki-preset span { display:flex; flex-direction:column; gap:3px; min-width:0; }
+        .card-wiki-preset strong { font-size:.75rem; color:#f2f6ff; }
+        .card-wiki-preset small { color:#9299a9; font-size:.63rem; line-height:1.35; }
+        .card-wiki-compare-help { margin-top:5px; color:#858c9c; font-size:.68rem; line-height:1.4; }
+        .member-directory-header { display:flex; justify-content:space-between; align-items:flex-end; gap:18px; flex-wrap:wrap; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #353844; }
+        .member-directory-header h2 { margin:0; font-size:1.45rem; }
+        .member-directory-header p { margin:5px 0 0; color:#9299a9; font-size:.82rem; max-width:680px; }
+        .member-directory-kicker { margin-bottom:8px; color:#7aa2f7; font-size:.63rem; font-weight:900; letter-spacing:.17em; }
+        .member-directory-form-panel { padding:15px; margin-bottom:14px; border:1px solid #363944; border-radius:11px; background:#23252d; }
+        .member-directory-form-panel h3 { margin:0; font-size:.9rem; }
+        .member-directory-form-panel p { margin:4px 0 12px; color:#9299a9; font-size:.72rem; }
+        .member-directory-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:end; }
+        .member-directory-form label,.member-directory-toolbar label { display:flex; flex-direction:column; gap:6px; color:#a8afbd; font-size:.68rem; font-weight:800; }
+        .member-directory-form input,.member-directory-toolbar input { width:100%; min-width:0; min-height:36px; padding:8px 10px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
+        .member-directory-form-actions { display:flex; gap:7px; flex-wrap:wrap; }
+        .member-directory-toolbar { display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin:14px 0 10px; }
+        .member-directory-toolbar label { width:min(440px,100%); }
+        #member-directory-count { padding-bottom:10px; color:#9299a9; font-size:.7rem; white-space:nowrap; }
+        .member-directory-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+        .member-directory-card { min-width:0; padding:13px; border:1px solid #383c48; border-radius:10px; background:linear-gradient(110deg,#272a34,#20222a); }
+        .member-directory-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+        .member-directory-name { margin:0; font-size:.86rem; font-weight:850; overflow-wrap:anywhere; color:#eef1f7; }
+        .member-directory-meta { margin-top:4px; color:#9299a9; font-size:.66rem; overflow-wrap:anywhere; }
+        .member-directory-actions { display:flex; gap:5px; flex:0 0 auto; }
+        .member-directory-actions .btn { padding:6px 8px; font-size:.65rem; }
+        .member-directory-char-heading { margin:12px 0 7px; color:#858c9c; font-size:.61rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+        .member-directory-chars { display:flex; flex-wrap:wrap; gap:6px; }
+        .member-directory-char { padding:5px 8px; border:1px solid #424653; border-radius:7px; background:#252832; color:#c7ccda; font-size:.68rem; overflow-wrap:anywhere; }
+        .member-directory-empty { padding:30px 16px; text-align:center; border:1px dashed #414652; border-radius:10px; color:#9299a9; }
+        .member-directory-note { margin-top:13px; color:#858c9c; font-size:.68rem; line-height:1.45; }
+        @media(max-width:1100px){.card-wiki-presets{grid-template-columns:repeat(3,minmax(0,1fr))}.member-directory-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:780px){.member-directory-form{grid-template-columns:1fr}.member-directory-list{grid-template-columns:1fr}}
+        @media(max-width:640px){.card-wiki-presets{grid-template-columns:1fr}.card-wiki-stat-options{grid-template-columns:1fr}.member-directory-toolbar{align-items:stretch;flex-direction:column}.member-directory-toolbar label{width:100%}}
+        .card-wiki-result-list { display:flex; flex-direction:column; gap:8px; }
+        .card-wiki-result-row { display:grid; grid-template-columns:minmax(220px,1.1fr) minmax(240px,2fr) auto; align-items:center; gap:13px; width:100%; min-width:0; padding:12px 14px; box-sizing:border-box; border:1px solid #383c48; border-radius:10px; background:linear-gradient(110deg,#272a34,#20222a); color:#eceff5; cursor:pointer; text-align:left; transition:border-color .12s ease,background .12s ease; }
+        .card-wiki-result-row:hover { border-color:#77839a; background:#292c36; }
+        .card-wiki-result-identity { display:flex; align-items:center; gap:10px; min-width:0; }
+        .card-wiki-result-number { flex:0 0 auto; display:flex; align-items:center; justify-content:center; min-width:34px; height:32px; padding:0 7px; border:1px solid #464b59; border-radius:8px; background:#191b22; color:#abb2c1; font-size:.72rem; font-weight:900; }
+        .card-wiki-result-name { display:block; margin:0; color:#f2f4f8; font-weight:850; font-size:.88rem; line-height:1.25; overflow-wrap:anywhere; }
+        .card-wiki-result-meta { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+        .card-wiki-cap-tag { display:inline-flex; align-items:center; padding:3px 7px; border-radius:999px; border:1px solid #4c5261; background:#1e2028; color:#acb4c5; font-size:.63rem; font-weight:850; white-space:nowrap; }
+        .card-wiki-result-stats { display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; }
+        .card-wiki-stat-value { display:inline-flex; gap:5px; align-items:center; padding:5px 7px; border:1px solid #3c414d; border-radius:7px; background:#1b1d24; color:#adb4c2; font-size:.69rem; line-height:1.2; }
+        .card-wiki-stat-value strong { color:#f0f2f7; font-size:.72rem; font-variant-numeric:tabular-nums; }
+        .card-wiki-stat-value.is-match { border-color:#668ab5; background:#263347; color:#dce9ff; }
+        .card-wiki-stat-value.is-match strong { color:#fff; }
+        .card-wiki-result-actions { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:6px; white-space:nowrap; }
+        .card-wiki-result-open { color:#9ca8bd; font-size:.65rem; }
+        .card-wiki-result-compare { display:inline-flex; align-items:center; gap:5px; color:#c0c6d2; font-size:.68rem; }
+        .card-wiki-result-compare input { margin:0; accent-color:#7aa2f7; }
+        .card-wiki-result-row.is-comparing { border-color:#7aa2f7; box-shadow:inset 3px 0 #7aa2f7; }
+        @media (max-width:900px) { .card-wiki-result-row { grid-template-columns:minmax(0,1fr) auto; } .card-wiki-result-stats { grid-column:1/-1; grid-row:2; } .card-wiki-result-actions { grid-column:2; grid-row:1; } }
+        @media (max-width:640px) { .card-wiki-controls { grid-template-columns:1fr; } .card-wiki-result-row { grid-template-columns:minmax(0,1fr); } .card-wiki-result-actions { grid-column:1; grid-row:auto; flex-direction:row; align-items:center; justify-content:space-between; } .card-wiki-result-stats { grid-column:1; grid-row:auto; } .card-wiki-stat-tools { width:100%; } .card-wiki-stat-search { width:100%; } }
+
     </style>
 </head>
 <body>
@@ -687,6 +831,8 @@
                 <div class="drawer-section-title">Pages</div>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('tracker'); toggleSideMenu(false)"><span class="drawer-icon">📋</span><span><strong>Tracker</strong><small>Daily & weekly board</small></span></button>
                 <button class="drawer-item" type="button" onclick="showAppPage('team-builder'); toggleSideMenu(false)"><span class="drawer-icon">⚔</span><span><strong>Team Builder</strong><small>Build two parties</small></span></button>
+                <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('card-wiki'); toggleSideMenu(false)"><span class="drawer-icon">🃏</span><span><strong>Card Build Finder</strong><small>Find cards for character builds</small></span></button>
+                <button class="drawer-item drawer-item-green" type="button" onclick="showAppPage('member-roster'); toggleSideMenu(false)"><span class="drawer-icon">👥</span><span><strong>Member Roster</strong><small>Guild directory by owner</small></span></button>
             </div>
 
             <div class="drawer-section">
@@ -850,6 +996,95 @@
             <strong>How it works:</strong> Characters come from Roster Registration. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
         </div>
     </main>
+
+    <main id="card-wiki-page" class="app-page hidden-page">
+        <div class="card-wiki-header">
+            <div>
+                <h2>🃏 Card Build Finder <button class="mini-help" type="button" title="Card Build Finder guide" onclick="alert('Choose a level cap, select one or more desired stats, and the list will show cards providing any selected stat. Choose All selected if you only want cards that contain every selected stat.')">?</button></h2>
+                <p>Find monster cards for a character build by level cap and desired stats. Nest names are intentionally hidden to keep the results focused on build choices.</p>
+            </div>
+            <div class="builder-header-actions"><span class="local-only-badge">REFERENCE DATA · LOCAL / READ-ONLY</span></div>
+        </div>
+        <div class="card-wiki-controls">
+            <label class="card-wiki-field">Search card<input id="card-wiki-search" type="search" placeholder="Monster name or card number…" oninput="renderCardWiki()" autocomplete="off"></label>
+            <label class="card-wiki-field">Level cap<select id="card-wiki-level-cap" onchange="renderCardWiki()">
+                <option value="40">Level 40 · Sea Dragon and below</option>
+                <option value="50">Level 50 · Green Dragon and below</option>
+                <option value="60">Level 60 · Desert Dragon and below</option>
+                <option value="70" selected>Level 70 · Black Dragon and below</option>
+            </select></label>
+            <label class="card-wiki-field">Display stat values at<select id="card-wiki-preview-rarity" onchange="renderCardWiki()"><option value="0">Magic</option><option value="1">Rare</option><option value="2">Epic</option><option value="3">Unique</option><option value="4" selected>Legend</option></select></label>
+            <label class="card-wiki-field">Sort results<select id="card-wiki-sort" onchange="renderCardWiki()"><option value="number">Card Number</option><option value="name">Name A–Z</option><option value="match">Most desired stats matched</option></select></label>
+        </div>
+        <section class="card-wiki-preset-panel">
+            <div class="card-wiki-preset-head"><div><h3>Quick build filters</h3><p>One click selects the core stats and requires every selected stat to appear on the card.</p></div></div>
+            <div class="card-wiki-presets" id="card-wiki-presets">
+                <label class="card-wiki-preset"><input type="checkbox" data-card-preset="magic"><span><strong>Magic</strong><small>MATK · INT · Final Damage</small></span></label>
+                <label class="card-wiki-preset"><input type="checkbox" data-card-preset="physical"><span><strong>Physical</strong><small>PATK · STR · AGI · Final Damage</small></span></label>
+                <label class="card-wiki-preset"><input type="checkbox" data-card-preset="defensive"><span><strong>Defensive</strong><small>DEF · MDEF · VIT · Max HP</small></span></label>
+            </div>
+        </section>
+        <section class="card-wiki-stat-panel">
+            <div class="card-wiki-stat-panel-head">
+                <div><h3>Desired character stats</h3><p>Select multiple stats. By default, results include cards that provide <b>any</b> selected stat. Nest names are not shown.</p></div>
+                <div class="card-wiki-stat-tools">
+                    <label class="card-wiki-field" style="display:flex;flex-direction:row;align-items:center;gap:7px;white-space:nowrap;color:#c1c7d3;">Match
+                        <select id="card-wiki-match-mode" onchange="cardWikiActivePreset='';renderCardWikiPresetChecks();renderCardWiki()"><option value="any">Any selected</option><option value="all">All selected</option></select>
+                    </label>
+                    <input class="card-wiki-stat-search" id="card-wiki-stat-search" type="search" placeholder="Find a stat (ATK, DEF, VIT…)" oninput="renderCardWikiStatOptions()" autocomplete="off">
+                    <button class="btn btn-secondary" type="button" onclick="clearCardWikiStatFilters()">Clear stats</button>
+                </div>
+            </div>
+            <div id="card-wiki-stat-options" class="card-wiki-stat-options"></div>
+            <div id="card-wiki-selected-stats" class="card-wiki-selected-stats"><span class="card-wiki-selected-none">No desired stats selected. Choose stats above to narrow the card list.</span></div>
+        </section>
+        <div class="card-wiki-summary">
+            <div><span id="card-wiki-result-count">Loading cards…</span><div class="card-wiki-compare-help">Compare selects 2–3 cards and shows their stat values side by side at the chosen rarity. It does not change the filters.</div></div>
+            <div class="card-wiki-summary-actions">
+                <button class="btn btn-secondary" id="card-wiki-compare-button" type="button" onclick="openCardWikiComparison()" disabled>Compare (0/3)</button>
+                <button class="btn btn-secondary" type="button" onclick="clearCardWikiFilters()">Reset all filters</button>
+            </div>
+        </div>
+        <div id="card-wiki-grid" class="card-wiki-grid card-wiki-result-list" aria-live="polite"></div>
+        <div class="team-builder-bottom" style="margin-top:16px;">
+            <strong>Build tip:</strong> Use <b>Any selected</b> to get a list of cards that contribute at least one stat you want. Choose <b>All selected</b> to require the same card to contain every selected stat. Select a rarity to see values at that tier; open a result for its full five-tier stats.
+        </div>
+    </main>
+
+    <main id="member-roster-page" class="app-page hidden-page">
+        <div class="member-directory-header"><div><div class="member-directory-kicker">GUILD DIRECTORY</div><h2>Member Roster</h2><p>One list of guild members grouped by owner. Members can appear here without registering characters in the tracker.</p></div><span class="local-only-badge">SHARED GUILD DIRECTORY</span></div>
+        <section class="member-directory-form-panel">
+            <h3 id="member-directory-form-title">Add a guild member</h3>
+            <p>Character names are optional. Use commas to separate multiple names.</p>
+            <form id="member-directory-form" class="member-directory-form">
+                <label>Member / owner<input id="member-directory-name" type="text" maxlength="60" placeholder="e.g. Vulcureon" required></label>
+                <label>Characters (optional)<input id="member-directory-characters" type="text" maxlength="500" placeholder="e.g. Vulcureon, Mysteln"></label>
+                <label>Role / notes (optional)<input id="member-directory-note" type="text" maxlength="180" placeholder="e.g. Raid lead, returning member"></label>
+                <div class="member-directory-form-actions"><button class="btn btn-primary" id="member-directory-submit" type="submit">Add member</button><button class="btn btn-secondary" id="member-directory-cancel" type="button" hidden>Cancel edit</button></div>
+            </form>
+        </section>
+        <div class="member-directory-toolbar"><label>Search members or characters<input id="member-directory-search" type="search" placeholder="Search directory…" autocomplete="off"></label><span id="member-directory-count"></span></div>
+        <section id="member-directory-list" class="member-directory-list" aria-live="polite"></section>
+        <p class="member-directory-note">Registered owners and their tracker characters appear automatically. Additional members and optional characters are stored in the shared guild database and do not require a tracker registration.</p>
+    </main>
+
+    <div class="modal-overlay hidden card-wiki-detail-modal" id="card-wiki-detail-modal" role="dialog" aria-label="Monster Card Details">
+        <div class="modal-card wide-modal">
+            <div class="card-wiki-detail-heading">
+                <div><h3 id="card-wiki-detail-title">Monster Card</h3><div id="card-wiki-detail-meta" class="modal-note" style="margin:0;">Card details</div></div>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('card-wiki-detail-modal')">Close</button>
+            </div>
+            <div id="card-wiki-detail-table" class="card-wiki-table-wrap"></div>
+            <div class="modal-actions"><button class="btn btn-secondary" type="button" id="card-wiki-detail-compare" onclick="toggleCardCompareFromDetail()">＋ Add to Compare</button></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="card-wiki-compare-modal" role="dialog" aria-label="Compare Monster Cards">
+        <div class="modal-card wide-modal">
+            <div class="card-wiki-detail-heading"><div><h3>⚖️ Compare Monster Cards</h3><div class="modal-note" style="margin:0;">Comparing selected cards at the currently selected preview rarity.</div></div><button class="btn btn-secondary" type="button" onclick="closeModal('card-wiki-compare-modal')">Close</button></div>
+            <div id="card-wiki-compare-content" style="margin-top:14px;"></div>
+        </div>
+    </div>
 
 
     <!-- Character Class Setup Modal -->
@@ -1481,7 +1716,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: cloneRosters(DEFAULT_ROSTERS), rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', categories: cloneCategories(DEFAULT_CATEGORIES), categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -1489,6 +1724,19 @@
         }
 
         function cloneRosters(rosters) { return (Array.isArray(rosters) ? rosters : []).map(r => ({ id: String(r.id || ''), name: String(r.name || ''), color: String(r.color || '#7aa2f7'), characters: Array.isArray(r.characters) ? [...r.characters] : [] })); }
+        function normalizeMemberDirectory(value) {
+            const source = Array.isArray(value) ? value : [], ids = new Set(), names = new Set(), out = [];
+            source.forEach((entry, index) => {
+                const name = String(entry?.name || '').trim().slice(0,60);
+                if (!name || names.has(name.toLowerCase())) return;
+                let id = String(entry?.id || `member-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80) || `member-${index}`;
+                if (ids.has(id)) id = `${id}-${index}`;
+                ids.add(id); names.add(name.toLowerCase());
+                const characters = [...new Set((Array.isArray(entry?.characters)?entry.characters:[]).map(x=>String(x||'').trim().slice(0,60)).filter(Boolean))].slice(0,30);
+                out.push({id,name,characters,note:String(entry?.note||'').trim().slice(0,180)});
+            });
+            return out;
+        }
         function cloneCategories(categories) { return (Array.isArray(categories) ? categories : []).map(c => ({ id: String(c.id || ''), group: String(c.group || 'Weeklies'), name: String(c.name || ''), color: String(c.color || '#ffffff'), tasks: Array.isArray(c.tasks) ? [...c.tasks] : [] })); }
         function normalizeColor(value, fallback = '#7aa2f7') { const color = String(value || '').trim(); return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback; }
 
@@ -1645,6 +1893,9 @@
             norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : cloneRosters(DEFAULT_ROSTERS);
             norm.settings.rosterUpdatedAt = Number(sets.rosterUpdatedAt) || 0;
             norm.settings.rosterUpdatedBy = String(sets.rosterUpdatedBy || '');
+            norm.settings.memberDirectory = normalizeMemberDirectory(sets.memberDirectory);
+            norm.settings.memberDirectoryUpdatedAt = Number(sets.memberDirectoryUpdatedAt) || 0;
+            norm.settings.memberDirectoryUpdatedBy = String(sets.memberDirectoryUpdatedBy || '');
             norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : cloneCategories(DEFAULT_CATEGORIES);
             norm.settings.categoriesUpdatedAt = Number(sets.categoriesUpdatedAt) || 0;
             norm.settings.categoriesUpdatedBy = String(sets.categoriesUpdatedBy || '');
@@ -1790,6 +2041,11 @@
             const rSrc = (lrTime > rrTime || (lrTime === rrTime && String(local.settings.rosterUpdatedBy) >= String(remote.settings.rosterUpdatedBy))) ? local.settings : remote.settings;
             merged.settings.rosters = cloneRosters(rSrc.rosters);
             merged.settings.rosterUpdatedAt = rSrc.rosterUpdatedAt; merged.settings.rosterUpdatedBy = rSrc.rosterUpdatedBy;
+
+            const lmTime = Number(local.settings.memberDirectoryUpdatedAt)||0, rmTime = Number(remote.settings.memberDirectoryUpdatedAt)||0;
+            const mSrc = (lmTime > rmTime || (lmTime === rmTime && String(local.settings.memberDirectoryUpdatedBy) >= String(remote.settings.memberDirectoryUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.memberDirectory = normalizeMemberDirectory(mSrc.memberDirectory);
+            merged.settings.memberDirectoryUpdatedAt = mSrc.memberDirectoryUpdatedAt; merged.settings.memberDirectoryUpdatedBy = mSrc.memberDirectoryUpdatedBy;
             
             const lcTime = Number(local.settings.categoriesUpdatedAt) || 0, rcTime = Number(remote.settings.categoriesUpdatedAt) || 0;
             const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
@@ -1888,33 +2144,36 @@
         function getGlobalImpactSnapshot(data = cloudData) {
             const settings = data.settings || {};
             const rosters = cloneRosters(settings.rosters || []).map(r => ({ id:r.id, name:r.name, color:r.color, characters:[...r.characters] }));
+            const memberDirectory = normalizeMemberDirectory(settings.memberDirectory || []).map(m => ({ id:m.id, name:m.name, characters:[...m.characters], note:m.note }));
             const categories = cloneCategories(settings.categories || []).map(c => ({ id:c.id, group:c.group, name:c.name, color:c.color, tasks:[...c.tasks] }));
             const characterJobs = normalizeCharacterJobs(settings.characterJobs || {});
             const jobProfiles = normalizeJobProfiles(settings.jobProfiles || {});
             const lootWeights = {};
             Object.keys(settings.lootWeights || {}).sort().forEach(k => { lootWeights[k] = clampWeight(settings.lootWeights[k]); });
-            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
+            return { rosters, memberDirectory, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
         }
         function getGlobalImpactSignature(data = cloudData) { return JSON.stringify(getGlobalImpactSnapshot(data)); }
         function sameValue(a,b){try{return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b);}catch(e){return false;}}
         function mapById(items){const map=new Map();for(const item of Array.isArray(items)?items:[])if(item?.id)map.set(String(item.id),item);return map;}
         function diffObjectMaps(beforeObj,afterObj){const out=[],b=safeObject(beforeObj),a=safeObject(afterObj);for(const key of [...new Set([...Object.keys(b),...Object.keys(a)])].sort()){const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null,av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;if(!sameValue(bv,av))out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});}return out;}
         function diffGlobalImpact(before,after){
-            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
+            const b=safeObject(before),a=safeObject(after),patch={rosters:[],memberDirectory:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
             const bR=mapById(b.rosters),aR=mapById(a.rosters);for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;if(!sameValue(bv,av))patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
+            const bM=mapById(b.memberDirectory),aM=mapById(a.memberDirectory);for(const id of [...new Set([...bM.keys(),...aM.keys()])].sort()){const bv=bM.has(id)?bM.get(id):null,av=aM.has(id)?aM.get(id):null;if(!sameValue(bv,av))patch.memberDirectory.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             const bC=mapById(b.categories),aC=mapById(a.categories);for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;if(!sameValue(bv,av))patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
             const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;if(!sameValue(bv,av))patch.lootWeights.push({key,before:bv,after:av});}
             if(b.splitPartyMechanic!==a.splitPartyMechanic)patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
             return patch;
         }
-        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.splitPartyMechanic);}
+        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.memberDirectory?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.splitPartyMechanic);}
 
         function normalizeRevisionEntry(entry){
             if(!entry||!entry.id)return null;
             const e={id:String(entry.id),at:Number(entry.at)||0,by:String(entry.by||''),label:String(entry.label||'Global change').slice(0,140),kind:String(entry.kind||'global-change'),signature:String(entry.signature||'')};
             if(entry.patch&&typeof entry.patch==='object'){const p=entry.patch;e.patch={
                 rosters:Array.isArray(p.rosters)?p.rosters.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
+                memberDirectory:Array.isArray(p.memberDirectory)?p.memberDirectory.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
                 categories:Array.isArray(p.categories)?p.categories.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
                 characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
                 jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
@@ -1941,6 +2200,7 @@
         function describeGlobalPatch(p){
             const labels=[];
             for(const item of p?.rosters||[]){const b=item.before,a=item.after; if(!b&&a){labels.push(`Added roster ${a.name}`);continue;} if(b&&!a){labels.push(`Removed roster ${b.name}`);continue;} if(b&&a){const bc=new Set(b.characters||[]),ac=new Set(a.characters||[]),added=[...(ac)].filter(x=>!bc.has(x)),removed=[...(bc)].filter(x=>!ac.has(x));if(added.length===1)labels.push(`Added ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed ${removed[0]} from ${b.name}`);else if(String(b.name)!==String(a.name))labels.push(`Renamed roster ${b.name} → ${a.name}`);else labels.push(`Updated roster ${a.name}`);}}
+            for(const item of p?.memberDirectory||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Added member ${a.name}`);else if(b&&!a)labels.push(`Removed member ${b.name}`);else if(b&&a)labels.push(`Updated member ${a.name}`);}
             for(const item of p?.categories||[]){const b=item.before,a=item.after;if(!b&&a){labels.push(`Added dungeon category ${a.name}`);continue;}if(b&&!a){labels.push(`Removed dungeon category ${b.name}`);continue;}if(b&&a){const bt=new Set(b.tasks||[]),at=new Set(a.tasks||[]),added=[...(at)].filter(x=>!bt.has(x)),removed=[...(bt)].filter(x=>!at.has(x));if(added.length===1)labels.push(`Added dungeon task ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed dungeon task ${removed[0]} from ${b.name}`);else labels.push(`Updated dungeon category ${a.name}`);}}
             for(const item of p?.characterJobs||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Set Job for ${item.key} to ${a.job||'Unassigned'}`);else if(b&&!a)labels.push(`Cleared Job for ${item.key}`);else labels.push(`Changed Job for ${item.key} to ${a?.job||'Unassigned'}`);}
             if(p?.jobProfiles?.length)labels.push('Updated Job / Role settings');
@@ -2063,13 +2323,14 @@
             box.innerHTML=html;openModal('revision-detail-modal');
         }
 
-        async function recoverPatchSlice(id,type,itemId,direction){if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);try{const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(journal.revisions||[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry?.patch?.[type])throw new Error('Revision detail not found.');const item=(entry.patch[type]||[]).find(x=>(x.id||x.key)===itemId);if(!item)throw new Error('Selected item not found.');const one={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};one[type]=[item];if(direction!=='before'&&direction!=='after')throw new Error('Invalid recovery direction.');const expected=direction==='before'?item.after:item.before;let cur=null;if(type==='rosters')cur=(current.settings.rosters||[]).find(x=>x.id===item.id)||null;else if(type==='categories')cur=(current.settings.categories||[]).find(x=>x.id===item.id)||null;if(!sameValue(cur,expected)&&!confirm('This item has changed since this revision. Recover it anyway?'))return;const beforeSnap=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,one,direction);restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok)throw new Error(`Recovery failed (${res.status})`);cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));const afterSnap=cloneDataObject(getGlobalImpactSnapshot(cloudData));const safety=diffGlobalImpact(afterSnap,beforeSnap);if(!patchIsEmpty(safety)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before selective recovery · ${entry.label}`,'global-change',safety,getGlobalImpactSignature(cloudData)));}setStatus(`🟢 Recovered ${type==='rosters'?'roster':'dungeon category'} from ${direction} state`);closeModal('revision-detail-modal');refreshTrackerUI();await loadVersionHistory(false);}catch(err){setStatus(`🔴 Recovery failed: ${err.message}`);alert(`Recovery failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}}
+        async function recoverPatchSlice(id,type,itemId,direction){if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);try{const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(journal.revisions||[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry?.patch?.[type])throw new Error('Revision detail not found.');const item=(entry.patch[type]||[]).find(x=>(x.id||x.key)===itemId);if(!item)throw new Error('Selected item not found.');const one={rosters:[],memberDirectory:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};one[type]=[item];if(direction!=='before'&&direction!=='after')throw new Error('Invalid recovery direction.');const expected=direction==='before'?item.after:item.before;let cur=null;if(type==='rosters')cur=(current.settings.rosters||[]).find(x=>x.id===item.id)||null;else if(type==='memberDirectory')cur=(current.settings.memberDirectory||[]).find(x=>x.id===item.id)||null;else if(type==='categories')cur=(current.settings.categories||[]).find(x=>x.id===item.id)||null;if(!sameValue(cur,expected)&&!confirm('This item has changed since this revision. Recover it anyway?'))return;const beforeSnap=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,one,direction);restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok)throw new Error(`Recovery failed (${res.status})`);cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));const afterSnap=cloneDataObject(getGlobalImpactSnapshot(cloudData));const safety=diffGlobalImpact(afterSnap,beforeSnap);if(!patchIsEmpty(safety)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before selective recovery · ${entry.label}`,'global-change',safety,getGlobalImpactSignature(cloudData)));}setStatus(`🟢 Recovered ${type==='rosters'?'roster':'dungeon category'} from ${direction} state`);closeModal('revision-detail-modal');refreshTrackerUI();await loadVersionHistory(false);}catch(err){setStatus(`🔴 Recovery failed: ${err.message}`);alert(`Recovery failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}}
         function recoverRosterFromRevision(id,itemId,direction){return recoverPatchSlice(id,'rosters',itemId,direction);}
         function recoverCategoryFromRevision(id,itemId,direction){return recoverPatchSlice(id,'categories',itemId,direction);}
 
         function applyGlobalPatch(data,patch,direction='before'){
             const p=patch||{},now=Date.now();
             if(Array.isArray(p.rosters)){for(const item of p.rosters){const value=direction==='before'?item.before:item.after;data.settings.rosters=cloneRosters(data.settings.rosters||[]).filter(r=>r.id!==item.id);if(value)data.settings.rosters.push(cloneDataObject(value));}data.settings.rosters=normalizeRosters(data.settings.rosters);data.settings.rosterUpdatedAt=now;data.settings.rosterUpdatedBy=deviceId;}
+            if(Array.isArray(p.memberDirectory)){for(const item of p.memberDirectory){const value=direction==='before'?item.before:item.after;data.settings.memberDirectory=normalizeMemberDirectory(data.settings.memberDirectory||[]).filter(m=>m.id!==item.id);if(value)data.settings.memberDirectory.push(cloneDataObject(value));}data.settings.memberDirectory=normalizeMemberDirectory(data.settings.memberDirectory);data.settings.memberDirectoryUpdatedAt=now;data.settings.memberDirectoryUpdatedBy=deviceId;}
             if(Array.isArray(p.categories)){for(const item of p.categories){const value=direction==='before'?item.before:item.after;data.settings.categories=cloneCategories(data.settings.categories||[]).filter(c=>c.id!==item.id);if(value)data.settings.categories.push(cloneDataObject(value));}data.settings.categories=normalizeCategories(data.settings.categories);data.settings.categoriesUpdatedAt=now;data.settings.categoriesUpdatedBy=deviceId;}
             if(Array.isArray(p.characterJobs)){const jobs=normalizeCharacterJobs(data.settings.characterJobs||{});for(const item of p.characterJobs){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete jobs[item.key];else jobs[item.key]=cloneDataObject(value);}data.settings.characterJobs=normalizeCharacterJobs(jobs);}
             if(Array.isArray(p.jobProfiles)){const prof=normalizeJobProfiles(data.settings.jobProfiles||{});for(const item of p.jobProfiles){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete prof[item.key];else prof[item.key]=cloneDataObject(value);}data.settings.jobProfiles=normalizeJobProfiles(prof);data.settings.jobProfilesUpdatedAt=now;data.settings.jobProfilesUpdatedBy=deviceId;}
@@ -2080,6 +2341,7 @@
         function patchConflictsWithCurrent(data,patch,direction='before'){
             const p=patch||{},conflicts=[];const check=(label,current,expected)=>{if(!sameValue(current,expected))conflicts.push(label);};
             for(const item of p.rosters||[]){const cur=(data.settings.rosters||[]).find(r=>r.id===item.id)||null;check(`Roster ${item.id}`,cur,direction==='before'?item.after:item.before);}
+            for(const item of p.memberDirectory||[]){const cur=(data.settings.memberDirectory||[]).find(m=>m.id===item.id)||null;check(`Member ${item.id}`,cur,direction==='before'?item.after:item.before);}
             for(const item of p.categories||[]){const cur=(data.settings.categories||[]).find(c=>c.id===item.id)||null;check(`Category ${item.id}`,cur,direction==='before'?item.after:item.before);}
             const jobs=safeObject(data.settings.characterJobs);for(const item of p.characterJobs||[]){check(`Job ${item.key}`,Object.prototype.hasOwnProperty.call(jobs,item.key)?jobs[item.key]:undefined,direction==='before'?item.after:item.before);}
             const prof=safeObject(data.settings.jobProfiles);for(const item of p.jobProfiles||[]){check(`Profile ${item.key}`,Object.prototype.hasOwnProperty.call(prof,item.key)?prof[item.key]:undefined,direction==='before'?item.after:item.before);}
@@ -2151,7 +2413,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadCloudForm();
             populateRegistrationJobSelect();
-            window.addEventListener('hashchange', handlePageRoute);
+            document.getElementById('card-wiki-presets')?.addEventListener('change', event => {
+            const input=event.target.closest('input[data-card-preset]'); if(input)applyCardWikiPreset(input.dataset.cardPreset,input.checked);
+        });
+        document.getElementById('member-directory-form')?.addEventListener('submit', saveMemberDirectoryEntry);
+        document.getElementById('member-directory-cancel')?.addEventListener('click', resetMemberDirectoryForm);
+        document.getElementById('member-directory-search')?.addEventListener('input', renderMemberDirectory);
+        document.getElementById('member-directory-list')?.addEventListener('click', event => {
+            const edit=event.target.closest('[data-member-edit]'); if(edit){editMemberDirectoryRow(edit.dataset.memberEdit);return;}
+            const remove=event.target.closest('[data-member-remove]'); if(remove)removeMemberDirectoryEntry(remove.dataset.memberRemove);
+        });
+        window.addEventListener('hashchange', handlePageRoute);
             loadLiveTracker().then(handlePageRoute);
         });
 
@@ -3455,16 +3727,325 @@
             renderTeamBuilder();
         }
 
+
+        // ==========================================
+        // 🃏 MONSTER CARD WIKI (source: supplied card-stat markdown)
+        // ==========================================
+        const CARD_WIKI_DATA = [{"number":1,"name":"General Umzaka","nest":"Minotaur Nest","stats":[{"name":"Str","values":[1,2,3,4,5]},{"name":"Crit Resist","values":[10,21,32,43,54]},{"name":"Crystal of Power","values":[1,2,3,4,5]}]},{"number":2,"name":"General Umhar","nest":"Minotaur Nest","stats":[{"name":"Agi","values":[1,2,3,4,5]},{"name":"Stun Resist","values":[10,21,32,43,54]},{"name":"Crystal of Power","values":[1,2,3,4,5]}]},{"number":3,"name":"General Crimson Ummanba","nest":"Minotaur Nest","stats":[{"name":"Int","values":[1,2,3,4,5]},{"name":"Vit","values":[1,2,3,4,5]},{"name":"Para Resist","values":[15,31,46,62,78]},{"name":"Crystal of Power","values":[2,4,6,8,10]}]},{"number":4,"name":"Minotaur Knight","nest":"Cerberus Nest","stats":[{"name":"Magic Def","values":[14,29,43,58,73]},{"name":"Paralyze","values":[31,63,95,127,159]},{"name":"Crystal of Power","values":[4,8,12,16,20]}]},{"number":5,"name":"Minotaur Commander","nest":"Cerberus Nest","stats":[{"name":"Defense","values":[14,29,43,58,73]},{"name":"Stun","values":[31,63,95,127,159]},{"name":"Crystal of Power","values":[4,8,12,16,20]}]},{"number":6,"name":"Crow Hobgoblin","nest":"Cerberus Nest","stats":[{"name":"Attk Power","values":[2,4,6,8,10]},{"name":"Crit","values":[24,48,72,96,120]},{"name":"Crystal of Power","values":[4,8,12,16,20]}]},{"number":7,"name":"Brother Summoner","nest":"Cerberus Nest","stats":[{"name":"Magic Attk","values":[2,4,6,8,10]},{"name":"Paralyze","values":[7,15,23,31,39]},{"name":"Max MP","values":[85,171,256,342,428]},{"name":"Crystal of Power","values":[4,8,12,16,20]}]},{"number":8,"name":"Ogre Slave","nest":"Cerberus Nest","stats":[{"name":"Str","values":[2,4,6,8,10]},{"name":"Magic Def","values":[14,28,43,57,72]},{"name":"Crystal of Power","values":[4,8,12,16,20]}]},{"number":9,"name":"Ogre Commander","nest":"Cerberus Nest","stats":[{"name":"Agi","values":[2,4,6,8,10]},{"name":"Magic Def","values":[14,28,43,57,72]},{"name":"Crystal of Power","values":[4,8,12,16,20]}]},{"number":10,"name":"Cerberus Kakari","nest":"Cerberus Nest","stats":[{"name":"Attk Power","values":[4,8,12,16,21]},{"name":"Magic Attk","values":[4,8,12,16,21]},{"name":"Max HP","values":[121,242,363,484,605]},{"name":"Crystal of Power","values":[8,16,24,32,40]}]},{"number":11,"name":"Gargoyle Stinger","nest":"Manticore Nest","stats":[{"name":"Int","values":[1,2,3,4,6]},{"name":"Max MP","values":[138,276,414,552,691]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":12,"name":"Lamia Attacker","nest":"Manticore Nest","stats":[{"name":"Agi","values":[1,3,5,7,9]},{"name":"Attk Power","values":[2,5,8,11,14]},{"name":"Para Resist","values":[40,81,122,163,204]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":13,"name":"Giant Stone Half Golem","nest":"Manticore Nest","stats":[{"name":"Vit","values":[1,2,3,4,5]},{"name":"Defense","values":[14,29,44,59,74]},{"name":"Crit Resist","values":[32,64,96,128,160]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":14,"name":"Manticore Lord Kram","nest":"Manticore Nest","stats":[{"name":"Str","values":[2,4,6,8,10]},{"name":"Attk Power","values":[5,11,16,22,28]},{"name":"Paralyze","values":[64,129,193,258,323]},{"name":"Max HP","values":[81,163,245,327,409]},{"name":"Crystal of Power","values":[12,24,36,48,60]}]},{"number":15,"name":"Fearful Death Ray","nest":"Apocalypse Nest","stats":[{"name":"Magic Attk","values":[2,5,8,11,14]},{"name":"Crit","values":[16,33,49,66,83]},{"name":"Max MP","values":[76,152,228,304,381]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":16,"name":"Midnight Death Howl","nest":"Apocalypse Nest","stats":[{"name":"Str","values":[1,3,4,6,8]},{"name":"Crit","values":[13,27,40,54,68]},{"name":"Stun","values":[40,80,120,160,200]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":17,"name":"Five Brothers' Specter","nest":"Apocalypse Nest","stats":[{"name":"Attk Power","values":[2,5,8,11,14]},{"name":"Crit","values":[14,28,43,57,72]},{"name":"Paralyze","values":[40,80,120,160,200]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":18,"name":"Vengeful Ling","nest":"Apocalypse Nest","stats":[{"name":"Agi","values":[1,3,4,6,8]},{"name":"Int","values":[1,2,3,4,6]},{"name":"Stun","values":[43,86,129,172,216]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":19,"name":"Obsessed Grunt","nest":"Apocalypse Nest","stats":[{"name":"Str","values":[1,3,4,6,8]},{"name":"Magic Def","values":[12,24,37,49,62]},{"name":"Stun","values":[40,80,120,160,200]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":20,"name":"Wild Hellglaze","nest":"Apocalypse Nest","stats":[{"name":"Agi","values":[1,3,4,6,8]},{"name":"Crit","values":[14,28,42,56,70]},{"name":"Max MP","values":[84,168,252,336,420]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":21,"name":"Enraged Umhama","nest":"Apocalypse Nest","stats":[{"name":"Agi","values":[1,3,4,6,8]},{"name":"Crit","values":[18,36,54,72,91]},{"name":"Stun Resist","values":[30,61,92,123,154]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":22,"name":"Prideful Levant","nest":"Apocalypse Nest","stats":[{"name":"Str","values":[1,3,4,6,8]},{"name":"Max HP","values":[67,134,201,268,336]},{"name":"Max MP","values":[72,144,216,288,360]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":23,"name":"Fanatic Blan","nest":"Apocalypse Nest","stats":[{"name":"Magic Def","values":[8,17,25,34,43]},{"name":"Crit Resist","values":[72,144,216,288,361]},{"name":"Crystal of Power","values":[6,12,18,24,30]}]},{"number":24,"name":"Judge Apocalypse","nest":"Apocalypse Nest","stats":[{"name":"Agi","values":[2,4,6,8,10]},{"name":"Int","values":[1,3,4,6,8]},{"name":"Magic Attk","values":[5,11,16,22,28]},{"name":"Stun","values":[73,147,220,294,368]},{"name":"Crystal of Power","values":[12,24,36,48,60]}]},{"number":25,"name":"Cyclops Berserker","nest":"Sea Dragon Nest","stats":[{"name":"Vit","values":[3,6,10,13,17]},{"name":"Attk Power","values":[4,9,14,19,24]},{"name":"Paralyze","values":[148,296,445,593,742]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":26,"name":"Ogre Berserker","nest":"Sea Dragon Nest","stats":[{"name":"Agi","values":[4,9,14,19,24]},{"name":"Magic Def","values":[49,99,148,198,248]},{"name":"Max MP","values":[198,396,594,792,990]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":27,"name":"Minotaur","nest":"Sea Dragon Nest","stats":[{"name":"Vit","values":[2,5,8,11,14]},{"name":"Int","values":[3,7,10,14,18]},{"name":"Stun","values":[128,256,384,512,641]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":28,"name":"Rotting One-eyed Orc","nest":"Sea Dragon Nest","stats":[{"name":"Agi","values":[3,6,9,12,16]},{"name":"Str","values":[4,9,14,19,24]},{"name":"Magic Def","values":[28,57,86,115,144]},{"name":"MP Recovery","values":[1,2,3,4,5]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":29,"name":"Golem Lava","nest":"Sea Dragon Nest","stats":[{"name":"Vit","values":[1,2,4,5,7]},{"name":"Magic Attk","values":[4,9,14,19,24]},{"name":"Defense","values":[39,78,118,157,197]},{"name":"Stun Resist","values":[111,223,335,447,559]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":30,"name":"Revived Kakari","nest":"Sea Dragon Nest","stats":[{"name":"Str","values":[4,9,14,19,24]},{"name":"Attk Power","values":[4,9,14,19,24]},{"name":"Magic Attk","values":[4,9,14,19,24]},{"name":"Crit","values":[42,85,127,170,213]},{"name":"Stun","values":[39,79,118,158,198]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":31,"name":"Kakari Returns with Vengeance","nest":"Sea Dragon Nest","stats":[{"name":"Attk Power","values":[4,9,14,19,24]},{"name":"Magic Attk","values":[4,9,14,19,24]},{"name":"Defense","values":[44,89,134,179,224]},{"name":"Magic Def","values":[44,89,134,179,224]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":32,"name":"Lizardman Brother Claw","nest":"Sea Dragon Nest","stats":[{"name":"Str","values":[4,9,14,19,24]},{"name":"Attk Power","values":[4,9,14,19,24]},{"name":"Para Resist","values":[67,135,203,271,339]},{"name":"Crit Resist","values":[67,135,203,271,339]},{"name":"Max HP","values":[54,109,164,219,274]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":33,"name":"Lizardman Brother Tooth","nest":"Sea Dragon Nest","stats":[{"name":"Agi","values":[4,9,14,19,24]},{"name":"Magic Attk","values":[4,9,14,19,24]},{"name":"Para Resist","values":[67,135,203,271,339]},{"name":"Stun Resist","values":[67,135,203,271,339]},{"name":"Max HP","values":[54,109,164,219,274]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":34,"name":"Lizardman Brother Tail","nest":"Sea Dragon Nest","stats":[{"name":"Int","values":[3,7,10,14,18]},{"name":"Magic Attk","values":[4,9,14,19,24]},{"name":"Crit Resist","values":[67,135,203,271,339]},{"name":"Stun Resist","values":[67,135,203,271,339]},{"name":"Max HP","values":[54,109,164,219,274]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":35,"name":"Scout Captain Norbak","nest":"Sea Dragon Nest","stats":[{"name":"Agi","values":[3,6,9,12,16]},{"name":"Attk Power","values":[7,14,21,28,36]},{"name":"Para Resist","values":[78,156,234,312,390]},{"name":"MP Recovery","values":[1,2,3,4,5]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":36,"name":"Golem Moltan","nest":"Sea Dragon Nest","stats":[{"name":"Vit","values":[1,2,4,5,7]},{"name":"Magic Attk","values":[7,14,21,28,36]},{"name":"Defense","values":[28,56,85,113,142]},{"name":"Crit Resist","values":[34,69,104,139,174]},{"name":"Max MP","values":[175,351,527,703,879]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":37,"name":"Sea Dragon Serpentra","nest":"Sea Dragon Nest","stats":[{"name":"Attk Power","values":[14,28,42,56,70]},{"name":"Magic Attk","values":[14,28,42,56,70]},{"name":"Str","values":[9,18,28,37,47]},{"name":"Agi","values":[9,18,28,37,47]},{"name":"Int","values":[7,14,21,28,35]},{"name":"Vit","values":[5,11,17,23,29]},{"name":"Final Damage","values":[8,16,24,32,40]},{"name":"Crystal of Power","values":[36,72,108,144,180]}]},{"number":38,"name":"Shaman Lich Andara","nest":"Archbishop Nest","stats":[{"name":"Crit","values":[23,47,71,95,119]},{"name":"Max HP","values":[89,178,267,356,446]},{"name":"Max MP","values":[95,191,286,382,478]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":39,"name":"Golem Toadstool","nest":"Archbishop Nest","stats":[{"name":"Vit","values":[1,2,4,5,7]},{"name":"Defense","values":[19,39,59,79,99]},{"name":"Crit Resist","values":[15,31,46,62,78]},{"name":"Max HP","values":[81,163,245,327,409]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":40,"name":"Treacherous Preacher Adolf","nest":"Archbishop Nest","stats":[{"name":"Magic Def","values":[19,39,59,79,99]},{"name":"Crit","values":[20,41,61,82,103]},{"name":"Para Resist","values":[52,104,156,208,260]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":41,"name":"Vengeful Assassin Bonita","nest":"Archbishop Nest","stats":[{"name":"Agi","values":[2,4,6,8,10]},{"name":"Crit","values":[26,53,79,106,133]},{"name":"Crit Resist","values":[53,107,160,214,268]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":42,"name":"Cold-Blooded Magician Rasputin","nest":"Archbishop Nest","stats":[{"name":"Int","values":[1,3,4,6,8]},{"name":"Magic Attk","values":[2,5,8,11,14]},{"name":"Paralyze","values":[22,44,66,88,110]},{"name":"Para Resist","values":[22,44,66,88,110]},{"name":"Max MP","values":[88,176,264,352,440]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":43,"name":"Fallen Sage Ballius","nest":"Archbishop Nest","stats":[{"name":"Vit","values":[1,2,4,5,7]},{"name":"Attk Power","values":[2,5,8,11,14]},{"name":"Magic Attk","values":[2,5,8,11,14]},{"name":"Crit Resist","values":[28,56,84,112,140]},{"name":"Max MP","values":[58,117,175,234,293]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":44,"name":"Resurrected Punisher Brass","nest":"Archbishop Nest","stats":[{"name":"Str","values":[2,4,6,8,10]},{"name":"Defense","values":[9,18,28,37,47]},{"name":"Magic Def","values":[9,18,28,37,47]},{"name":"Crit Resist","values":[10,20,30,40,50]},{"name":"Max HP","values":[111,222,333,444,555]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":45,"name":"Archbishop Kazalman","nest":"Archbishop Nest","stats":[{"name":"Int","values":[2,5,8,11,14]},{"name":"Magic Attk","values":[6,13,20,27,34]},{"name":"Crit Resist","values":[47,94,141,188,235]},{"name":"Max HP","values":[47,94,141,188,235]},{"name":"MP Recovery","values":[1,2,3,4,5]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":46,"name":"Golem Fujinorth","nest":"Archbishop Nest","stats":[{"name":"Str","values":[3,7,10,14,18]},{"name":"Attk Power","values":[6,13,20,27,34]},{"name":"Defense","values":[24,49,74,99,124]},{"name":"Crit","values":[27,54,82,109,137]},{"name":"Stun Resist","values":[55,111,166,222,278]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":47,"name":"Gatekeeper Quercus","nest":"Gigantes Nest","stats":[{"name":"Agi","values":[1,3,5,7,9]},{"name":"Vit","values":[1,2,3,4,6]},{"name":"Attk Power","values":[3,6,10,13,17]},{"name":"Defense","values":[23,46,70,93,117]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":48,"name":"Watcher Blanco 04","nest":"Gigantes Nest","stats":[{"name":"Int","values":[1,2,4,5,7]},{"name":"Magic Def","values":[13,27,40,54,68]},{"name":"Max HP","values":[155,310,465,620,775]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":49,"name":"Immoral Ghost","nest":"Gigantes Nest","stats":[{"name":"Int","values":[1,2,4,5,7]},{"name":"Magic Attk","values":[3,6,10,13,17]},{"name":"Magic Def","values":[18,37,55,74,93]},{"name":"Crit Resist","values":[39,78,118,157,197]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":50,"name":"Slave Leader Constan","nest":"Gigantes Nest","stats":[{"name":"Agi","values":[2,4,6,8,10]},{"name":"Magic Def","values":[11,23,35,47,59]},{"name":"Crit","values":[17,34,51,68,86]},{"name":"Stun Resist","values":[48,96,145,193,242]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":51,"name":"Gigantes Maha","nest":"Gigantes Nest","stats":[{"name":"Str","values":[3,7,10,14,18]},{"name":"Vit","values":[2,5,8,11,14]},{"name":"Defense","values":[24,49,73,98,123]},{"name":"Max HP","values":[95,190,286,381,477]},{"name":"Max MP","values":[102,204,306,408,511]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":52,"name":"Bishop Gaius","nest":"Green Dragon Nest","stats":[{"name":"Int","values":[4,8,13,17,22]},{"name":"Vit","values":[3,6,9,12,16]},{"name":"Magic Def","values":[39,78,117,156,196]},{"name":"Paralyze","values":[37,74,112,149,187]},{"name":"Para Resist","values":[37,74,112,149,187]},{"name":"Max MP","values":[175,351,527,703,879]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":53,"name":"Golem Morgon","nest":"Green Dragon Nest","stats":[{"name":"Vit","values":[3,6,9,12,16]},{"name":"Attk Power","values":[12,25,38,51,64]},{"name":"Defense","values":[56,112,168,224,280]},{"name":"Stun","values":[101,202,304,405,507]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":54,"name":"White-eyes Krakes","nest":"Green Dragon Nest","stats":[{"name":"Magic Attk","values":[8,16,24,32,40]},{"name":"Crit","values":[41,82,123,164,205]},{"name":"Paralyze","values":[141,282,423,564,706]},{"name":"Max HP","values":[246,492,738,984,1231]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":55,"name":"Swamp Queen Zabel","nest":"Green Dragon Nest","stats":[{"name":"Str","values":[7,14,21,28,36]},{"name":"Agi","values":[7,14,21,28,36]},{"name":"Attk Power","values":[10,20,31,41,52]},{"name":"Para Resist","values":[111,222,333,444,556]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":56,"name":"Sorcerer Karahan","nest":"Green Dragon Nest","stats":[{"name":"Int","values":[6,13,20,27,34]},{"name":"Magic Attk","values":[10,20,31,41,52]},{"name":"Stun Resist","values":[103,207,311,415,519]},{"name":"MP Recovery","values":[1,2,3,4,5]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":57,"name":"Green Dragon Karahan","nest":"Green Dragon Nest","stats":[{"name":"Attk Power","values":[20,40,60,80,100]},{"name":"Magic Attk","values":[20,40,60,80,100]},{"name":"Str","values":[14,28,42,56,70]},{"name":"Agi","values":[14,28,42,56,70]},{"name":"Int","values":[10,20,31,41,52]},{"name":"Vit","values":[8,16,25,33,42]},{"name":"Final Damage","values":[12,24,36,48,60]},{"name":"Crystal of Power","values":[54,108,162,216,270]}]},{"number":58,"name":"Experiment No.287 Upgraded Tenakrun","nest":"Professor K Nest","stats":[{"name":"Crit","values":[31,63,94,126,158]},{"name":"Max HP","values":[94,188,282,376,471]},{"name":"Max MP","values":[101,202,303,404,505]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":59,"name":"Experiment No.171 Kalamari Dienu","nest":"Professor K Nest","stats":[{"name":"Int","values":[1,3,5,7,9]},{"name":"Magic Def","values":[34,68,102,136,170]},{"name":"Max HP","values":[115,231,347,463,579]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":60,"name":"Experiment No.172 Kalamari Elube","nest":"Professor K Nest","stats":[{"name":"Crit","values":[16,33,50,67,84]},{"name":"Magic Def","values":[26,52,79,105,132]},{"name":"Para Resist","values":[66,132,198,264,330]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":61,"name":"Experiment No.60 Proto Omega","nest":"Professor K Nest","stats":[{"name":"Agi","values":[2,5,8,11,14]},{"name":"Crit","values":[16,33,50,67,84]},{"name":"Crit Resist","values":[96,192,288,384,480]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":62,"name":"Little Fairy Queen Lantana","nest":"Professor K Nest","stats":[{"name":"Str","values":[2,5,8,11,14]},{"name":"Agi","values":[2,5,8,11,14]},{"name":"Paralyze","values":[18,36,54,72,90]},{"name":"Para Resist","values":[36,72,108,144,181]},{"name":"Max MP","values":[101,202,303,404,506]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":63,"name":"Experiment No.665 Super Strong XXXX","nest":"Professor K Nest","stats":[{"name":"Agi","values":[3,6,9,12,16]},{"name":"Vit","values":[1,3,4,6,8]},{"name":"Attk Power","values":[4,9,13,18,23]},{"name":"Defense","values":[28,57,85,114,143]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":64,"name":"Professor K","nest":"Professor K Nest","stats":[{"name":"Str","values":[4,9,14,19,24]},{"name":"Vit","values":[4,8,12,16,20]},{"name":"Defense","values":[24,48,72,96,120]},{"name":"Max HP","values":[147,295,443,591,739]},{"name":"Max MP","values":[158,316,475,633,792]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":65,"name":"Cursed Soul Hero","nest":"Chaos Resting Place (Tomb Invader)","stats":[{"name":"Vit","values":[3,6,9,12,15]},{"name":"Attk Power","values":[1,3,5,7,9]},{"name":"Magic Attk","values":[1,3,5,7,9]},{"name":"Crit Resist","values":[31,62,94,125,157]},{"name":"Max MP","values":[101,202,303,404,506]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":66,"name":"Cursed Soul Chemise","nest":"Chaos Resting Place (Tomb Invader)","stats":[{"name":"Int","values":[3,7,11,15,19]},{"name":"Magic Attk","values":[9,18,27,36,45]},{"name":"Crit Resist","values":[71,143,214,286,358]},{"name":"Max HP","values":[27,54,81,108,135]},{"name":"MP Recovery","values":[1,2,3,4,6]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":67,"name":"Gardener Garland","nest":"Typhoon Kim Nest","stats":[{"name":"Str","values":[2,5,7,10,13]},{"name":"Defense","values":[12,25,37,50,63]},{"name":"Magic Def","values":[12,25,37,50,63]},{"name":"Crit Resist","values":[20,40,60,80,110]},{"name":"Max HP","values":[147,295,442,590,738]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":68,"name":"Blacksmith Little John","nest":"Typhoon Kim Nest","stats":[{"name":"Vit","values":[1,3,5,7,9]},{"name":"Defense","values":[26,52,79,105,132]},{"name":"Crit Resist","values":[27,55,83,111,139]},{"name":"Max HP","values":[81,163,245,327,409]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":69,"name":"Orc Kim Trio","nest":"Typhoon Kim Nest","stats":[{"name":"Agi","values":[3,7,11,15,19]},{"name":"Magic Def","values":[15,31,46,62,78]},{"name":"Crit","values":[22,45,68,91,114]},{"name":"Stun Resist","values":[39,78,117,156,196]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":70,"name":"Harpy Dark Mage","nest":"Typhoon Kim Nest","stats":[{"name":"Int","values":[1,3,5,7,9]},{"name":"Magic Attk","values":[4,8,12,16,20]},{"name":"Magic Def","values":[24,49,74,99,124]},{"name":"Crit Resist","values":[46,92,139,185,232]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":71,"name":"Typhoon Kim","nest":"Typhoon Kim Nest","stats":[{"name":"Str","values":[4,9,14,19,24]},{"name":"Attk Power","values":[9,18,27,36,45]},{"name":"Stun","values":[26,52,79,105,132]},{"name":"Crit","values":[36,72,108,145,182]},{"name":"Paralyze","values":[95,191,286,382,478]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":72,"name":"Spitflower Ignis","nest":"Desert Dragon Nest","stats":[{"name":"Str","values":[3,6,9,12,15]},{"name":"Agi","values":[1,2,4,5,7]},{"name":"Attk Power","values":[10,20,30,40,50]},{"name":"Defense","values":[74,148,223,297,372]},{"name":"Paralyze","values":[167,334,501,668,836]},{"name":"Stun Resist","values":[170,350,520,700,880]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":73,"name":"Storm Master Zuu","nest":"Desert Dragon Nest","stats":[{"name":"Agi","values":[4,8,12,16,20]},{"name":"Int","values":[4,8,12,16,20]},{"name":"Vit","values":[6,12,18,24,31]},{"name":"Magic Def","values":[52,104,156,208,261]},{"name":"Stun Resist","values":[63,127,190,254,318]},{"name":"Max MP","values":[202,405,607,810,1013]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":74,"name":"Canyon Guardian Abubbah","nest":"Desert Dragon Nest","stats":[{"name":"Magic Attk","values":[10,21,31,42,53]},{"name":"Stun","values":[228,456,684,912,1141]},{"name":"Crit","values":[41,82,123,164,205]},{"name":"Max HP","values":[80,160,240,320,400]},{"name":"Max MP","values":[80,160,240,320,400]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":75,"name":"Sandworm Hazal","nest":"Desert Dragon Nest","stats":[{"name":"Str","values":[9,19,28,38,48]},{"name":"Agi","values":[9,19,28,38,48]},{"name":"Attk Power","values":[13,27,41,55,69]},{"name":"Stun Resist","values":[17,34,51,68,85]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":76,"name":"Loyal Follower Kajif","nest":"Desert Dragon Nest","stats":[{"name":"Int","values":[9,18,27,36,45]},{"name":"Magic Attk","values":[13,27,41,55,69]},{"name":"Stun Resist","values":[151,302,454,605,757]},{"name":"MP Recovery","values":[1,2,3,4,5]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":77,"name":"Desert Dragon Jakard","nest":"Desert Dragon Nest","stats":[{"name":"Attk Power","values":[27,54,81,108,135]},{"name":"Magic Attk","values":[27,54,81,108,135]},{"name":"Str","values":[25,50,75,100,125]},{"name":"Agi","values":[25,50,75,100,125]},{"name":"Int","values":[19,38,57,76,95]},{"name":"Vit","values":[15,30,45,60,75]},{"name":"Final Damage","values":[16,33,49,66,83]},{"name":"Crystal of Power","values":[54,108,162,216,270]}]},{"number":78,"name":"Arch Frogolin Augur","nest":"Guardian Nest","stats":[{"name":"Int","values":[1,2,3,4,6]},{"name":"Vit","values":[1,2,3,4,5]},{"name":"Magic Def","values":[24,49,74,99,124]},{"name":"Max HP","values":[143,287,431,575,719]},{"name":"Max MP","values":[66,132,199,265,332]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":79,"name":"Furious Aera Venom","nest":"Guardian Nest","stats":[{"name":"Str","values":[1,3,4,6,8]},{"name":"Agi","values":[3,7,11,15,19]},{"name":"Defense","values":[11,22,33,44,55]},{"name":"Stun","values":[11,23,35,47,59]},{"name":"Stun Resist","values":[67,134,201,268,335]},{"name":"Max MP","values":[66,132,198,264,331]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":80,"name":"The Great Dux Arks","nest":"Guardian Nest","stats":[{"name":"Magic Attk","values":[0,0,1,1,2]},{"name":"Agi","values":[3,7,11,15,19]},{"name":"Int","values":[1,2,3,4,6]},{"name":"Magic Def","values":[24,49,74,99,124]},{"name":"Crit Resist","values":[77,154,231,308,386]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":81,"name":"Ignacio Gigante","nest":"Guardian Nest","stats":[{"name":"Attk Power","values":[0,1,1,2,3]},{"name":"Str","values":[1,3,4,6,8]},{"name":"Defense","values":[33,66,99,132,166]},{"name":"Magic Def","values":[24,49,74,99,124]},{"name":"Crit Resist","values":[18,36,54,72,91]},{"name":"Max HP","values":[42,84,127,169,212]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":84,"name":"Fell Guardian, Keeper of the Forest","nest":"Guardian Nest","stats":[{"name":"Int","values":[3,6,9,12,15]},{"name":"Magic Attk","values":[7,14,21,28,36]},{"name":"Magic Def","values":[25,50,76,101,127]},{"name":"Crit Resist","values":[86,172,258,344,430]},{"name":"Max HP","values":[32,64,97,129,162]},{"name":"MP Recovery","values":[1,2,3,4,6]},{"name":"Crit Damage","values":[13,27,40,54,68]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":83,"name":"Devoured Echo Adventurer","nest":"Mysterious Resting Place (Tomb Invader)","stats":[{"name":"Vit","values":[3,6,9,12,15]},{"name":"Attk Power","values":[2,4,6,8,11]},{"name":"Magic Attk","values":[2,4,6,8,11]},{"name":"Crit","values":[9,19,29,39,49]},{"name":"Crit Resist","values":[37,75,113,151,189]},{"name":"Max MP","values":[66,132,198,264,330]},{"name":"Crit Damage","values":[16,33,50,67,84]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":86,"name":"Devoured Echo Chemise","nest":"Mysterious Resting Place (Tomb Invader)","stats":[{"name":"Str","values":[5,11,17,23,29]},{"name":"Attk Power","values":[7,14,21,28,36]},{"name":"Stun","values":[31,63,94,126,158]},{"name":"Crit","values":[21,43,65,87,109]},{"name":"Crit Resist","values":[57,114,172,229,287]},{"name":"Paralyze","values":[43,87,131,175,219]},{"name":"Stun Resist","values":[57,114,172,229,287]},{"name":"Crit Damage","values":[28,57,86,115,144]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":82,"name":"Rusty Mist Gustcry","nest":"Mist Nest","stats":[{"name":"Crit","values":[47,95,143,191,239]},{"name":"Stun Resist","values":[25,51,77,103,129]},{"name":"Max HP","values":[101,202,304,405,507]},{"name":"Crit Damage","values":[16,33,50,67,84]},{"name":"Crystal of Power","values":[9,18,27,36,45]}]},{"number":85,"name":"Weeping Mist Queen","nest":"Mist Nest","stats":[{"name":"Str","values":[5,11,17,23,29]},{"name":"Vit","values":[4,9,14,19,24]},{"name":"Defense","values":[28,57,86,115,144]},{"name":"Stun","values":[88,177,266,355,444]},{"name":"Max HP","values":[177,354,532,709,887]},{"name":"Crystal of Power","values":[18,36,54,72,90]}]},{"number":87,"name":"Centurian Ogre Baopar","nest":"Black Dragon Nest","stats":[{"name":"Attk Power","values":[1,3,4,6,8]},{"name":"Defense","values":[93,186,279,372,465]},{"name":"Stun","values":[141,282,424,565,707]},{"name":"Paralyze","values":[209,418,627,836,1046]},{"name":"Stun Resist","values":[22,44,66,88,110]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":88,"name":"Engata General Umbala","nest":"Black Dragon Nest","stats":[{"name":"Str","values":[5,10,15,20,26]},{"name":"Agi","values":[5,10,15,20,26]},{"name":"Para Resist","values":[213,426,639,852,1066]},{"name":"Max MP","values":[291,582,873,1164,1456]},{"name":"Crit Damage","values":[138,276,415,553,692]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":89,"name":"Black Ring Punisher Meluka","nest":"Black Dragon Nest","stats":[{"name":"Agi","values":[5,10,15,20,26]},{"name":"Int","values":[5,10,15,20,26]},{"name":"Vit","values":[3,6,9,12,15]},{"name":"Magic Def","values":[65,130,195,260,326]},{"name":"Crit","values":[38,76,114,152,190]},{"name":"Stun Resist","values":[79,158,238,317,397]},{"name":"Max MP","values":[253,506,759,1012,1266]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":90,"name":"Chiliarch Titanion","nest":"Black Dragon Nest","stats":[{"name":"Int","values":[3,7,11,15,19]},{"name":"Crit","values":[47,94,142,189,237]},{"name":"Stun Resist","values":[94,189,283,378,473]},{"name":"Max HP","values":[200,400,600,800,1000]},{"name":"MP Recovery","values":[1,2,3,4,6]},{"name":"Crit Damage","values":[138,276,415,553,692]},{"name":"Crystal of Power","values":[27,54,81,108,135]}]},{"number":91,"name":"Black Dragon Feder","nest":"Black Dragon Nest","stats":[{"name":"Attk Power","values":[33,67,101,135,169]},{"name":"Magic Attk","values":[33,67,101,135,169]},{"name":"Str","values":[29,59,88,118,148]},{"name":"Agi","values":[29,59,88,118,148]},{"name":"Int","values":[22,44,66,88,111]},{"name":"Vit","values":[17,35,53,71,89]},{"name":"Final Damage","values":[20,41,61,82,103]},{"name":"Crit Damage","values":[82,165,248,331,414]},{"name":"Crystal of Power","values":[54,108,162,216,270]}]}];
+        const CARD_WIKI_RARITIES = [
+            { name:'Magic', colorName:'Green', css:'magic', valueIndex:0 },
+            { name:'Rare', colorName:'Blue', css:'rare', valueIndex:1 },
+            { name:'Epic', colorName:'Orange', css:'epic', valueIndex:2 },
+            { name:'Unique', colorName:'Purple', css:'unique', valueIndex:3 },
+            { name:'Legend', colorName:'Red', css:'legend', valueIndex:4 }
+        ];
+        let cardWikiCompareNumbers = [];
+        let cardWikiActiveDetailNumber = null;
+        let cardWikiSelectedStats = [];
+        let cardWikiActivePreset = '';
+        const CARD_WIKI_PRESETS = {
+            magic: ['Magic Attk','Int','Final Damage'],
+            physical: ['Attk Power','Str','Agi','Final Damage'],
+            defensive: ['Defense','Magic Def','Vit','Max HP']
+        };
+        let memberDirectoryEditingId = null;
+
+        const CARD_WIKI_STAT_LABELS = {
+            'Attk Power':'PATK', 'Magic Attk':'MATK', 'Magic Def':'Magic Defense',
+            'Str':'STR', 'Agi':'AGI', 'Int':'INT', 'Vit':'VIT', 'Crit':'Crit',
+            'Crit Resist':'Crit Resist', 'Para Resist':'Paralyze Resist', 'Stun Resist':'Stun Resist',
+            'Paralyze':'Paralyze', 'Defense':'Defense', 'Max HP':'Max HP', 'Max MP':'Max MP',
+            'MP Recovery':'MP Recovery', 'Final Damage':'Final Damage', 'Crit Damage':'Crit Damage',
+            'Crystal of Power':'Crystal of Power', 'Stun':'Stun'
+        };
+        const CARD_WIKI_CAPS = {
+            'Minotaur Nest':40, 'Cerberus Nest':40, 'Manticore Nest':40, 'Apocalypse Nest':40,
+            'Sea Dragon Nest':40, 'Archbishop Nest':40,
+            'Gigantes Nest':50, 'Green Dragon Nest':50,
+            'Professor K Nest':60, 'Chaos Resting Place (Tomb Invader)':60, 'Typhoon Kim Nest':60,
+            'Desert Dragon Nest':60, 'Guardian Nest':60, 'Mysterious Resting Place (Tomb Invader)':60,
+            'Mist Nest':60, 'Black Dragon Nest':70
+        };
+        function cardWikiStatLabel(name) { return CARD_WIKI_STAT_LABELS[name] || name; }
+        function cardWikiCardCap(card) { return CARD_WIKI_CAPS[card.nest] || 70; }
+        function cardWikiCapName(cap) {
+            return ({40:'Sea Dragon and below',50:'Green Dragon and below',60:'Desert Dragon and below',70:'Black Dragon and below'})[Number(cap)] || 'Black Dragon and below';
+        }
+        function getCardWikiCard(number) { return CARD_WIKI_DATA.find(c => c.number === Number(number)); }
+        function cardWikiTierIndex() { return Math.max(0, Math.min(4, Number(document.getElementById('card-wiki-preview-rarity')?.value ?? 4))); }
+        function cardWikiRarity() { return CARD_WIKI_RARITIES[cardWikiTierIndex()]; }
+        function cardWikiFilterStats() {
+            return [...new Set(CARD_WIKI_DATA.flatMap(c => c.stats.map(s => s.name)))].filter(name => name !== 'Crystal of Power').sort((a,b)=>cardWikiStatLabel(a).localeCompare(cardWikiStatLabel(b)));
+        }
+        function initCardWiki() {
+            const options = document.getElementById('card-wiki-stat-options');
+            if (!options) return;
+            if (options.dataset.ready !== '1') options.dataset.ready = '1';
+            renderCardWikiStatOptions();
+            renderCardWiki();
+        }
+        function renderCardWikiPresetChecks() {
+            document.querySelectorAll('input[data-card-preset]').forEach(input => { input.checked = input.dataset.cardPreset === cardWikiActivePreset; });
+        }
+        function applyCardWikiPreset(name, checked) {
+            if (checked) {
+                cardWikiActivePreset = name;
+                cardWikiSelectedStats = [...(CARD_WIKI_PRESETS[name] || [])];
+                const mode = document.getElementById('card-wiki-match-mode'); if (mode) mode.value = 'all';
+            } else if (cardWikiActivePreset === name) {
+                cardWikiActivePreset = '';
+                cardWikiSelectedStats = [];
+            }
+            renderCardWikiPresetChecks();
+            renderCardWikiStatOptions();
+            renderCardWiki();
+        }
+        function toggleCardWikiStatFilter(rawName, checked) {
+            if (checked) {
+                if (!cardWikiSelectedStats.includes(rawName)) cardWikiSelectedStats.push(rawName);
+            } else {
+                cardWikiSelectedStats = cardWikiSelectedStats.filter(s => s !== rawName);
+            }
+            cardWikiActivePreset = '';
+            renderCardWikiPresetChecks();
+            renderCardWikiStatOptions();
+            renderCardWiki();
+        }
+        function clearCardWikiStatFilters() {
+            cardWikiSelectedStats = [];
+            const q = document.getElementById('card-wiki-stat-search'); if (q) q.value = '';
+            renderCardWikiStatOptions();
+            renderCardWiki();
+        }
+        function cardWikiStatGroupFor(name) {
+            if (name === 'Attk Power' || name === 'Magic Attk') return 'offensive';
+            if (name === 'Str' || name === 'Agi' || name === 'Int') return 'stats';
+            if (['Defense','Magic Def','Vit','Max HP'].includes(name)) return 'defensive';
+            return 'other';
+        }
+        function renderCardWikiStatOptions() {
+            const list = document.getElementById('card-wiki-stat-options');
+            const selected = document.getElementById('card-wiki-selected-stats');
+            if (!list || !selected) return;
+            const q = (document.getElementById('card-wiki-stat-search')?.value || '').trim().toLowerCase();
+            const allNames = cardWikiFilterStats();
+            const groups = [
+                { key:'offensive', title:'OFFENSIVE', subtitle:'PATK · MATK' },
+                { key:'stats', title:'STATS', subtitle:'STR · AGI · INT' },
+                { key:'defensive', title:'DEFENSIVE', subtitle:'DEF · MDEF · VIT · HP' },
+                { key:'other', title:'UTILITY & OTHER', subtitle:'CRIT · FD · RESISTS · MP' }
+            ];
+            const groupHtml = groups.map(group => {
+                const names = allNames.filter(name => cardWikiStatGroupFor(name) === group.key).filter(name => {
+                    const blob = `${name} ${cardWikiStatLabel(name)}`.toLowerCase();
+                    return !q || blob.includes(q) || cardWikiSelectedStats.includes(name);
+                }).sort((a,b) => cardWikiStatLabel(a).localeCompare(cardWikiStatLabel(b)));
+                if (!names.length) return '';
+                return `<section class="card-wiki-stat-group" data-stat-group="${group.key}"><div class="card-wiki-stat-group-head"><span class="card-wiki-stat-group-title">${group.title}</span><span class="card-wiki-stat-group-subtitle">${group.subtitle}</span></div><div class="card-wiki-stat-group-options">${names.map(name => `<label class="card-wiki-stat-option"><input type="checkbox" ${cardWikiSelectedStats.includes(name) ? 'checked' : ''} onchange="toggleCardWikiStatFilter('${escapeHTML(name)}',this.checked)"><span>${escapeHTML(cardWikiStatLabel(name))}</span></label>`).join('')}</div></section>`;
+            }).join('');
+            list.innerHTML = groupHtml || '<span class="card-wiki-selected-none">No stats match that search.</span>';
+            selected.innerHTML = cardWikiSelectedStats.length
+                ? `<span style="color:#8f98aa;font-size:.69rem;font-weight:800;">SELECTED:</span>` + cardWikiSelectedStats.map(name => `<button type="button" class="card-wiki-selected-tag" onclick="toggleCardWikiStatFilter('${escapeHTML(name)}',false)" title="Remove ${escapeHTML(cardWikiStatLabel(name))}">${escapeHTML(cardWikiStatLabel(name))} ×</button>`).join('')
+                : '<span class="card-wiki-selected-none">No desired stats selected. Choose stats above to browse all cards available at this level cap.</span>';
+        }
+        function clearCardWikiFilters() {
+            const q = document.getElementById('card-wiki-search'), cap = document.getElementById('card-wiki-level-cap'), rarity = document.getElementById('card-wiki-preview-rarity'), sort = document.getElementById('card-wiki-sort'), mode = document.getElementById('card-wiki-match-mode'), statSearch = document.getElementById('card-wiki-stat-search');
+            if (q) q.value = '';
+            if (cap) cap.value = '70';
+            if (rarity) rarity.value = '4';
+            if (sort) sort.value = 'number';
+            if (mode) mode.value = 'any';
+            if (statSearch) statSearch.value = '';
+            cardWikiSelectedStats = [];
+            cardWikiActivePreset = '';
+            renderCardWikiPresetChecks();
+            renderCardWikiStatOptions();
+            renderCardWiki();
+        }
+        function getFilteredCardWikiCards() {
+            const query = (document.getElementById('card-wiki-search')?.value || '').trim().toLowerCase();
+            const maxCap = Number(document.getElementById('card-wiki-level-cap')?.value || 70);
+            const sort = document.getElementById('card-wiki-sort')?.value || 'number';
+            const mode = document.getElementById('card-wiki-match-mode')?.value || 'any';
+            const selected = [...cardWikiSelectedStats];
+            const out = CARD_WIKI_DATA.filter(card => {
+                if (cardWikiCardCap(card) > maxCap) return false;
+                const cardStatNames = card.stats.map(s => s.name);
+                const matchedCount = selected.filter(name => cardStatNames.includes(name)).length;
+                if (selected.length && mode === 'all' && matchedCount !== selected.length) return false;
+                if (selected.length && mode !== 'all' && matchedCount < 1) return false;
+                if (query) {
+                    const searchBlob = [card.number, card.name, ...card.stats.flatMap(s => [s.name, cardWikiStatLabel(s.name)])].join(' ').toLowerCase();
+                    if (!searchBlob.includes(query)) return false;
+                }
+                return true;
+            });
+            out.sort(sort === 'name'
+                ? (a,b) => a.name.localeCompare(b.name)
+                : sort === 'match'
+                    ? (a,b) => selected.filter(n=>b.stats.some(s=>s.name===n)).length - selected.filter(n=>a.stats.some(s=>s.name===n)).length || a.number-b.number
+                    : (a,b) => a.number-b.number);
+            return out;
+        }
+        function renderCardWiki() {
+            const grid = document.getElementById('card-wiki-grid'); if (!grid) return;
+            const cards = getFilteredCardWikiCards(), tier = cardWikiRarity();
+            const result = document.getElementById('card-wiki-result-count');
+            const maxCap = Number(document.getElementById('card-wiki-level-cap')?.value || 70);
+            const mode = document.getElementById('card-wiki-match-mode')?.value || 'any';
+            if (result) {
+                const selectedLabels = cardWikiSelectedStats.map(cardWikiStatLabel);
+                const filterText = selectedLabels.length ? `${mode === 'all' ? 'all of' : 'one or more of'} ${selectedLabels.join(' + ')}` : 'all build stats';
+                result.textContent = `${cards.length} cards · Level ${maxCap} cap (${cardWikiCapName(maxCap)}) · ${selectedLabels.length ? `matching ${filterText}` : 'choose desired stats to narrow results'} · ${tier.name} values`;
+            }
+            const compareButton = document.getElementById('card-wiki-compare-button');
+            if (compareButton) { compareButton.textContent = `Compare (${cardWikiCompareNumbers.length}/3)`; compareButton.disabled = cardWikiCompareNumbers.length < 2; }
+            if (!cards.length) {
+                grid.innerHTML = `<div class="card-wiki-empty">No cards match these build filters at Level ${maxCap}. Try changing the desired stats, match mode, or level cap.</div>`;
+                return;
+            }
+            grid.innerHTML = cards.map(card => {
+                const selected = cardWikiCompareNumbers.includes(card.number);
+                const statNames = cardWikiSelectedStats.length
+                    ? cardWikiSelectedStats.filter(name => card.stats.some(st => st.name === name))
+                    : card.stats.filter(st => st.name !== 'Crystal of Power').slice(0,4).map(st => st.name);
+                const statPills = statNames.map(name => {
+                    const stat = card.stats.find(st => st.name === name);
+                    if (!stat) return '';
+                    const isMatch = cardWikiSelectedStats.includes(name);
+                    return `<span class="card-wiki-stat-value ${isMatch ? 'is-match' : ''}"><span>${escapeHTML(cardWikiStatLabel(name))}</span><strong>${stat.values[tier.valueIndex].toLocaleString()}</strong></span>`;
+                }).join('');
+                const extraCount = !cardWikiSelectedStats.length ? Math.max(0, card.stats.filter(st=>st.name!=='Crystal of Power').length - statNames.length) : 0;
+                return `<article class="card-wiki-result-row ${selected?'is-comparing':''}" role="button" tabindex="0" aria-label="Open ${escapeHTML(card.name)} card details" onclick="openCardWikiDetail(${card.number})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCardWikiDetail(${card.number})}">
+                    <div class="card-wiki-result-identity"><span class="card-wiki-result-number">#${card.number}</span><div style="min-width:0;"><h3 class="card-wiki-result-name">${escapeHTML(card.name)}</h3><div class="card-wiki-result-meta"><span class="card-wiki-cap-tag">CAP ${cardWikiCardCap(card)}</span><span class="card-wiki-tier-pill card-rarity-${tier.css}">${tier.name}</span>${cardWikiSelectedStats.length?`<span class="card-wiki-cap-tag">${statNames.length} desired stat${statNames.length===1?'':'s'} matched</span>`:''}</div></div></div>
+                    <div class="card-wiki-result-stats">${statPills || '<span class="card-wiki-selected-none">No matching stat values</span>'}${extraCount?`<span class="card-wiki-selected-none">+${extraCount} more stats in details</span>`:''}</div>
+                    <div class="card-wiki-result-actions"><label class="card-wiki-result-compare" onclick="event.stopPropagation()"><input type="checkbox" ${selected?'checked':''} ${!selected&&cardWikiCompareNumbers.length>=3?'disabled':''} onchange="toggleCardWikiCompare(${card.number},this.checked)"> Compare</label><span class="card-wiki-result-open">View all stats ↗</span></div>
+                </article>`;
+            }).join('');
+        }
+        function toggleCardWikiCompare(number, checked) {
+            const n = Number(number);
+            if (checked) {
+                if (!cardWikiCompareNumbers.includes(n) && cardWikiCompareNumbers.length >= 3) { alert('You can compare up to three cards at a time.'); renderCardWiki(); return; }
+                if (!cardWikiCompareNumbers.includes(n)) cardWikiCompareNumbers.push(n);
+            } else cardWikiCompareNumbers = cardWikiCompareNumbers.filter(x => x !== n);
+            renderCardWiki();
+            const detailButton = document.getElementById('card-wiki-detail-compare');
+            if (detailButton && cardWikiActiveDetailNumber === n) detailButton.textContent = cardWikiCompareNumbers.includes(n) ? '✓ Added to Compare' : '＋ Add to Compare';
+        }
+        function openCardWikiDetail(number) {
+            const card = getCardWikiCard(number); if (!card) return;
+            cardWikiActiveDetailNumber = card.number;
+            document.getElementById('card-wiki-detail-title').textContent = `#${card.number} · ${card.name}`;
+            document.getElementById('card-wiki-detail-meta').textContent = `Level ${cardWikiCardCap(card)} card pool · available in higher level-cap selections too`;
+            const head = '<thead><tr><th>Stat</th>' + CARD_WIKI_RARITIES.map(t=>`<th class="tier-${t.css}">${t.name}</th>`).join('') + '</tr></thead>';
+            const rows = card.stats.map(st=>`<tr><td>${escapeHTML(cardWikiStatLabel(st.name))}</td>${st.values.map((v,i)=>`<td class="${CARD_WIKI_RARITIES[i].css==='magic'?'tier-magic':CARD_WIKI_RARITIES[i].css==='rare'?'tier-rare':CARD_WIKI_RARITIES[i].css==='epic'?'tier-epic':CARD_WIKI_RARITIES[i].css==='unique'?'tier-unique':'tier-legend'}">${v.toLocaleString()}</td>`).join('')}</tr>`).join('');
+            document.getElementById('card-wiki-detail-table').innerHTML = `<table class="card-wiki-stats-table">${head}<tbody>${rows}</tbody></table>`;
+            const btn = document.getElementById('card-wiki-detail-compare');
+            btn.textContent = cardWikiCompareNumbers.includes(card.number) ? '✓ Added to Compare' : '＋ Add to Compare';
+            btn.disabled = !cardWikiCompareNumbers.includes(card.number) && cardWikiCompareNumbers.length >= 3;
+            openModal('card-wiki-detail-modal');
+        }
+        function toggleCardCompareFromDetail() {
+            if (cardWikiActiveDetailNumber == null) return;
+            toggleCardWikiCompare(cardWikiActiveDetailNumber, !cardWikiCompareNumbers.includes(cardWikiActiveDetailNumber));
+            const btn = document.getElementById('card-wiki-detail-compare');
+            if (btn) { btn.textContent = cardWikiCompareNumbers.includes(cardWikiActiveDetailNumber) ? '✓ Added to Compare' : '＋ Add to Compare'; btn.disabled = !cardWikiCompareNumbers.includes(cardWikiActiveDetailNumber) && cardWikiCompareNumbers.length >= 3; }
+        }
+        function openCardWikiComparison() {
+            const cards = cardWikiCompareNumbers.map(getCardWikiCard).filter(Boolean);
+            if (cards.length < 2) { alert('Select at least two cards to compare.'); return; }
+            const tier = cardWikiRarity();
+            const allStats = [...new Set(cards.flatMap(c=>c.stats.map(st=>st.name)))].sort((a,b)=>cardWikiStatLabel(a).localeCompare(cardWikiStatLabel(b)));
+            const headers = '<thead><tr><th>Stat</th>' + cards.map(c=>`<th>${escapeHTML(c.name)}<br><span style="color:#9299a8;font-weight:500;">#${c.number} · Cap ${cardWikiCardCap(c)}</span></th>`).join('') + '</tr></thead>';
+            const rows = allStats.map(name=>`<tr><td>${escapeHTML(cardWikiStatLabel(name))}</td>${cards.map(c=>{const st=c.stats.find(x=>x.name===name);return `<td>${st?st.values[tier.valueIndex].toLocaleString():'—'}</td>`;}).join('')}</tr>`).join('');
+            document.getElementById('card-wiki-compare-content').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px;"><span class="card-wiki-tier-pill card-rarity-${tier.css}">${tier.name} tier</span><span style="color:#9299a8;font-size:.75rem;">${cards.length} cards · ${tier.colorName} values from source</span></div><div class="card-wiki-compare-wrap"><table class="card-wiki-compare-table">${headers}<tbody>${rows}</tbody></table></div>`;
+            openModal('card-wiki-compare-modal');
+        }
+
+
+        // ===== Shared Member Directory (independent of tracked characters) =====
+        function getMemberDirectoryRows() {
+            const rows = new Map();
+            getRosters().forEach(roster => {
+                const key = roster.name.trim().toLowerCase();
+                rows.set(key, { key, name:roster.name, characters:[...roster.characters], note:'', tracked:true, directoryId:'' });
+            });
+            normalizeMemberDirectory(cloudData.settings.memberDirectory).forEach(member => {
+                const key = member.name.trim().toLowerCase(), existing = rows.get(key);
+                if (existing) {
+                    existing.characters = [...new Set([...existing.characters, ...member.characters])];
+                    existing.note = member.note || existing.note;
+                    existing.directoryId = member.id;
+                } else rows.set(key, { key, name:member.name, characters:[...member.characters], note:member.note, tracked:false, directoryId:member.id });
+            });
+            return [...rows.values()].sort((a,b)=>a.name.localeCompare(b.name));
+        }
+        function renderMemberDirectory() {
+            const list = document.getElementById('member-directory-list'); if (!list) return;
+            const q = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
+            const rows = getMemberDirectoryRows().filter(row => [row.name,row.note,...row.characters].join(' ').toLowerCase().includes(q));
+            const memberCount = rows.length, charCount = rows.reduce((n,row)=>n+row.characters.length,0);
+            const count = document.getElementById('member-directory-count'); if (count) count.textContent = `${memberCount} member${memberCount===1?'':'s'} · ${charCount} listed character${charCount===1?'':'s'}`;
+            list.innerHTML = rows.length ? rows.map(row => `<article class="member-directory-card"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(row.name)}</h3><div class="member-directory-meta">${row.tracked?'Tracker registered':'Directory only'}${row.note?' · '+escapeHTML(row.note):''}</div></div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(row.key)}">Edit</button>${row.directoryId?`<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(row.directoryId)}">Remove</button>`:''}</div></div><div class="member-directory-char-heading">Owned characters · ${row.characters.length}</div>${row.characters.length?`<div class="member-directory-chars">${row.characters.map(name=>`<span class="member-directory-char">${escapeHTML(name)}</span>`).join('')}</div>`:'<div class="member-directory-meta">No characters listed. This member does not need a tracker registration.</div>'}</article>`).join('') : '<div class="member-directory-empty"><strong>No matching members.</strong><br>Add a guild member above. Characters are optional.</div>';
+        }
+        function resetMemberDirectoryForm() {
+            memberDirectoryEditingId = null;
+            document.getElementById('member-directory-form')?.reset();
+            const title=document.getElementById('member-directory-form-title'), submit=document.getElementById('member-directory-submit'), cancel=document.getElementById('member-directory-cancel');
+            if(title)title.textContent='Add a guild member'; if(submit)submit.textContent='Add member'; if(cancel)cancel.hidden=true;
+        }
+        function editMemberDirectoryRow(key) {
+            const row=getMemberDirectoryRows().find(item=>item.key===String(key)); if(!row)return;
+            const saved=normalizeMemberDirectory(cloudData.settings.memberDirectory).find(item=>item.name.trim().toLowerCase()===row.key);
+            memberDirectoryEditingId=saved?.id||'';
+            document.getElementById('member-directory-name').value=row.name;
+            document.getElementById('member-directory-characters').value=(saved?.characters||[]).join(', ');
+            document.getElementById('member-directory-note').value=saved?.note||'';
+            document.getElementById('member-directory-form-title').textContent='Edit guild member';
+            document.getElementById('member-directory-submit').textContent='Save changes';
+            document.getElementById('member-directory-cancel').hidden=false;
+            document.getElementById('member-directory-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+        }
+        async function saveMemberDirectoryEntry(event) {
+            event.preventDefault();
+            const name=document.getElementById('member-directory-name').value.trim(); if(!name)return;
+            const characters=[...new Set(document.getElementById('member-directory-characters').value.split(/[,;\n]/).map(x=>x.trim().slice(0,60)).filter(Boolean))].slice(0,30);
+            const note=document.getElementById('member-directory-note').value.trim().slice(0,180);
+            if(!await prepareGlobalChange(`Updated member directory: ${name}`)) return;
+            const existing=normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const priorIndex=existing.findIndex(item=>item.id===memberDirectoryEditingId || item.name.trim().toLowerCase()===name.toLowerCase());
+            if(priorIndex>=0) existing[priorIndex]={...existing[priorIndex],name,characters,note};
+            else existing.push({id:`member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,7)}`,name,characters,note});
+            cloudData.settings.memberDirectory=normalizeMemberDirectory(existing);
+            cloudData.settings.memberDirectoryUpdatedAt=Date.now(); cloudData.settings.memberDirectoryUpdatedBy=deviceId; cloudData.updatedAt=Date.now();
+            persistLocalData(); resetMemberDirectoryForm(); renderMemberDirectory(); triggerAutoSync();
+        }
+        async function removeMemberDirectoryEntry(id) {
+            const entry=normalizeMemberDirectory(cloudData.settings.memberDirectory).find(item=>item.id===String(id));
+            if(!entry||!confirm(`Remove ${entry.name} from the extra member directory? Registered tracker owners will still appear.`))return;
+            if(!await prepareGlobalChange(`Removed member directory entry: ${entry.name}`))return;
+            cloudData.settings.memberDirectory=normalizeMemberDirectory(cloudData.settings.memberDirectory).filter(item=>item.id!==String(id));
+            cloudData.settings.memberDirectoryUpdatedAt=Date.now(); cloudData.settings.memberDirectoryUpdatedBy=deviceId; cloudData.updatedAt=Date.now();
+            persistLocalData(); if(memberDirectoryEditingId===String(id))resetMemberDirectoryForm(); renderMemberDirectory(); triggerAutoSync();
+        }
+
         function showAppPage(page) {
-            const tracker = document.getElementById('tracker-page'), builder = document.getElementById('team-builder-page');
-            if (!tracker || !builder) return;
-            const isBuilder = page === 'team-builder';
-            tracker.classList.toggle('hidden-page', isBuilder);
-            builder.classList.toggle('hidden-page', !isBuilder);
-            document.getElementById('page-tab-tracker')?.classList.toggle('active', !isBuilder);
-            document.getElementById('page-tab-team-builder')?.classList.toggle('active', isBuilder);
-            if (isBuilder) { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
-            else if (location.hash === '#team-builder') history.replaceState(null, '', location.pathname + location.search);
+            const pages = {
+                tracker: document.getElementById('tracker-page'),
+                'team-builder': document.getElementById('team-builder-page'),
+                'card-wiki': document.getElementById('card-wiki-page'),
+                'member-roster': document.getElementById('member-roster-page')
+            };
+            if (!pages[page]) page = 'tracker';
+            Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
+            document.getElementById('page-tab-tracker')?.classList.toggle('active', page === 'tracker');
+            document.getElementById('page-tab-team-builder')?.classList.toggle('active', page === 'team-builder');
+            document.getElementById('page-tab-card-wiki')?.classList.toggle('active', page === 'card-wiki');
+            if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
+            else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
+            else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
+            else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster') history.replaceState(null, '', location.pathname + location.search);
         }
 
 
@@ -3476,9 +4057,11 @@
         function handlePageRoute() {
             closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal');
             if (location.hash === '#registration') { showAppPage('tracker'); renderRosterRegistration(); openModal('roster-modal'); }
-            if (location.hash === '#dungeons') { showAppPage('tracker'); renderDungeonRegistration(); openModal('dungeon-modal'); }
-            if (location.hash === '#team-builder') showAppPage('team-builder');
-            else if (location.hash !== '#registration' && location.hash !== '#dungeons') showAppPage('tracker');
+            else if (location.hash === '#dungeons') { showAppPage('tracker'); renderDungeonRegistration(); openModal('dungeon-modal'); }
+            else if (location.hash === '#team-builder') showAppPage('team-builder');
+            else if (location.hash === '#card-wiki') showAppPage('card-wiki');
+            else if (location.hash === '#member-roster') showAppPage('member-roster');
+            else showAppPage('tracker');
         }
 
         function loadCloudForm() { const c = getCloudConfig(); document.getElementById('cloud-bin-id').value = c.binId; document.getElementById('cloud-api-key').value = c.apiKey; }
