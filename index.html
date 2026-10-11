@@ -657,9 +657,14 @@
         .card-wiki-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
         .card-wiki-tile { min-width:0; border:1px solid #383c48; border-radius:12px; background:linear-gradient(145deg,#272a34,#20222a); overflow:hidden; transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease; cursor:pointer; }
         .card-wiki-tile:hover { transform:translateY(-2px); border-color:#666d80; box-shadow:0 7px 20px rgba(0,0,0,.18); }
-        .card-wiki-tile.is-comparing { border-color:#7aa2f7; box-shadow:0 0 0 1px rgba(122,162,247,.25); }
+
         .card-wiki-tile-head { display:flex; align-items:flex-start; justify-content:space-between; gap:9px; padding:12px 13px 10px; border-bottom:1px solid #363944; }
         .card-wiki-card-name { margin:0; color:#f0f2f6; font-size:.92rem; line-height:1.28; overflow-wrap:anywhere; }
+        .card-wiki-name-row { display:flex; align-items:center; gap:6px; min-width:0; }
+        .card-wiki-copy-button { flex:0 0 25px; width:25px; height:25px; display:inline-flex; align-items:center; justify-content:center; padding:0; border:1px solid #414653; border-radius:6px; background:#191b22; color:#abb2c1; cursor:pointer; }
+        .card-wiki-copy-button:hover { color:#e8ebf0; border-color:#7a8baa; }
+        .card-wiki-copy-button.copied { color:#62c98a; border-color:#62c98a; }
+        .card-wiki-copy-button svg { display:block; width:15px; height:15px; }
         .card-wiki-card-meta { color:#969dad; font-size:.68rem; margin-top:5px; }
         .card-wiki-number { flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:27px; box-sizing:border-box; padding:0 7px; background:#1b1d24; border:1px solid #414653; border-radius:8px; color:#c5cbd6; font-size:.7rem; font-weight:900; }
         .card-wiki-tile-body { padding:10px 13px 12px; }
@@ -674,8 +679,8 @@
         .card-rarity-epic { color:#f0ac58; }
         .card-rarity-unique { color:#c5a0ff; }
         .card-rarity-legend { color:#ff7474; }
-        .card-wiki-compare-check { display:inline-flex; align-items:center; gap:5px; color:#adb4c2; font-size:.68rem; white-space:nowrap; cursor:pointer; }
-        .card-wiki-compare-check input { margin:0; transform:none !important; }
+
+
         .card-wiki-empty { grid-column:1/-1; padding:36px 16px; text-align:center; border:1px dashed #414653; border-radius:12px; color:#939aab; background:#20222a; }
         .card-wiki-detail-modal .modal-card { width:min(1100px,98vw); }
         .card-wiki-detail-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
@@ -692,11 +697,11 @@
         .card-wiki-stats-table .tier-epic { color:#f0ac58; }
         .card-wiki-stats-table .tier-unique { color:#c5a0ff; }
         .card-wiki-stats-table .tier-legend { color:#ff7474; }
-        .card-wiki-compare-wrap { overflow:auto; max-height:62vh; border:1px solid #3d404b; border-radius:9px; }
-        .card-wiki-compare-table { width:100%; border-collapse:collapse; min-width:640px; font-size:.75rem; }
-        .card-wiki-compare-table th { position:sticky; top:0; background:#20222a; color:#dce1ea; padding:10px; text-align:left; border-bottom:1px solid #3d404b; }
-        .card-wiki-compare-table td { padding:9px 10px; border-bottom:1px solid #30333d; color:#cdd2dd; }
-        .card-wiki-compare-table td:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
+
+
+
+
+
         @media (max-width: 1050px) { .card-wiki-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .card-wiki-controls { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width: 640px) { .card-wiki-grid { grid-template-columns:1fr; } .card-wiki-controls { grid-template-columns:1fr; } }
 
@@ -710,16 +715,16 @@
         .card-wiki-stat-tools { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
         .card-wiki-stat-tools select,.card-wiki-stat-tools input { min-height:34px; box-sizing:border-box; padding:7px 9px; background:#191b22; color:#e8ebf0; border:1px solid #474b58; border-radius:7px; }
         .card-wiki-stat-search { width:min(100%,260px); }
-        .card-wiki-stat-options { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; align-items:stretch; }
-        .card-wiki-stat-group { min-width:0; border:1px solid #3a3e49; border-radius:10px; padding:10px; background:#1d1f26; }
+        .card-wiki-stat-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; align-items:stretch; }
+        .card-wiki-stat-group { min-width:0; max-width:100%; border:1px solid #3a3e49; border-radius:10px; padding:10px; background:#1d1f26; }
         .card-wiki-stat-group-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px; padding-bottom:8px; border-bottom:1px solid #373b46; }
         .card-wiki-stat-group-title { color:#edf0f6; font-size:.73rem; font-weight:900; letter-spacing:.07em; }
         .card-wiki-stat-group-subtitle { color:#858fa2; font-size:.62rem; font-weight:750; text-align:right; }
         .card-wiki-stat-group-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
-        .card-wiki-stat-option { display:flex; align-items:center; gap:6px; min-width:0; width:100%; padding:7px 8px; background:#252832; border:1px solid #424653; border-radius:8px; color:#c7ccda; font-size:.69rem; line-height:1.3; cursor:pointer; user-select:none; }
-        .card-wiki-stat-option span { min-width:0; overflow-wrap:anywhere; }
+        .card-wiki-stat-option { display:flex; align-items:flex-start; gap:6px; min-width:0; max-width:100%; width:100%; box-sizing:border-box; padding:7px 8px; background:#252832; border:1px solid #424653; border-radius:8px; color:#c7ccda; font-size:.69rem; line-height:1.3; cursor:pointer; user-select:none; }
+        .card-wiki-stat-option span { flex:1 1 0%; min-width:0; overflow-wrap:anywhere; }
         .card-wiki-stat-option:has(input:checked) { background:#29384b; border-color:#739bd0; color:#f2f6ff; box-shadow:inset 0 0 0 1px rgba(115,155,208,.16); }
-        .card-wiki-stat-option input { margin:0; accent-color:#7aa2f7; }
+        .card-wiki-stat-option input { flex:0 0 auto; margin:2px 0 0; accent-color:#7aa2f7; }
         @media (max-width:1100px) { .card-wiki-stat-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:900px) { .card-wiki-stat-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media (max-width:640px) { .card-wiki-stat-options { grid-template-columns:1fr; } }
@@ -737,7 +742,7 @@
         .card-wiki-preset span { display:flex; flex-direction:column; gap:3px; min-width:0; }
         .card-wiki-preset strong { font-size:.75rem; }
         .card-wiki-preset small { color:#9299a9; font-size:.62rem; line-height:1.35; }
-        .card-wiki-compare-help { margin:5px 0 0; color:#9299a9; font-size:.68rem; line-height:1.4; }
+
         .member-directory-panel { margin-bottom:14px; padding:14px; border:1px solid #363944; border-radius:11px; background:#23252d; }
         .member-directory-panel h3 { margin:0; font-size:.95rem; }
         .member-directory-panel p { margin:4px 0 12px; color:#9299a9; font-size:.72rem; }
@@ -776,8 +781,8 @@
         .card-wiki-stat-value.is-match strong { color:#fff; }
         .card-wiki-result-actions { display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:6px; white-space:nowrap; }
         .card-wiki-result-open { color:#9ca8bd; font-size:.65rem; }
-        .card-wiki-result-compare { display:inline-flex; align-items:center; gap:5px; color:#c0c6d2; font-size:.68rem; }
-        .card-wiki-result-compare input { margin:0; accent-color:#7aa2f7; }
+
+
         .card-wiki-result-row.is-comparing { border-color:#7aa2f7; box-shadow:inset 3px 0 #7aa2f7; }
         @media (max-width:900px) { .card-wiki-result-row { grid-template-columns:minmax(0,1fr) auto; } .card-wiki-result-stats { grid-column:1/-1; grid-row:2; } .card-wiki-result-actions { grid-column:2; grid-row:1; } }
         @media (max-width:640px) { .card-wiki-controls { grid-template-columns:1fr; } .card-wiki-result-row { grid-template-columns:minmax(0,1fr); } .card-wiki-result-actions { grid-column:1; grid-row:auto; flex-direction:row; align-items:center; justify-content:space-between; } .card-wiki-result-stats { grid-column:1; grid-row:auto; } .card-wiki-stat-tools { width:100%; } .card-wiki-stat-search { width:100%; } }
@@ -794,6 +799,10 @@
         .welcome-modal { width:min(820px,95vw) !important; max-width:820px; max-height:88vh; overflow-y:auto; }
         .welcome-modal .welcome-banner { height:auto; max-height:none; object-fit:contain; margin-bottom:10px; }
         .welcome-modal .welcome-whats-new { margin:9px 0 11px; padding:11px 13px; }
+        .welcome-previous-release { margin-top:9px; padding-top:8px; border-top:1px solid #373b46; color:#aeb5c4; font-size:.7rem; }
+        .welcome-previous-release summary { cursor:pointer; font-weight:800; }
+        .welcome-previous-release ul { margin:7px 0 0; padding-left:18px; }
+        .welcome-previous-release li { margin:4px 0; }
         .welcome-modal .welcome-shortcuts { margin:10px 0; }
         .welcome-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:14px 0; }
         .welcome-shortcuts button { display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:0; text-align:left; padding:12px; border:1px solid #414653; border-radius:9px; background:#20222a; color:#e5e8f0; cursor:pointer; }
@@ -1072,9 +1081,8 @@
             <div id="card-wiki-selected-stats" class="card-wiki-selected-stats"><span class="card-wiki-selected-none">No desired stats selected. Choose stats above to narrow the card list.</span></div>
         </section>
         <div class="card-wiki-summary">
-            <div><span id="card-wiki-result-count">Loading cards…</span><p class="card-wiki-compare-help">Compare shows 2–3 selected cards side by side at the chosen rarity, with each stat in its own row. Use it to compare candidates; it does not change the filters.</p></div>
+            <div><span id="card-wiki-result-count">Loading cards…</span></div>
             <div class="card-wiki-summary-actions">
-                <button class="btn btn-secondary" id="card-wiki-compare-button" type="button" onclick="openCardWikiComparison()" disabled>Compare (0/3)</button>
                 <button class="btn btn-secondary" type="button" onclick="clearCardWikiFilters()">Reset all filters</button>
             </div>
         </div>
@@ -1125,14 +1133,20 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3.3</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.3.6</span></div>
                 <ul>
-                    <li><strong>Pantheon Tools overview:</strong> the guild banner, Discord invite, and a guide to the available tools.</li>
-                    <li><strong>Guild banner scaling:</strong> the welcome popup and Overview now display the full banner image without cropping.</li>
-                    <li><strong>Cleaner navigation:</strong> removed the redundant Overview/Tracker top tabs. Use the Overview tool cards or the side menu to open a tool.</li>
-                    <li><strong>Quick Builds now use OR matching:</strong> Magic returns cards with MATK or INT or Final Damage; Physical returns cards with PATK or STR or AGI or Final Damage; Defensive returns cards with Defense or Magic Defense or VIT or Max HP.</li>
-                    <li><strong>Local card updates:</strong> Card Database batches and the Member Roster stay in this browser and do not write to the shared tracker.</li>
+                    <li><strong>Quick card copy:</strong> click the overlapping-squares icon beside any card name to copy the exact name for the in-game Trading House.</li>
+                    <li><strong>Simpler Card Database:</strong> removed Compare and its related controls and help text. Full five-rarity details remain available by opening a card.</li>
                 </ul>
+                <details class="welcome-previous-release"><summary>Earlier update highlights (v1.3.4–v1.3.3)</summary><ul>
+                    <li><strong>Card Database layout:</strong> Desired character stat groups use wider columns, and long checkbox labels wrap inside their own boxes instead of overlapping the results table.</li>
+                    <li><strong>Overview and navigation:</strong> the guild banner, Discord invite, tool overview, and default landing behavior.</li>
+                    <li><strong>Pantheon Tools overview:</strong> the guild banner, Discord invite, and a guide to the available tools.</li>
+                    <li><strong>Guild banner scaling:</strong> the welcome popup and Overview display the full banner image without cropping.</li>
+                    <li><strong>Cleaner navigation:</strong> removed the redundant Overview/Tracker top tabs. Use the Overview tool cards or side menu to open a tool.</li>
+                    <li><strong>Quick Builds use OR matching:</strong> Magic returns cards with MATK or INT or Final Damage; Physical returns cards with PATK or STR or AGI or Final Damage; Defensive returns cards with Defense or Magic Defense or VIT or Max HP.</li>
+                    <li><strong>Local card updates:</strong> Card Database batches and the Member Roster stay in this browser and do not write to the shared tracker.</li>
+                </ul></details>
             </section>
             <div class="modal-note">Choose a shortcut to open a tool, or save a default landing page below. Without a saved default, the Overview page is the starting page.</div>
             <div class="overview-footer" style="margin-top:0"><a id="welcome-discord-link" class="btn btn-cloud" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a></div>
@@ -1161,14 +1175,6 @@
                 <button class="btn btn-secondary" type="button" onclick="closeModal('card-wiki-detail-modal')">Close</button>
             </div>
             <div id="card-wiki-detail-table" class="card-wiki-table-wrap"></div>
-            <div class="modal-actions"><button class="btn btn-secondary" type="button" id="card-wiki-detail-compare" onclick="toggleCardCompareFromDetail()">＋ Add to Compare</button></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay hidden" id="card-wiki-compare-modal" role="dialog" aria-label="Compare Monster Cards">
-        <div class="modal-card wide-modal">
-            <div class="card-wiki-detail-heading"><div><h3>⚖️ Compare Monster Cards</h3><div class="modal-note" style="margin:0;">Comparing selected cards at the currently selected preview rarity.</div></div><button class="btn btn-secondary" type="button" onclick="closeModal('card-wiki-compare-modal')">Close</button></div>
-            <div id="card-wiki-compare-content" style="margin-top:14px;"></div>
         </div>
     </div>
 
@@ -1425,7 +1431,7 @@
                         <p>Card Database is a local reference tool. Its filters and personal card batches stay in this browser and never add traffic or data to the guild's shared tracker database.</p>
                         <h5>Filter cards for a build</h5>
                         <p>Choose <b>Level 70 and below</b>, <b>Level 50 - 60</b>, or <b>Level 40 - 50</b>. Select Magic, Physical, or Defensive to set a starter group of stats, or check stats manually. <b>All selected</b> means every chosen stat must be on the same card; <b>Any selected</b> only needs one.</p>
-                        <p>The Defensive group contains Defense, Magic Def, Vit, and Max HP. Choose Magic, Rare, Epic, Unique, or Legend to preview those values. Open a card for its full five-rarity table. Compare displays the selected rarity side by side; it does not calculate combined equipped-card totals.</p>
+                        <p>The Defensive group contains Defense, Magic Def, Vit, and Max HP. Choose Magic, Rare, Epic, Unique, or Legend to preview those values. Click the overlapping-squares icon beside a card name to copy it for the in-game Trading House, or open the card for its full five-rarity table.</p>
                         <h5>Import future card updates</h5>
                         <p>Click <b>Manage Card Batches</b>, name the update, and paste a JSON array. Every card requires a unique number, name, nest or pool label, a valid level cap (40, 50, 60, or 70), and stats. Each stat requires five numeric values in Magic, Rare, Epic, Unique, Legend order. Export your local batches as a backup before changing browsers or clearing site data.</p>
                     </section>
@@ -3882,8 +3888,6 @@
             { name:'Unique', colorName:'Purple', css:'unique', valueIndex:3 },
             { name:'Legend', colorName:'Red', css:'legend', valueIndex:4 }
         ];
-        let cardWikiCompareNumbers = [];
-        let cardWikiActiveDetailNumber = null;
         let cardWikiSelectedStats = [];
         let cardWikiActivePreset = '';
         let editingMemberDirectoryId = null;
@@ -4115,14 +4119,11 @@
                 const filterText = selectedLabels.length ? `${mode === 'all' ? 'all of' : 'any of'} ${selectedLabels.join(mode === 'all' ? ' + ' : ' OR ')}` : 'all build stats';
                 result.textContent = `${cards.length} cards · ${cardWikiCapName(range)} · ${selectedLabels.length ? `matching ${filterText}` : 'choose desired stats to narrow results'} · ${tier.name} values`;
             }
-            const compareButton = document.getElementById('card-wiki-compare-button');
-            if (compareButton) { compareButton.textContent = `Compare (${cardWikiCompareNumbers.length}/3)`; compareButton.disabled = cardWikiCompareNumbers.length < 2; }
             if (!cards.length) {
                 grid.innerHTML = `<div class="card-wiki-empty">No cards match these build filters for ${cardWikiCapName(range)}. Try changing the desired stats, match mode, or level range.</div>`;
                 return;
             }
             grid.innerHTML = cards.map(card => {
-                const selected = cardWikiCompareNumbers.includes(card.number);
                 const statNames = cardWikiSelectedStats.length
                     ? cardWikiSelectedStats.filter(name => card.stats.some(st => st.name === name))
                     : card.stats.filter(st => st.name !== 'Crystal of Power').slice(0,4).map(st => st.name);
@@ -4133,54 +4134,46 @@
                     return `<span class="card-wiki-stat-value ${isMatch ? 'is-match' : ''}"><span>${escapeHTML(cardWikiStatLabel(name))}</span><strong>${stat.values[tier.valueIndex].toLocaleString()}</strong></span>`;
                 }).join('');
                 const extraCount = !cardWikiSelectedStats.length ? Math.max(0, card.stats.filter(st=>st.name!=='Crystal of Power').length - statNames.length) : 0;
-                return `<article class="card-wiki-result-row ${selected?'is-comparing':''}" role="button" tabindex="0" aria-label="Open ${escapeHTML(card.name)} card details" onclick="openCardWikiDetail(${card.number})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCardWikiDetail(${card.number})}">
-                    <div class="card-wiki-result-identity"><span class="card-wiki-result-number">#${card.number}</span><div style="min-width:0;"><h3 class="card-wiki-result-name">${escapeHTML(card.name)}</h3><div class="card-wiki-result-meta"><span class="card-wiki-cap-tag">CAP ${cardWikiCardCap(card)}</span><span class="card-wiki-tier-pill card-rarity-${tier.css}">${tier.name}</span>${cardWikiSelectedStats.length?`<span class="card-wiki-cap-tag">${statNames.length} desired stat${statNames.length===1?'':'s'} matched</span>`:''}</div></div></div>
+                return `<article class="card-wiki-result-row" role="button" tabindex="0" aria-label="Open ${escapeHTML(card.name)} card details" onclick="openCardWikiDetail(${card.number})" onkeydown="if(event.target.closest('.card-wiki-copy-button'))return;if(event.key==='Enter'||event.key===' '){event.preventDefault();openCardWikiDetail(${card.number})}">
+                    <div class="card-wiki-result-identity"><span class="card-wiki-result-number">#${card.number}</span><div style="min-width:0;"><div class="card-wiki-name-row"><h3 class="card-wiki-result-name">${escapeHTML(card.name)}</h3><button class="card-wiki-copy-button" type="button" title="Copy card name" aria-label="Copy ${escapeHTML(card.name)} to clipboard" onclick="event.stopPropagation();copyCardWikiName(${card.number},this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"></path></svg></button></div><div class="card-wiki-result-meta"><span class="card-wiki-cap-tag">CAP ${cardWikiCardCap(card)}</span><span class="card-wiki-tier-pill card-rarity-${tier.css}">${tier.name}</span>${cardWikiSelectedStats.length?`<span class="card-wiki-cap-tag">${statNames.length} desired stat${statNames.length===1?'':'s'} matched</span>`:''}</div></div></div>
                     <div class="card-wiki-result-stats">${statPills || '<span class="card-wiki-selected-none">No matching stat values</span>'}${extraCount?`<span class="card-wiki-selected-none">+${extraCount} more stats in details</span>`:''}</div>
-                    <div class="card-wiki-result-actions"><label class="card-wiki-result-compare" onclick="event.stopPropagation()"><input type="checkbox" ${selected?'checked':''} ${!selected&&cardWikiCompareNumbers.length>=3?'disabled':''} onchange="toggleCardWikiCompare(${card.number},this.checked)"> Compare</label><span class="card-wiki-result-open">View all stats ↗</span></div>
+                    <div class="card-wiki-result-actions"><span class="card-wiki-result-open">View all stats ↗</span></div>
                 </article>`;
             }).join('');
         }
-        function toggleCardWikiCompare(number, checked) {
-            const n = Number(number);
-            if (checked) {
-                if (!cardWikiCompareNumbers.includes(n) && cardWikiCompareNumbers.length >= 3) { alert('You can compare up to three cards at a time.'); renderCardWiki(); return; }
-                if (!cardWikiCompareNumbers.includes(n)) cardWikiCompareNumbers.push(n);
-            } else cardWikiCompareNumbers = cardWikiCompareNumbers.filter(x => x !== n);
-            renderCardWiki();
-            const detailButton = document.getElementById('card-wiki-detail-compare');
-            if (detailButton && cardWikiActiveDetailNumber === n) detailButton.textContent = cardWikiCompareNumbers.includes(n) ? '✓ Added to Compare' : '＋ Add to Compare';
-        }
         function openCardWikiDetail(number) {
             const card = getCardWikiCard(number); if (!card) return;
-            cardWikiActiveDetailNumber = card.number;
             document.getElementById('card-wiki-detail-title').textContent = `#${card.number} · ${card.name}`;
             document.getElementById('card-wiki-detail-meta').textContent = `Level ${cardWikiCardCap(card)} card pool · available in higher level-cap selections too`;
             const head = '<thead><tr><th>Stat</th>' + CARD_WIKI_RARITIES.map(t=>`<th class="tier-${t.css}">${t.name}</th>`).join('') + '</tr></thead>';
             const rows = card.stats.map(st=>`<tr><td>${escapeHTML(cardWikiStatLabel(st.name))}</td>${st.values.map((v,i)=>`<td class="${CARD_WIKI_RARITIES[i].css==='magic'?'tier-magic':CARD_WIKI_RARITIES[i].css==='rare'?'tier-rare':CARD_WIKI_RARITIES[i].css==='epic'?'tier-epic':CARD_WIKI_RARITIES[i].css==='unique'?'tier-unique':'tier-legend'}">${v.toLocaleString()}</td>`).join('')}</tr>`).join('');
             document.getElementById('card-wiki-detail-table').innerHTML = `<table class="card-wiki-stats-table">${head}<tbody>${rows}</tbody></table>`;
-            const btn = document.getElementById('card-wiki-detail-compare');
-            btn.textContent = cardWikiCompareNumbers.includes(card.number) ? '✓ Added to Compare' : '＋ Add to Compare';
-            btn.disabled = !cardWikiCompareNumbers.includes(card.number) && cardWikiCompareNumbers.length >= 3;
             openModal('card-wiki-detail-modal');
         }
-        function toggleCardCompareFromDetail() {
-            if (cardWikiActiveDetailNumber == null) return;
-            toggleCardWikiCompare(cardWikiActiveDetailNumber, !cardWikiCompareNumbers.includes(cardWikiActiveDetailNumber));
-            const btn = document.getElementById('card-wiki-detail-compare');
-            if (btn) { btn.textContent = cardWikiCompareNumbers.includes(cardWikiActiveDetailNumber) ? '✓ Added to Compare' : '＋ Add to Compare'; btn.disabled = !cardWikiCompareNumbers.includes(cardWikiActiveDetailNumber) && cardWikiCompareNumbers.length >= 3; }
+        async function copyCardWikiName(number, button) {
+            const card = getCardWikiCard(number); if (!card) return;
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(card.name);
+                } else {
+                    const area = document.createElement('textarea');
+                    area.value = card.name; area.setAttribute('readonly', '');
+                    area.style.position = 'fixed'; area.style.opacity = '0';
+                    document.body.appendChild(area); area.select();
+                    const copied = document.execCommand('copy'); area.remove();
+                    if (!copied) throw new Error('Clipboard access unavailable');
+                }
+                button.classList.add('copied'); button.title = 'Copied!';
+                button.setAttribute('aria-label', 'Copied ' + card.name + ' to clipboard');
+                window.setTimeout(() => {
+                    if (!button.isConnected) return;
+                    button.classList.remove('copied'); button.title = 'Copy card name';
+                    button.setAttribute('aria-label', 'Copy ' + card.name + ' to clipboard');
+                }, 1200);
+            } catch (error) {
+                window.prompt('Copy this card name and paste it into the in-game Trading House:', card.name);
+            }
         }
-        function openCardWikiComparison() {
-            const cards = cardWikiCompareNumbers.map(getCardWikiCard).filter(Boolean);
-            if (cards.length < 2) { alert('Select at least two cards to compare.'); return; }
-            const tier = cardWikiRarity();
-            const allStats = [...new Set(cards.flatMap(c=>c.stats.map(st=>st.name)))].sort((a,b)=>cardWikiStatLabel(a).localeCompare(cardWikiStatLabel(b)));
-            const headers = '<thead><tr><th>Stat</th>' + cards.map(c=>`<th>${escapeHTML(c.name)}<br><span style="color:#9299a8;font-weight:500;">#${c.number} · Cap ${cardWikiCardCap(c)}</span></th>`).join('') + '</tr></thead>';
-            const rows = allStats.map(name=>`<tr><td>${escapeHTML(cardWikiStatLabel(name))}</td>${cards.map(c=>{const st=c.stats.find(x=>x.name===name);return `<td>${st?st.values[tier.valueIndex].toLocaleString():'—'}</td>`;}).join('')}</tr>`).join('');
-            document.getElementById('card-wiki-compare-content').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:9px;"><span class="card-wiki-tier-pill card-rarity-${tier.css}">${tier.name} tier</span><span style="color:#9299a8;font-size:.75rem;">${cards.length} cards · ${tier.colorName} values from source</span></div><div class="card-wiki-compare-wrap"><table class="card-wiki-compare-table">${headers}<tbody>${rows}</tbody></table></div>`;
-            openModal('card-wiki-compare-modal');
-        }
-
-
         function getMemberDirectoryView() {
             const map = new Map();
             getRosters().forEach(roster => {
