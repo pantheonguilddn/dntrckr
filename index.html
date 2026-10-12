@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.4.0</title>
+    <title>Pantheon Tools v1.4.1</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1161,8 +1161,9 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.4.0</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.4.1</span></div>
                 <ul>
+                    <li><strong>Share Salary Calculator receipt:</strong> use Share Receipt to copy a screenshot of the receipt only, ready to paste into Discord. If clipboard image access is unavailable, it downloads a PNG instead.</li>
                     <li><strong>Clean first launch:</strong> a fresh browser starts without preloaded guild members, characters, or tracker task categories. Shared guild data is loaded only after the user connects through Cloud Setup.</li>
                     <li><strong>Safe first cloud connection:</strong> when there is no meaningful local tracker data, the connected cloud database is treated as authoritative. A blank new install will not overwrite an existing guild roster or task setup during the first sync.</li>
                     <li><strong>Offline behavior:</strong> without a cloud connection, changes made by the user remain local to that browser and are not sent to the shared guild database.</li>
@@ -1284,7 +1285,7 @@
                     </div>
                 </div>
             </div>
-            <div style="background: #17171d; border: 1px solid #444; border-radius: 5px; padding: 15px;">
+            <div id="salary-receipt" style="background: #17171d; color: #f0f0f0; border: 1px solid #444; border-radius: 5px; padding: 15px;">
                 <h4 style="margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 8px;">Breakdown Receipt</h4>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Gross Income:</span> <span id="out-gross" style="color: #fff; font-weight: bold;">0.00g</span></div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Salary Holder Cut (<span id="out-cut-pct">5</span>%):</span> <span id="out-cut" style="color: #ea9999;">-0.00g</span></div>
@@ -1294,6 +1295,7 @@
                 <div style="display: flex; justify-content: space-between; font-size: 1.2rem; margin-top: 10px;"><span>Payout per member:</span> <span id="out-split" style="color: #ffd966; font-weight: bold;">0.00g</span></div>
             </div>
             <div class="modal-actions">
+                <button class="btn btn-cloud" type="button" onclick="shareSalaryReceiptAsImage()">📸 Share Receipt</button>
                 <button class="btn btn-secondary" type="button" onclick="closeModal('salary-modal')">Close</button>
             </div>
         </div>
@@ -3922,6 +3924,42 @@
             catch (err) { alert(`Screenshot failed: ${err.message}`); }
         }
 
+        async function shareSalaryReceiptAsImage(){
+            const receipt = document.getElementById('salary-receipt');
+            if (!receipt) { alert('Could not find the Salary Calculator receipt.'); return; }
+            try {
+                const html2canvas = await loadHtml2Canvas();
+                const canvas = await html2canvas(receipt, {
+                    backgroundColor: '#17171d',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: false
+                });
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                if (!blob) throw new Error('PNG creation failed');
+                if (navigator.clipboard?.write && window.ClipboardItem) {
+                    try {
+                        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+                        alert('The Salary Calculator receipt was copied as an image. Paste it directly into Discord.');
+                        return true;
+                    } catch (_) { /* fall through to download */ }
+                }
+                const url = URL.createObjectURL(blob), link = document.createElement('a');
+                link.href = url;
+                link.download = 'pantheon-salary-receipt.png';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                alert('The receipt was saved as a PNG because direct clipboard image access was blocked by the browser.');
+                return false;
+            } catch (err) {
+                alert(`Receipt screenshot failed: ${err.message}`);
+                return false;
+            }
+        }
+
         async function resetTeamsForNewWeek() {
             if (!confirm('Clear both teams for a new week?')) return;
             const now = Date.now();
@@ -4336,7 +4374,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.4.0';
+        const PANTHEON_TOOLS_VERSION = 'v1.4.1';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
