@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.4.1</title>
+    <title>Pantheon Tools v1.4.3</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -937,9 +937,13 @@
         </table>
     </div>
 
-    <div style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
+    <div style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
         <h2 style="margin: 0;">📊 Roster Analytics <button class="mini-help" type="button" title="Analytics Guide" onclick="openHelpModal('analytics')">?</button></h2>
-        <button id="toggle-analytics-btn" class="btn btn-secondary" onclick="toggleAnalytics()">👁️ Hide Analytics</button>
+        <div style="display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:10px;">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:#c7cad1;cursor:pointer;"><input id="analytics-tracking-enabled" type="checkbox" onchange="setAnalyticsTrackingEnabled(this.checked)" style="margin:0;"> Track weekly analytics (opt-in)</label>
+            <button id="clear-analytics-history-btn" class="btn btn-secondary" type="button" onclick="clearAnalyticsHistory()">Clear Stored History</button>
+            <button id="toggle-analytics-btn" class="btn btn-secondary" onclick="toggleAnalytics()">👁️ Hide Analytics</button>
+        </div>
     </div>
     
     <div class="analytics-container" id="analytics-grid">
@@ -1161,8 +1165,11 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.4.1</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.4.3</span></div>
                 <ul>
+                    <li><strong>Optional weekly analytics:</strong> analytics tracking is now off by default. Enable it only if the guild wants five-week trends and priority history; normal daily and weekly task resets still work without it.</li>
+                    <li><strong>Reduce cloud record size:</strong> historical analytics is limited to five weeks, and Clear Stored History removes older archives without deleting task progress, roster data, salary logs, or other tracker settings. Clearing is an explicit action.</li>
+                    <li><strong>Compact cloud sync:</strong> the main tracker payload uses a compact, reversible format to reduce JSONBin record size. If the record still exceeds the free-plan limit, sync reports the measured size and keeps changes local instead of sending a request that will be rejected.</li>
                     <li><strong>Share Salary Calculator receipt:</strong> use Share Receipt to copy a screenshot of the receipt only, ready to paste into Discord. If clipboard image access is unavailable, it downloads a PNG instead.</li>
                     <li><strong>Clean first launch:</strong> a fresh browser starts without preloaded guild members, characters, or tracker task categories. Shared guild data is loaded only after the user connects through Cloud Setup.</li>
                     <li><strong>Safe first cloud connection:</strong> when there is no meaningful local tracker data, the connected cloud database is treated as authoritative. A blank new install will not overwrite an existing guild roster or task setup during the first sync.</li>
@@ -1448,7 +1455,8 @@
                     </section>
                     <section class="help-topic" data-help-topic="analytics">
                         <h4>Roster Analytics</h4>
-                        <p>Analytics uses archived weekly records to show each character's recent activity and areas that may need attention.</p>
+                        <p>Weekly analytics is <b>opt-in</b>. When <b>Track weekly analytics</b> is unchecked, normal daily and weekly task resets still run, but new historical snapshots are not saved. This switch is shared across connected clients.</p>
+                        <p>When enabled, the tracker retains up to five weekly snapshots to support the visible trend and priority calculations. Use <b>Clear Stored History</b> to remove old snapshots and reduce the shared cloud record size.</p>
                         <h5>5-Week Trend</h5>
                         <p>Shows the most recent weekly completion percentages available for that character.</p>
                         <h5>Loot-Weighted Priorities</h5>
@@ -1655,7 +1663,7 @@
         // ☁️ APP CONFIGURATION
         // ==========================================
         const APP_SCHEMA_VERSION = 20; 
-        const MAX_ARCHIVE_WEEKS = 12;
+        const MAX_ARCHIVE_WEEKS = 5;
                 const LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v5';
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
@@ -1845,7 +1853,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -2006,8 +2014,100 @@
             return { state, note: String(value.note || '').slice(0, 40), updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
         }
 
+        // Compact, reversible transport encoding for the JSONBin Free plan.
+        // The decoded in-memory/localStorage schema remains unchanged.
+        const PANTHEON_COMPACT_RECORD_MARKER = '__pantheonCompactV1';
+        const PANTHEON_WIRE_KEY_MAP = Object.freeze({
+            schemaVersion:'~a', cells:'~b', history:'~c', weeklyArchive:'~d', lastDailyReset:'~e', lastWeeklyReset:'~f',
+            updatedAt:'~g', syncInfo:'~h', operationId:'~i', settings:'~j', lootWeights:'~k', lootWeightUpdatedAt:'~l',
+            rosters:'~m', rosterUpdatedAt:'~n', rosterUpdatedBy:'~o', memberDirectory:'~p', memberDirectoryUpdatedAt:'~q',
+            memberDirectoryUpdatedBy:'~r', categories:'~s', categoriesUpdatedAt:'~t', categoriesUpdatedBy:'~u',
+            characterJobs:'~v', jobProfiles:'~w', jobProfilesUpdatedAt:'~x', jobProfilesUpdatedBy:'~y', teamBuilder:'~z',
+            analyticsTrackingEnabled:'~aa', analyticsTrackingUpdatedAt:'~ab', analyticsTrackingUpdatedBy:'~ac', analyticsHistoryClearedAt:'~ad', analyticsHistoryClearedBy:'~ae', versionControl:'~A', lastCheckpointAt:'~B', lastCheckpointBy:'~C', lastCheckpointLabel:'~D', lastCheckpointKind:'~E',
+            lastVersionedWriteAt:'~F', lastGlobalSignature:'~G', globalBaselineSignature:'~H', revisionBinId:'~I',
+            revisionBinUpdatedAt:'~J', revisionBinUpdatedBy:'~K', versioningEnabled:'~L', state:'~M', note:'~N', deviceId:'~O',
+            createdAt:'~P', taskOrder:'~Q', rates:'~R', states:'~S', scholarship:'~T', logs:'~U', timestamp:'~V', type:'~W',
+            gold:'~X', dia:'~Y', eol:'~Z', deleted:'~0', characters:'~1', name:'~2', color:'~3', group:'~4', tasks:'~5',
+            owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
+            runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
+            updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~='
+        });
+        const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
+        const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
+
+        function pantheonDeviceTable(data) {
+            const ids = [''];
+            const seen = new Set(ids);
+            Object.values(safeObject(data?.cells)).forEach(tasks => Object.values(safeObject(tasks)).forEach(cell => {
+                const id = String(cell?.deviceId || '');
+                if (!seen.has(id)) { seen.add(id); ids.push(id); }
+            }));
+            return ids;
+        }
+        function encodePantheonWireValue(value, parentKey = '', deviceIndexes = new Map()) {
+            if (Array.isArray(value)) return value.map(item => encodePantheonWireValue(item, '', deviceIndexes));
+            if (!value || typeof value !== 'object') return value;
+            if (parentKey === 'cells') {
+                const compactCells = {};
+                Object.entries(value).forEach(([characterName, tasks]) => {
+                    const compactTasks = {};
+                    Object.entries(safeObject(tasks)).forEach(([taskName, cell]) => {
+                        const normalized = normalizeCellRecord(cell) || {state:'open', note:'', updatedAt:0, deviceId:''};
+                        compactTasks[taskName] = [
+                            Math.max(0, PANTHEON_CELL_STATES.indexOf(normalized.state)),
+                            normalized.note,
+                            normalized.updatedAt,
+                            deviceIndexes.get(normalized.deviceId) || 0
+                        ];
+                    });
+                    compactCells[characterName] = compactTasks;
+                });
+                return compactCells;
+            }
+            const out = {};
+            Object.entries(value).forEach(([key, child]) => {
+                out[PANTHEON_WIRE_KEY_MAP[key] || key] = encodePantheonWireValue(child, key, deviceIndexes);
+            });
+            return out;
+        }
+        function decodePantheonWireValue(value, parentKey = '', devices = ['']) {
+            if (Array.isArray(value)) return value.map(item => decodePantheonWireValue(item, '', devices));
+            if (!value || typeof value !== 'object') return value;
+            if (parentKey === 'cells') {
+                const cells = {};
+                Object.entries(value).forEach(([characterName, tasks]) => {
+                    const restoredTasks = {};
+                    Object.entries(safeObject(tasks)).forEach(([taskName, cell]) => {
+                        if (Array.isArray(cell)) {
+                            const stateIndex = Number(cell[0]);
+                            restoredTasks[taskName] = {
+                                state: PANTHEON_CELL_STATES[stateIndex] || 'open',
+                                note: String(cell[1] || ''),
+                                updatedAt: Number(cell[2]) || 0,
+                                deviceId: String(devices[Number(cell[3]) || 0] || '')
+                            };
+                        } else {
+                            restoredTasks[taskName] = decodePantheonWireValue(cell, '', devices);
+                        }
+                    });
+                    cells[characterName] = restoredTasks;
+                });
+                return cells;
+            }
+            const out = {};
+            Object.entries(value).forEach(([wireKey, child]) => {
+                const key = PANTHEON_WIRE_KEY_REVERSE[wireKey] || wireKey;
+                out[key] = decodePantheonWireValue(child, key, devices);
+            });
+            return out;
+        }
+        function decodePantheonCompactRecord(record) {
+            if (!record || typeof record !== 'object' || record[PANTHEON_COMPACT_RECORD_MARKER] !== 1) return record;
+            return decodePantheonWireValue(record.payload || {}, '', Array.isArray(record.devices) ? record.devices : ['']);
+        }
+
         function normalizeData(record) {
-            const source = safeObject(record);
+            const source = safeObject(decodePantheonCompactRecord(record));
             const norm = createEmptyData();
             norm.schemaVersion = APP_SCHEMA_VERSION;
             norm.history = safeObject(source.history);
@@ -2018,6 +2118,11 @@
             if (source.syncInfo && typeof source.syncInfo === 'object') norm.syncInfo = { operationId:String(source.syncInfo.operationId || ''), by:String(source.syncInfo.by || ''), at:Number(source.syncInfo.at) || 0 };
 
             const sets = safeObject(source.settings);
+            norm.settings.analyticsTrackingEnabled = sets.analyticsTrackingEnabled === true;
+            norm.settings.analyticsTrackingUpdatedAt = Number(sets.analyticsTrackingUpdatedAt) || 0;
+            norm.settings.analyticsTrackingUpdatedBy = String(sets.analyticsTrackingUpdatedBy || '');
+            norm.settings.analyticsHistoryClearedAt = Number(sets.analyticsHistoryClearedAt) || 0;
+            norm.settings.analyticsHistoryClearedBy = String(sets.analyticsHistoryClearedBy || '');
             norm.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sets.lootWeights) };
             norm.settings.lootWeightUpdatedAt = safeObject(sets.lootWeightUpdatedAt);
             norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : [];
@@ -2034,6 +2139,11 @@
             norm.settings.jobProfilesUpdatedAt = Number(sets.jobProfilesUpdatedAt) || 0;
             norm.settings.jobProfilesUpdatedBy = String(sets.jobProfilesUpdatedBy || '');
             norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
+            const historyClearAt = Number(norm.settings.analyticsHistoryClearedAt) || 0;
+            if (historyClearAt) {
+                norm.history = {};
+                Object.entries(safeObject(norm.weeklyArchive)).forEach(([key, entry]) => { if ((Number(entry?.createdAt) || Number(key) || 0) <= historyClearAt) delete norm.weeklyArchive[key]; });
+            }
             const vc = safeObject(sets.versionControl);
             const historySource = Array.isArray(vc.history) ? vc.history : [];
             norm.settings.versionControl = {
@@ -2163,7 +2273,16 @@
             const remote = normalizeData(remoteRecord);
             const merged = createEmptyData();
             
-            merged.history = local.history;
+            merged.history = { ...remote.history, ...local.history };
+            const lat = Number(local.settings.analyticsTrackingUpdatedAt) || 0, rat = Number(remote.settings.analyticsTrackingUpdatedAt) || 0;
+            const analyticsSource = (lat > rat || (lat === rat && String(local.settings.analyticsTrackingUpdatedBy) >= String(remote.settings.analyticsTrackingUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.analyticsTrackingEnabled = analyticsSource.analyticsTrackingEnabled === true;
+            merged.settings.analyticsTrackingUpdatedAt = Math.max(lat, rat);
+            merged.settings.analyticsTrackingUpdatedBy = String(analyticsSource.analyticsTrackingUpdatedBy || '');
+            const localClearAt = Number(local.settings.analyticsHistoryClearedAt) || 0, remoteClearAt = Number(remote.settings.analyticsHistoryClearedAt) || 0;
+            const clearSource = localClearAt >= remoteClearAt ? local.settings : remote.settings;
+            merged.settings.analyticsHistoryClearedAt = Math.max(localClearAt, remoteClearAt);
+            merged.settings.analyticsHistoryClearedBy = String(clearSource.analyticsHistoryClearedBy || '');
             merged.lastDailyReset = Math.max(local.lastDailyReset, remote.lastDailyReset);
             merged.lastWeeklyReset = Math.max(local.lastWeeklyReset, remote.lastWeeklyReset);
             merged.updatedAt = Math.max(local.updatedAt, remote.updatedAt);
@@ -2199,7 +2318,9 @@
             merged.weeklyArchive = { ...remote.weeklyArchive, ...local.weeklyArchive };
             Object.keys(merged.weeklyArchive).forEach(k => {
                 if (local.weeklyArchive[k] && remote.weeklyArchive[k]) merged.weeklyArchive[k] = (Number(local.weeklyArchive[k].createdAt)||0) >= (Number(remote.weeklyArchive[k].createdAt)||0) ? local.weeklyArchive[k] : remote.weeklyArchive[k];
+                if (merged.settings.analyticsHistoryClearedAt && (Number(merged.weeklyArchive[k]?.createdAt) || Number(k) || 0) <= merged.settings.analyticsHistoryClearedAt) delete merged.weeklyArchive[k];
             });
+            if (merged.settings.analyticsHistoryClearedAt) merged.history = {};
 
             new Set([...Object.keys(DEFAULT_LOOT_WEIGHTS), ...Object.keys(local.settings.lootWeights), ...Object.keys(remote.settings.lootWeights)]).forEach(t => {
                 const lt = Number(local.settings.lootWeightUpdatedAt[t]) || 0, rt = Number(remote.settings.lootWeightUpdatedAt[t]) || 0;
@@ -2309,7 +2430,14 @@
         function fitCandidateUnderFreeLimit(candidate){
             // Never store revision history in the core tracker record.
             if(candidate?.settings?.versionControl){candidate.settings.versionControl.history=[];}
-            return candidate;
+            const devices = pantheonDeviceTable(candidate);
+            const deviceIndexes = new Map(devices.map((id, index) => [id, index]));
+            const packed = { [PANTHEON_COMPACT_RECORD_MARKER]:1, devices, payload:encodePantheonWireValue(candidate, '', deviceIndexes) };
+            const bytes = candidateByteSize(packed);
+            if (bytes > SAFE_MAIN_RECORD_BYTES) {
+                throw new Error(`Tracker data is ${(bytes/1024).toFixed(1)} KB after compact encoding, above the safe 96 KB sync budget for JSONBin Free. Nothing was uploaded; your changes remain saved locally. To preserve all data, split the shared tracker across multiple records or use storage with a larger record limit.`);
+            }
+            return packed;
         }
 
         function getGlobalImpactSnapshot(data = cloudData) {
@@ -2595,6 +2723,31 @@
             return ((parseInt(c.slice(0, 2), 16) * 299 + parseInt(c.slice(2, 4), 16) * 587 + parseInt(c.slice(4, 6), 16) * 114) / 1000) >= 150 ? '#000' : '#fff';
         }
 
+        function setAnalyticsTrackingEnabled(enabled) {
+            const next = enabled === true;
+            cloudData.settings.analyticsTrackingEnabled = next;
+            cloudData.settings.analyticsTrackingUpdatedAt = Date.now();
+            cloudData.settings.analyticsTrackingUpdatedBy = deviceId;
+            renderAnalytics();
+            triggerAutoSync();
+            setStatus(next ? '🟡 Weekly analytics enabled · syncing setting...' : '🟡 Weekly analytics disabled · syncing setting...');
+        }
+
+        function clearAnalyticsHistory() {
+            const weeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
+            const legacy = Object.keys(safeObject(cloudData.history)).length;
+            if (!weeks && !legacy) { alert('There is no stored analytics history to clear.'); return; }
+            if (!confirm(`Clear ${weeks} archived week${weeks === 1 ? '' : 's'} and legacy analytics history? This cannot be undone. Task progress, roster data, salary logs, and other tracker settings will be kept.`)) return;
+            cloudData.weeklyArchive = {};
+            cloudData.history = {};
+            cloudData.settings.analyticsHistoryClearedAt = Date.now();
+            cloudData.settings.analyticsHistoryClearedBy = deviceId;
+            persistLocalData();
+            renderAnalytics();
+            triggerAutoSync();
+            setStatus('🟡 Analytics history cleared locally · syncing cleanup...');
+        }
+
         function toggleAnalytics() {
             isAnalyticsVisible = !isAnalyticsVisible;
             document.getElementById('analytics-grid').style.display = isAnalyticsVisible ? 'grid' : 'none';
@@ -2842,7 +2995,7 @@
 
         function executeWeeklyReset(rk = getTargetResetTimeUTC(true)) {
             const k = String(rk);
-            if (!cloudData.weeklyArchive[k]) {
+            if (cloudData.settings.analyticsTrackingEnabled && !cloudData.weeklyArchive[k]) {
                 const rates = {}, states = {};
                 characters.forEach(c => {
                     let ct = 0, dn = 0;
@@ -2875,7 +3028,7 @@
         }
 
         async function manualDailyReset() { if (!confirm('Force Daily Reset?')) return; executeDailyReset(); cloudData.lastDailyReset = getTargetResetTimeUTC(false); applyBoardState(); triggerAutoSync(); }
-        async function manualWeeklyReset() { if (!confirm('Force Weekly Archive?')) return; const rk = Math.max(Date.now(), getTargetResetTimeUTC(true)); executeWeeklyReset(rk); cloudData.lastWeeklyReset = rk; applyBoardState(); renderAnalytics(); triggerAutoSync(); }
+        async function manualWeeklyReset() { const enabled = cloudData.settings.analyticsTrackingEnabled === true; if (!confirm(enabled ? 'Force Weekly Archive & Reset?' : 'Force Weekly Reset? Analytics is disabled, so no history will be saved.')) return; const rk = Math.max(Date.now(), getTargetResetTimeUTC(true)); executeWeeklyReset(rk); cloudData.lastWeeklyReset = rk; applyBoardState(); renderAnalytics(); triggerAutoSync(); }
 
         function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
         function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
@@ -2883,6 +3036,14 @@
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
+            const trackingToggle = document.getElementById('analytics-tracking-enabled');
+            const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true;
+            if (trackingToggle) trackingToggle.checked = analyticsEnabled;
+            if (!analyticsEnabled) {
+                const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
+                cont.innerHTML = `<div class="analytics-disabled"><strong>Weekly analytics tracking is off.</strong><br>Daily and weekly task resets will continue normally, but no new weekly history will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting five weeks of history.'}</div>`;
+                return;
+            }
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = 'char-card'; card.style.borderTopColor = char.color;
                 
@@ -4374,7 +4535,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.4.1';
+        const PANTHEON_TOOLS_VERSION = 'v1.4.3';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -4570,7 +4731,7 @@
         function loadCloudForm() { const c = getCloudConfig(); document.getElementById('cloud-bin-id').value = c.binId; document.getElementById('cloud-api-key').value = c.apiKey; }
         function showCloudMessage(msg, isErr = false) { const el = document.getElementById('cloud-modal-message'); el.style.display = 'block'; el.style.borderLeftColor = isErr ? '#c45858' : '#4f7cac'; el.textContent = msg; }
         function saveCloudSettings(con = false) { const c = { binId: document.getElementById('cloud-bin-id').value.trim(), apiKey: document.getElementById('cloud-api-key').value.trim() }; if (!c.binId || !c.apiKey) return showCloudMessage('Enter both ID and Key.', true); localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(c)); showCloudMessage('Saved. Connecting...'); if (con) forceSync(true); }
-        async function createNewCloudBin() { const key = document.getElementById('cloud-api-key').value.trim(); if (!key) return showCloudMessage('Paste API key first.', true); showCloudMessage('Creating...'); try { const res = await fetch(`${JSONBIN_ROOT}/b`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders({binId:'', apiKey:key}) }, body: JSON.stringify(cloudData) }); if (!res.ok) throw new Error(`Create failed (${res.status})`); const id = (await res.json()).metadata?.id; document.getElementById('cloud-bin-id').value = id; localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId: id, apiKey: key })); showCloudMessage(`Created. ID: ${id}`); await forceSync(true); } catch (e) { showCloudMessage(e.message, true); } }
+        async function createNewCloudBin() { const key = document.getElementById('cloud-api-key').value.trim(); if (!key) return showCloudMessage('Paste API key first.', true); showCloudMessage('Creating...'); try { const res = await fetch(`${JSONBIN_ROOT}/b`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders({binId:'', apiKey:key}) }, body: JSON.stringify(fitCandidateUnderFreeLimit(cloudData)) }); if (!res.ok) throw new Error(`Create failed (${res.status})`); const id = (await res.json()).metadata?.id; document.getElementById('cloud-bin-id').value = id; localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId: id, apiKey: key })); showCloudMessage(`Created. ID: ${id}`); await forceSync(true); } catch (e) { showCloudMessage(e.message, true); } }
         function clearCloudSettings() { if (!confirm('Remove cloud settings?')) return; localStorage.removeItem(CLOUD_CONFIG_KEY); loadCloudForm(); setStatus('⚪ Local mode'); showCloudMessage('Cleared.'); }
         function openCloudModal() { loadCloudForm(); document.getElementById('cloud-modal-message').style.display = 'none'; openModal('cloud-modal'); }
         function openHelpModal(topic = 'start') {
