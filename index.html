@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.7</title>
+    <title>Pantheon Tools v1.5.8</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1493,6 +1493,52 @@
         #btn-ledger[hidden] { display:none !important; }
         .overview-avatar { overflow:hidden; }
         .overview-avatar .overview-avatar-image { display:block; width:100%; height:100%; object-fit:cover; border-radius:inherit; }
+        /* v1.5.8: the signed-in account belongs in the top-right toolbar, never in a viewport overlay. */
+        #pantheon-session-bar {
+            position:static !important; inset:auto !important; top:auto !important; right:auto !important;
+            bottom:auto !important; left:auto !important; transform:none !important; z-index:auto !important;
+            display:none; flex:0 1 auto; align-items:center; gap:7px; min-width:0; max-width:100%;
+            margin:0; padding:5px 7px; border:1px solid var(--pt-border); border-radius:11px;
+            background:var(--pt-surface) !important; color:var(--pt-text) !important; box-shadow:none !important;
+            font:inherit; line-height:1.25;
+        }
+        #pantheon-session-bar .p-session-name { max-width:115px; color:var(--pt-text) !important; font-size:.68rem; font-weight:850; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #pantheon-session-bar .p-session-role { display:inline-flex; align-items:center; justify-content:center; padding:4px 7px; border:1px solid var(--pt-border); border-radius:999px; background:var(--pt-surface-soft); color:var(--pt-text) !important; font-size:.58rem; font-weight:850; white-space:nowrap; }
+        #pantheon-session-bar a, #pantheon-session-bar button { color:var(--pt-text) !important; background:var(--pt-surface-soft) !important; border:1px solid var(--pt-border) !important; border-radius:8px; padding:6px 8px; font:inherit; font-size:.63rem; font-weight:800; text-decoration:none; white-space:nowrap; cursor:pointer; }
+        #pantheon-session-bar a[hidden] { display:none !important; }
+        @media (max-width:900px) { #pantheon-session-bar .p-session-name { max-width:90px; } }
+        @media (max-width:760px) { #pantheon-session-bar { order:-1; width:auto; flex:1 1 100%; justify-content:flex-end; } #pantheon-session-bar .p-session-name { max-width:140px; } }
+        /* High-contrast Card Database number/stat badges in every theme. */
+        :root[data-pantheon-theme] .card-wiki-number,
+        :root[data-pantheon-theme] .card-wiki-result-number {
+            background:#465778 !important; color:#fff !important; border-color:#7385a6 !important;
+        }
+        :root[data-pantheon-theme] .card-wiki-stat-value {
+            background:#465778 !important; color:#f6f8ff !important; border-color:#7385a6 !important;
+        }
+        :root[data-pantheon-theme] .card-wiki-stat-value strong { color:#fff !important; font-weight:900 !important; }
+        :root[data-pantheon-theme="dark"] .card-wiki-number,
+        :root[data-pantheon-theme="dark"] .card-wiki-result-number,
+        :root[data-pantheon-theme="dark"] .card-wiki-stat-value { background:#263955 !important; border-color:#526a8a !important; }
+        :root[data-pantheon-theme="pastel"] .card-wiki-number,
+        :root[data-pantheon-theme="pastel"] .card-wiki-result-number,
+        :root[data-pantheon-theme="pastel"] .card-wiki-stat-value { background:#755180 !important; border-color:#9a7aa4 !important; }
+        :root[data-pantheon-theme="eye-comfort"] .card-wiki-number,
+        :root[data-pantheon-theme="eye-comfort"] .card-wiki-result-number,
+        :root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-value { background:#5c684d !important; border-color:#7e8b6c !important; }
+        :root[data-pantheon-theme="light"] .card-wiki-number,
+        :root[data-pantheon-theme="light"] .card-wiki-result-number,
+        :root[data-pantheon-theme="light"] .card-wiki-stat-value { background:#465778 !important; border-color:#7183a2 !important; }
+        :root[data-pantheon-theme] .card-wiki-stat-value.is-match { background:#3c625b !important; border-color:#78a69c !important; color:#fff !important; }
+        :root[data-pantheon-theme] .card-wiki-stat-value.is-match strong { color:#fff !important; }
+        /* Job content is a badge rather than bare text, so it remains legible on pastel/light surfaces. */
+        .team-job { display:inline-flex; align-items:center; max-width:100%; padding:4px 8px; border:1px solid #526a8a; border-radius:8px; background:#263955; color:#fff !important; font-weight:850; line-height:1.25; white-space:normal; overflow-wrap:anywhere; }
+        .team-job.team-unknown { background:#55505f; border-color:#81788e; color:#fff !important; font-style:normal; }
+        :root[data-pantheon-theme="dark"] .team-job { background:#263955 !important; border-color:#526a8a !important; color:#fff !important; }
+        :root[data-pantheon-theme="pastel"] .team-job { background:#755180 !important; border-color:#9a7aa4 !important; color:#fff !important; }
+        :root[data-pantheon-theme="eye-comfort"] .team-job { background:#5c684d !important; border-color:#7e8b6c !important; color:#fff !important; }
+        :root[data-pantheon-theme="light"] .team-job { background:#465778 !important; border-color:#7183a2 !important; color:#fff !important; }
+        :root[data-pantheon-theme] .team-job.team-unknown { background:#55505f !important; border-color:#81788e !important; color:#fff !important; }
         .tracker-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:11px; width:100%; max-width:1600px; margin:0 auto 12px; padding:12px 14px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); color:var(--pt-text); box-sizing:border-box; }
         .bounty-boards-toggle { min-height:36px; font-weight:800; }
         :root[data-pantheon-theme] #track-bounty-boards-btn[aria-pressed="true"] { background:var(--pt-accent) !important; border-color:var(--pt-accent) !important; color:#fff !important; }
@@ -1533,6 +1579,22 @@
         :root[data-pantheon-theme="dark"] { --pt-negative:#ef929c; }
         @media(max-width:1050px) { .pantheon-session-bar { order:-1; } }
         @media(max-width:760px) { .pantheon-session-bar { width:100%; box-sizing:border-box; } #pantheon-session-bar .p-session-name { max-width:unset; flex:1; } }
+    
+        /* v1.5.8 account UI: one profile control only, attached to the existing Overview profile chip. */
+        #pantheon-session-bar, .pantheon-session-bar { display:none !important; position:static !important; inset:auto !important; }
+        .overview-profile-chip { flex-wrap:wrap; justify-content:flex-start; }
+        .overview-profile-copy { flex:1 1 110px; }
+        .overview-profile-actions { display:flex; align-items:center; justify-content:flex-end; gap:6px; flex:0 0 auto; }
+        .overview-profile-actions a, .overview-profile-actions button {
+            display:inline-flex; align-items:center; justify-content:center; min-height:31px; box-sizing:border-box;
+            padding:6px 9px; border:1px solid var(--pt-border); border-radius:8px;
+            background:var(--pt-surface-soft); color:var(--pt-text); font:inherit; font-size:.62rem;
+            font-weight:850; line-height:1.2; text-decoration:none; white-space:nowrap; cursor:pointer;
+        }
+        .overview-profile-actions a[hidden] { display:none !important; }
+        .overview-profile-actions button:hover, .overview-profile-actions a:hover { border-color:var(--pt-accent); background:var(--pt-hover); }
+        @media(max-width:760px) { .overview-profile-chip { align-items:center; } .overview-profile-actions { margin-left:auto; } }
+        @media(max-width:520px) { .overview-profile-chip { gap:8px; } .overview-profile-actions { flex-basis:100%; justify-content:flex-end; } }
     </style>
     <script>
     try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
@@ -1575,12 +1637,6 @@
 
         <div class="control-actions">
             <div class="topbar-player">
-                <div id="pantheon-session-bar" class="pantheon-session-bar" aria-label="Signed-in Discord account">
-                    <img id="pantheon-session-avatar" class="pantheon-session-avatar" alt="Discord profile picture" referrerpolicy="no-referrer">
-                    <span class="p-session-name" id="pantheon-session-name">Signed in</span>
-                    <a href="/admin.html" id="pantheon-admin-link" hidden>Admin</a>
-                    <button type="button" id="pantheon-signout">Log out</button>
-                </div>
                 <select id="user-identity" class="btn identity-select" onchange="saveIdentity()">
                     <option value="">👤 Your roster (auto)</option>
                 </select>
@@ -1654,9 +1710,13 @@
                 <h1>Welcome to Pantheon Tools</h1>
                 <p>Your home for Dragon Nest Classic guild coordination. Track weekly progress, register characters, build raid parties, browse card stats, maintain the member directory, and calculate party income.</p>
             </div>
-            <div class="overview-profile-chip">
+            <div class="overview-profile-chip" aria-label="Signed-in Discord account">
                 <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
-                <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Verified</div></div>
+                <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
+                <div class="overview-profile-actions">
+                    <a href="/admin.html" id="overview-admin-link" hidden>Admin</a>
+                    <button type="button" id="overview-signout" class="overview-signout">Log out</button>
+                </div>
             </div>
         </section>
         <section class="overview-feature-banner" aria-label="Guild banner">
@@ -1941,14 +2001,14 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.7</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.8</span></div>
                 <ul>
 
-                    <li><strong>Full-fit banner:</strong> the sign-in and Overview banners now show the entire <code>banner.png</code> image with no overlaid title text.</li>
-                    <li><strong>Mockup-based Overview:</strong> workspace cards, guild activity reminders, the Discord panel, and shared-data status cards follow the approved visual layout.</li>
-                    <li><strong>Activity reminders:</strong> Overview calculates incomplete weekly tasks and low-completion characters from Tracker data and reads existing opt-in analytics history.</li>
-                    <li><strong>Performance:</strong> Tracker clicks update only affected cells. Hidden tools are no longer rebuilt after each successful save unless a remote change needs reconciliation.</li>
-                    <li><strong>Consistent appearance:</strong> Dark, Light, Eye comfort, and Pastel share the Pantheon palette across tools, dialogs, and the admin screen.</li>
+                    <li><strong>Account bar placement:</strong> removed the floating account rectangle; the signed-in name, role, Admin shortcut, and Log out button now live together in the existing Overview profile chip.</li>
+                    <li><strong>Reliable Personal View:</strong> the authenticated account's saved roster mapping is restored first, and both the view toggle and roster filter explicitly select that roster after data refreshes.</li>
+                    <li><strong>Discord avatar recovery:</strong> existing sessions that store a full Discord CDN avatar URL and new sessions that store the Discord avatar hash both render the real profile picture.</li>
+                    <li><strong>Contrast-safe Card Database:</strong> card numbers and stat badges use solid dark theme-aware fills with white numeric values in every appearance theme.</li>
+                    <li><strong>Readable Team Builder jobs:</strong> Job values render as high-contrast filled badges in Light, Dark, Eye comfort, and Pastel themes.</li>
                 
                 </ul>
             </section>
@@ -2929,7 +2989,11 @@
             const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(user.id)}`;
             const rememberedId = localStorage.getItem(accountIdentityKey) || '';
             const rememberedMatch = eligibleRosters.find(roster => roster.id === rememberedId) || null;
-            const roster = profileMatch || rememberedMatch;
+            // The generic identity key is cleared whenever Discord account IDs change at login,
+            // so it is a safe last-resort mapping for an existing member on this same account.
+            const selectedId = localStorage.getItem(IDENTITY_KEY) || '';
+            const selectedMatch = eligibleRosters.find(roster => roster.id === selectedId) || null;
+            const roster = profileMatch || rememberedMatch || selectedMatch;
 
             if (!roster) {
                 localStorage.removeItem(IDENTITY_KEY);
@@ -2951,13 +3015,15 @@
             if (identitySelect) identitySelect.value = roster.id;
             discordIdentityMatchStatus = profileMatch ? 'matched' : 'remembered';
 
-            if (!isPersonalView) {
-                togglePersonalView();
-            } else {
-                const filter = document.getElementById('roster-filter');
-                if (filter) filter.value = roster.id;
-                applyRosterFilter();
-            }
+            // Set state directly instead of toggling. This prevents stale UI state from leaving
+            // the Tracker in Universal View even when the correct member identity says Cho.
+            isPersonalView = true;
+            const modeButton = document.getElementById('mode-toggle-btn');
+            if (modeButton) { modeButton.textContent = '👤 Personal View'; modeButton.classList.add('personal-active'); }
+            const filter = document.getElementById('roster-filter');
+            if (filter) filter.value = roster.id;
+            activeRosterFilter = roster.id;
+            refreshTrackerUI();
             return roster;
         }
 
@@ -2979,7 +3045,8 @@
             });
 
             filter.innerHTML = options;
-            filter.value = cloudData.settings.rosters.some(r => r.id === currentVal) ? currentVal : 'all';
+            const preferredFilter = isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || currentVal) : currentVal;
+            filter.value = cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
             activeRosterFilter = filter.value;
 
             identitySel.innerHTML = idOptions;
@@ -3780,15 +3847,13 @@
                 }
                 localStorage.setItem(DISCORD_IDENTITY_ACCOUNT_KEY, currentDiscordId);
                 gate.hidden = true;
-                const bar = document.getElementById('pantheon-session-bar');
-                bar.style.display = 'flex';
-                document.getElementById('pantheon-session-name').textContent = state.user?.label || state.user?.username || 'Signed in with Discord';
-                document.getElementById('pantheon-admin-link').hidden = state.user?.role !== 'admin';
-                if (state.user?.role === 'admin') document.getElementById('pantheon-admin-link').textContent = 'Admin';
                 updateOverviewProfile(state.user);
                 refreshLedgerVisibility();
                 updateOverviewStatusCards();
-                document.getElementById('pantheon-signout').addEventListener('click', async () => {
+                const signOutButton = document.getElementById('overview-signout');
+                if (signOutButton) signOutButton.addEventListener('click', async () => {
+                    signOutButton.disabled = true;
+                    signOutButton.textContent = 'Signing out…';
                     try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
                     location.href = '/';
                 }, { once: true });
@@ -4156,11 +4221,19 @@
 
         function discordAvatarUrl(user, size = 96) {
             const id = String(user?.id || '');
-            const hash = String(user?.avatar || '');
+            const rawAvatar = String(user?.avatar || '').trim();
             if (!/^\d{5,25}$/.test(id)) return '';
-            if (/^[a-zA-Z0-9_]+$/.test(hash)) {
-                const extension = hash.startsWith('a_') ? 'gif' : 'png';
-                return `https://cdn.discordapp.com/avatars/${id}/${hash}.${extension}?size=${size}`;
+            // Legacy sessions saved the complete CDN URL; accept it, but only from Discord's CDN
+            // and only when the URL belongs to the authenticated Discord ID.
+            const urlMatch = /^https:\/\/cdn\.discordapp\.com\/avatars\/(\d{5,25})\/([a-zA-Z0-9_-]+)\.(png|gif|webp)(?:\?[^#]*)?$/i.exec(rawAvatar);
+            if (urlMatch && urlMatch[1] === id) {
+                const extension = urlMatch[2].startsWith('a_') ? 'gif' : urlMatch[3].toLowerCase();
+                return `https://cdn.discordapp.com/avatars/${id}/${urlMatch[2]}.${extension}?size=${size}`;
+            }
+            // Current sessions store the avatar hash returned by Discord.
+            if (/^[a-zA-Z0-9_-]+$/.test(rawAvatar)) {
+                const extension = rawAvatar.startsWith('a_') ? 'gif' : 'png';
+                return `https://cdn.discordapp.com/avatars/${id}/${rawAvatar}.${extension}?size=${size}`;
             }
             try { return `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(id) % 6n)}.png`; } catch (_) { return ''; }
         }
@@ -4191,10 +4264,10 @@
                 if (url) avatarEl.innerHTML = `<img class="overview-avatar-image" src="${escapeHTML(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent='${escapeHTML((name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase())}'">`;
                 else avatarEl.textContent = (name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase();
             }
-            const sessionName = document.getElementById('pantheon-session-name');
-            if (sessionName) sessionName.textContent = name;
-            paintDiscordAvatar(document.getElementById('pantheon-session-avatar'), user, name);
-            if (subEl) subEl.textContent = user?.role === 'admin' ? 'Discord account · Administrator' : 'Discord account · Verified';
+            const isAdmin = user?.role === 'admin';
+            const adminLink = document.getElementById('overview-admin-link');
+            if (adminLink) adminLink.hidden = !isAdmin;
+            if (subEl) subEl.textContent = isAdmin ? 'Discord account · Administrator' : 'Discord account · Member';
             refreshLedgerVisibility();
         }
         function updateOverviewStatusCards() {
@@ -4203,7 +4276,7 @@
             const failed = /failed|error|denied|not ready/i.test(syncLabel);
             const busy = !!syncInProgress || /merging|syncing|unsaved/i.test(syncLabel);
             const connected = typeof hasCloudConfig === 'function' ? hasCloudConfig() : true;
-            const isAdmin = document.getElementById('pantheon-admin-link')?.hidden === false;
+            const isAdmin = isPantheonAdmin();
             const set = (id, value) => { const node = document.getElementById(id); if (node) node.textContent = value; };
             set('overview-shared-value', failed ? 'Check connection' : connected ? 'Connected' : 'Local only');
             set('overview-shared-detail', failed ? 'Latest sync needs attention' : connected ? 'Shared guild record available' : 'Saved on this device');
@@ -5958,7 +6031,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.7';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.8';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

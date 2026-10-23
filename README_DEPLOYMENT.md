@@ -1,6 +1,14 @@
-# Pantheon Tools v1.5.7 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.8 — Cloudflare Pages + D1
 
 This release starts from the supplied Pantheon Tools v1.5.6 Cloudflare Pages + D1 bundle and carries its Discord-account allowlist gateway, D1-backed JSONBin-compatible data API, and authenticated Personal View matching forward into v1.5.7. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
+
+## v1.5.8 account placement, identity, and contrast fixes
+
+- Removed the floating account rectangle from the global toolbar. The existing Overview profile chip now displays the authenticated label, Administrator/Member role, Admin shortcut for admins, and Log out button.
+- Personal View applies the resolved or remembered roster ID directly to both the mode button and the roster filter. Existing saved identity is considered after the account-switch safeguard, and refreshes preserve the active Personal View filter.
+- Discord avatars support both hashes and full CDN URLs stored in existing sessions. New OAuth sessions store the raw avatar hash so animated Discord avatars can use the proper file extension.
+- Card Database card IDs and stat badges use solid high-contrast fills, with white numeric values in all four themes.
+- Team Builder Job values display as high-contrast filled badges in all four themes.
 
 ## v1.5.7 interface, personalization, and access updates
 
@@ -20,14 +28,14 @@ This release starts from the supplied Pantheon Tools v1.5.6 Cloudflare Pages + D
 - Overview reminders are calculated from the current Tracker's eligible weekly tasks (bounty tasks excluded from completion rates) and the existing opt-in weekly analytics archive. They are reminders rather than a fabricated audit log.
 - Tracker clicks update only the affected cell and character completion rate. Hidden tools are not rebuilt after every save; they refresh when visible or when a remote change requires reconciliation.
 - Dark, Light, Eye comfort, and Pastel remain available across the working tools and admin console. Existing font families are preserved.
-- The release popup reports `v1.5.7`; a dismissal saved for an older version does not suppress this update.
+- The release popup reports `v1.5.8`; a dismissal saved for an older version does not suppress this update.
 
 ## Important before deploying
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
 - The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- This ZIP uses v1.5.6 as its base with the v1.5.7 updates listed above. Back up the current repository before replacing its files.
+- This ZIP uses v1.5.6 as its base with the v1.5.7 and v1.5.8 updates listed above. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch

@@ -67,7 +67,7 @@ export async function onRequestGet({ request, env }) {
   const sessionToken = randomToken();
   const tokenHash = await sha256(sessionToken);
   const expiresAt = now + 7 * 24 * 60 * 60 * 1000;
-  const avatar = discordUser.avatar ? `https://cdn.discordapp.com/avatars/${discordId}/${discordUser.avatar}.png?size=64` : '';
+  const avatar = String(discordUser.avatar || ''); // Store Discord's hash; the client supports hashes and legacy full CDN URLs.
   const username = String(discordUser.global_name || discordUser.username || 'Discord member').slice(0, 100);
   await env.PANTHEON_DB.prepare(`
     INSERT INTO sessions (token_hash, discord_id, username, avatar, expires_at, created_at)
