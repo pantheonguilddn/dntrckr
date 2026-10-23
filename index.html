@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.5</title>
+    <title>Pantheon Tools v1.5.6</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1214,7 +1214,7 @@
 
 
 
-        /* Pantheon Tools v1.5.5 — shared appearance and navigation system. */
+        /* Pantheon Tools v1.5.6 — shared appearance and navigation system. */
         html { min-height: 100%; background: var(--pt-page); }
         body {
             min-height: 100vh !important;
@@ -1385,8 +1385,8 @@
             background: var(--pt-card-gradient) !important;
             box-shadow: 0 28px 90px rgba(0,0,0,.22) !important;
         }
-        .pantheon-auth-banner { min-height: 112px !important; padding: 18px 20px !important; border-radius: 14px !important; border-color: var(--pt-banner-border) !important; }
-        .pantheon-auth-banner-title { color: #fff !important; text-shadow: 0 2px 12px rgba(0,0,0,.78) !important; }
+        .pantheon-auth-banner { height: clamp(100px, 17vw, 140px) !important; min-height: 0 !important; padding: 0 !important; border-radius: 14px !important; border-color: var(--pt-banner-border) !important; background-color: var(--pt-surface-soft) !important; background-image: url("banner.png") !important; background-position: center !important; background-size: contain !important; background-repeat: no-repeat !important; }
+        .pantheon-auth-banner-title { display: none !important; }
         .pantheon-auth-card h1 { color: var(--pt-text) !important; letter-spacing: -.035em !important; }
         .pantheon-auth-copy, .pantheon-auth-note { color: var(--pt-muted) !important; }
         .pantheon-discord-btn { border-radius: 11px !important; box-shadow: 0 9px 22px rgba(88,101,242,.18) !important; }
@@ -1427,6 +1427,62 @@
             .pantheon-auth-feature { padding: 11px; }
         }
 
+    
+        /* v1.5.6 mockup-aligned Overview and shared tool surface styles. */
+        .brand-name { letter-spacing: .02em !important; text-transform: none !important; }
+        .brand-subtitle { letter-spacing: .01em !important; text-transform: none !important; font-weight: 650 !important; }
+        .overview-dashboard-head { display:flex; align-items:flex-start; justify-content:space-between; gap:22px; flex-wrap:wrap; margin:22px 0 24px; }
+        .overview-dashboard-copy { min-width:0; max-width:750px; }
+        .overview-dashboard-copy h1 { margin:11px 0 9px; color:var(--pt-text); font-size:clamp(1.8rem,3vw,2.3rem); line-height:1.08; letter-spacing:-.04em; }
+        .overview-dashboard-copy p { margin:0; max-width:680px; color:var(--pt-muted); font-size:.78rem; line-height:1.75; }
+        .overview-profile-chip { display:flex; align-items:center; gap:10px; padding:9px 12px; border:1px solid var(--pt-border); border-radius:13px; background:var(--pt-surface); min-width:0; max-width:100%; }
+        .overview-avatar { display:grid; place-items:center; flex:0 0 36px; width:36px; height:36px; border-radius:11px; background:var(--pt-accent-soft); color:var(--pt-accent); font-weight:900; font-size:.8rem; }
+        .overview-profile-copy { min-width:0; }
+        .overview-profile-name { font-size:.73rem; color:var(--pt-text); font-weight:850; overflow-wrap:anywhere; }
+        .overview-profile-sub { margin-top:3px; font-size:.62rem; color:var(--pt-muted); }
+        .overview-feature-banner { display:flex; align-items:center; justify-content:center; width:100%; min-height:120px; padding:10px; overflow:hidden; margin:0 0 25px; border:1px solid var(--pt-border); border-radius:16px; background:var(--pt-surface); }
+        .overview-feature-banner .overview-banner { display:block; width:100%; height:clamp(100px,15vw,164px); max-height:none; margin:0 !important; border:0 !important; border-radius:8px !important; background:transparent !important; object-fit:contain !important; object-position:center !important; }
+        .overview-section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:24px 2px 12px !important; color:var(--pt-accent) !important; font-size:.68rem !important; font-weight:900 !important; letter-spacing:.15em !important; text-transform:uppercase; }
+        .overview-tool-count { color:var(--pt-muted); font-size:.64rem; letter-spacing:.02em; font-weight:650; text-transform:none; white-space:nowrap; }
+        .overview-tools-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px !important; }
+        .overview-tool-card { position:relative; display:flex; flex-direction:column; align-items:flex-start; min-width:0; min-height:165px !important; padding:17px !important; gap:8px !important; overflow:hidden; border:1px solid var(--pt-border) !important; border-radius:16px !important; background:linear-gradient(160deg,var(--pt-surface-raised),var(--pt-surface)) !important; color:var(--pt-text) !important; text-align:left; box-shadow:0 4px 15px rgba(0,0,0,.04) !important; transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease !important; }
+        .overview-tool-card:hover { transform:translateY(-3px) !important; border-color:var(--pt-accent) !important; background:var(--pt-surface-raised) !important; box-shadow:0 10px 24px rgba(0,0,0,.09) !important; }
+        .overview-tool-card strong { display:block; margin-top:2px; color:var(--pt-text) !important; font-size:.83rem !important; line-height:1.4 !important; }
+        .overview-tool-card > span:not(.overview-tool-icon):not(.overview-tool-arrow) { color:var(--pt-muted) !important; font-size:.7rem !important; line-height:1.6 !important; }
+        .overview-tool-icon { display:grid; place-items:center; flex:0 0 36px; width:36px; height:36px; margin-bottom:4px; border:1px solid color-mix(in srgb,var(--pt-accent) 25%,var(--pt-border)); border-radius:11px; background:var(--pt-accent-soft); color:var(--pt-accent); font-size:1.05rem; font-weight:800; }
+        .overview-tool-arrow { position:absolute; top:15px; right:16px; color:var(--pt-accent); font-size:.95rem; opacity:.78; }
+        .overview-bottom-grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr); align-items:start; gap:13px; margin-top:16px; }
+        .overview-panel { min-width:0; padding:18px; border:1px solid var(--pt-border); border-radius:16px; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 4px 15px rgba(0,0,0,.035); }
+        .overview-panel h2 { margin:0; color:var(--pt-text); font-size:.83rem; letter-spacing:-.01em; }
+        .overview-panel p { margin:5px 0 0; color:var(--pt-muted); font-size:.67rem; line-height:1.65; }
+        .overview-panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:15px; }
+        .overview-panel-kicker { display:inline-flex; align-items:center; border:1px solid var(--pt-border); border-radius:999px; padding:5px 8px; color:var(--pt-muted); background:var(--pt-surface-soft); font-size:.55rem; font-weight:850; letter-spacing:.08em; white-space:nowrap; }
+        .overview-activity-list { display:grid; gap:0; }
+        .overview-activity-row { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-top:1px solid var(--pt-border); }
+        .overview-activity-row:first-child { border-top:0; padding-top:0; }
+        .overview-activity-row:last-child { padding-bottom:0; }
+        .overview-activity-icon { display:grid; place-items:center; width:29px; height:29px; flex:0 0 29px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft); color:var(--pt-accent); font-size:.8rem; }
+        .overview-activity-row strong { display:block; margin:1px 0 4px; color:var(--pt-text); font-size:.7rem; line-height:1.45; }
+        .overview-activity-row p { margin:0; color:var(--pt-muted); font-size:.66rem; line-height:1.6; overflow-wrap:anywhere; }
+        .overview-activity-meta { display:block; margin-top:4px; color:var(--pt-muted); opacity:.86; font-size:.57rem; line-height:1.5; }
+        .overview-side-stack { display:grid; gap:12px; min-width:0; }
+        .overview-discord-panel { background:linear-gradient(160deg,var(--pt-surface-raised),var(--pt-surface)); }
+        .overview-discord-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:14px; }
+        .overview-discord-mark { display:grid; place-items:center; width:32px; height:32px; flex:0 0 32px; border-radius:10px; background:var(--pt-accent-soft); color:var(--pt-accent); font-weight:900; }
+        .overview-discord-button { display:flex !important; justify-content:center; align-items:center; width:100%; min-height:42px; border-radius:10px !important; text-decoration:none !important; }
+        .overview-discord-note { color:var(--pt-muted) !important; font-size:.63rem !important; }
+        .overview-status-stack { display:grid; gap:8px; }
+        .overview-status-card { display:flex; align-items:center; gap:10px; min-width:0; padding:12px 13px; border:1px solid var(--pt-border); border-radius:13px; background:var(--pt-surface); }
+        .overview-status-symbol { display:grid; place-items:center; width:31px; height:31px; flex:0 0 31px; border-radius:9px; background:var(--pt-surface-soft); color:var(--pt-accent); font-size:.85rem; }
+        .overview-status-card > div { min-width:0; display:grid; gap:2px; }
+        .overview-status-label { color:var(--pt-muted); font-size:.57rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+        .overview-status-card strong { color:var(--pt-text); font-size:.76rem; font-weight:850; overflow-wrap:anywhere; }
+        .overview-status-card small { color:var(--pt-muted); font-size:.59rem; line-height:1.5; overflow-wrap:anywhere; }
+        :root[data-pantheon-theme] .pantheon-auth-banner { height:clamp(100px,17vw,140px) !important; min-height:0 !important; padding:0 !important; border-radius:14px !important; border-color:var(--pt-banner-border) !important; background-color:var(--pt-surface-soft) !important; background-image:url("banner.png") !important; background-position:center !important; background-size:contain !important; background-repeat:no-repeat !important; }
+        .pantheon-auth-banner-title { display:none !important; }
+        @media(max-width:900px) { .overview-bottom-grid { grid-template-columns:1fr; } .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .overview-side-stack { grid-template-columns:minmax(0,1fr); } }
+        @media(max-width:640px) { .overview-dashboard-head { margin-top:13px; } .overview-dashboard-copy h1 { font-size:1.8rem; } .overview-profile-chip { width:100%; } .overview-feature-banner { min-height:92px; padding:6px; margin-bottom:20px; } .overview-feature-banner .overview-banner { height:clamp(80px,25vw,115px); } .overview-tools-grid { grid-template-columns:1fr !important; } .overview-tool-card { min-height:125px !important; } .overview-panel { padding:15px; } .overview-section-title { letter-spacing:.1em !important; } .overview-tool-count { font-size:.58rem; } }
+
     </style>
     <script>
     try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
@@ -1448,7 +1504,7 @@
           <p class="pantheon-auth-footnote">Pantheon Tools is maintained for the guild community.</p>
         </section>
         <div class="pantheon-auth-card">
-        <div class="pantheon-auth-banner"><div class="pantheon-auth-banner-title">Dragon Nest - Classic Pantheon</div></div>
+        <div class="pantheon-auth-banner" role="img" aria-label="Dragon Nest - Classic Pantheon banner"></div>
         <div class="pantheon-auth-brand-row">
           <label class="pantheon-theme-control pantheon-auth-theme" for="pantheon-auth-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-auth-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
         </div>
@@ -1463,7 +1519,7 @@
 
     <div class="controls">
         <div class="brand-area">
-            <div class="brand-copy" id="pantheon-home-link" role="button" tabindex="0" aria-label="Return to Overview" title="Return to Overview"><div class="brand-name">PANTHEON TOOLS</div><div class="brand-subtitle">DRAGON NEST · GUILD OPERATIONS</div></div>
+            <div class="brand-copy" id="pantheon-home-link" role="button" tabindex="0" aria-label="Return to Overview" title="Return to Overview"><div class="brand-name">Pantheon Tools</div><div class="brand-subtitle">Dragon Nest - Classic SEA [Guild Operations]</div></div>
             <div class="system-status">
                 <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Loading Database...</span></div>
             </div>
@@ -1538,22 +1594,51 @@
 
 
     <main id="overview-page" class="app-page overview-page">
-        <section class="overview-hero">
-            <img class="overview-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
-            <div class="drawer-kicker">PANTHEON GUILD TOOLS</div>
-            <h1>Welcome to Pantheon Tools</h1>
-            <p>Your home for Dragon Nest guild coordination. Track daily and weekly progress, register characters, build raid parties, browse card stats, maintain the member directory, and calculate party income. Choose a tool below to get started.</p>
+        <section class="overview-dashboard-head">
+            <div class="overview-dashboard-copy">
+                <div class="drawer-kicker">GUILD OVERVIEW</div>
+                <h1>Welcome to Pantheon Tools</h1>
+                <p>Your home for Dragon Nest Classic guild coordination. Track weekly progress, register characters, build raid parties, browse card stats, maintain the member directory, and calculate party income.</p>
+            </div>
+            <div class="overview-profile-chip">
+                <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
+                <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Verified</div></div>
+            </div>
         </section>
-        <div class="overview-section-title">Available tools</div>
+        <section class="overview-feature-banner" aria-label="Guild banner">
+            <img class="overview-banner" src="banner.png" alt="Dragon Nest - Classic Pantheon banner" onerror="this.style.display='none'">
+        </section>
+        <div class="overview-section-title"><span>Your guild workspace</span><span class="overview-tool-count">6 tools available</span></div>
         <section class="overview-tools-grid" aria-label="Pantheon tool overview">
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-universal')"><strong>📋 Tracker & Bounties</strong><span>Review daily and weekly tasks, bounty targets and notes, analytics, and guild progress. Switch between Universal and Personal View.</span></button>
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('team-builder')"><strong>⚔ Team Builder</strong><span>Build raid parties from tracker-registered characters, check party roles, configure class capabilities, and share setups.</span></button>
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('card-database')"><strong>🃏 Card Database</strong><span>Filter monster cards by level range and desired stats. Quick Builds return cards with any one of the preset stats. Card batches stay local.</span></button>
-            <button class="overview-tool-card" type="button" onclick="openLandingSettings()"><strong>⚙ Default Landing Page</strong><span>Choose which Pantheon tool opens first. Change or clear your startup destination anytime.</span></button>
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><strong>🧮 Salary Calculator</strong><span>Calculate and split party income using the available calculator.</span></button>
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('help')"><strong>❔ Help & Guide</strong><span>Open the relevant guides for Tracker, Team Builder, Card Database, and roster workflows.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-universal')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▤</span><strong>Tracker &amp; Bounties</strong><span>Review daily and weekly tasks, bounty targets, completion rates, and guild progress.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('team-builder')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚔</span><strong>Team Builder</strong><span>Build raid parties from registered characters and check role coverage.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('card-database')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▧</span><strong>Card Database</strong><span>Filter monster cards by level range and desired stats. Local card batches stay local.</span></button>
+            <button class="overview-tool-card" type="button" onclick="openLandingSettings()"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚙</span><strong>Default Landing Page</strong><span>Choose which Pantheon tool opens first and change the preference anytime.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▣</span><strong>Salary Calculator</strong><span>Calculate party income, deductions, and member splits.</span></button>
+            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('help')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">?</span><strong>Help &amp; Guide</strong><span>Find instructions for Tracker, Team Builder, the Card Database, and roster workflows.</span></button>
         </section>
-        <div class="overview-footer"><a id="overview-discord-link" class="btn btn-cloud" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a><p>Quick tip: save a default landing page in the welcome screen if you normally use only one tool.</p></div>
+        <section class="overview-bottom-grid">
+            <div class="overview-panel overview-activity-panel">
+                <div class="overview-panel-heading"><div><h2>Recent Workspace Activity</h2><p>Useful reminders based on Tracker and weekly analytics</p></div><span class="overview-panel-kicker">GUILD CHECK-IN</span></div>
+                <div class="overview-activity-list" id="overview-activity" aria-live="polite">
+                    <div class="overview-activity-row"><span class="overview-activity-icon">✓</span><div><strong>Weekly tracker review</strong><p>Check for outstanding weekly tasks before the reset.</p></div></div>
+                    <div class="overview-activity-row"><span class="overview-activity-icon">↻</span><div><strong>Low-completion follow-up</strong><p>Review characters who may need a guild check-in.</p></div></div>
+                    <div class="overview-activity-row"><span class="overview-activity-icon">▤</span><div><strong>Analytics history</strong><p>Review participation trends when weekly tracking is enabled.</p></div></div>
+                </div>
+            </div>
+            <aside class="overview-side-stack">
+                <section class="overview-panel overview-discord-panel">
+                    <div class="overview-discord-heading"><div><h2>Join the Pantheon Discord</h2><p>Talk with the guild, coordinate raids, and keep up with Pantheon announcements.</p></div><span class="overview-discord-mark" aria-hidden="true">↗</span></div>
+                    <a id="overview-discord-link" class="btn btn-cloud overview-discord-button" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a>
+                    <p id="overview-discord-note" class="overview-discord-note" hidden>Ask a Pantheon administrator for the current Discord invite.</p>
+                </section>
+                <section class="overview-status-stack" aria-label="Workspace status">
+                    <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
+                    <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
+                    <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
+                </section>
+            </aside>
+        </section>
     </main>
 
     <main id="tracker-page" class="app-page hidden-page">
@@ -1803,15 +1888,15 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.5</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.6</span></div>
                 <ul>
-                    <li><strong>Unified interface:</strong> the Overview, Tracker, Team Builder, Card Database, roster, and administrative screens now share a cleaner card-based layout, more consistent controls, and polished spacing.</li>
-                    <li><strong>Appearance themes:</strong> choose Light, Dark, Eye comfort, or Pastel from the top toolbar. Your preference applies to the sign-in screen, tools, and pop-up windows.</li>
-                    <li><strong>Default landing page:</strong> choose or change your startup destination from the new Overview shortcut or the Tools menu. Overview remains the default when no preference is saved.</li>
-                    <li><strong>Less intrusive updates:</strong> the startup pop-up now contains only release changes. You can suppress it until the next version is released.</li>
-                    <li><strong>Sign-in banner:</strong> <code>banner.png</code> is now the banner background, while the visible title remains the editable text “Dragon Nest - Classic Pantheon”.</li>
-                    <li><strong>Cleaner header:</strong> removed the redundant P badge. Select the Pantheon Tools brand text to return to Overview from another tool.</li>
-                    <li><strong>Theme consistency:</strong> Dark, Light, Eye comfort, and Pastel now use the same palette and ambient background style as the approved Overview mockup, with typography and layout preserved.</li>
+
+                    <li><strong>Full-fit banner:</strong> the sign-in and Overview banners now show the entire <code>banner.png</code> image with no overlaid title text.</li>
+                    <li><strong>Mockup-based Overview:</strong> workspace cards, guild activity reminders, the Discord panel, and shared-data status cards follow the approved visual layout.</li>
+                    <li><strong>Activity reminders:</strong> Overview calculates incomplete weekly tasks and low-completion characters from Tracker data and reads existing opt-in analytics history.</li>
+                    <li><strong>Performance:</strong> Tracker clicks update only affected cells. Hidden tools are no longer rebuilt after each successful save unless a remote change needs reconciliation.</li>
+                    <li><strong>Consistent appearance:</strong> Dark, Light, Eye comfort, and Pastel share the Pantheon palette across tools, dialogs, and the admin screen.</li>
+                
                 </ul>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
@@ -3471,9 +3556,12 @@
             const hasMeaningfulLocalData = hasActualTrackerActivity(cloudData) || cloudData.settings.rosters.length > 0 || cloudData.settings.categories.length > 0;
             (async()=>{
                 try{
+                    let remoteChangedSinceUI = false;
                     for(let attempt=1;attempt<=3;attempt++){
                         const remote=normalizeData(await fetchRemoteRecord(config));
-                        if (!lastSeenRemoteMarker) lastSeenRemoteMarker = remoteSyncMarker(remote);
+                        const observedRemoteMarker = remoteSyncMarker(remote);
+                        if (lastSeenRemoteMarker && observedRemoteMarker !== lastSeenRemoteMarker) remoteChangedSinceUI = true;
+                        if (!lastSeenRemoteMarker) lastSeenRemoteMarker = observedRemoteMarker;
                         // Refresh/sync itself does not create a revision. Only an
                         // explicit global-impact edit (prepared by prepareGlobalChange)
                         // is versioned.
@@ -3493,7 +3581,7 @@
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
                             lastSeenRemoteMarker=remoteSyncMarker(latest);unsavedCloudChanges=false;
-                            cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();refreshTrackerUI();
+                            cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();if(remoteChangedSinceUI)refreshTrackerUI();else updateOverviewStatusCards();
                             // Revision logging happens after the core sync and can fail safely.
                             if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
                             const flushed=await flushRevisionQueue();
@@ -3503,7 +3591,7 @@
                     }
                     throw new Error('Cloud changed during sync. Please press Sync Now again.');
                 }catch(err){unsavedCloudChanges=true;persistLocalData();setStatus(`🔴 Sync Failed: ${err.message}`);}
-                finally{syncInProgress=false;if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}}
+                finally{syncInProgress=false;updateOverviewStatusCards();if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}}
             })();
         }
 
@@ -3544,7 +3632,7 @@
 
         function openVersionHistoryModal(){toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
-        function setStatus(msg) { document.getElementById('sync-status').textContent = msg; }
+        function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
         function triggerAutoSync() { unsavedCloudChanges = true; persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
 
         async function pantheonCheckSessionAndBoot() {
@@ -3577,6 +3665,8 @@
                 document.getElementById('pantheon-session-name').textContent = state.user?.username || 'Signed in with Discord';
                 document.getElementById('pantheon-admin-link').hidden = state.user?.role !== 'admin';
                 if (state.user?.role === 'admin') document.getElementById('pantheon-admin-link').textContent = 'Access admin';
+                updateOverviewProfile(state.user);
+                updateOverviewStatusCards();
                 document.getElementById('pantheon-signout').addEventListener('click', async () => {
                     try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
                     location.href = '/';
@@ -3641,20 +3731,27 @@
             isAnalyticsVisible = !isAnalyticsVisible;
             document.getElementById('analytics-grid').style.display = isAnalyticsVisible ? 'grid' : 'none';
             document.getElementById('toggle-analytics-btn').textContent = isAnalyticsVisible ? '👁️ Hide Analytics' : '👁️ Show Analytics';
+            if (isAnalyticsVisible) renderAnalytics();
         }
 
         function refreshTrackerUI() {
             syncDataStructures();
-            buildTrackerTable();
-            buildLootWeightEditor();
-            renderRosterRegistration();
-            renderDungeonRegistration();
-            renderScholarLedger();
-            applyBoardState();
-            renderAnalytics();
+            const visible = id => { const el = document.getElementById(id); return !!el && !el.classList.contains('hidden-page'); };
+            const modalOpen = id => { const el = document.getElementById(id); return !!el && !el.classList.contains('hidden'); };
+            if (visible('tracker-page')) {
+                buildTrackerTable();
+                applyBoardState();
+                if (isAnalyticsVisible) renderAnalytics();
+            }
             updateClassSetupSummary();
-            renderTeamBuilder();
-            renderMemberDirectory();
+            if (visible('team-builder-page')) renderTeamBuilder();
+            if (visible('member-roster-page')) renderMemberDirectory();
+            if (modalOpen('weights-modal')) buildLootWeightEditor();
+            if (modalOpen('roster-modal')) renderRosterRegistration();
+            if (modalOpen('dungeon-modal')) renderDungeonRegistration();
+            if (modalOpen('scholar-modal')) renderScholarLedger();
+            if (visible('overview-page')) renderOverviewActivity();
+            updateOverviewStatusCards();
         }
 
         function buildTrackerTable() {
@@ -3796,10 +3893,10 @@
                         }
                     }
                     
-                    if (targetBounty) setCellState(c, targetBounty, 'done');
+                    if (targetBounty) { setCellState(c, targetBounty, 'done'); updateCellPresentation(c, targetBounty); }
                 }
             }
-            applyBoardState(); triggerAutoSync();
+            updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerAutoSync();
         }
 
         function handleRightClick(e) {
@@ -3836,9 +3933,21 @@
                 }
             }
 
-            applyBoardState(); triggerAutoSync();
+            updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerAutoSync();
         }
 
+        function renderOverviewIfVisible() {
+            const page = document.getElementById('overview-page');
+            if (page && !page.classList.contains('hidden-page')) renderOverviewActivity();
+        }
+        function updateCellPresentation(c, t) {
+            const td = document.querySelector(`td.interactive-cell[data-char="${CSS.escape(String(c))}"][data-task="${CSS.escape(String(t))}"]`);
+            if (!td) return;
+            const state = getCellState(c, t);
+            ['excluded','marked','reset','done'].forEach(name => td.classList.toggle(name, state === name));
+            const cb = td.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = state === 'done';
+        }
         function applyBoardState() {
             document.querySelectorAll('td.interactive-cell').forEach(td => {
                 const s = getCellState(td.dataset.char, td.dataset.task);
@@ -3855,17 +3964,16 @@
         }
         function getCompletionTaskNames() { return weeklyTaskNames.filter(t => !isBountyTask(t)); }
 
-        function updateRates() {
-            characters.forEach(c => {
-                let ct = 0, dn = 0;
-                getCompletionTaskNames().forEach(task => {
-                    const s = getCellState(c.name, task);
-                    if (s !== 'excluded') { ct++; if (s === 'done') dn++; }
-                });
-                const el = document.getElementById(rateElementId(c.name));
-                if (el) el.textContent = `${ct ? Math.round((dn / ct) * 100) : 0}%`;
+        function updateRateForCharacter(charName) {
+            let ct = 0, dn = 0;
+            getCompletionTaskNames().forEach(task => {
+                const state = getCellState(charName, task);
+                if (state !== 'excluded') { ct++; if (state === 'done') dn++; }
             });
+            const el = document.getElementById(rateElementId(charName));
+            if (el) el.textContent = `${ct ? Math.round((dn / ct) * 100) : 0}%`;
         }
+        function updateRates() { characters.forEach(c => updateRateForCharacter(c.name)); }
 
         function checkAutoResets() {
             let changed = false; const dt = getTargetResetTimeUTC(false), wt = getTargetResetTimeUTC(true);
@@ -3922,6 +4030,58 @@
         function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
         function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
 
+        function updateOverviewProfile(user) {
+            const name = String(user?.username || user?.global_name || 'Pantheon Member').trim() || 'Pantheon Member';
+            const nameEl = document.getElementById('overview-profile-name');
+            const avatarEl = document.getElementById('overview-avatar');
+            const subEl = document.getElementById('overview-profile-sub');
+            if (nameEl) nameEl.textContent = name;
+            if (avatarEl) avatarEl.textContent = (name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase();
+            if (subEl) subEl.textContent = user?.role === 'admin' ? 'Discord account · Administrator' : 'Discord account · Verified';
+        }
+        function updateOverviewStatusCards() {
+            const getText = id => document.getElementById(id)?.textContent || '';
+            const syncLabel = getText('sync-status').trim();
+            const failed = /failed|error|denied|not ready/i.test(syncLabel);
+            const busy = !!syncInProgress || /merging|syncing|unsaved/i.test(syncLabel);
+            const connected = typeof hasCloudConfig === 'function' ? hasCloudConfig() : true;
+            const isAdmin = document.getElementById('pantheon-admin-link')?.hidden === false;
+            const set = (id, value) => { const node = document.getElementById(id); if (node) node.textContent = value; };
+            set('overview-shared-value', failed ? 'Check connection' : connected ? 'Connected' : 'Local only');
+            set('overview-shared-detail', failed ? 'Latest sync needs attention' : connected ? 'Shared guild record available' : 'Saved on this device');
+            set('overview-sync-value', failed ? 'Needs attention' : busy ? 'Syncing' : unsavedCloudChanges ? 'Pending' : 'Up to date');
+            set('overview-sync-detail', syncLabel || 'Waiting for first sync');
+            set('overview-permissions-value', isAdmin ? 'Administrator' : 'Member');
+            set('overview-permissions-detail', isAdmin ? 'Guild management access' : 'Authenticated guild account');
+        }
+        function renderOverviewActivity() {
+            const cont = document.getElementById('overview-activity');
+            if (!cont) return;
+            const tasks = typeof getCompletionTaskNames === 'function' ? getCompletionTaskNames() : [];
+            const metrics = (Array.isArray(characters) ? characters : []).map(char => {
+                let eligible = 0, done = 0;
+                tasks.forEach(task => {
+                    const state = getCellState(char.name, task);
+                    if (state !== 'excluded') { eligible++; if (state === 'done') done++; }
+                });
+                return { name: char.name, eligible, done, pending: Math.max(0, eligible - done), rate: eligible ? Math.round(done / eligible * 100) : 100 };
+            });
+            const withPending = metrics.filter(item => item.eligible > 0 && item.pending > 0);
+            const low = metrics.filter(item => item.eligible > 0 && item.rate < 40).sort((a,b) => a.rate - b.rate || a.name.localeCompare(b.name)).slice(0,3);
+            const rates = metrics.filter(item => item.eligible > 0);
+            const avg = rates.length ? Math.round(rates.reduce((sum,item) => sum + item.rate,0) / rates.length) : null;
+            const analyticsOn = cloudData?.settings?.analyticsTrackingEnabled === true;
+            const archives = Object.entries(safeObject(cloudData?.weeklyArchive)).sort((a,b) => Number(a[0]) - Number(b[0]));
+            const historyText = analyticsOn
+                ? (archives.length ? `Weekly analytics is enabled with ${archives.length} archived week${archives.length === 1 ? '' : 's'}. Open Analytics to review participation trends and loot-weighted priorities.` : 'Weekly analytics is enabled, but no archived weeks are available yet. Review the next weekly trend after an archive is created.')
+                : 'Weekly analytics tracking is currently off. The Tracker still works; enable opt-in tracking to retain weekly trend history.';
+            const activity = [
+                { icon:'✓', title:'Weekly tracker review', body: metrics.length ? `${avg}% average weekly completion across ${rates.length} character${rates.length === 1 ? '' : 's'} with eligible tasks. ${withPending.length} character${withPending.length === 1 ? ' has' : 's have'} outstanding weekly tasks to review.` : 'No characters are currently registered in the Tracker. Check Member Roster and tracker opt-ins.', meta:'Tracker reminder · Bounty tasks excluded from completion rate' },
+                { icon:'↻', title:'Low-completion follow-up', body: low.length ? `Below 40% completion: ${low.map(item => `${item.name} (${item.rate}%)`).join(', ')}. Consider a guild check-in.` : (metrics.length ? 'No tracked characters currently fall below 40% weekly completion.' : 'Once characters are opted in, low-completion follow-ups will appear here.'), meta:`Participation reminder · ${low.length} follow-up${low.length === 1 ? '' : 's'}` },
+                { icon:'▤', title:'Weekly analytics history', body:historyText, meta: analyticsOn ? `Analytics enabled · ${archives.length} archived week${archives.length === 1 ? '' : 's'}` : 'Analytics opt-in is off' }
+            ];
+            cont.innerHTML = activity.map(item => `<div class="overview-activity-row"><span class="overview-activity-icon" aria-hidden="true">${escapeHTML(item.icon)}</span><div><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.body)}</p><span class="overview-activity-meta">${escapeHTML(item.meta)}</span></div></div>`).join('');
+        }
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
@@ -3933,14 +4093,15 @@
                 cont.innerHTML = `<div class="analytics-disabled"><strong>Weekly analytics tracking is off.</strong><br>Daily and weekly task resets will continue normally, but no new weekly history will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting five weeks of history.'}</div>`;
                 return;
             }
+            const sortedArchiveEntries = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0]));
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = 'char-card'; card.style.borderTopColor = char.color;
                 
-                const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>a[0]-b[0]).map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
+                const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...sortedArchiveEntries.map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
                 const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
 
                 const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m: 0, c: 0, x: 0, o: 0 });
-                Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>a[0]-b[0]).forEach(([,a]) => {
+                sortedArchiveEntries.forEach(([,a]) => {
                     const order = Array.isArray(a.taskOrder) ? a.taskOrder : weeklyTaskNames;
                     const sStr = String(a.states?.[char.name] || '');
                     order.forEach((t, i) => { if(!stats[t])stats[t]={m:0,c:0,x:0,o:0}; if(sStr[i]) { stats[t].o++; if(sStr[i]==='x')stats[t].x++; else if(sStr[i]==='d')stats[t].c++; else stats[t].m++; } });
@@ -5594,7 +5755,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.4';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.6';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -5771,6 +5932,8 @@
             };
             if (!pages[page]) page = 'tracker';
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
+            if (page === 'overview') { renderOverviewActivity(); updateOverviewStatusCards(); }
+            if (page === 'tracker') { buildTrackerTable(); applyBoardState(); if (isAnalyticsVisible) renderAnalytics(); updateClassSetupSummary(); }
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }

@@ -1,18 +1,22 @@
-# Pantheon Tools v1.5.5 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.6 — Cloudflare Pages + D1
 
 This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway, a D1-backed JSONBin-compatible data API, and automatic Personal View selection based on the authenticated Discord profile. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
 
-## v1.5.5 visual updates
+## v1.5.6 interface and performance updates
 
-- The redundant P badge was removed from the application header; the PANTHEON TOOLS brand text is the home control and returns signed-in users to Overview.
-- The Light, Dark, Eye comfort, and Pastel color palettes now match the approved access/Overview mockup. Typography and font sizes were not changed.
-- The Overview layout and existing Discord invite link are preserved.
+- The login banner displays the entire `banner.png` image using `contain`; no title text is overlaid on the image.
+- The header reads **Pantheon Tools** and **Dragon Nest - Classic SEA [Guild Operations]**. The brand remains the home control that returns signed-in users to Overview.
+- Overview follows the approved mockup layout: tool cards, the banner in the open area, Recent Workspace Activity reminders, the Discord invite, and Shared Data / Sync Status / Permissions beneath it.
+- Overview reminders are calculated from the current Tracker's eligible weekly tasks (bounty tasks excluded from completion rates) and the existing opt-in weekly analytics archive. They are reminders rather than a fabricated audit log.
+- Tracker clicks update only the affected cell and character completion rate. Hidden tools are not rebuilt after every save; they refresh when visible or when a remote change requires reconciliation.
+- Dark, Light, Eye comfort, and Pastel remain available across the working tools and admin console. Existing font families are preserved.
+- The release popup uses `v1.5.6`, so dismissals of earlier versions do not suppress this update.
 
 ## Important before deploying
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
-- The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The visible text **Dragon Nest - Classic Pantheon** is separate HTML text layered over that background, so it remains visible and editable.
+- The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
 - If the current root `index.html` in GitHub is newer than the supplied v1.4.6-based HTML, do not overwrite it blindly. Reconcile the frontend edits with that newer tracker version first.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
@@ -130,7 +134,7 @@ This is an account allowlist, not a live guild-membership check. Personal View a
 Cloudflare's published Workers Free quota includes 100,000 requests per day; D1 Free includes 5 million rows read/day, 100,000 rows written/day, and 5 GB total storage. This small guild tracker is designed to fit those limits with modest usage and no 30-second whole-record polling. Limits can change, so monitor the dashboard. Pages static-asset requests themselves do not count as Pages Functions invocations; API, OAuth, and D1-backed requests do.
 
 
-## Sign-in banner background (v1.5.4)
+## Sign-in and Overview banner (v1.5.6)
 
 - Place the supplied image file named `banner.png` in the same root folder as `index.html` in the GitHub repository.
 - The image is used only as the sign-in banner background. The front-facing text `Dragon Nest - Classic Pantheon` remains HTML text layered over the image.
@@ -143,6 +147,6 @@ The tracker and administrator console include Light, Dark, Eye comfort, and Past
 Upload `guild-logo.png` to the same published root directory as `index.html` and `admin.html`. The tracker header, Discord sign-in gate, and administrator console reference this file. Keep `Guild Banner.png` as well; Overview and release/banner areas still use it.
 
 
-## v1.5.4 interface update
+## Earlier v1.5.4 interface update
 
-This release refreshes the presentation of the existing Tracker, Team Builder, Card Database, roster, overview, dialogs, and administrator console with a consistent card-based layout, unified spacing, refined inputs and controls, and the existing four appearance themes. It preserves the existing tool logic, Cloudflare Pages Functions, D1 binding, and Discord OAuth flow. The sign-in banner still displays the title “Dragon Nest - Classic Pantheon” over the `banner.png` background; place `banner.png` in the project root beside `index.html` if it is not already in your repository.
+This release refreshes the presentation of the existing Tracker, Team Builder, Card Database, roster, overview, dialogs, and administrator console with a consistent card-based layout, unified spacing, refined inputs and controls, and the existing four appearance themes. It preserves the existing tool logic, Cloudflare Pages Functions, D1 binding, and Discord OAuth flow. The v1.5.6 sign-in and Overview banners display the complete `banner.png` image with no overlaid title; place `banner.png` in the project root beside `index.html` if it is not already in your repository.
