@@ -1,6 +1,6 @@
-# Pantheon Tools v1.5.0 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.1 — Cloudflare Pages + D1
 
-This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway plus a D1-backed JSONBin-compatible data API. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard to avoid the invalid `wrangler.jsonc` issue from the previous attempt.
+This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway, a D1-backed JSONBin-compatible data API, and automatic Personal View selection based on the authenticated Discord profile. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
 
 ## Important before deploying
 
@@ -103,12 +103,12 @@ If JSONBin reports an error, stop and keep the JSONBin record as your active bac
 ## I. Add permitted Discord accounts
 
 1. Open `/admin.html` while signed in as an admin.
-2. Enter each member's numeric Discord User ID and an optional label.
+2. Enter each member's numeric Discord User ID. Leave **Roster match name** blank when their Discord profile display name matches their Member Roster owner name. If it differs, enter the exact Member Roster owner name once as the roster-match fallback.
 3. Click **Add / enable account**.
 4. Tell the member to open the Pages URL and click **Continue with Discord**. They do not need a JSONBin ID or key. Their account will be denied until their numeric ID is added.
 5. Use **Revoke** to disable an account. Revoking deletes its stored sessions so its next API request is denied.
 
-This is an account allowlist, not a live guild-membership check. Removing someone from the Discord server does not automatically remove their app access unless an admin revokes their ID here.
+This is an account allowlist, not a live guild-membership check. Personal View automatically matches the signed-in Discord display name to the Member Roster owner name; a configured roster-match fallback is used only if the profile name does not match. Manual fallback selections are remembered per Discord account in that browser. Removing someone from the Discord server does not automatically remove their app access unless an admin revokes their ID here.
 
 ## J. Test before inviting the guild
 

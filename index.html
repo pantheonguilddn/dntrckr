@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.0</title>
+    <title>Pantheon Tools v1.5.1</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -874,7 +874,7 @@
         <div class="control-actions">
             <div class="topbar-player">
                 <select id="user-identity" class="btn identity-select" onchange="saveIdentity()">
-                    <option value="">👤 Who are you?</option>
+                    <option value="">👤 Your roster (auto)</option>
                 </select>
                 <button id="mode-toggle-btn" class="btn btn-view-toggle" type="button" onclick="togglePersonalView()">🌍 Universal View</button>
                 <select id="roster-filter" class="btn roster-filter-top" onchange="applyRosterFilter()">
@@ -1206,8 +1206,9 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.5.0</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.5.1</span></div>
                 <ul>
+                    <li><strong>Discord-based Personal View:</strong> after sign-in, Pantheon automatically matches your Discord profile name to your Member Roster owner name and enables Personal View for that roster. If the names differ, a roster match label or one-time manual selection is remembered for that Discord account.</li>
                     <li><strong>Discord allowlist gateway:</strong> sign in with Discord; only account IDs approved by a Pantheon administrator can access shared guild data.</li>
                     <li><strong>Cloudflare D1 sync:</strong> shared tracker and Member Roster records use the protected same-origin API instead of browser-held JSONBin keys. Members do not configure cloud credentials per device.</li>
                     <li><strong>Member Roster remains the master source:</strong> characters retain their IGN and Class / Job when removed from Tracker; only opted-in characters feed Tracker and Team Builder.</li>
@@ -1252,7 +1253,7 @@
                 <h4 style="margin:0;">Choose a default landing page</h4>
                 <div class="welcome-default-row"><label for="welcome-default-landing">Open by default</label><select id="welcome-default-landing"><option value="overview">Overview</option><option value="tracker-universal">Tracker · Universal View</option><option value="tracker-personal">Tracker · Personal View</option><option value="team-builder">Team Builder</option><option value="card-database">Card Database</option><option value="member-roster">Member Roster</option><option value="salary">Salary Calculator</option></select></div>
                 <label class="welcome-check"><input id="welcome-default-enabled" type="checkbox"><span>Use this selection whenever I refresh or reopen the tracker.</span></label>
-                <div class="modal-note">Personal View needs an identity selected in the top bar. If no identity is saved, the tracker opens in Universal View instead.</div>
+                <div class="modal-note">After Discord sign-in, Pantheon selects the Member Roster owner that matches your Discord profile and enables Personal View. If your profile name differs from your owner name, select your roster once or ask an admin to set a roster match label; that fallback is remembered for your Discord account.</div>
                 <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="saveWelcomeDefault(false)">Don't save a default</button><button class="btn btn-cloud" type="button" onclick="saveWelcomeDefault(true)">Save Default</button><button class="btn btn-secondary" type="button" onclick="continueFromWelcome()">Continue</button></div>
             </div>
         </div>
@@ -1457,8 +1458,8 @@
                 <div class="help-content">
                     <section class="help-topic" data-help-topic="start">
                         <h4>Getting Started</h4>
-                        <p>Start by choosing your identity from <b>👤 Who are you?</b>. This tells the tracker which roster belongs to you and enables Personal View.</p>
-                        <div class="help-callout"><b>Simple rule:</b> select your identity once, then use the tracker normally. Your identity is saved in your browser.</div>
+                        <p>After Discord sign-in, Pantheon automatically matches your Discord profile display name to the Member Roster owner name and enables Personal View for that roster.</p>
+                        <div class="help-callout"><b>If the names differ:</b> select your roster once from the top bar, and the choice is remembered separately for your Discord account on that browser. An administrator can also set the optional roster match label to the exact Member Roster owner name.</div>
                         <p><b>Universal View</b> is for seeing the guild-wide board. <b>Personal View</b> is for focusing on your own roster.</p>
                     </section>
                     <section class="help-topic" data-help-topic="registration">
@@ -1700,6 +1701,8 @@
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
         const JSONBIN_ROOT = '/api/cloud';
         const IDENTITY_KEY = 'pantheon-identity';
+        const DISCORD_IDENTITY_ACCOUNT_KEY = 'pantheon-discord-account-id-v1';
+        const DISCORD_IDENTITY_STORAGE_PREFIX = 'pantheon-identity-discord-v1:';
         const TEAM_BUILDER_LOCAL_KEY = 'pantheon-team-builder-local-v2';
 
         const PASTEL_COLORS = ['#ffffff', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#c9daf8', '#cfe2f3', '#d9d2e9', '#ead1dc', '#f8cbad', '#b5e5c5', '#a4c2f4', '#b4a7d6', '#a2c4c9'];
@@ -1879,6 +1882,8 @@
 
         let cloudData = createEmptyData();
         let localTeamBuilderState = null;
+        let pantheonDiscordUser = null;
+        let discordIdentityMatchStatus = 'pending';
 
         function createEmptyData() {
             return {
@@ -2041,7 +2046,7 @@
         function togglePersonalView() {
             const identity = localStorage.getItem(IDENTITY_KEY);
             if (!identity) {
-                alert('Please select your identity from the "👤 Who are you?" dropdown first!');
+                alert('No personal roster is linked yet. Check that your Discord profile name matches your Member Roster owner name, or select your roster once.');
                 document.getElementById('user-identity').focus();
                 return;
             }
@@ -2064,20 +2069,127 @@
 
         function saveIdentity() {
             const val = document.getElementById('user-identity').value;
+            const wasUnmatched = discordIdentityMatchStatus === 'unmatched';
             localStorage.setItem(IDENTITY_KEY, val);
-            
+            if (pantheonDiscordUser?.id) {
+                const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(pantheonDiscordUser.id)}`;
+                if (val) localStorage.setItem(accountIdentityKey, val);
+                else localStorage.removeItem(accountIdentityKey);
+                discordIdentityMatchStatus = val ? 'manual' : 'unmatched';
+            }
+
             const allowedLedgers = ['cho', 'cheean', 'bio'];
             const ledgerBtn = document.getElementById('btn-ledger');
             if (ledgerBtn) {
                 ledgerBtn.style.display = allowedLedgers.includes(val.toLowerCase()) ? 'inline-block' : 'none';
             }
-            
-            if (isPersonalView && val) {
+
+            if (val && wasUnmatched && !isPersonalView) {
+                // A one-time fallback identity choice should immediately become the Personal View.
+                const btn = document.getElementById('mode-toggle-btn');
+                const filter = document.getElementById('roster-filter');
+                isPersonalView = true;
+                if (btn) { btn.textContent = '👤 Personal View'; btn.classList.add('personal-active'); }
+                if (filter) filter.value = val;
+                applyRosterFilter();
+            } else if (isPersonalView && val) {
                 document.getElementById('roster-filter').value = val;
                 applyRosterFilter();
             } else if (isPersonalView && !val) {
-                togglePersonalView(); 
+                isPersonalView = false;
+                const btn = document.getElementById('mode-toggle-btn');
+                if (btn) { btn.textContent = '🌍 Universal View'; btn.classList.remove('personal-active'); }
+                const filter = document.getElementById('roster-filter');
+                if (filter) filter.value = 'all';
+                applyRosterFilter();
             }
+        }
+
+        function identityMatchKey(value) {
+            return String(value || '').normalize('NFKC').trim().toLocaleLowerCase();
+        }
+
+        function identityCompactKey(value) {
+            return identityMatchKey(value).replace(/[\s._-]+/g, '');
+        }
+
+        function findDiscordRosterMatch(user) {
+            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters).filter(roster => roster.characters.length > 0);
+            const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
+            // Discord display name is the default. If an admin explicitly configured a different
+            // roster-match label, prefer that mapping; otherwise use the profile name first.
+            const profileName = String(user?.username || '').trim();
+            const rosterMatchLabel = String(user?.label || '').trim();
+            const aliasOverridesProfile = !!rosterMatchLabel && identityMatchKey(rosterMatchLabel) !== identityMatchKey(profileName);
+            const candidates = (aliasOverridesProfile ? [rosterMatchLabel, profileName] : [profileName, rosterMatchLabel]).filter(Boolean);
+
+            const rosterForMember = member => eligibleRosters.find(roster => roster.id === member.trackerRosterId)
+                || eligibleRosters.find(roster => identityMatchKey(roster.name) === identityMatchKey(member.name));
+
+            for (const candidate of candidates) {
+                const matchingMembers = members.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
+                if (matchingMembers.length === 1) {
+                    const roster = rosterForMember(matchingMembers[0]);
+                    if (roster) return roster;
+                }
+                const matchingRosters = eligibleRosters.filter(roster => identityMatchKey(roster.name) === identityMatchKey(candidate));
+                if (matchingRosters.length === 1) return matchingRosters[0];
+            }
+
+            // Handle minor spacing/punctuation differences only when the match is unique.
+            for (const candidate of candidates) {
+                const compact = identityCompactKey(candidate);
+                if (!compact) continue;
+                const matchingMembers = members.filter(member => identityCompactKey(member.name) === compact);
+                if (matchingMembers.length === 1) {
+                    const roster = rosterForMember(matchingMembers[0]);
+                    if (roster) return roster;
+                }
+                const matchingRosters = eligibleRosters.filter(roster => identityCompactKey(roster.name) === compact);
+                if (matchingRosters.length === 1) return matchingRosters[0];
+            }
+            return null;
+        }
+
+        function applyDiscordIdentityDefaults() {
+            const user = pantheonDiscordUser;
+            if (!user?.id) return null;
+            const identitySelect = document.getElementById('user-identity');
+            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters).filter(roster => roster.characters.length > 0);
+            const profileMatch = findDiscordRosterMatch(user);
+            const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(user.id)}`;
+            const rememberedId = localStorage.getItem(accountIdentityKey) || '';
+            const rememberedMatch = eligibleRosters.find(roster => roster.id === rememberedId) || null;
+            const roster = profileMatch || rememberedMatch;
+
+            if (!roster) {
+                localStorage.removeItem(IDENTITY_KEY);
+                if (identitySelect) identitySelect.value = '';
+                discordIdentityMatchStatus = 'unmatched';
+                if (isPersonalView) {
+                    isPersonalView = false;
+                    const modeButton = document.getElementById('mode-toggle-btn');
+                    if (modeButton) { modeButton.textContent = '🌍 Universal View'; modeButton.classList.remove('personal-active'); }
+                }
+                const filter = document.getElementById('roster-filter');
+                if (filter) filter.value = 'all';
+                applyRosterFilter();
+                return null;
+            }
+
+            localStorage.setItem(IDENTITY_KEY, roster.id);
+            localStorage.setItem(accountIdentityKey, roster.id);
+            if (identitySelect) identitySelect.value = roster.id;
+            discordIdentityMatchStatus = profileMatch ? 'matched' : 'remembered';
+
+            if (!isPersonalView) {
+                togglePersonalView();
+            } else {
+                const filter = document.getElementById('roster-filter');
+                if (filter) filter.value = roster.id;
+                applyRosterFilter();
+            }
+            return roster;
         }
 
         function updateFilterDropdown() {
@@ -2087,7 +2199,8 @@
             const savedIdentity = localStorage.getItem(IDENTITY_KEY) || '';
 
             let options = `<option value="all">👁️ Show All Rosters</option>`;
-            let idOptions = `<option value="">👤 Who are you?</option>`;
+            const identityPrompt = discordIdentityMatchStatus === 'unmatched' ? '👤 No matching roster' : '👤 Your roster (auto)';
+            let idOptions = `<option value="">${identityPrompt}</option>`;
 
             cloudData.settings.rosters.forEach(r => { 
                 if (r.characters.length > 0) {
@@ -2887,6 +3000,17 @@
                     note.textContent = accessDenied ? 'Access denied: this Discord account is not on Pantheon’s approved list. Ask an administrator to add your account ID.' : 'Only approved Discord accounts can access shared roster and tracker data.';
                     return false;
                 }
+                if (!state.user?.id) throw new Error('The authenticated Discord profile ID is missing.');
+                pantheonDiscordUser = state.user;
+                const currentDiscordId = String(state.user.id);
+                const previousDiscordId = localStorage.getItem(DISCORD_IDENTITY_ACCOUNT_KEY) || '';
+                if (previousDiscordId !== currentDiscordId) {
+                    // Never carry a browser-wide identity across two different Discord accounts.
+                    localStorage.removeItem(IDENTITY_KEY);
+                    isPersonalView = false;
+                    discordIdentityMatchStatus = 'pending';
+                }
+                localStorage.setItem(DISCORD_IDENTITY_ACCOUNT_KEY, currentDiscordId);
                 gate.hidden = true;
                 const bar = document.getElementById('pantheon-session-bar');
                 bar.style.display = 'flex';
@@ -2913,12 +3037,13 @@
             populateRegistrationJobSelect();
             window.addEventListener('hashchange', handlePageRoute);
             loadLiveTracker().then(() => {
+                applyDiscordIdentityDefaults();
                 const routeHash = location.hash;
                 if (['#registration', '#dungeons', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
                 else applySavedLandingPage();
                 initializeWelcomeModal();
                 startRemoteRefresh();
-            }).catch(() => { applySavedLandingPage(); initializeWelcomeModal(); startRemoteRefresh(); });
+            }).catch(() => { applyDiscordIdentityDefaults(); applySavedLandingPage(); initializeWelcomeModal(); startRemoteRefresh(); });
         });
 
         function rateElementId(charName) { return `rate-${encodeURIComponent(charName)}`; }
@@ -4909,7 +5034,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.0';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.1';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

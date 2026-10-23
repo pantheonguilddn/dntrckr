@@ -59,6 +59,7 @@ export async function getSession(request, env) {
   return {
     discordId: String(row.discord_id),
     username: String(row.username || row.label || 'Discord member'),
+    label: String(row.label || ''),
     avatar: String(row.avatar || ''),
     role: row.role === 'admin' ? 'admin' : 'member',
     expiresAt: Number(row.expires_at) || 0

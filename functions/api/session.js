@@ -5,7 +5,7 @@ export async function onRequestGet({ request, env }) {
   try {
     const session = await getSession(request, env);
     if (!session) return jsonResponse({ authenticated: false });
-    return jsonResponse({ authenticated: true, user: { id: session.discordId, username: session.username, avatar: session.avatar, role: session.role } });
+    return jsonResponse({ authenticated: true, user: { id: session.discordId, username: session.username, label: session.label, avatar: session.avatar, role: session.role } });
   } catch (_) {
     return jsonResponse({ authenticated: false, setupRequired: true, error: 'Authentication service unavailable.' }, 503);
   }
