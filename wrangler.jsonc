@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "YOUR-WORKER-NAME",
+  "name": "dntrckr.siegfrieddouglas",
   "compatibility_date": "2026-10-23",
   "assets": {
     "directory": "."
