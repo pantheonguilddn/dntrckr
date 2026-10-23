@@ -1607,7 +1607,7 @@
 .member-character-main { display:flex !important; flex-direction:row !important; align-items:center !important; min-height:34px; }
 @media (max-width:1100px) { .member-character-row { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
 @media (max-width:640px) { .member-character-row { grid-template-columns:1fr !important; } }
-#tracker-toolbar[hidden],#tracker-table-wrap[hidden],#tracker-analytics-header[hidden],#analytics-grid[hidden],.tracker-reset-note[hidden],#tracker-empty-state[hidden],#profile-confirm-submit[hidden],#profile-confirm-register[hidden],#profile-confirm-warning[hidden]{display:none!important}
+#tracker-toolbar[hidden],#tracker-table-wrap[hidden],#tracker-analytics-header[hidden],#analytics-grid[hidden],.tracker-reset-note[hidden],#tracker-empty-state[hidden],#profile-confirm-submit[hidden],#profile-confirm-register[hidden],#profile-confirm-warning[hidden],#profile-confirm-cancel[hidden]{display:none!important}
 #drawer-admin-console[hidden],.drawer-item[hidden]{display:none!important}
 .tracker-reset-note{margin-top:8px;padding:12px 14px;border:1px solid var(--pt-border);border-radius:10px;background:var(--pt-surface);color:var(--pt-muted);font-size:.78rem;line-height:1.55}
 .tracker-empty-state{width:min(820px,100%);margin:22px auto 30px;padding:clamp(24px,5vw,42px);border:1px solid var(--pt-border);border-radius:18px;background:var(--pt-surface);color:var(--pt-text);text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.07)}
@@ -1633,6 +1633,7 @@
 .profile-confirm-order{display:flex;gap:5px}
 .profile-confirm-order button{width:32px;height:32px;border:1px solid var(--pt-border);border-radius:7px;background:var(--pt-surface-soft);color:var(--pt-text);font-size:1rem;font-weight:900;cursor:pointer}
 .profile-confirm-order button:disabled{opacity:.32;cursor:not-allowed}
+.profile-confirm-remove-draft{border:1px solid var(--pt-border);border-radius:7px;background:var(--pt-surface-soft);color:var(--pt-text);padding:6px 9px;font-size:.75rem;font-weight:800;cursor:pointer}.profile-confirm-remove-draft:hover{border-color:var(--pt-accent);background:var(--pt-hover)}
 .profile-confirm-job-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
 .profile-confirm-job-row label{color:var(--pt-muted);font-size:.72rem;font-weight:800}
 .profile-confirm-character small{display:block;color:var(--pt-muted);font-size:.74rem;margin-top:4px}
@@ -2056,8 +2057,9 @@
             <div id="profile-confirm-characters" class="profile-confirm-characters"></div>
             <div id="profile-confirm-warning" class="modal-note profile-confirm-warning" hidden></div>
             <div class="modal-actions profile-confirm-actions">
+                <button id="profile-confirm-cancel" class="btn btn-secondary" type="button" onclick="cancelOwnCharacterEditor()" hidden>Cancel</button>
                 <button id="profile-confirm-submit" class="btn btn-cloud" type="button" onclick="confirmOwnCharacterDetails()" hidden>Save Changes &amp; Confirm</button>
-                <button id="profile-confirm-review" class="btn btn-secondary" type="button" onclick="reviewOwnCharacterDetails()">＋ Add / Manage Characters</button>
+                <button id="profile-confirm-review" class="btn btn-secondary" type="button" onclick="addOwnCharacterPromptRow()">＋ Add Character</button>
                 <button id="profile-confirm-register" class="btn btn-roster" type="button" onclick="registerOwnCharactersFromPrompt()">Register My Characters</button>
             </div>
         </div>
@@ -2066,9 +2068,9 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.1</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.2</span></div>
                 <ul>
-
+                    <li><strong>Shared character editor:</strong> add a new character directly from the confirmation popup or Tracker. Saving syncs the ordered character list, class, Main designation, and tracking opt-in to the shared Member Roster and refreshes Tracker.</li>
                     <li><strong>Character confirmation editor:</strong> review and edit IGN, Class / Job, Main designation, Tracker opt-in, and character order during first-login confirmation.</li>
                     <li><strong>Bounty tracking:</strong> Bounty Boards start hidden by default unless a member explicitly enables them in this version.</li>
                     <li><strong>Member onboarding:</strong> first-time users must register characters or confirm their existing IGN, class, and Main designation before continuing.</li>
@@ -4607,13 +4609,15 @@
         }
 
         function openMyCharacterRegistration() {
-            const own = getCurrentMemberDirectoryEntry();
-            showAppPage('member-roster');
+            // Tracker's Add Characters actions intentionally reuse the same editor as
+            // first-login confirmation. All edits are saved to the canonical shared
+            // Member Roster and projected back into Tracker on Save.
             toggleSideMenu(false);
-            renderMemberDirectory();
-            if (own) startMemberDirectoryEdit(own.name, own.id);
-            else resetMemberDirectoryForm();
-            document.getElementById('member-directory-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            profileConfirmationMode = 'manage';
+            profileConfirmationDraft = null;
+            const own = getCurrentMemberDirectoryEntry();
+            renderProfileConfirmationPrompt(own?.characterProfiles || []);
+            openModal('profile-confirm-modal');
         }
 
         async function startTrackingOwnCharacters() {
@@ -6212,7 +6216,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.1';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.2';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -6331,12 +6335,14 @@
             closeModal('welcome-modal');
         }
         let profileConfirmationDraft = null;
+        let profileConfirmationMode = 'confirm';
         function cloneConfirmationProfiles(profiles) {
             return (Array.isArray(profiles) ? profiles : []).map(profile => ({
                 name: String(profile?.name || '').trim(),
                 job: String(profile?.job || ''),
                 trackerEnabled: profile?.trackerEnabled === true,
-                isMain: profile?.isMain === true
+                isMain: profile?.isMain === true,
+                isNewDraft: profile?.isNewDraft === true
             }));
         }
         function memberHasValidMainDesignation(member) {
@@ -6350,7 +6356,8 @@
                 name: String(row.querySelector('[data-confirm-ign]')?.value || '').trim().slice(0, 40),
                 job: String(row.querySelector('[data-confirm-job]')?.value || ''),
                 trackerEnabled: row.querySelector('[data-confirm-tracker]')?.checked === true,
-                isMain: row.querySelector('[data-confirm-main]')?.checked === true
+                isMain: row.querySelector('[data-confirm-main]')?.checked === true,
+                isNewDraft: row.dataset.profileNew === 'true'
             }));
         }
         function validateProfileConfirmationDraft(profiles) {
@@ -6386,29 +6393,63 @@
             const intro = document.getElementById('profile-confirm-intro');
             const review = document.getElementById('profile-confirm-review');
             const register = document.getElementById('profile-confirm-register');
+            const title = document.getElementById('profile-confirm-title');
+            const submit = document.getElementById('profile-confirm-submit');
+            const cancel = document.getElementById('profile-confirm-cancel');
+            const manageMode = profileConfirmationMode === 'manage';
+            if (title) title.textContent = manageMode ? 'Manage Your Characters' : 'Confirm Your Character Registration';
             if (intro) intro.textContent = profiles.length
-                ? 'Check your characters below. You can correct each IGN, change the Class / Job, choose your Main, decide which characters should be tracked, and reorder them. This order will be reflected in your Tracker.'
-                : 'Your account does not have registered characters yet. Register at least one IGN and class, and choose exactly one Main character before using the personal Tracker.';
+                ? (manageMode
+                    ? 'Add characters, correct IGNs, change Class / Job, choose your Main, and opt each character into Tracker + Team Builder. Use the arrows to set the order shown in Tracker. Saving updates the shared Member Roster and Tracker.'
+                    : 'Check your characters below. You can add characters, correct each IGN, change the Class / Job, choose your Main, decide which characters should be tracked, and reorder them. Saving updates the shared Member Roster and Tracker.')
+                : (manageMode
+                    ? 'No characters are registered yet. Add an entry below, select its Class / Job, choose your Main character, and decide whether it should appear in Tracker + Team Builder.'
+                    : 'Your account does not have registered characters yet. Add an entry below, select its Class / Job, and choose exactly one Main character before using the personal Tracker.');
             if (container) container.innerHTML = profiles.length ? profiles.map((profile, index) => {
                 const jobOptions = '<option value="">Select Class / Job…</option>' + JOB_ORDER.map(job => `<option value="${escapeHTML(job)}" ${job === profile.job ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
-                return `<div class="profile-confirm-character" data-profile-index="${index}">
+                return `<div class="profile-confirm-character" data-profile-index="${index}" data-profile-new="${profile.isNewDraft ? 'true' : 'false'}">
                     <div class="profile-confirm-character-info">
                         <div class="profile-confirm-character-main">
-                            <label class="profile-confirm-main-choice"><input type="radio" name="profile-confirm-main" data-confirm-main value="${index}" ${profile.isMain ? 'checked' : ''} aria-label="Set ${escapeHTML(profile.name)} as Main"><span>★ Main</span></label>
+                            <label class="profile-confirm-main-choice"><input type="radio" name="profile-confirm-main" data-confirm-main value="${index}" ${profile.isMain ? 'checked' : ''} aria-label="Set ${escapeHTML(profile.name || 'this character')} as Main"><span>★ Main</span></label>
                             <div class="profile-confirm-name-line"><strong data-confirm-name-display>${escapeHTML(profile.name || 'Unnamed character')}</strong><button class="profile-confirm-edit-ign" type="button" onclick="toggleProfileConfirmIgnEdit(${index})" title="Edit character name" aria-label="Edit ${escapeHTML(profile.name || 'character name')}">✎</button><input class="profile-confirm-ign-input" data-confirm-ign value="${escapeHTML(profile.name)}" maxlength="40" autocomplete="off" aria-label="Character IGN" hidden></div>
                         </div>
-                        <div class="profile-confirm-job-row"><label for="profile-confirm-job-${index}">CLASS / JOB</label><select id="profile-confirm-job-${index}" class="profile-confirm-job-select" data-confirm-job aria-label="Class or job for ${escapeHTML(profile.name)}">${jobOptions}</select></div>
+                        <div class="profile-confirm-job-row"><label for="profile-confirm-job-${index}">CLASS / JOB</label><select id="profile-confirm-job-${index}" class="profile-confirm-job-select" data-confirm-job aria-label="Class or job for ${escapeHTML(profile.name || 'new character')}">${jobOptions}</select></div>
                     </div>
                     <div class="profile-confirm-character-controls">
                         <label class="profile-confirm-track-choice"><input type="checkbox" data-confirm-tracker ${profile.trackerEnabled ? 'checked' : ''}><span>Track this character</span></label>
-                        <div class="profile-confirm-order" aria-label="Reorder ${escapeHTML(profile.name)}"><button type="button" onclick="moveOwnCharacterPrompt(${index},-1)" ${index === 0 ? 'disabled' : ''} title="Move up" aria-label="Move ${escapeHTML(profile.name)} up">↑</button><button type="button" onclick="moveOwnCharacterPrompt(${index},1)" ${index === profiles.length - 1 ? 'disabled' : ''} title="Move down" aria-label="Move ${escapeHTML(profile.name)} down">↓</button></div>
+                        <div class="profile-confirm-order" aria-label="Reorder ${escapeHTML(profile.name || 'new character')}"><button type="button" onclick="moveOwnCharacterPrompt(${index},-1)" ${index === 0 ? 'disabled' : ''} title="Move up" aria-label="Move ${escapeHTML(profile.name || 'new character')} up">↑</button><button type="button" onclick="moveOwnCharacterPrompt(${index},1)" ${index === profiles.length - 1 ? 'disabled' : ''} title="Move down" aria-label="Move ${escapeHTML(profile.name || 'new character')} down">↓</button></div>
+                        ${profile.isNewDraft ? `<button class="profile-confirm-remove-draft" type="button" onclick="removeOwnCharacterPromptRow(${index})" title="Remove this unsaved entry">Remove entry</button>` : ''}
                     </div>
                 </div>`;
-            }).join('') : '<div class="profile-confirm-character"><div><strong>No characters registered</strong><small>Register your characters to unlock Personal Tracker setup.</small></div></div>';
-            if (review) review.textContent = profiles.length ? '＋ Add / Manage Characters' : 'Register My Characters';
+            }).join('') : '<div class="profile-confirm-character"><div><strong>No characters registered</strong><small>Use Add Character below to create your first entry.</small></div></div>';
+            if (review) { review.textContent = '＋ Add Character'; review.hidden = false; }
             if (register) register.hidden = true;
+            if (cancel) cancel.hidden = !manageMode;
+            if (submit) submit.textContent = manageMode ? 'Save Changes' : 'Save Changes & Confirm';
             profileConfirmationDraft = { memberId: member?.id || '', profiles };
             updateProfileConfirmationValidation();
+        }
+        function addOwnCharacterPromptRow() {
+            const draft = collectProfileConfirmationDraft();
+            const hasMain = draft.some(profile => profile.isMain);
+            draft.push({ name: '', job: '', trackerEnabled: false, isMain: !hasMain, isNewDraft: true });
+            renderProfileConfirmationPrompt(draft);
+            const index = draft.length - 1;
+            const row = document.querySelector(`#profile-confirm-characters .profile-confirm-character[data-profile-index="${index}"]`);
+            const input = row?.querySelector('[data-confirm-ign]');
+            const display = row?.querySelector('[data-confirm-name-display]');
+            if (input) { input.hidden = false; input.focus(); }
+            if (display) display.hidden = true;
+            row?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            updateProfileConfirmationValidation();
+        }
+        function removeOwnCharacterPromptRow(index) {
+            const draft = collectProfileConfirmationDraft();
+            const selectedIndex = Number(index);
+            if (!Number.isInteger(selectedIndex) || !draft[selectedIndex]?.isNewDraft) return;
+            draft.splice(selectedIndex, 1);
+            if (draft.length && !draft.some(profile => profile.isMain)) draft[0].isMain = true;
+            renderProfileConfirmationPrompt(draft);
         }
         function toggleProfileConfirmIgnEdit(index) {
             const row = document.querySelector(`#profile-confirm-characters .profile-confirm-character[data-profile-index="${Number(index)}"]`);
@@ -6451,28 +6492,53 @@
             if (modalIds.some(id => { const el=document.getElementById(id); return el && !el.classList.contains('hidden'); })) return;
             const member = getCurrentMemberDirectoryEntry();
             if (member && String(member.profileConfirmedDiscordId || '') === userId && Number(member.profileConfirmedAt) > 0 && memberHasValidMainDesignation(member)) return;
+            profileConfirmationMode = 'confirm';
+            profileConfirmationDraft = null;
             renderProfileConfirmationPrompt();
             openModal('profile-confirm-modal');
         }
         async function confirmOwnCharacterDetails() {
-            const member = getCurrentMemberDirectoryEntry();
-            if (!member) { alert('Your character registration could not be found. Register your characters first.'); return; }
+            if (!pantheonDiscordUser?.id) { alert('Your verified Discord session could not be found. Please sign in again.'); return; }
             const profiles = collectProfileConfirmationDraft();
             const validationMessage = validateProfileConfirmationDraft(profiles);
             if (validationMessage) { alert(validationMessage); updateProfileConfirmationValidation(); return; }
-            if (hasCloudConfig() && !(await prepareGlobalChange(`Member updated and confirmed character registration: ${member.name}`))) return;
+            const initialMember = getCurrentMemberDirectoryEntry();
+            const intendedOwnerName = String(initialMember?.name || getCurrentOwnerName() || pantheonDiscordUser?.label || pantheonDiscordUser?.username || '').trim().slice(0, 60);
+            if (!intendedOwnerName) { alert('Your Discord account could not be linked to a Member Roster name. Ask an administrator to configure your account label.'); return; }
+            if (!(await prepareGlobalChange(`Save character registration for ${intendedOwnerName}`))) return;
+
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const own = entries.find(item => item.id === member.id);
-            if (!own) { alert('Your registration changed while this prompt was open. Reload and try again.'); return; }
+            let own = initialMember ? entries.find(item => item.id === initialMember.id) : null;
+            if (!own) {
+                const candidates = ownerCandidateNames().map(identityCompactKey).filter(Boolean);
+                const matched = entries.filter(item => candidates.includes(identityCompactKey(item.name)));
+                if (matched.length === 1) own = matched[0];
+                else if (matched.length > 1) { alert('Your Discord identity matches multiple Member Roster entries. Ask an administrator to resolve the duplicate before saving.'); return; }
+            }
+            if (!own) {
+                const ownerCollision = entries.find(item => identityCompactKey(item.name) === identityCompactKey(intendedOwnerName));
+                if (ownerCollision) { alert('An existing Member Roster entry uses this owner name, but it could not be uniquely linked to your Discord account. Ask an administrator to fix the roster match.'); return; }
+                own = {
+                    id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+                    name: intendedOwnerName,
+                    characters: [], characterProfiles: [], trackerRosterId: '', color: '#7aa2f7', note: '',
+                    profileConfirmedDiscordId: '', profileConfirmedAt: 0
+                };
+                entries.push(own);
+            }
+
             const otherNames = new Set(entries.filter(item => item.id !== own.id).flatMap(item => (item.characterProfiles || []).map(profile => String(profile.name || '').trim().toLocaleLowerCase())));
             const conflict = profiles.find(profile => otherNames.has(profile.name.toLocaleLowerCase()));
             if (conflict) { alert(`The IGN "${conflict.name}" is already registered to another member. Correct the name or ask an administrator to resolve the duplicate.`); return; }
+
             const previousNames = (own.characterProfiles || []).map(profile => String(profile.name || '').trim());
             own.characters = profiles.map(profile => profile.name);
             own.characterProfiles = profiles.map(profile => ({ name: profile.name, job: profile.job, trackerEnabled: profile.trackerEnabled, isMain: profile.isMain }));
             own.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
             own.profileConfirmedAt = Date.now();
-            // Update each current class record and remove only stale class keys formerly owned here.
+
+            // Keep IGN, Class / Job, Main, track opt-in, and user-defined ordering together
+            // in the canonical shared Member Roster. Tracker rosters are projections of it.
             if (!cloudData.settings.characterJobs) cloudData.settings.characterJobs = {};
             profiles.forEach(profile => { cloudData.settings.characterJobs[profile.name] = { job: profile.job, updatedAt: Date.now(), deviceId }; });
             const allCurrentProfiles = entries.flatMap(item => item.characterProfiles || []);
@@ -6490,17 +6556,16 @@
             refreshTrackerUI();
             triggerAutoSync();
             profileConfirmationDraft = null;
+            profileConfirmationMode = 'confirm';
             closeModal('profile-confirm-modal');
         }
-        function reviewOwnCharacterDetails() {
+        function reviewOwnCharacterDetails() { addOwnCharacterPromptRow(); }
+        function registerOwnCharactersFromPrompt() { addOwnCharacterPromptRow(); }
+        function cancelOwnCharacterEditor() {
+            if (profileConfirmationMode !== 'manage') return;
             profileConfirmationDraft = null;
+            profileConfirmationMode = 'confirm';
             closeModal('profile-confirm-modal');
-            openMyCharacterRegistration();
-        }
-        function registerOwnCharactersFromPrompt() {
-            profileConfirmationDraft = null;
-            closeModal('profile-confirm-modal');
-            openMyCharacterRegistration();
         }
 
         function initializeWelcomeModal() {
