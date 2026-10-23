@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.4.5</title>
+    <title>Pantheon Tools v1.5.0</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -746,7 +746,17 @@
         .member-directory-panel { margin-bottom:14px; padding:14px; border:1px solid #363944; border-radius:11px; background:#23252d; }
         .member-directory-panel h3 { margin:0; font-size:.95rem; }
         .member-directory-panel p { margin:4px 0 12px; color:#9299a9; font-size:.72rem; }
-        .member-directory-form { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:end; }
+        .member-directory-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; align-items:end; }
+        .member-character-editor-block { grid-column:1/-1; display:grid; gap:8px; min-width:0; padding:12px; border:1px solid #3a3e49; border-radius:9px; background:#1d1f26; }
+        .member-character-editor-heading { display:flex; align-items:center; justify-content:space-between; gap:9px; flex-wrap:wrap; }
+        .member-character-editor-heading strong { font-size:.76rem; }
+        .member-character-editor { display:grid; gap:8px; }
+        .member-character-row { display:grid; grid-template-columns:minmax(150px,1fr) minmax(190px,1fr) minmax(200px,1.1fr) 34px; gap:8px; align-items:end; padding:9px; border:1px solid #383d49; border-radius:8px; background:#242731; }
+        .member-character-row label { display:flex; flex-direction:column; gap:5px; color:#bfc5d2; font-size:.64rem; font-weight:800; min-width:0; }
+        .member-character-row input[type=text],.member-character-row select { width:100%; min-width:0; box-sizing:border-box; min-height:34px; padding:7px 8px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
+        .member-character-opt-in { display:flex!important; flex-direction:row!important; align-items:center; gap:7px!important; min-height:34px; line-height:1.35; cursor:pointer; }
+        .member-character-opt-in input { flex:0 0 auto; margin:0; accent-color:#7aa2f7; }
+        .member-character-row-remove { width:30px; height:32px; border:1px solid #424653; border-radius:7px; background:#191b22; color:#ff9292; font-size:1rem; cursor:pointer; }
         .member-directory-field { display:flex; flex-direction:column; gap:6px; color:#bfc5d2; font-size:.68rem; font-weight:800; }
         .member-directory-field input { width:100%; min-width:0; box-sizing:border-box; min-height:36px; padding:8px 9px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
         .member-directory-actions { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
@@ -770,8 +780,8 @@
         .member-directory-char-remove { display:grid; place-items:center; flex:0 0 19px; width:19px; height:19px; padding:0; border:1px solid #424653; border-radius:5px; background:#191b22; color:#aeb5c4; font:inherit; font-size:14px; line-height:1; cursor:pointer; }
         .member-directory-char-remove:hover { color:#ff9292; border-color:#a74e57; }
         .member-directory-empty { padding:24px 14px; border:1px dashed #424653; border-radius:10px; color:#9299a9; text-align:center; font-size:.75rem; }
-        @media (max-width:1100px) { .card-wiki-presets { grid-template-columns:repeat(2,minmax(0,1fr)); } .member-directory-form { grid-template-columns:repeat(2,minmax(0,1fr)); } .member-directory-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media (max-width:640px) { .card-wiki-presets,.member-directory-form,.member-directory-list { grid-template-columns:1fr; } }
+        @media (max-width:1100px) { .card-wiki-presets { grid-template-columns:repeat(2,minmax(0,1fr)); } .member-character-row { grid-template-columns:repeat(2,minmax(0,1fr)); } .member-character-editor-block,.member-directory-actions { grid-column:1/-1; } .member-directory-list { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media (max-width:640px) { .card-wiki-presets,.member-directory-form,.member-directory-list,.member-character-row { grid-template-columns:1fr; } .member-character-editor-block,.member-directory-actions { grid-column:1; } .member-character-row-remove { width:100%; } }
         .card-wiki-result-list { display:flex; flex-direction:column; gap:8px; }
         .card-wiki-result-row { display:grid; grid-template-columns:minmax(220px,1.1fr) minmax(240px,2fr) auto; align-items:center; gap:13px; width:100%; min-width:0; padding:12px 14px; box-sizing:border-box; border:1px solid #383c48; border-radius:10px; background:linear-gradient(110deg,#272a34,#20222a); color:#eceff5; cursor:pointer; text-align:left; transition:border-color .12s ease,background .12s ease; }
         .card-wiki-result-row:hover { border-color:#77839a; background:#292c36; }
@@ -825,9 +835,33 @@
         @media(max-width:900px) { .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         @media(max-width:640px) { .welcome-shortcuts,.overview-tools-grid { grid-template-columns:1fr; } .overview-banner,.welcome-banner { width:100%; height:auto; max-height:none; object-fit:contain; } }
 
+
+        #pantheon-auth-gate{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(ellipse at 10% 0%,rgba(85,113,210,.22),transparent 44%),rgba(12,15,23,.98);color:#eef2ff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+        #pantheon-auth-gate[hidden]{display:none!important}
+        .pantheon-auth-card{width:min(490px,100%);padding:28px;border:1px solid #39445b;border-radius:20px;background:linear-gradient(155deg,#1a2233,#111720);box-shadow:0 24px 80px rgba(0,0,0,.35)}
+        .pantheon-auth-kicker{font-size:10px;font-weight:900;letter-spacing:.18em;color:#aab8ff;text-transform:uppercase}
+        .pantheon-auth-card h1{font-size:30px;line-height:1.08;margin:13px 0 11px;color:#f4f6ff}
+        .pantheon-auth-copy{color:#aeb8ca;font-size:13px;line-height:1.7;margin:0 0 19px}
+        .pantheon-discord-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:1px solid #7883ff;border-radius:11px;padding:13px 16px;color:#fff;background:#5865f2;font-size:13px;font-weight:850;cursor:pointer}
+        .pantheon-discord-btn:hover{filter:brightness(1.08)}
+        .pantheon-auth-note{min-height:18px;margin-top:13px;color:#97a6c2;font-size:11px;line-height:1.6}
+        #pantheon-session-bar{position:fixed;z-index:1000;right:12px;bottom:12px;display:none;align-items:center;gap:8px;max-width:calc(100vw - 24px);padding:8px 10px;background:#151b28;border:1px solid #3c465c;border-radius:12px;color:#eaf0ff;box-shadow:0 8px 28px rgba(0,0,0,.25);font:11px/1.35 Inter,ui-sans-serif,system-ui,sans-serif}
+        #pantheon-session-bar .p-session-name{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        #pantheon-session-bar a,#pantheon-session-bar button{color:#dbe2ff;background:transparent;border:1px solid #46516a;border-radius:7px;padding:6px 8px;font:inherit;text-decoration:none;cursor:pointer}
+        #pantheon-session-bar a[hidden]{display:none}
     </style>
 </head>
 <body>
+    <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
+      <div class="pantheon-auth-card">
+        <div class="pantheon-auth-kicker">Pantheon · Dragon Nest Classic</div>
+        <h1 id="pantheon-auth-title">Your guild tools, protected.</h1>
+        <p class="pantheon-auth-copy">Sign in with Discord. Pantheon checks your account ID against the administrator-approved list before loading shared guild data. Your Discord password is never given to Pantheon.</p>
+        <button class="pantheon-discord-btn" type="button" onclick="window.location.href='/auth/discord/login'"><span aria-hidden="true">◉</span> Continue with Discord</button>
+        <div class="pantheon-auth-note" id="pantheon-auth-note">Only approved Discord accounts can access shared roster and tracker data.</div>
+      </div>
+    </div>
+    <div id="pantheon-session-bar"><span class="p-session-name" id="pantheon-session-name">Signed in</span><a href="/admin.html" id="pantheon-admin-link" hidden>Access admin</a><button type="button" id="pantheon-signout">Sign out</button></div>
 
     <div class="controls">
         <div class="brand-area">
@@ -882,7 +916,7 @@
             <div class="drawer-section">
                 <div class="drawer-section-title">System</div>
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
-                <button class="drawer-item" type="button" onclick="openCloudModal()"><span class="drawer-icon">☁</span><span><strong>Cloud Setup</strong><small>Configure shared storage</small></span></button>
+                <button class="drawer-item" type="button" onclick="window.open('/admin.html','_blank','noopener')"><span class="drawer-icon">☁</span><span><strong>Access & Migration</strong><small>Administrator tools</small></span></button>
                 <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Savepoints & undo global changes</small></span></button>
                 <button class="drawer-item" type="button" onclick="openLandingSettings()"><span class="drawer-icon">⌂</span><span><strong>Set Default Landing Page</strong><small>Change startup destination anytime</small></span></button>
             </div>
@@ -1112,17 +1146,17 @@
         </div>
         <section class="member-directory-panel">
             <h3 id="member-directory-form-title">Add a guild member</h3>
-            <p>Add members here first. Characters listed as aliases do not automatically enter the Tracker or Team Builder; use Tracker Registration to opt in each character.</p>
+            <p>Member Roster is the master list. Add each character's exact IGN and Class / Job here, then opt in only the characters that should appear in Tracker and Team Builder.</p>
             <form id="member-directory-form" class="member-directory-form" onsubmit="saveMemberDirectoryForm(event)">
-                <label class="member-directory-field">Member / owner name<input id="member-directory-name" type="text" maxlength="60" placeholder="Member name" required></label>
-                <label class="member-directory-field">Other characters / aliases (optional)<input id="member-directory-characters" type="text" maxlength="1000" placeholder="Unregistered names or aliases"></label>
+                <label class="member-directory-field">Member / owner name<input id="member-directory-name" type="text" maxlength="60" placeholder="Discord / owner name" required></label>
                 <label class="member-directory-field">Role / notes (optional)<input id="member-directory-note" type="text" maxlength="160" placeholder="e.g. Returning member, raid lead"></label>
+                <div class="member-character-editor-block"><div class="member-character-editor-heading"><strong>Character IGNs and classes</strong><button class="btn btn-secondary" type="button" onclick="addMemberCharacterRow()">＋ Add Character</button></div><div class="member-directory-note">Each character needs a Class / Job. Leave the tracker checkbox off for directory-only characters.</div><div id="member-character-editor" class="member-character-editor"></div></div>
                 <div class="member-directory-actions"><button id="member-directory-submit" class="btn btn-roster" type="submit">Add member</button><button id="member-directory-cancel" class="btn btn-secondary" type="button" onclick="resetMemberDirectoryForm()" hidden>Cancel edit</button></div>
             </form>
         </section>
         <div class="member-directory-toolbar"><input id="member-directory-search" class="card-wiki-stat-search member-directory-search" type="search" placeholder="Search members, characters, or notes…" oninput="renderMemberDirectory()" autocomplete="off"><span id="member-directory-count" class="member-directory-count"></span></div>
         <section id="member-directory-list" class="member-directory-list" aria-live="polite"></section>
-        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the shared member directory. Add people here even if they do not track progress. To make a character appear in the Tracker and Team Builder, register that character under the correct owner through Tracker Registration. Member and alias entries sync when Cloud is configured.</div>
+        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the master source of truth for members, character IGNs, and classes. Check <b>Include in Tracker + Team Builder</b> for each opted-in character; unchecked characters remain listed as directory-only. Team Builder and Tracker both read their eligible character list from this shared roster. Changes sync when Cloud is connected.</div>
     </main>
 
     <div class="modal-overlay hidden" id="card-wiki-batches-modal" role="dialog" aria-modal="true" aria-label="Manage Card Batches">
@@ -1172,9 +1206,11 @@
             <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
             <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.4.5</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.5.0</span></div>
                 <ul>
-                    <li><strong>Member Roster character controls:</strong> use <b>Add character</b> to add a directory-only character or alias to an existing member. Each listed character has an individual remove button. Removing a tracked character also unregisters it from Tracker and Team Builder; the member record remains. Characters removed from Tracker Registration stay listed as directory-only characters until explicitly removed from Member Roster.</li>
+                    <li><strong>Discord allowlist gateway:</strong> sign in with Discord; only account IDs approved by a Pantheon administrator can access shared guild data.</li>
+                    <li><strong>Cloudflare D1 sync:</strong> shared tracker and Member Roster records use the protected same-origin API instead of browser-held JSONBin keys. Members do not configure cloud credentials per device.</li>
+                    <li><strong>Member Roster remains the master source:</strong> characters retain their IGN and Class / Job when removed from Tracker; only opted-in characters feed Tracker and Team Builder.</li>
                 </ul>
                 <details class="welcome-previous-release"><summary>Previous release highlights (v1.4.4)</summary><ul>
                     <li><strong>Member Roster navigation restored:</strong> open the shared guild member directory directly from the Tools side menu, without needing the Overview shortcut.</li>
@@ -1427,14 +1463,13 @@
                     </section>
                     <section class="help-topic" data-help-topic="registration">
                         <h4>Tracker Registration</h4>
-                        <p>Use <b>Tracker Registration</b> to opt characters into progress tracking under a member/owner from Member Roster. Characters registered here become available to both the tracker and Team Builder.</p>
-                        <div class="help-step"><b>1.</b> Choose an existing owner, or choose <b>＋ Create new group</b>.</div>
-                        <div class="help-step"><b>2.</b> Enter the exact in-game character name.</div>
-                        <div class="help-step"><b>3.</b> Select the character's <b>Class / Job</b>.</div>
-                        <div class="help-step"><b>4.</b> For a new group, choose the owner's name and a color.</div>
-                        <div class="help-step"><b>5.</b> Press <b>Register Character</b>.</div>
-                        <p>You can later rename groups, change colors, remove characters, or drag characters into a different order.</p>
-                        <div class="help-callout"><b>Guild-wide setting:</b> roster changes affect everyone. Only change roster structure when it is actually needed.</div>
+                        <p>Member Roster is the master list for member names, character IGNs, and Classes / Jobs. Register characters by editing their owner in Member Roster and checking <b>Include in Tracker + Team Builder</b>. Only opted-in characters appear in the tracker and Team Builder.</p>
+                        <div class="help-step"><b>1.</b> Open <b>Member Roster</b> and add or edit the member.</div>
+                        <div class="help-step"><b>2.</b> Add each character's exact in-game name and select its <b>Class / Job</b>.</div>
+                        <div class="help-step"><b>3.</b> Check <b>Include in Tracker + Team Builder</b> for characters who opt in.</div>
+                        <div class="help-step"><b>4.</b> Save the member. The tracker and Team Builder update from the same master record.</div>
+                        <p>Use this panel only to adjust registered group colors, reorder opted-in characters, or unregister characters. Unregistering here keeps the IGN and class in Member Roster as directory-only.</p>
+                        <div class="help-callout"><b>Guild-wide setting:</b> member directory and tracker opt-in changes affect connected clients after cloud sync.</div>
                     </section>
                     <section class="help-topic" data-help-topic="dungeons">
                         <h4>Dungeon Registration</h4>
@@ -1493,17 +1528,19 @@
                     </section>
                     <section class="help-topic" data-help-topic="member-roster">
                         <h4>Member Roster</h4>
-                        <p>Use Member Roster as the guild's member directory. Add people whether or not they use the tracker. Existing registered owners are shown automatically, alongside anyone added to the directory.</p>
-                        <h5>How it connects</h5>
-                        <p>Add or maintain the member/owner here first. Use <b>Add character</b> on a member card to add a directory-only character or alias without automatically adding it to Tracker or Team Builder. Each listed character has its own × button.</p>
-                        <p>Character chips marked <b>DIRECTORY</b> are unregistered names; removing one only removes that alias. Chips marked <b>TRACKING</b> represent a registered character; removing one from this page also unregisters it from Tracker and Team Builder and deletes its Job assignment, while keeping the member in Member Roster. If you unregister a character in Tracker Registration instead, the character stays in Member Roster as a directory-only entry. To opt it in again, use <b>Tracker Registration</b> and choose the appropriate owner.</p>
-                        <p>When Cloud is configured, member names, aliases, and notes are shared with the guild. Card Database data and card batches are not part of that sync.</p>
+                        <p>Member Roster is the guild's master directory and the source of truth for member names, character IGNs, character Classes / Jobs, and opt-in status. Add every guild member here whether or not they use the tracker.</p>
+                        <h5>Add members and characters</h5>
+                        <p>Add a member, then use <b>Add Character</b> to enter each exact IGN, select its Class / Job, and decide whether it should be included in Tracker and Team Builder. Every character must have a class. Leave its opt-in checkbox unchecked to keep the IGN and class in the directory without creating a tracker entry.</p>
+                        <p>Use <b>Edit member</b> to update the name, notes, character IGNs, classes, or opt-in settings. The per-character × button removes that character profile from the master directory; the member stays listed. Removing a character also removes its tracker entry and Team Builder eligibility.</p>
+                        <h5>Tracker registration</h5>
+                        <p>Checking <b>Include in Tracker + Team Builder</b> is the opt-in action. Unregistering a character from Tracker Registration keeps its IGN and class in Member Roster as directory-only. Re-enable it from Member Roster by checking the same box again.</p>
+                        <p>When Cloud is configured, member names, IGNs, classes, and opt-in states are shared with the guild. Card Database data and card batches are not part of that sync.</p>
                     </section>
                     <section class="help-topic" data-help-topic="team-builder">
                         <h4>Team Builder</h4>
-                        <p>Team Builder is the second page of the tracker. It uses the characters registered in Tracker Registration.</p>
+                        <p>Team Builder uses only characters opted into tracking from Member Roster. The member list, character IGNs, and Classes / Jobs originate in Member Roster; directory-only characters remain unavailable for team slots until their opt-in checkbox is checked.</p>
                         <h5>Set each character's Job</h5>
-                        <p>Open <b>Configure Classes</b> and choose the correct Job. The Class, Raid Position, and default DPS side are filled automatically from the guild's Job list. The Class dropdown can also be used first to narrow the character list.</p>
+                        <p>Choose the Class / Job in Member Roster when adding or editing a character. The Team Builder's class configuration uses the same Job mapping, and class changes are written back to the master character profile to keep the two views consistent. The Class dropdown can also narrow the eligible character list.</p>
                         <h5>Choose a Party Format</h5>
                         <p><b>4 Man Normal</b> is for casual normal nests. <b>4 Man Hardcore</b> is for higher-intensity 4-man content such as Hell Nests and Dragon Memoria. <b>8 Man Normal</b> is for Classic Raids with more composition flexibility. <b>8 Man Hardcore</b> uses both teams for high-end mechanics and exposes physical / magical DPS balance.</p>
                         <h5>Build the two teams</h5>
@@ -1570,21 +1607,13 @@
         </div>
     </div>
 
-    <!-- Cloud Setup Modal -->
-    <div class="modal-overlay hidden" id="cloud-modal" role="dialog">
+    <!-- Cloud Sync Information Modal -->
+    <div class="modal-overlay hidden" id="cloud-modal" role="dialog" aria-label="Cloud sync information">
         <div class="modal-card">
-            <h3>☁️ JSONBin Cloud Setup</h3>
-            <div class="modal-note">Your Bin ID and API Key are saved safely in your browser's local memory.</div>
-            <div class="modal-grid">
-                <label for="cloud-bin-id">Bin ID</label><input id="cloud-bin-id" autocomplete="off" placeholder="Example: 66abc123...">
-                <label for="cloud-api-key">Master Key</label><input id="cloud-api-key" type="password" autocomplete="new-password" placeholder="Paste your JSONBin Master Key">
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-cloud" type="button" onclick="saveCloudSettings(true)">Save & Connect</button>
-                <button class="btn btn-sync" type="button" onclick="createNewCloudBin()">Create New Private Bin</button>
-                <button class="btn btn-danger" type="button" onclick="clearCloudSettings()">Clear This PC</button>
-                <button class="btn btn-secondary" type="button" onclick="closeModal('cloud-modal')">Close</button>
-            </div>
+            <h3>☁️ Pantheon Cloud Sync</h3>
+            <div class="modal-note">Cloud sync is managed automatically after you sign in with an approved Discord account. Members do not need a JSONBin ID, master key, or per-device cloud setup.</div>
+            <div class="modal-note">If shared data has not been migrated yet, ask a Pantheon administrator to open the Access & Migration page and import the existing guild record.</div>
+            <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="closeModal('cloud-modal')">Close</button></div>
             <div id="cloud-modal-message" class="modal-note" style="display:none;"></div>
         </div>
     </div>
@@ -1607,26 +1636,15 @@
     <div class="modal-overlay hidden" id="roster-modal" role="dialog">
         <div class="modal-card wide-modal">
             <h3>🧾 Tracker Registration</h3>
-            <div class="modal-note">Drag and drop chips to reorder them. Removing a character hides it from the tracker but keeps its historical analytics.</div>
+            <div class="modal-note">Member Roster is the source of truth for member names, character IGNs, and Class / Job. Add or edit characters there and check <b>Include in Tracker + Team Builder</b> to opt a character in. This panel is for arranging and managing already registered characters.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
-                    <h4>Add a Character</h4>
-                    <div class="registration-form">
-                        <label>Owner / character bunch</label><select id="registration-roster-select" onchange="handleRegistrationRosterChange()"></select>
-                        <div id="registration-new-owner-fields">
-                            <label>New owner name</label><input id="registration-owner-name" maxlength="30" placeholder="Example: New Member">
-                        </div>
-                        <label>Bunch color</label>
-                        <div class="registration-color-row">
-                            <input id="registration-color" type="color" value="#7aa2f7"><span style="color:#aaa;font-size:0.82rem;">Used for headers.</span>
-                        </div>
-                        <label>Character name</label><input id="registration-character-name" maxlength="40" placeholder="Exact in-game name" onkeydown="if(event.key==='Enter') registerCharacter()">
-                        <label>Class / Job</label><select id="registration-job"></select>
-                        <button class="btn btn-roster" type="button" onclick="registerCharacter()">Register Character</button>
-                    </div>
+                    <h4>Add or register characters</h4>
+                    <p style="color:#aaa;font-size:.82rem;line-height:1.5;">Characters are added to the Member Roster first so the IGN, class, and tracker opt-in stay together in one record.</p>
+                    <button class="btn btn-roster" type="button" onclick="closeModal('roster-modal'); showAppPage('member-roster'); document.getElementById('member-directory-form')?.scrollIntoView({behavior:'smooth',block:'start'});">Open Member Roster</button>
                 </section>
                 <section class="registration-panel">
-                    <h4>Manage Existing Rosters</h4>
+                    <h4>Manage registered rosters</h4>
                     <div id="roster-management-list" class="roster-management-list"></div>
                 </section>
             </div>
@@ -1680,7 +1698,7 @@
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
-        const JSONBIN_ROOT = 'https://api.jsonbin.io/v3';
+        const JSONBIN_ROOT = '/api/cloud';
         const IDENTITY_KEY = 'pantheon-identity';
         const TEAM_BUILDER_LOCAL_KEY = 'pantheon-team-builder-local-v2';
 
@@ -1850,6 +1868,10 @@
         let autoSyncTimer;
         let syncInProgress = false;
         let syncRequestedWhileBusy = false;
+        let remoteRefreshTimer = null;
+        let remoteRefreshBusy = false;
+        let unsavedCloudChanges = false;
+        let lastSeenRemoteMarker = '';
         let activeRosterFilter = 'all'; 
         let isAnalyticsVisible = true;
         let isPersonalView = false;
@@ -1865,7 +1887,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -1900,10 +1922,101 @@
                 const key = name.toLowerCase();
                 if (!name || seen.has(key)) return null;
                 seen.add(key);
-                const characters = [...new Set((Array.isArray(member?.characters) ? member.characters : []).map(x => String(x || '').trim().slice(0, 40)).filter(Boolean))].slice(0, 100);
+                const rawCharacters = Array.isArray(member?.characters) ? member.characters : [];
+                const characters = [...new Set(rawCharacters.map(x => String(typeof x === 'object' ? (x?.name || x?.ign || '') : x || '').trim().slice(0, 40)).filter(Boolean))].slice(0, 100);
+                const rawProfiles = Array.isArray(member?.characterProfiles) ? member.characterProfiles : [];
+                const profileByName = new Map(rawProfiles.map(profile => [String(profile?.name || profile?.ign || '').trim().toLowerCase(), profile]));
+                const characterProfiles = characters.map(charName => {
+                    const profile = profileByName.get(charName.toLowerCase()) || {};
+                    return {
+                        name: charName,
+                        job: JOB_ORDER.includes(String(profile.job || '')) ? String(profile.job) : '',
+                        trackerEnabled: profile.trackerEnabled === true
+                    };
+                });
                 const id = String(member?.id || `member-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '') || `member-${index}`;
-                return { id, name, characters, note: String(member?.note || '').trim().slice(0, 160) };
+                return {
+                    id, name, characters, characterProfiles,
+                    trackerRosterId: String(member?.trackerRosterId || '').trim().replace(/[^a-zA-Z0-9_-]/g, ''),
+                    color: normalizeColor(member?.color),
+                    note: String(member?.note || '').trim().slice(0, 160)
+                };
             }).filter(Boolean);
+        }
+
+        function projectTrackerRostersFromMemberDirectory(data = cloudData, updateTimestamps = false) {
+            if (!data?.settings) return;
+            const oldRosters = normalizeRosters(data.settings.rosters);
+            const members = normalizeMemberDirectory(data.settings.memberDirectory);
+            const projected = members.map(member => {
+                const existing = oldRosters.find(roster => roster.id === member.trackerRosterId)
+                    || oldRosters.find(roster => roster.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                const rosterId = existing?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, '');
+                member.trackerRosterId = rosterId;
+                member.color = normalizeColor(member.color || existing?.color || '#7aa2f7');
+                const trackedNames = (member.characterProfiles || []).filter(profile => profile.trackerEnabled && profile.name).map(profile => profile.name);
+                return { id: rosterId, name: member.name.slice(0, 30), color: member.color, characters: trackedNames };
+            });
+            data.settings.memberDirectory = members;
+            data.settings.rosters = normalizeRosters(projected);
+            if (updateTimestamps) {
+                const now = Date.now();
+                data.settings.rosterUpdatedAt = now;
+                data.settings.rosterUpdatedBy = deviceId;
+                data.settings.memberDirectoryUpdatedAt = now;
+                data.settings.memberDirectoryUpdatedBy = deviceId;
+                data.updatedAt = now;
+            }
+        }
+
+        function ensureMemberRosterMaster(data = cloudData) {
+            if (!data?.settings) return false;
+            const settings = data.settings;
+            const version = Number(settings.memberRosterMasterVersion) || 0;
+            const rosters = normalizeRosters(settings.rosters);
+            let members = normalizeMemberDirectory(settings.memberDirectory);
+            const jobs = safeObject(settings.characterJobs);
+            let migrated = false;
+            if (version < 1) {
+                // One-time migration: bring the legacy Tracker roster into the directory,
+                // preserving every previously registered IGN and its known class.
+                rosters.forEach(roster => {
+                    let member = members.find(item => item.name.trim().toLowerCase() === roster.name.trim().toLowerCase());
+                    if (!member) {
+                        member = { id: `member-${String(roster.id || Date.now().toString(36)).replace(/[^a-zA-Z0-9_-]/g, '')}`, name: roster.name, characters: [], characterProfiles: [], trackerRosterId: roster.id, color: roster.color, note: '' };
+                        members.push(member);
+                    }
+                    member.trackerRosterId = roster.id || member.trackerRosterId;
+                    member.color = normalizeColor(roster.color || member.color);
+                    roster.characters.forEach(characterName => {
+                        const key = characterName.trim().toLowerCase();
+                        if (!key) return;
+                        if (!member.characters.some(name => name.trim().toLowerCase() === key)) member.characters.push(characterName);
+                        const profile = member.characterProfiles.find(item => item.name.trim().toLowerCase() === key);
+                        const knownJob = JOB_ORDER.includes(jobs[characterName]?.job) ? jobs[characterName].job : (profile?.job || '');
+                        if (profile) { profile.name = characterName; profile.job = knownJob; profile.trackerEnabled = true; }
+                        else member.characterProfiles.push({ name: characterName, job: knownJob, trackerEnabled: true });
+                    });
+                    migrated = true;
+                });
+                members.forEach(member => {
+                    const roster = rosters.find(item => item.id === member.trackerRosterId) || rosters.find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                    if (roster) { member.trackerRosterId = roster.id; member.color = normalizeColor(member.color || roster.color); }
+                    member.characterProfiles = member.characters.map(characterName => {
+                        const previous = member.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterName.trim().toLowerCase()) || {};
+                        const isLegacyTracked = !!roster?.characters.some(name => name.trim().toLowerCase() === characterName.trim().toLowerCase());
+                        const knownJob = JOB_ORDER.includes(previous.job) ? previous.job : (JOB_ORDER.includes(jobs[characterName]?.job) ? jobs[characterName].job : '');
+                        return { name: characterName, job: knownJob, trackerEnabled: previous.trackerEnabled === true || isLegacyTracked };
+                    });
+                });
+                settings.memberRosterMasterVersion = 1;
+                settings.memberDirectoryUpdatedAt = Math.max(Number(settings.memberDirectoryUpdatedAt) || 0, Number(settings.rosterUpdatedAt) || 0);
+                settings.memberDirectoryUpdatedBy = settings.memberDirectoryUpdatedBy || settings.rosterUpdatedBy || '';
+                migrated = true;
+            }
+            settings.memberDirectory = normalizeMemberDirectory(members);
+            projectTrackerRostersFromMemberDirectory(data, false);
+            return migrated;
         }
 
         function normalizeCategories(value) {
@@ -2003,6 +2116,8 @@
         }
 
         function syncDataStructures() {
+            ensureMemberRosterMaster(cloudData);
+            projectTrackerRostersFromMemberDirectory(cloudData, false);
             cloudData.settings.rosters = normalizeRosters(cloudData.settings.rosters);
             updateFilterDropdown();
             const visibleRosters = activeRosterFilter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
@@ -2026,7 +2141,7 @@
             return { state, note: String(value.note || '').slice(0, 40), updatedAt: Number(value.updatedAt) || 0, deviceId: String(value.deviceId || '') };
         }
 
-        // Compact, reversible transport encoding for the JSONBin Free plan.
+        // Compact, reversible transport encoding for shared cloud transport.
         // The decoded in-memory/localStorage schema remains unchanged.
         const PANTHEON_COMPACT_RECORD_MARKER = '__pantheonCompactV1';
         const PANTHEON_WIRE_KEY_MAP = Object.freeze({
@@ -2042,7 +2157,8 @@
             gold:'~X', dia:'~Y', eol:'~Z', deleted:'~0', characters:'~1', name:'~2', color:'~3', group:'~4', tasks:'~5',
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
-            updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~='
+            updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -2143,6 +2259,7 @@
             norm.settings.memberDirectory = normalizeMemberDirectory(sets.memberDirectory);
             norm.settings.memberDirectoryUpdatedAt = Number(sets.memberDirectoryUpdatedAt) || 0;
             norm.settings.memberDirectoryUpdatedBy = String(sets.memberDirectoryUpdatedBy || '');
+            norm.settings.memberRosterMasterVersion = Number(sets.memberRosterMasterVersion) || 0;
             norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : [];
             norm.settings.categoriesUpdatedAt = Number(sets.categoriesUpdatedAt) || 0;
             norm.settings.categoriesUpdatedBy = String(sets.categoriesUpdatedBy || '');
@@ -2151,6 +2268,7 @@
             norm.settings.jobProfilesUpdatedAt = Number(sets.jobProfilesUpdatedAt) || 0;
             norm.settings.jobProfilesUpdatedBy = String(sets.jobProfilesUpdatedBy || '');
             norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
+            ensureMemberRosterMaster(norm);
             const historyClearAt = Number(norm.settings.analyticsHistoryClearedAt) || 0;
             if (historyClearAt) {
                 norm.history = {};
@@ -2231,9 +2349,12 @@
             } catch (e) { return createEmptyData(); }
         }
         function persistLocalData() { cloudData.schemaVersion = APP_SCHEMA_VERSION; cloudData.updatedAt = Date.now(); localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(cloudData)); }
-        function getCloudConfig() { try { const c = JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || '{}'); return { binId: String(c.binId || '').trim(), apiKey: String(c.apiKey || '').trim() }; } catch (e) { return { binId: '', apiKey: '' }; } }
-        function hasCloudConfig() { const c = getCloudConfig(); return Boolean(c.binId && c.apiKey); }
-        function authHeaders(config = getCloudConfig()) { return { 'X-Master-Key': config.apiKey }; }
+        // Cloudflare edition: every authorized member uses the same server-managed D1 records.
+        // No JSONBin key is stored in browsers. The same-origin session cookie authenticates API calls.
+        const PANTHEON_MAIN_RECORD_ID = 'pantheon-main';
+        function getCloudConfig() { return { binId: PANTHEON_MAIN_RECORD_ID, apiKey: '' }; }
+        function hasCloudConfig() { return true; }
+        function authHeaders() { return {}; }
 
         function compareCellRecords(a, b) {
             const l = normalizeCellRecord(a) || { state: 'open', note: '', updatedAt: 0, deviceId: '' };
@@ -2350,6 +2471,7 @@
             merged.settings.memberDirectory = normalizeMemberDirectory(mdSrc.memberDirectory);
             merged.settings.memberDirectoryUpdatedAt = Math.max(lmdTime, rmdTime);
             merged.settings.memberDirectoryUpdatedBy = String(mdSrc.memberDirectoryUpdatedBy || '');
+            merged.settings.memberRosterMasterVersion = Math.max(Number(local.settings.memberRosterMasterVersion) || 0, Number(remote.settings.memberRosterMasterVersion) || 0);
 
             const lcTime = Number(local.settings.categoriesUpdatedAt) || 0, rcTime = Number(remote.settings.categoriesUpdatedAt) || 0;
             const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
@@ -2362,6 +2484,7 @@
             merged.settings.jobProfilesUpdatedAt = Math.max(ljp, rjp);
             merged.settings.jobProfilesUpdatedBy = jsrc.jobProfilesUpdatedBy || '';
             merged.settings.teamBuilder = mergeTeamBuilder(local.settings.teamBuilder, remote.settings.teamBuilder);
+            ensureMemberRosterMaster(merged);
 
             ['cheean', 'bio', 'idontheal'].forEach(p => {
                 const lL = local.scholarship[p]?.logs || {}, rL = remote.scholarship[p]?.logs || {};
@@ -2412,16 +2535,14 @@
         // ==========================================================
         // 🕘 SHARED GLOBAL REVISION JOURNAL (SEPARATE BIN)
         // ==========================================================
-        // v21 keeps the core tracker in the existing main bin and puts
-        // revision history in a separate tiny JSONBin. This avoids the
-        // 100 KB Free-plan limit of the main tracker record and, most
-        // importantly, a journal failure can NEVER block a normal sync.
+        // Revision history stays in a separate D1 record so journal failures
+        // never block ordinary tracker synchronization.
         const VERSION_HISTORY_MAX = 120;
         const REVISION_JOURNAL_LOCAL_KEY = 'pantheon-revision-journal-cache-v1';
         const REVISION_QUEUE_LOCAL_KEY = 'pantheon-revision-queue-v1';
         const REVISION_BIN_NAME = 'Pantheon DN Revision Journal';
-        const REVISION_JOURNAL_BYTE_BUDGET = 85000;
-        const SAFE_MAIN_RECORD_BYTES = 96000;
+        const REVISION_JOURNAL_BYTE_BUDGET = 850000;
+        const SAFE_MAIN_RECORD_BYTES = 1500000;
 
         let pendingGlobalChangeLabel = '';
         let pendingGlobalBeforeSnapshot = null;
@@ -2430,7 +2551,7 @@
         let versionHistoryRows = [];
 
         function getRevisionBinId(data=cloudData){
-            return String(data?.settings?.versionControl?.revisionBinId || localStorage.getItem('pantheon-revision-bin-id-v1') || '').trim();
+            return String(data?.settings?.versionControl?.revisionBinId || '').trim();
         }
         function setRevisionBinIdLocal(id){if(id)localStorage.setItem('pantheon-revision-bin-id-v1',String(id));}
         function loadRevisionQueue(){try{const q=JSON.parse(localStorage.getItem(REVISION_QUEUE_LOCAL_KEY)||'[]');return Array.isArray(q)?q.filter(Boolean):[];}catch(e){return [];}}
@@ -2447,7 +2568,7 @@
             const packed = { [PANTHEON_COMPACT_RECORD_MARKER]:1, devices, payload:encodePantheonWireValue(candidate, '', deviceIndexes) };
             const bytes = candidateByteSize(packed);
             if (bytes > SAFE_MAIN_RECORD_BYTES) {
-                throw new Error(`Tracker data is ${(bytes/1024).toFixed(1)} KB after compact encoding, above the safe 96 KB sync budget for JSONBin Free. Nothing was uploaded; your changes remain saved locally. To preserve all data, split the shared tracker across multiple records or use storage with a larger record limit.`);
+                throw new Error(`Tracker data is ${(bytes/1024).toFixed(1)} KB after compact encoding, above the safe 1.5 MB Pantheon sync budget. Nothing was uploaded; your changes remain saved locally. Reduce retained history or contact a Pantheon administrator.`);
             }
             return packed;
         }
@@ -2679,6 +2800,7 @@
                 try{
                     for(let attempt=1;attempt<=3;attempt++){
                         const remote=normalizeData(await fetchRemoteRecord(config));
+                        if (!lastSeenRemoteMarker) lastSeenRemoteMarker = remoteSyncMarker(remote);
                         // Refresh/sync itself does not create a revision. Only an
                         // explicit global-impact edit (prepared by prepareGlobalChange)
                         // is versioned.
@@ -2697,6 +2819,7 @@
                         const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
+                            lastSeenRemoteMarker=remoteSyncMarker(latest);unsavedCloudChanges=false;
                             cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();refreshTrackerUI();
                             // Revision logging happens after the core sync and can fail safely.
                             if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
@@ -2706,18 +2829,86 @@
                         cloudData=mergeData(cloudData,latest);delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
                     }
                     throw new Error('Cloud changed during sync. Please press Sync Now again.');
-                }catch(err){persistLocalData();setStatus(`🔴 Sync Failed: ${err.message}`);}
+                }catch(err){unsavedCloudChanges=true;persistLocalData();setStatus(`🔴 Sync Failed: ${err.message}`);}
                 finally{syncInProgress=false;if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}}
             })();
+        }
+
+        function remoteSyncMarker(record){
+            const data = safeObject(record);
+            const sync = safeObject(data.syncInfo);
+            return `${Number(data.updatedAt)||0}:${String(sync.operationId||'')}:${String(sync.by||'')}`;
+        }
+
+        async function refreshSharedDataIfChanged(){
+            if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return;
+            remoteRefreshBusy = true;
+            try{
+                const remote = await fetchRemoteRecord(getCloudConfig());
+                if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return;
+                const marker = remoteSyncMarker(remote);
+                if(!marker || marker === lastSeenRemoteMarker) return;
+                cloudData = normalizeData(remote);
+                delete cloudData.syncInfo;
+                lastSeenRemoteMarker = marker;
+                setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                persistLocalData();
+                refreshTrackerUI();
+                setStatus('🟢 Shared data refreshed from cloud');
+            }catch(_){
+                // Keep the current local view during transient connection failures.
+            }finally{
+                remoteRefreshBusy = false;
+            }
+        }
+
+        function startRemoteRefresh(){
+            if(remoteRefreshTimer) clearInterval(remoteRefreshTimer);
+            remoteRefreshTimer = setInterval(refreshSharedDataIfChanged, 120000);
+            window.addEventListener('focus', refreshSharedDataIfChanged);
+            document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged(); });
         }
 
         function openVersionHistoryModal(){toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { document.getElementById('sync-status').textContent = msg; }
-        function triggerAutoSync() { persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
+        function triggerAutoSync() { unsavedCloudChanges = true; persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        async function pantheonCheckSessionAndBoot() {
+            const gate = document.getElementById('pantheon-auth-gate');
+            const note = document.getElementById('pantheon-auth-note');
+            const accessDenied = new URLSearchParams(location.search).get('access') === 'denied';
+            try {
+                const response = await fetch('/api/session', { credentials: 'same-origin', cache: 'no-store' });
+                const state = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(state.error || `Session check failed (${response.status})`);
+                if (!state.authenticated) {
+                    gate.hidden = false;
+                    note.textContent = accessDenied ? 'Access denied: this Discord account is not on Pantheon’s approved list. Ask an administrator to add your account ID.' : 'Only approved Discord accounts can access shared roster and tracker data.';
+                    return false;
+                }
+                gate.hidden = true;
+                const bar = document.getElementById('pantheon-session-bar');
+                bar.style.display = 'flex';
+                document.getElementById('pantheon-session-name').textContent = state.user?.username || 'Signed in with Discord';
+                document.getElementById('pantheon-admin-link').hidden = state.user?.role !== 'admin';
+                if (state.user?.role === 'admin') document.getElementById('pantheon-admin-link').textContent = 'Access admin';
+                document.getElementById('pantheon-signout').addEventListener('click', async () => {
+                    try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
+                    location.href = '/';
+                }, { once: true });
+                return true;
+            } catch (error) {
+                gate.hidden = false;
+                note.textContent = 'The authentication service is not ready yet. Check the Cloudflare Pages Functions and D1 binding before inviting members.';
+                return false;
+            }
+        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            const canEnter = await pantheonCheckSessionAndBoot();
+            if (!canEnter) return;
             hydrateCardWikiData();
+            renderMemberCharacterRows([]);
             loadCloudForm();
             populateRegistrationJobSelect();
             window.addEventListener('hashchange', handlePageRoute);
@@ -2726,7 +2917,8 @@
                 if (['#registration', '#dungeons', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
                 else applySavedLandingPage();
                 initializeWelcomeModal();
-            }).catch(() => { applySavedLandingPage(); initializeWelcomeModal(); });
+                startRemoteRefresh();
+            }).catch(() => { applySavedLandingPage(); initializeWelcomeModal(); startRemoteRefresh(); });
         });
 
         function rateElementId(charName) { return `rate-${encodeURIComponent(charName)}`; }
@@ -3172,18 +3364,15 @@
         function touchRosterSettings() { cloudData.settings.rosterUpdatedAt = Date.now(); cloudData.settings.rosterUpdatedBy = deviceId; cloudData.updatedAt = Date.now(); }
 
         function renderRosterRegistration() {
-            const sel = document.getElementById('registration-roster-select'), list = document.getElementById('roster-management-list');
-            if(!sel||!list) return;
-            populateRegistrationJobSelect();
-            const cur = sel.value;
-            const trackerOptions = getRosters().map(r => `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)} (${r.characters.length})</option>`).join('');
-            const trackerOwnerNames = new Set(getRosters().map(r => r.name.trim().toLowerCase()));
-            const directoryOwners = normalizeMemberDirectory(cloudData.settings.memberDirectory).filter(m => !trackerOwnerNames.has(m.name.trim().toLowerCase()));
-            const directoryOptions = directoryOwners.length ? `<optgroup label="Member Roster · not yet tracking">${directoryOwners.map(m => `<option value="__member__:${escapeHTML(m.id)}">${escapeHTML(m.name)} · Member Roster</option>`).join('')}</optgroup>` : '';
-            sel.innerHTML = '<option value="__new__">＋ Create new group</option>' + trackerOptions + directoryOptions;
-            const validMemberSelection = cur.startsWith('__member__:') && directoryOwners.some(m => `__member__:${m.id}` === cur);
-            sel.value = getRosters().some(r => r.id === cur) || validMemberSelection ? cur : '__new__'; handleRegistrationRosterChange(false);
-            list.innerHTML = getRosters().length ? getRosters().map(r => `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><input class="roster-name-input" data-roster-name="${escapeHTML(r.id)}" maxlength="30" value="${escapeHTML(r.name)}"><input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save</button><button class="btn btn-danger" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Remove</button></div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="true" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')">×</button></span>`).join('') : '<div style="color:#aaa;">No characters yet.</div>'}</div></div>`).join('') : '<div style="color:#aaa;">No groups yet.</div>';
+            const list = document.getElementById('roster-management-list');
+            if (!list) return;
+            ensureMemberRosterMaster(cloudData);
+            projectTrackerRostersFromMemberDirectory(cloudData, false);
+            const rosters = getRosters();
+            list.innerHTML = rosters.length ? rosters.map(r => {
+                const member = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === r.id);
+                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span><input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button><button class="btn btn-secondary" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Unregister All</button></div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="true" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')" title="Opt out of Tracker while keeping this character in Member Roster">×</button></span>`).join('') : '<div style="color:#aaa;">No characters opted in.</div>'}</div></div>`;
+            }).join('') : '<div style="color:#aaa;">Add a member in Member Roster first.</div>';
             attachDragDropListeners();
         }
 
@@ -3212,67 +3401,79 @@
         }
 
         async function registerCharacter() {
-            const v = document.getElementById('registration-character-name').value.trim(); if(!v) return alert('Enter character name.');
-            if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === v.toLowerCase()))) return alert('Character exists.');
-            const job = document.getElementById('registration-job')?.value || '';
-            if (!job) return alert("Choose the character's Class / Job. Team Builder uses this to determine roles and raid position.");
-            const rosterChoice = document.getElementById('registration-roster-select').value;
-            const ownerNameInput = document.getElementById('registration-owner-name')?.value.trim() || '';
-            const color = normalizeColor(document.getElementById('registration-color')?.value, '#7aa2f7');
-            const name = v.slice(0,40);
-            const isDirectoryOwner = rosterChoice.startsWith('__member__:');
-            const selectedDirectoryMember = isDirectoryOwner ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(m => m.id === rosterChoice.slice('__member__:'.length)) : null;
-            const selectedRoster = !isDirectoryOwner && rosterChoice !== '__new__' ? findRoster(rosterChoice) : null;
-            const ownerName = selectedDirectoryMember?.name || ownerNameInput;
-            if (rosterChoice === '__new__' && !ownerName) return alert('Enter owner.');
-            if (isDirectoryOwner && !selectedDirectoryMember) return alert('That Member Roster entry no longer exists. Refresh and try again.');
-            const targetOwner = selectedRoster?.name || ownerName.slice(0,30) || 'new roster';
-            if (!(await prepareGlobalChange(`Added ${name} to ${targetOwner}`))) return;
-            // Re-check after refreshing to the latest shared state.
-            if (getRosters().some(r => r.characters.some(n => n.toLowerCase() === name.toLowerCase()))) return alert('Character was already added by another device.');
-            let r;
-            if (rosterChoice === '__new__' || isDirectoryOwner) {
-                const desiredOwner = ownerName.slice(0,30);
-                const existingOwner = getRosters().find(group => group.name.trim().toLowerCase() === desiredOwner.toLowerCase());
-                if (existingOwner) r = existingOwner;
-                else {
-                    r = { id: `roster-${Date.now().toString(36)}`, name: desiredOwner, color, characters: [] };
-                    getRosters().push(r);
-                }
-            } else {
-                r = findRoster(rosterChoice);
-                if (!r) return alert('That owner group no longer exists. Refresh the tracker and try again.');
-            }
-            r.characters.push(name);
-            cloudData.settings.characterJobs[name] = { job, updatedAt: Date.now(), deviceId };
-            touchRosterSettings(); document.getElementById('registration-character-name').value='';
-            if (document.getElementById('registration-job')) document.getElementById('registration-job').value='';
-            refreshTrackerUI(); document.getElementById('registration-roster-select').value = r.id; handleRegistrationRosterChange(false); triggerAutoSync();
+            closeModal('roster-modal');
+            showAppPage('member-roster');
+            document.getElementById('member-directory-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            alert('Add the IGN, Class / Job, and Tracker opt-in from Member Roster. Tracker Registration no longer creates a separate source record.');
         }
 
         async function saveRosterGroup(id) {
-            const r = findRoster(id); if (!r) return;
-            const name = document.querySelector(`[data-roster-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || r.name;
-            const color = normalizeColor(document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`).value, r.color);
-            if (!(await prepareGlobalChange(`Update roster ${r.name}`))) return;
-            const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
-            latest.name = name; latest.color = color; touchRosterSettings(); refreshTrackerUI(); triggerAutoSync();
+            const roster = findRoster(id); if (!roster) return;
+            const colorInput = document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`);
+            const color = normalizeColor(colorInput?.value, roster.color);
+            if (!(await prepareGlobalChange(`Update member roster color for ${roster.name}`))) return;
+            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const member = entries.find(item => item.trackerRosterId === id || item.name.trim().toLowerCase() === roster.name.trim().toLowerCase());
+            if (!member) return alert('That member no longer exists. Edit the Member Roster instead.');
+            member.color = color;
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            refreshTrackerUI(); triggerAutoSync();
         }
         async function removeCharacterFromRoster(id, n) {
-            const r = findRoster(id); if(!r || !confirm(`Remove ${n}?`)) return;
-            if (!(await prepareGlobalChange(`Removed ${n} from ${r.name}`))) return;
-            const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
-            latest.characters = latest.characters.filter(c => c !== n); delete cloudData.settings.characterJobs[n];
-            touchRosterSettings(); ensureMemberDirectoryCharacters(latest.name, [n]); refreshTrackerUI(); triggerAutoSync();
+            const roster = findRoster(id); if (!roster) return;
+            const ownerKey = roster.name.trim().toLowerCase();
+            const characterKey = String(n || '').trim().toLowerCase();
+            const initialMembers = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const initialMember = initialMembers.find(member => member.name.trim().toLowerCase() === ownerKey || member.trackerRosterId === id);
+            const initialProfile = initialMember?.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterKey);
+            if (!initialMember || !initialProfile) return alert('That character is no longer in Member Roster. Refresh and try again.');
+            if (!confirm(`Unregister ${initialProfile.name} from Tracker and Team Builder? Its IGN and Class / Job will remain in Member Roster as a directory-only character.`)) return;
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Unregister ${initialProfile.name} from Tracker`))) return;
+            const members = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const member = members.find(item => item.id === initialMember.id);
+            const profile = member?.characterProfiles.find(item => item.name.trim().toLowerCase() === characterKey);
+            if (!member || !profile) return alert('That character was already changed on another device. Refresh the roster.');
+            profile.trackerEnabled = false;
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            refreshTrackerUI();
+            triggerAutoSync();
+        }
+
+        function syncTrackedRosterOrderToMemberDirectory(roster) {
+            if (!roster) return false;
+            const members = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const member = members.find(item => item.trackerRosterId === roster.id || item.name.trim().toLowerCase() === roster.name.trim().toLowerCase());
+            if (!member) return false;
+            const profilesByName = new Map(member.characterProfiles.map(profile => [profile.name.trim().toLowerCase(), profile]));
+            const orderedTrackedProfiles = roster.characters.map(name => profilesByName.get(String(name).trim().toLowerCase())).filter(Boolean);
+            let nextTrackedIndex = 0;
+            member.characterProfiles = member.characterProfiles.map(profile => profile.trackerEnabled
+                ? (orderedTrackedProfiles[nextTrackedIndex++] || profile)
+                : profile);
+            member.characters = member.characterProfiles.map(profile => profile.name);
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            return true;
         }
         async function removeRosterGroup(id) {
-            if(!confirm('Remove group?')) return; const r = findRoster(id); if (!r) return;
-            if (!(await prepareGlobalChange(`Remove roster ${r.name}`))) return;
-            const latest = findRoster(id); if (!latest) return alert('Roster no longer exists. Refresh and try again.');
-            const removedCharacters = [...latest.characters];
-            removedCharacters.forEach(n => { delete cloudData.settings.characterJobs[n]; });
-            ensureMemberDirectoryCharacters(latest.name, removedCharacters);
-            cloudData.settings.rosters = getRosters().filter(item => item.id !== id); touchRosterSettings(); refreshTrackerUI(); triggerAutoSync();
+            const roster = findRoster(id); if (!roster) return;
+            const names = [...roster.characters];
+            if (!names.length) return alert('This member has no opted-in characters to unregister. The member itself remains in Member Roster.');
+            if (!confirm(`Unregister all ${names.length} character(s) owned by ${roster.name} from Tracker and Team Builder? Their IGNs and classes will remain in Member Roster as directory-only entries.`)) return;
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Unregister all tracking characters for ${roster.name}`))) return;
+            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const member = entries.find(item => item.trackerRosterId === id || item.name.trim().toLowerCase() === roster.name.trim().toLowerCase());
+            if (!member) return alert('That member no longer exists in Member Roster.');
+            member.characterProfiles = member.characterProfiles.map(profile => ({ ...profile, trackerEnabled: false }));
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            refreshTrackerUI(); triggerAutoSync();
         }
         
         function getCategories() { return cloudData.settings.categories; }
@@ -3389,7 +3590,8 @@
                         const latest = findRoster(dragSrcData.parent); if (!latest) return;
                         const item = latest.characters.splice(dragSrcData.index, 1)[0];
                         latest.characters.splice(Math.min(tgtIdx, latest.characters.length), 0, item);
-                        touchRosterSettings(); renderRosterRegistration();
+                        if (!syncTrackedRosterOrderToMemberDirectory(latest)) touchRosterSettings();
+                        renderRosterRegistration();
                     } else if (dragSrcData.type === 'dungeon') {
                         const c = findCategory(dragSrcData.parent); if (!c) return;
                         if (!(await prepareGlobalChange(`Reorder dungeon tasks in ${c.name}`))) return;
@@ -3414,7 +3616,8 @@
                         if (!(await prepareGlobalChange(`Reorder roster ${r.name}`))) return;
                         const latest = findRoster(lParent); if (!latest || dragSrcData.index >= latest.characters.length) return;
                         latest.characters.push(latest.characters.splice(dragSrcData.index, 1)[0]);
-                        touchRosterSettings(); renderRosterRegistration();
+                        if (!syncTrackedRosterOrderToMemberDirectory(latest)) touchRosterSettings();
+                        renderRosterRegistration();
                     } else {
                         const c = findCategory(lParent); if (!c || dragSrcData.index === c.tasks.length - 1) return;
                         if (!(await prepareGlobalChange(`Reorder dungeon tasks in ${c.name}`))) return;
@@ -3430,7 +3633,16 @@
         // ==========================================
         // ⚔ TEAM BUILDER
         // ==========================================
-        function allRegisteredCharacters() { return flattenRosters(cloudData.settings.rosters); }
+        function allRegisteredCharacters() {
+            ensureMemberRosterMaster(cloudData);
+            const rosterById = new Map(normalizeRosters(cloudData.settings.rosters).map(roster => [roster.id, roster]));
+            return normalizeMemberDirectory(cloudData.settings.memberDirectory).flatMap(member => {
+                const roster = rosterById.get(member.trackerRosterId) || normalizeRosters(cloudData.settings.rosters).find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                return (member.characterProfiles || []).filter(profile => profile.trackerEnabled).map(profile => ({
+                    name: profile.name, color: member.color || roster?.color || '#7aa2f7', rosterId: roster?.id || member.trackerRosterId, rosterName: member.name
+                }));
+            });
+        }
         function getCharacterJob(name) { return cloudData.settings.characterJobs?.[name]?.job || ''; }
 
         async function setCharacterJob(name, job) {
@@ -3440,6 +3652,17 @@
             if (!(await prepareGlobalChange(`Set Job for ${name}`))) return;
             if (!cloudData.settings.characterJobs) cloudData.settings.characterJobs = {};
             cloudData.settings.characterJobs[name] = { job, updatedAt: Date.now(), deviceId };
+            const directoryEntries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            let directoryClassUpdated = false;
+            directoryEntries.forEach(member => {
+                const profile = member.characterProfiles.find(item => item.name.trim().toLowerCase() === name.trim().toLowerCase());
+                if (profile && profile.job !== job) { profile.job = job; directoryClassUpdated = true; }
+            });
+            if (directoryClassUpdated) {
+                cloudData.settings.memberDirectory = normalizeMemberDirectory(directoryEntries);
+                touchMemberDirectorySettings();
+                projectTrackerRostersFromMemberDirectory(cloudData, true);
+            }
             cloudData.updatedAt = Date.now();
             updateClassSetupSummary();
             renderClassSetup();
@@ -3661,10 +3884,8 @@
 
         function getTeamBuilderRosterCharacters() {
             const filter = document.getElementById('team-builder-roster-filter')?.value || 'all';
-            const rosterSet = filter === 'all'
-                ? cloudData.settings.rosters
-                : cloudData.settings.rosters.filter(r => r.id === filter);
-            return flattenRosters(rosterSet);
+            const registered = allRegisteredCharacters();
+            return filter === 'all' ? registered : registered.filter(character => character.rosterId === filter);
         }
 
         function getClassCounts(teamKey = '', slotIndex = -1) {
@@ -4445,6 +4666,14 @@
                 window.prompt('Copy this card name and paste it into the in-game Trading House:', card.name);
             }
         }
+        function touchMemberDirectorySettings() {
+            const now = Date.now();
+            cloudData.settings.memberDirectoryUpdatedAt = now;
+            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
+            cloudData.settings.memberRosterMasterVersion = 1;
+            cloudData.updatedAt = now;
+        }
+
         function ensureMemberDirectoryCharacters(ownerName, characterNames) {
             const name = String(ownerName || '').trim().slice(0, 60);
             if (!name) return false;
@@ -4453,63 +4682,88 @@
             let entry = entries.find(member => member.name.trim().toLowerCase() === name.toLowerCase());
             let changed = false;
             if (!entry) {
-                entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: [], note: '' };
+                entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: [], characterProfiles: [], trackerRosterId: '', color: '#7aa2f7', note: '' };
                 entries.push(entry);
                 changed = true;
             }
-            const seen = new Set(entry.characters.map(value => value.trim().toLowerCase()));
-            keep.forEach(value => {
-                const key = value.toLowerCase();
-                if (!seen.has(key) && entry.characters.length < 100) { entry.characters.push(value); seen.add(key); changed = true; }
+            keep.forEach(characterName => {
+                const key = characterName.toLowerCase();
+                if (!entry.characters.some(value => value.toLowerCase() === key) && entry.characters.length < 100) {
+                    entry.characters.push(characterName);
+                    entry.characterProfiles.push({ name: characterName, job: JOB_ORDER.includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: false });
+                    changed = true;
+                }
             });
             if (changed) {
                 cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-                cloudData.settings.memberDirectoryUpdatedAt = Date.now();
-                cloudData.settings.memberDirectoryUpdatedBy = deviceId;
-                cloudData.updatedAt = Date.now();
+                touchMemberDirectorySettings();
             }
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
             return changed;
         }
 
         function getMemberDirectoryView() {
-            const map = new Map();
-            getRosters().forEach(roster => {
-                const key = String(roster.name || '').trim().toLowerCase();
-                if (!key) return;
-                const existing = map.get(key);
-                const characters = [...new Set([...(existing?.characters || []), ...(roster.characters || [])])];
-                map.set(key, { ...(existing || {}), id: existing?.id || `tracker-${roster.id}`, name: existing?.name || roster.name, characters, color: roster.color || existing?.color || '#7aa2f7', inTracker: true, rosterId: existing?.rosterId || roster.id, recordId: existing?.recordId || '', note: existing?.note || '' });
-            });
-            normalizeMemberDirectory(cloudData.settings.memberDirectory).forEach(member => {
-                const key = member.name.trim().toLowerCase();
-                const existing = map.get(key);
-                const characters = [...new Map([...(existing?.characters || []), ...(member.characters || [])].map(name => [name.toLowerCase(), name])).values()];
-                map.set(key, { ...(existing || {}), id: member.id, name: existing?.name || member.name, characters, color: existing?.color || '#7aa2f7', inTracker: Boolean(existing?.inTracker), recordId: member.id, note: member.note || existing?.note || '' });
-            });
-            return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+            ensureMemberRosterMaster(cloudData);
+            const rosterById = new Map(normalizeRosters(cloudData.settings.rosters).map(roster => [roster.id, roster]));
+            return normalizeMemberDirectory(cloudData.settings.memberDirectory).map(member => {
+                const roster = rosterById.get(member.trackerRosterId) || normalizeRosters(cloudData.settings.rosters).find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                const inTracker = (member.characterProfiles || []).some(profile => profile.trackerEnabled);
+                return { ...member, color: member.color || roster?.color || '#7aa2f7', inTracker, recordId: member.id };
+            }).sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        function renderMemberCharacterRows(profiles = []) {
+            const container = document.getElementById('member-character-editor');
+            if (!container) return;
+            const rows = profiles.length ? profiles : [{ name: '', job: '', trackerEnabled: false }];
+            container.innerHTML = rows.map((profile, index) => `<div class="member-character-row" data-member-character-row>
+                <label>Character IGN<input class="member-character-ign" type="text" maxlength="40" value="${escapeHTML(profile.name || '')}" placeholder="Exact in-game name" autocomplete="off"></label>
+                <label>Class / Job<select class="member-character-job">${buildJobOptions(profile.job || '')}</select></label>
+                <label class="member-character-opt-in"><input class="member-character-tracker" type="checkbox" ${profile.trackerEnabled ? 'checked' : ''}><span>Include in Tracker + Team Builder</span></label>
+                <button class="member-character-row-remove" type="button" data-remove-member-character-row title="Remove this row" aria-label="Remove character row">×</button>
+            </div>`).join('');
+        }
+        function addMemberCharacterRow(profile = null) {
+            const container = document.getElementById('member-character-editor');
+            if (!container) return;
+            const rows = [...container.querySelectorAll('[data-member-character-row]')].map(row => ({
+                name: row.querySelector('.member-character-ign')?.value || '',
+                job: row.querySelector('.member-character-job')?.value || '',
+                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked
+            }));
+            if (profile) rows.push(profile);
+            else rows.push({ name: '', job: '', trackerEnabled: false });
+            renderMemberCharacterRows(rows);
+            const inputs = container.querySelectorAll('.member-character-ign');
+            inputs[inputs.length - 1]?.focus();
+        }
+        function collectMemberCharacterRows() {
+            return [...(document.querySelectorAll('#member-character-editor [data-member-character-row]'))].map(row => ({
+                name: String(row.querySelector('.member-character-ign')?.value || '').trim().slice(0, 40),
+                job: String(row.querySelector('.member-character-job')?.value || ''),
+                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked
+            })).filter(profile => profile.name);
         }
         function renderMemberDirectory() {
             const list = document.getElementById('member-directory-list'); if (!list) return;
             const query = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
             const all = getMemberDirectoryView();
-            const members = all.filter(member => [member.name, member.note || '', ...(member.characters || [])].join(' ').toLowerCase().includes(query));
+            const members = all.filter(member => [member.name, member.note || '', ...(member.characters || []), ...(member.characterProfiles || []).map(profile => `${profile.job} ${profile.trackerEnabled ? 'tracking' : 'directory'}`)].join(' ').toLowerCase().includes(query));
             const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
-            const independentCount = members.filter(member => !member.inTracker).length;
+            const trackingCount = members.reduce((sum, member) => sum + (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length, 0);
             const count = document.getElementById('member-directory-count');
-            if (count) count.textContent = `${members.length} members · ${characterCount} listed characters · ${independentCount} directory-only`;
+            if (count) count.textContent = `${members.length} members · ${characterCount} characters · ${trackingCount} opted in to Tracker / Team Builder`;
             list.innerHTML = members.length ? members.map(member => {
-                const ownerKey = String(member.name || '').trim().toLowerCase();
-                const trackerRoster = getRosters().find(roster => String(roster.name || '').trim().toLowerCase() === ownerKey);
-                const trackedNames = new Set((trackerRoster?.characters || []).map(name => String(name).trim().toLowerCase()));
-                const characterChips = member.characters.map(name => {
-                    const tracked = trackedNames.has(String(name).trim().toLowerCase());
+                const characterChips = (member.characterProfiles || []).map(profile => {
+                    const tracked = profile.trackerEnabled;
                     const status = tracked ? 'TRACKING' : 'DIRECTORY';
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
-                    const title = tracked ? 'Remove from Member Roster and unregister from Tracker / Team Builder' : 'Remove directory-only character';
-                    return `<span class="member-directory-char"><span class="member-directory-char-label">${escapeHTML(name)}</span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(name)}" data-member-owner="${escapeHTML(member.name)}" title="${title}" aria-label="Remove ${escapeHTML(name)} from ${escapeHTML(member.name)}">×</button></span>`;
+                    const jobLabel = profile.job || 'Class not set';
+                    const title = `${profile.name} · ${jobLabel} · ${tracked ? 'Included in Tracker and Team Builder' : 'Directory only'}`;
+                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} <small style="color:#8f9aaf;">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
-                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Tracker roster' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${member.recordId ? 'Edit' : 'Add details'}</button>${member.recordId ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId)}" title="Remove this directory entry; registered tracker owners will remain listed">Remove entry</button>` : ''}</div></div><div class="member-directory-chars-title">Characters / aliases</div>${member.characters.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed. Add a character here without automatically registering it for Tracker or Team Builder.</div>'}</article>`;
-            }).join('') : '<div class="member-directory-empty">No members match that search. Add a member above; characters are optional.</div>';
+                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracking characters' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">Edit member</button><button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button></div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
+            }).join('') : '<div class="member-directory-empty">No members match that search. Add a member above; character entries are optional.</div>';
         }
         function resetMemberDirectoryForm() {
             editingMemberDirectoryId = null;
@@ -4518,128 +4772,104 @@
             document.getElementById('member-directory-form-title').textContent = 'Add a guild member';
             document.getElementById('member-directory-submit').textContent = 'Add member';
             document.getElementById('member-directory-cancel').hidden = true;
+            renderMemberCharacterRows([]);
         }
         function startMemberDirectoryEdit(name, recordId = '') {
             const view = getMemberDirectoryView().find(member => member.name.toLowerCase() === String(name).toLowerCase());
-            const record = recordId ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.id === recordId) : null;
+            const record = recordId ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.id === recordId) : view;
             if (!view) return;
-            editingMemberDirectoryId = record?.id || null;
+            editingMemberDirectoryId = record?.id || view.id || null;
             editingMemberDirectoryOriginalName = view.name;
             document.getElementById('member-directory-name').value = record?.name || view.name;
-            document.getElementById('member-directory-characters').value = (record?.characters || []).join(', ');
             document.getElementById('member-directory-note').value = record?.note || view.note || '';
-            document.getElementById('member-directory-form-title').textContent = record ? 'Edit member details' : 'Add details for ' + view.name;
-            document.getElementById('member-directory-submit').textContent = record ? 'Save changes' : 'Add details';
+            renderMemberCharacterRows(record?.characterProfiles || view.characterProfiles || []);
+            document.getElementById('member-directory-form-title').textContent = 'Edit member and character registrations';
+            document.getElementById('member-directory-submit').textContent = 'Save changes';
             document.getElementById('member-directory-cancel').hidden = false;
-            document.getElementById('member-directory-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('member-directory-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         async function addMemberDirectoryCharacter(ownerName) {
-            const ownerKey = String(ownerName || '').trim().toLowerCase();
-            const view = getMemberDirectoryView().find(member => member.name.trim().toLowerCase() === ownerKey);
+            const view = getMemberDirectoryView().find(member => member.name.trim().toLowerCase() === String(ownerName || '').trim().toLowerCase());
             if (!view) return alert('That member is no longer in the roster. Refresh and try again.');
-            const answer = prompt(`Add a directory-only character / alias for ${view.name}. It will not enter Tracker or Team Builder until separately registered.
-
-Character name:`);
-            if (answer === null) return;
-            const characterName = answer.trim().slice(0, 40);
-            if (!characterName) return;
-            if (view.characters.some(name => String(name).trim().toLowerCase() === characterName.toLowerCase())) return alert('That character is already listed for this member.');
-            if (hasCloudConfig() && !(await prepareGlobalChange(`Add character alias ${characterName} for ${view.name}`))) return;
-            const latestView = getMemberDirectoryView().find(member => member.name.trim().toLowerCase() === ownerKey);
-            if (!latestView) return alert('That member no longer exists. Refresh and try again.');
-            if (latestView.characters.some(name => String(name).trim().toLowerCase() === characterName.toLowerCase())) return alert('That character was already added on another device.');
-            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            let entry = entries.find(member => member.name.trim().toLowerCase() === ownerKey);
-            if (!entry) {
-                entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name: latestView.name, characters: [], note: latestView.note || '' };
-                entries.push(entry);
-            }
-            if (entry.characters.length >= 100) return alert('This member already has the maximum of 100 directory characters.');
-            entry.characters = [...entry.characters, characterName];
-            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-            cloudData.settings.memberDirectoryUpdatedAt = Date.now();
-            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
-            cloudData.updatedAt = Date.now();
-            triggerAutoSync();
-            renderMemberDirectory();
+            startMemberDirectoryEdit(view.name, view.recordId || view.id);
+            addMemberCharacterRow();
         }
-
         async function removeMemberDirectoryCharacter(ownerName, characterName) {
             const ownerKey = String(ownerName || '').trim().toLowerCase();
             const charKey = String(characterName || '').trim().toLowerCase();
-            const initialRoster = getRosters().find(roster => String(roster.name || '').trim().toLowerCase() === ownerKey && (roster.characters || []).some(name => String(name).trim().toLowerCase() === charKey));
-            if (initialRoster) {
-                const exactName = initialRoster.characters.find(name => String(name).trim().toLowerCase() === charKey);
-                if (!confirm(`Remove ${exactName} from ${initialRoster.name}? This unregisters the character from Tracker and Team Builder and removes its Job assignment. The member will remain in Member Roster.`)) return;
-                if (hasCloudConfig() && !(await prepareGlobalChange(`Remove tracked character ${exactName} from ${initialRoster.name}`))) return;
-                const roster = findRoster(initialRoster.id);
-                if (!roster) return alert('That Tracker roster no longer exists. Refresh and try again.');
-                const latestName = roster.characters.find(name => String(name).trim().toLowerCase() === charKey);
-                if (!latestName) return alert('That character was already removed on another device. Refresh the roster.');
-                roster.characters = roster.characters.filter(name => String(name).trim().toLowerCase() !== charKey);
-                delete cloudData.settings.characterJobs[latestName];
-                touchRosterSettings();
-                // If this name was also explicitly listed as an alias, remove that duplicate too.
-                const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-                const directoryEntry = entries.find(member => member.name.trim().toLowerCase() === ownerKey);
-                if (directoryEntry) {
-                    directoryEntry.characters = directoryEntry.characters.filter(name => String(name).trim().toLowerCase() !== charKey);
-                    cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-                    cloudData.settings.memberDirectoryUpdatedAt = Date.now();
-                    cloudData.settings.memberDirectoryUpdatedBy = deviceId;
-                }
-                cloudData.updatedAt = Date.now();
-                refreshTrackerUI();
-                triggerAutoSync();
-                return;
-            }
             const initialEntries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const initialEntry = initialEntries.find(member => member.name.trim().toLowerCase() === ownerKey);
-            const initialAlias = initialEntry?.characters.find(name => String(name).trim().toLowerCase() === charKey);
-            if (!initialEntry || !initialAlias) return alert('That character is no longer an editable directory-only entry. Refresh and try again.');
-            if (!confirm(`Remove ${initialAlias} from ${initialEntry.name}'s Member Roster? This removes only the directory entry and does not change any other member's Tracker registration.`)) return;
-            if (hasCloudConfig() && !(await prepareGlobalChange(`Remove directory character ${initialAlias} from ${initialEntry.name}`))) return;
+            const initialProfile = initialEntry?.characterProfiles.find(profile => profile.name.trim().toLowerCase() === charKey);
+            if (!initialEntry || !initialProfile) return alert('That character is no longer in Member Roster. Refresh and try again.');
+            if (!confirm(`Remove ${initialProfile.name} from ${initialEntry.name}'s Member Roster? If opted in, this also removes it from Tracker and Team Builder. The member will remain listed.`)) return;
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Remove character ${initialProfile.name} from member ${initialEntry.name}`))) return;
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const entry = entries.find(member => member.name.trim().toLowerCase() === ownerKey);
-            if (!entry || !entry.characters.some(name => String(name).trim().toLowerCase() === charKey)) return alert('That character was already removed on another device. Refresh the roster.');
-            entry.characters = entry.characters.filter(name => String(name).trim().toLowerCase() !== charKey);
+            const entry = entries.find(member => member.id === initialEntry.id);
+            if (!entry || !entry.characterProfiles.some(profile => profile.name.trim().toLowerCase() === charKey)) return alert('That character was already removed on another device. Refresh the roster.');
+            const removed = entry.characterProfiles.find(profile => profile.name.trim().toLowerCase() === charKey);
+            entry.characters = entry.characters.filter(name => name.trim().toLowerCase() !== charKey);
+            entry.characterProfiles = entry.characterProfiles.filter(profile => profile.name.trim().toLowerCase() !== charKey);
+            if (removed) {
+                const stillExists = entries.some(member => member.characterProfiles.some(profile => profile.name.trim().toLowerCase() === charKey));
+                if (!stillExists) delete cloudData.settings.characterJobs[removed.name];
+            }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-            cloudData.settings.memberDirectoryUpdatedAt = Date.now();
-            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
-            cloudData.updatedAt = Date.now();
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            refreshTrackerUI();
             triggerAutoSync();
-            renderMemberDirectory();
         }
-
         async function saveMemberDirectoryForm(event) {
             event.preventDefault();
             const name = document.getElementById('member-directory-name').value.trim().slice(0, 60);
-            const characters = [...new Set(document.getElementById('member-directory-characters').value.split(/[,;\n]/).map(value => value.trim().slice(0, 40)).filter(Boolean))];
+            const profiles = collectMemberCharacterRows();
             const note = document.getElementById('member-directory-note').value.trim().slice(0, 160);
             if (!name) return alert('Enter a member or owner name.');
-            if (hasCloudConfig() && !(await prepareGlobalChange(`${editingMemberDirectoryId ? 'Update' : 'Add'} member directory entry: ${name}`))) return;
+            const localNames = new Set();
+            for (const profile of profiles) {
+                const key = profile.name.toLowerCase();
+                if (localNames.has(key)) return alert(`The IGN ${profile.name} appears more than once. Each character must be listed only once.`);
+                localNames.add(key);
+                if (!JOB_ORDER.includes(profile.job)) return alert(`Choose a Class / Job for ${profile.name}.`);
+            }
+            if (hasCloudConfig() && !(await prepareGlobalChange(`${editingMemberDirectoryId ? 'Update' : 'Add'} member roster entry: ${name}`))) return;
+            ensureMemberRosterMaster(cloudData);
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const sameName = entries.find(member => member.name.toLowerCase() === name.toLowerCase() && member.id !== editingMemberDirectoryId);
-            if (sameName) return alert('That member already has a directory entry. Edit the existing entry instead.');
+            if (sameName) return alert('That member already has a Member Roster entry. Edit the existing member instead.');
+            const otherMembers = entries.filter(member => member.id !== editingMemberDirectoryId);
+            const existingNames = new Set(otherMembers.flatMap(member => member.characters.map(character => character.toLowerCase())));
+            const duplicateCharacter = profiles.find(profile => existingNames.has(profile.name.toLowerCase()));
+            if (duplicateCharacter) return alert(`The IGN ${duplicateCharacter.name} is already assigned to another Member Roster entry. Remove the duplicate or edit the existing owner first.`);
             const previousOwnerName = editingMemberDirectoryOriginalName.trim();
-            const matchingTrackerOwner = previousOwnerName ? getRosters().find(group => group.name.trim().toLowerCase() === previousOwnerName.toLowerCase()) : null;
-            if (matchingTrackerOwner && matchingTrackerOwner.name.toLowerCase() !== name.toLowerCase()) {
-                const duplicateTrackerOwner = getRosters().find(group => group.id !== matchingTrackerOwner.id && group.name.trim().toLowerCase() === name.toLowerCase());
-                if (duplicateTrackerOwner) return alert('A tracker roster already uses that owner name. Rename one owner first.');
-                matchingTrackerOwner.name = name.slice(0,30);
-                touchRosterSettings();
-            }
+            let entry;
             if (editingMemberDirectoryId) {
                 const index = entries.findIndex(item => item.id === editingMemberDirectoryId);
-                if (index < 0) return alert('That directory entry no longer exists. Refresh the page and try again.');
-                entries[index] = { ...entries[index], name, characters, note };
+                if (index < 0) return alert('That member no longer exists. Refresh the page and try again.');
+                entry = { ...entries[index], name, characters: profiles.map(profile => profile.name), characterProfiles: profiles, note };
+                entries[index] = entry;
             } else {
-                entries.push({ id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters, note });
+                entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: profiles.map(profile => profile.name), characterProfiles: profiles, trackerRosterId: '', color: '#7aa2f7', note };
+                entries.push(entry);
             }
+            // Keep class selections in the shared Job map. The master profile stores opt-in state;
+            // the Tracker roster is only a projection of checked character profiles.
+            const currentProfileNames = new Set(profiles.map(profile => profile.name.toLowerCase()));
+            if (previousOwnerName) {
+                const previous = entries.find(item => item.id === editingMemberDirectoryId);
+                const oldRoster = getRosters().find(roster => roster.name.trim().toLowerCase() === previousOwnerName.toLowerCase());
+                if (oldRoster && previous) { previous.trackerRosterId = oldRoster.id; previous.color = oldRoster.color; }
+            }
+            profiles.forEach(profile => { cloudData.settings.characterJobs[profile.name] = { job: profile.job, updatedAt: Date.now(), deviceId }; });
+            const remainingProfiles = entries.flatMap(member => member.characterProfiles || []);
+            Object.keys(cloudData.settings.characterJobs).forEach(characterName => {
+                const stillPresent = remainingProfiles.some(profile => profile.name.toLowerCase() === characterName.toLowerCase());
+                if (!stillPresent) delete cloudData.settings.characterJobs[characterName];
+            });
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-            cloudData.settings.memberDirectoryUpdatedAt = Date.now();
-            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
-            cloudData.updatedAt = Date.now();
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            refreshTrackerUI();
             triggerAutoSync();
             resetMemberDirectoryForm();
             renderMemberDirectory();
@@ -4647,15 +4877,25 @@ Character name:`);
         async function removeMemberDirectoryEntry(id) {
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.id === id);
-            if (!member || !confirm(`Remove ${member.name} from the member directory? If they have registered tracker characters, that tracker roster will still appear here.`)) return;
-            if (hasCloudConfig() && !(await prepareGlobalChange(`Remove member directory entry: ${member.name}`))) return;
+            if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any opted-in characters will also be removed from Tracker and Team Builder.`)) return;
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Remove member and characters: ${member.name}`))) return;
             cloudData.settings.memberDirectory = entries.filter(item => item.id !== id);
-            cloudData.settings.memberDirectoryUpdatedAt = Date.now();
-            cloudData.settings.memberDirectoryUpdatedBy = deviceId;
-            cloudData.updatedAt = Date.now();
+            const remaining = cloudData.settings.memberDirectory.flatMap(item => item.characterProfiles || []);
+            member.characters.forEach(characterName => { if (!remaining.some(profile => profile.name.toLowerCase() === characterName.toLowerCase())) delete cloudData.settings.characterJobs[characterName]; });
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            refreshTrackerUI();
             triggerAutoSync();
             renderMemberDirectory();
         }
+        document.getElementById('member-character-editor')?.addEventListener('click', event => {
+            const remove = event.target.closest('[data-remove-member-character-row]');
+            if (!remove) return;
+            const row = remove.closest('[data-member-character-row]');
+            const container = document.getElementById('member-character-editor');
+            if (row) row.remove();
+            if (container && !container.querySelector('[data-member-character-row]')) renderMemberCharacterRows([]);
+        });
         document.getElementById('member-directory-list')?.addEventListener('click', event => {
             const addCharacter = event.target.closest('[data-member-add-character]');
             if (addCharacter) { addMemberDirectoryCharacter(addCharacter.dataset.memberAddCharacter); return; }
@@ -4669,7 +4909,7 @@ Character name:`);
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.4.5';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.0';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -4862,12 +5102,12 @@ Character name:`);
             else showAppPage('tracker');
         }
 
-        function loadCloudForm() { const c = getCloudConfig(); document.getElementById('cloud-bin-id').value = c.binId; document.getElementById('cloud-api-key').value = c.apiKey; }
-        function showCloudMessage(msg, isErr = false) { const el = document.getElementById('cloud-modal-message'); el.style.display = 'block'; el.style.borderLeftColor = isErr ? '#c45858' : '#4f7cac'; el.textContent = msg; }
-        function saveCloudSettings(con = false) { const c = { binId: document.getElementById('cloud-bin-id').value.trim(), apiKey: document.getElementById('cloud-api-key').value.trim() }; if (!c.binId || !c.apiKey) return showCloudMessage('Enter both ID and Key.', true); localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(c)); showCloudMessage('Saved. Connecting...'); if (con) forceSync(true); }
-        async function createNewCloudBin() { const key = document.getElementById('cloud-api-key').value.trim(); if (!key) return showCloudMessage('Paste API key first.', true); showCloudMessage('Creating...'); try { const res = await fetch(`${JSONBIN_ROOT}/b`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'true', 'X-Bin-Name': 'Pantheon DN Tracker', ...authHeaders({binId:'', apiKey:key}) }, body: JSON.stringify(fitCandidateUnderFreeLimit(cloudData)) }); if (!res.ok) throw new Error(`Create failed (${res.status})`); const id = (await res.json()).metadata?.id; document.getElementById('cloud-bin-id').value = id; localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ binId: id, apiKey: key })); showCloudMessage(`Created. ID: ${id}`); await forceSync(true); } catch (e) { showCloudMessage(e.message, true); } }
-        function clearCloudSettings() { if (!confirm('Remove cloud settings?')) return; localStorage.removeItem(CLOUD_CONFIG_KEY); loadCloudForm(); setStatus('⚪ Local mode'); showCloudMessage('Cleared.'); }
-        function openCloudModal() { loadCloudForm(); document.getElementById('cloud-modal-message').style.display = 'none'; openModal('cloud-modal'); }
+        function loadCloudForm() { /* Cloudflare authentication and D1 bindings are centrally managed. */ }
+        function showCloudMessage(msg, isErr = false) { const el = document.getElementById('cloud-modal-message'); if(!el)return; el.style.display = 'block'; el.style.borderLeftColor = isErr ? '#c45858' : '#4f7cac'; el.textContent = msg; }
+        function saveCloudSettings() { showCloudMessage('Cloud sync is configured by Pantheon administrators and cannot be changed per device.', true); }
+        async function createNewCloudBin() { showCloudMessage('The shared D1 record is managed by Pantheon administrators.', true); }
+        function clearCloudSettings() { showCloudMessage('Per-device cloud settings are disabled. Sign in with Discord to sync.', true); }
+        function openCloudModal() { const el=document.getElementById('cloud-modal-message'); if(el)el.style.display='none'; openModal('cloud-modal'); }
         function openHelpModal(topic = 'start') {
             showHelpTopic(topic);
             openModal('help-modal');
