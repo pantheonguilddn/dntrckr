@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon · Access & Migration</title>
+<title>Pantheon Tools · Admin Console</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1020;--surface:#111a2d;--surface2:#1b2742;--border:#2a3857;--text:#eef2ff;--muted:#a7b4d0;--accent:#8d9aff;--good:#57d6a4;--danger:#ff8796}
 :root[data-pantheon-theme="light"]{color-scheme:light;--bg:#f4f6fb;--surface:#fff;--surface2:#edf1f8;--border:#dce2ec;--text:#1a2230;--muted:#657187;--accent:#5265d7;--good:#087e65;--danger:#b93852}
@@ -29,7 +29,7 @@ html[data-pantheon-theme] .btn.danger{color:var(--danger);border-color:var(--bor
 
 
 
-/* Pantheon Tools v1.5.8 — matching administrator console styling. */
+/* Pantheon Tools v1.5.9 — matching administrator console styling. */
 html{min-height:100%;background:var(--bg)}
 body{min-height:100vh;background:radial-gradient(ellipse at 15% 3%,rgba(82,103,217,.20),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(87,214,164,.09),transparent 38%),var(--bg);padding:22px 0 48px}
 html[data-pantheon-theme="light"] body{background:radial-gradient(ellipse at 10% 0%,rgba(82,101,215,.10),transparent 42%),var(--bg)}
@@ -66,34 +66,96 @@ main>p{max-width:850px;color:var(--muted);line-height:1.75;margin-bottom:22px}
 
 </style>
 <script>try{document.documentElement.setAttribute('data-pantheon-theme',localStorage.getItem('pantheon-theme-choice-v1')||'dark')}catch(_){document.documentElement.setAttribute('data-pantheon-theme','dark')}</script>
+<style id="admin-character-styles">
+.character-admin-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.character-owner-card{padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);margin:10px 0}.character-owner-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.character-owner-head h3{font-size:13px;margin:0}.character-owner-head small{display:block;color:var(--muted);font-size:10px;font-weight:500;margin-top:3px}.admin-character-rows{display:grid;gap:8px}.admin-character-row{display:grid;grid-template-columns:minmax(130px,1.2fr) minmax(135px,1fr) auto auto auto;align-items:end;gap:8px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}.admin-character-row .field{min-width:0}.admin-character-row .field input,.admin-character-row .field select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;min-height:38px;padding:8px;font:12px inherit;letter-spacing:normal;text-transform:none}.admin-main-choice,.admin-track-choice{display:flex;align-items:center;gap:6px;color:var(--text);font-size:10px;font-weight:800;white-space:nowrap;min-height:38px}.admin-main-choice input,.admin-track-choice input{accent-color:var(--accent)}.admin-remove-character{border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--danger);padding:8px 10px;font-weight:900;cursor:pointer;min-height:38px}.character-admin-status{margin:10px 0;padding:10px 12px;border-left:3px solid var(--accent);border-radius:6px;background:var(--surface2);color:var(--text);font-size:11px;white-space:pre-wrap}.character-admin-empty{padding:12px;color:var(--muted);font-size:11px}@media(max-width:760px){.admin-character-row{grid-template-columns:1fr 1fr}.admin-character-row .field:first-child{grid-column:1/-1}.admin-main-choice,.admin-track-choice{min-height:32px}.admin-remove-character{grid-column:1/-1}}
+</style>
 </head>
 <body>
 <main>
 <header><a class="brand admin-home-link" href="/" aria-label="Return to Pantheon Overview"><span>Pantheon Tools<small>Dragon Nest - Classic SEA [Guild Operations]</small></span></a><div class="admin-header-actions"><label class="pantheon-theme-control" for="pantheon-admin-theme-select"><span>Appearance</span><select id="pantheon-admin-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label><a class="toplink" href="/">← Back to Pantheon</a></div></header>
 <div id="auth-status" class="status">Checking your Pantheon administrator session…</div>
 <div id="admin-content" class="hidden">
-  <div class="kicker">Account access</div><h1>Access & Migration</h1><p>Only administrators can manage the permitted Discord account list or import the previous JSONBin records. Do not share the old JSONBin master key; it is used only for the one-time import form and is not saved by this page.</p>
+  <div class="kicker">Guild administration</div><h1>Pantheon Admin Console</h1><p>Manage approved Discord accounts, character registrations and Main designations, and the one-time JSONBin migration. Do not share the old JSONBin master key; it is used only for the one-time import form and is not saved by this page.</p>
   <section class="card">
     <h2>1. Add an approved Discord account</h2><p>Use the account's numeric Discord user ID, not a username. The member does not need to configure cloud sync after being allowlisted.</p>
     <form id="allowlist-form"><div class="grid"><label class="field">Discord user ID<input id="discord-id" inputmode="numeric" pattern="[0-9]{17,20}" placeholder="17–20 digit ID" required></label><label class="field">Roster match name (optional)<input id="discord-label" maxlength="100" placeholder="Exact Member Roster owner name"></label></div><div class="actions"><button class="btn primary" type="submit">Add / enable account</button><button class="btn" type="button" id="refresh-list">Refresh list</button></div></form>
     <div id="allowlist-status" class="status hidden"></div><div id="allowlist-list" class="list"></div>
     <p class="hint">Pantheon normally matches a Discord profile name to the same-named Member Roster owner automatically. Use Roster match name only if those names differ; enter the exact owner name once. To copy a Discord ID, enable User Settings → Advanced → Developer Mode, then right-click the user's profile and choose Copy User ID.</p>
   </section>
+  <section class="card" id="character-admin-panel">
+    <h2>2. Character registration &amp; Main designation</h2>
+    <p>Admin-only controls for every member’s registered IGNs, class / job, tracking opt-in, and Main designation. Changing a registration requires that member to confirm their details again at their next login.</p>
+    <div class="character-admin-toolbar"><button class="btn" type="button" id="refresh-character-list">Refresh character registrations</button><span class="hint" id="character-admin-count">Loading registrations…</span></div>
+    <div id="character-admin-status" class="character-admin-status hidden"></div>
+    <div id="character-admin-list" class="list"></div>
+  </section>
   <section class="card">
-    <h2>2. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
+    <h2>3. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
     <form id="migration-form"><div class="grid"><label class="field">Existing main JSONBin ID<input id="old-bin-id" autocomplete="off" placeholder="Existing tracker Bin ID" required></label><label class="field">Existing JSONBin Master Key<input id="old-bin-key" type="password" autocomplete="off" placeholder="Used for this import only" required></label></div><label class="checkbox-line"><input type="checkbox" id="confirm-migration" required><span>I understand this imports the selected main record into Pantheon D1 and overwrites the new Pantheon main record if it already exists.</span></label><div class="actions"><button class="btn primary" type="submit">Import main record and revision journal</button></div></form>
     <div id="migration-status" class="status hidden"></div>
   </section>
   <section class="card">
-    <h2>3. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
+    <h2>4. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
   </section>
 </div>
 </main>
 <script>
 const $ = id => document.getElementById(id);
+const ADMIN_JOBS = ["Adept", "Physician", "Gear Master", "Shooting Star", "Sniper", "Artillery", "Wind Walker", "Tempest", "Light Fury", "Abyss Walker", "Raven", "Ripper", "Saint", "Inquisitor", "Crusader", "Guardian", "Spirit Dancer", "Blade Dancer", "Dark Summoner", "Soul Eater", "Saleana", "Elestra", "Majesty", "Smasher", "Gladiator", "Moonlord", "Barbarian", "Destroyer", "Dark Avenger"];
+let adminCharacterMembers = [];
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function characterJobOptions(selected=''){
+  const current=String(selected||'');
+  let html='<option value="">Choose class / job</option>';
+  if(current&&!ADMIN_JOBS.includes(current))html+=`<option value="${escapeHtml(current)}" selected>${escapeHtml(current)} (legacy)</option>`;
+  return html+ADMIN_JOBS.map(job=>`<option value="${escapeHtml(job)}" ${job===current?'selected':''}>${escapeHtml(job)}</option>`).join('');
+}
+function adminCharacterRow(profile={},memberId=''){
+  return `<div class="admin-character-row" data-admin-character-row>
+    <label class="field">IGN<input data-admin-ign maxlength="40" value="${escapeHtml(profile.name||'')}" placeholder="In-game name"></label>
+    <label class="field">Class / Job<select data-admin-job>${characterJobOptions(profile.job||'')}</select></label>
+    <label class="admin-main-choice"><input type="radio" name="admin-main-${escapeHtml(memberId)}" data-admin-main ${profile.isMain?'checked':''}> Main</label>
+    <label class="admin-track-choice"><input type="checkbox" data-admin-tracking ${profile.trackerEnabled?'checked':''}> Track</label>
+    <button class="admin-remove-character" type="button" data-remove-admin-character aria-label="Remove character">×</button>
+  </div>`;
+}
+function renderCharacterAdmin(){
+  const list=$('character-admin-list');
+  $('character-admin-count').textContent=`${adminCharacterMembers.length} member records`;
+  if(!adminCharacterMembers.length){list.innerHTML='<div class="character-admin-empty">No member registrations are in the shared record yet.</div>';return;}
+  list.innerHTML=adminCharacterMembers.map(member=>`<article class="character-owner-card" data-admin-owner-card="${escapeHtml(member.id)}">
+    <div class="character-owner-head"><div><h3>${escapeHtml(member.name)}</h3><small>${(member.characterProfiles||[]).length} registered character(s) · owner ID: ${escapeHtml(member.id)}</small></div><div class="actions" style="margin:0"><button class="btn" type="button" data-add-admin-character>＋ Add character</button><button class="btn primary" type="button" data-save-admin-characters>Save registration</button></div></div>
+    <div class="admin-character-rows" data-admin-character-rows>${(member.characterProfiles||[]).map(profile=>adminCharacterRow(profile,member.id)).join('')}</div>
+  </article>`).join('');
+}
+async function refreshCharacterAdmin(){
+  try{const data=await api('/api/admin/characters');adminCharacterMembers=Array.isArray(data.members)?data.members:[];renderCharacterAdmin();setStatus('character-admin-status','Character registrations loaded. Changes are saved directly to the shared guild record.','ok');}
+  catch(error){setStatus('character-admin-status',error.message,'error');}
+}
+function collectAdminCharacters(card){
+  const rows=[...card.querySelectorAll('[data-admin-character-row]')];
+  return rows.map(row=>({name:row.querySelector('[data-admin-ign]')?.value.trim()||'',job:row.querySelector('[data-admin-job]')?.value||'',isMain:!!row.querySelector('[data-admin-main]')?.checked,trackerEnabled:!!row.querySelector('[data-admin-tracking]')?.checked})).filter(profile=>profile.name);
+}
+$('character-admin-list')?.addEventListener('click',async event=>{
+  const card=event.target.closest('[data-admin-owner-card]');if(!card)return;
+  if(event.target.closest('[data-add-admin-character]')){card.querySelector('[data-admin-character-rows]').insertAdjacentHTML('beforeend',adminCharacterRow({},card.dataset.adminOwnerCard));return;}
+  if(event.target.closest('[data-remove-admin-character]')){event.target.closest('[data-admin-character-row]')?.remove();return;}
+  if(event.target.closest('[data-save-admin-characters]')){
+    const button=event.target.closest('[data-save-admin-characters]');button.disabled=true;
+    try{
+      const profiles=collectAdminCharacters(card);
+      if(profiles.some(profile=>!profile.job))throw new Error('Every character needs a Class / Job.');
+      if(profiles.length&&profiles.filter(profile=>profile.isMain).length!==1)throw new Error('Choose exactly one Main character for this member.');
+      const duplicate=profiles.find((p,i)=>profiles.findIndex(q=>q.name.toLocaleLowerCase()===p.name.toLocaleLowerCase())!==i);if(duplicate)throw new Error(`Duplicate IGN: ${duplicate.name}.`);
+      const data=await api('/api/admin/characters',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId:card.dataset.adminOwnerCard,characterProfiles:profiles})});
+      adminCharacterMembers=Array.isArray(data.members)?data.members:adminCharacterMembers;renderCharacterAdmin();setStatus('character-admin-status',`Saved ${data.memberName}'s character registration. If the Main designation or character details changed, the member will be asked to confirm them at the next login.`,'ok');
+    }catch(error){setStatus('character-admin-status',error.message,'error');}finally{button.disabled=false;}
+  }
+});
+$('refresh-character-list')?.addEventListener('click',refreshCharacterAdmin);
 function setStatus(id, text, kind=''){const el=$(id);el.textContent=text;el.className='status'+(kind?' '+kind:'');el.classList.remove('hidden');}
 async function api(url, options={}){const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||data.message||`Request failed (${response.status})`);return data;}
-async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
+async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
 async function refreshAllowlist(){try{const data=await api('/api/admin/allowlist');const list=$('allowlist-list');list.replaceChildren();if(!data.users?.length){list.textContent='No approved accounts yet.';return;}for(const user of data.users){const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=user.label||user.discord_id;const meta=document.createElement('small');meta.textContent=`${user.discord_id} · ${user.enabled?'Enabled':'Disabled'} · added by ${user.created_by||'system'}`;info.append(name,meta);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='7px';const badge=document.createElement('span');badge.className='badge';badge.textContent=user.role==='admin'?'ADMIN':'MEMBER';right.append(badge);if(user.enabled && user.role!=='admin'){const button=document.createElement('button');button.className='btn danger';button.type='button';button.textContent='Revoke';button.addEventListener('click',async()=>{if(!confirm(`Revoke access for ${user.label||user.discord_id}?`))return;try{await api('/api/admin/allowlist?discordId='+encodeURIComponent(user.discord_id),{method:'DELETE'});setStatus('allowlist-status',`Access revoked for ${user.discord_id}.`,'ok');await refreshAllowlist();}catch(error){setStatus('allowlist-status',error.message,'error');}});right.append(button);}row.append(info,right);list.append(row);}}catch(error){setStatus('allowlist-status',error.message,'error');}}
 $('allowlist-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;try{const data=await api('/api/admin/allowlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discordId:$('discord-id').value.trim(),label:$('discord-label').value.trim()})});setStatus('allowlist-status',`Approved Discord account ${data.discordId}.`,'ok');$('allowlist-form').reset();await refreshAllowlist();}catch(error){setStatus('allowlist-status',error.message,'error');}finally{button.disabled=false;}});
 $('refresh-list').addEventListener('click',refreshAllowlist);

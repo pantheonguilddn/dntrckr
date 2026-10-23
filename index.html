@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.8</title>
+    <title>Pantheon Tools v1.5.9</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1600,6 +1600,20 @@
     try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
     catch (_) { document.documentElement.setAttribute('data-pantheon-theme', 'dark'); }
     </script>
+
+<style id="pantheon-v159-styles">
+/* v1.5.9: the radio Main designation adds a control; keep editor rows stable across widths. */
+.member-character-row { grid-template-columns:minmax(130px,1.05fr) minmax(150px,.95fr) minmax(118px,auto) minmax(175px,1fr) 34px !important; }
+.member-character-main { display:flex !important; flex-direction:row !important; align-items:center !important; min-height:34px; }
+@media (max-width:1100px) { .member-character-row { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+@media (max-width:640px) { .member-character-row { grid-template-columns:1fr !important; } }
+#tracker-toolbar[hidden],#tracker-table-wrap[hidden],#tracker-analytics-header[hidden],#analytics-grid[hidden],.tracker-reset-note[hidden],#tracker-empty-state[hidden],#profile-confirm-submit[hidden],#profile-confirm-register[hidden],#profile-confirm-warning[hidden]{display:none!important}
+#drawer-admin-console[hidden],.drawer-item[hidden]{display:none!important}
+.tracker-reset-note{margin-top:8px;padding:12px 14px;border:1px solid var(--pt-border);border-radius:10px;background:var(--pt-surface);color:var(--pt-muted);font-size:.78rem;line-height:1.55}
+.tracker-empty-state{width:min(820px,100%);margin:22px auto 30px;padding:clamp(24px,5vw,42px);border:1px solid var(--pt-border);border-radius:18px;background:var(--pt-surface);color:var(--pt-text);text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.07)}
+.tracker-empty-state[hidden]{display:none!important}.tracker-empty-icon{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 15px;border-radius:18px;background:var(--pt-surface-soft);font-size:28px}.tracker-empty-state h2{margin:0 0 8px;color:var(--pt-text);font-size:1.25rem}.tracker-empty-state p{max-width:540px;margin:0 auto 20px;color:var(--pt-muted);font-size:.88rem}.tracker-empty-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.tracker-empty-actions .btn{min-height:42px}.profile-confirm-modal{max-width:760px}.profile-confirm-kicker{font-size:.66rem;letter-spacing:.16em;font-weight:900;color:var(--pt-accent);margin-bottom:8px}.profile-confirm-characters{display:grid;gap:8px;margin:14px 0}.profile-confirm-character{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--pt-border);border-radius:10px;background:var(--pt-surface-soft);color:var(--pt-text)}.profile-confirm-character strong{font-size:.86rem}.profile-confirm-character small{display:block;color:var(--pt-muted);font-size:.74rem}.profile-confirm-main{font-size:.65rem;font-weight:900;padding:4px 8px;border-radius:999px;background:#385a48;color:#fff;white-space:nowrap}.profile-confirm-warning{color:var(--pt-warning,#9b5727)}.profile-confirm-actions{justify-content:flex-end;gap:8px;flex-wrap:wrap}.member-character-main{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;color:var(--pt-text);font-weight:750;white-space:nowrap}.member-character-main input{accent-color:var(--pt-accent)}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1681,14 +1695,14 @@
             <div class="drawer-section">
                 <div class="drawer-section-title">System</div>
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
-                <button class="drawer-item" type="button" onclick="window.open('/admin.html','_blank','noopener')"><span class="drawer-icon">☁</span><span><strong>Access & Migration</strong><small>Administrator tools</small></span></button>
+                <button class="drawer-item" id="drawer-admin-console" type="button" onclick="window.open('/admin.html','_blank','noopener')" hidden><span class="drawer-icon">⚙</span><span><strong>Admin Console</strong><small>Accounts &amp; character registrations</small></span></button>
                 <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Savepoints & undo global changes</small></span></button>
                 <button class="drawer-item" type="button" onclick="openLandingSettings()"><span class="drawer-icon">⌂</span><span><strong>Set Default Landing Page</strong><small>Change startup destination anytime</small></span></button>
             </div>
 
             <div class="drawer-section">
                 <div class="drawer-section-title">Manage</div>
-                <button class="drawer-item drawer-item-brown" type="button" onclick="openRegistrationPage()"><span class="drawer-icon">🧾</span><span><strong>Tracker Registration</strong><small>Add and organize characters</small></span></button>
+
                 <button class="drawer-item drawer-item-green" type="button" onclick="openDungeonPage()"><span class="drawer-icon">🏰</span><span><strong>Dungeon Registration</strong><small>Manage tracked content</small></span></button>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="openWeightsModal()"><span class="drawer-icon">🎁</span><span><strong>Loot Weights</strong><small>Adjust priority weighting</small></span></button>
             </div>
@@ -1751,11 +1765,21 @@
     </main>
 
     <main id="tracker-page" class="app-page hidden-page">
-    <div class="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
+    <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
         <button id="track-bounty-boards-btn" class="btn btn-secondary bounty-boards-toggle" type="button" aria-pressed="false" onclick="toggleBountyBoards()">Track Bounty Boards</button>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
+        <button id="tracker-add-characters-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()" hidden>＋ Add More Characters</button>
     </div>
-    <div class="table-responsive">
+    <section id="tracker-empty-state" class="tracker-empty-state hidden" aria-live="polite" hidden>
+        <div class="tracker-empty-icon" aria-hidden="true">📋</div>
+        <h2 id="tracker-empty-title">Your tracker is empty</h2>
+        <p id="tracker-empty-message">Register your characters to start tracking daily and weekly progress.</p>
+        <div class="tracker-empty-actions">
+            <button id="tracker-empty-start-btn" class="btn btn-cloud" type="button" onclick="startTrackingOwnCharacters()">Start Tracking Registered Characters</button>
+            <button id="tracker-empty-add-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()">＋ Add Characters</button>
+        </div>
+    </section>
+    <div class="table-responsive" id="tracker-table-wrap">
         <table id="dn-tracker">
             <colgroup id="table-colgroup"></colgroup>
             <thead>
@@ -1775,7 +1799,7 @@
         </table>
     </div>
 
-    <div style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
+    <div id="tracker-analytics-header" style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
         <h2 style="margin: 0;">📊 Roster Analytics <button class="mini-help" type="button" title="Analytics Guide" onclick="openHelpModal('analytics')">?</button></h2>
         <div style="display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:10px;">
             <label style="display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:#c7cad1;cursor:pointer;"><input id="analytics-tracking-enabled" type="checkbox" onchange="setAnalyticsTrackingEnabled(this.checked)" style="margin:0;"> Track weekly analytics (opt-in)</label>
@@ -1787,10 +1811,8 @@
     <div class="analytics-container" id="analytics-grid">
     </div>
 
-    <div class="dev-controls">
-        <span style="color: #666; font-size: 0.8rem; display: block; margin-bottom: 10px;">System Auto-Resets Weeklies at 9AM MNL.</span>
-        <button class="btn" style="background-color: #555; color: white;" onclick="manualDailyReset()">Force Daily Reset</button>
-        <button class="btn btn-danger" onclick="manualWeeklyReset()">Force Weekly Archive & Reset</button>
+    <div class="dev-controls tracker-reset-note" role="note">
+        <span>Daily boards reset automatically. Weekly progress resets every Saturday at 9:00 AM Manila time.</span>
     </div>
     </main>
 
@@ -1880,7 +1902,7 @@
         </div>
 
         <div class="team-builder-bottom">
-            <strong>How it works:</strong> Characters come from Tracker Registration. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
+            <strong>How it works:</strong> Characters come from Member Roster and are available after a member opts them into Tracker + Team Builder. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
         </div>
     </main>
 
@@ -1998,17 +2020,32 @@
         </div>
     </div>
 
+    <div class="modal-overlay hidden" id="profile-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="profile-confirm-title">
+        <div class="modal-card wide-modal profile-confirm-modal">
+            <div class="profile-confirm-kicker">MEMBER SETUP</div>
+            <h3 id="profile-confirm-title">Confirm Your Character Registration</h3>
+            <p id="profile-confirm-intro" class="modal-note">Before using the Tracker, register your characters and confirm which one is your Main.</p>
+            <div id="profile-confirm-characters" class="profile-confirm-characters"></div>
+            <div id="profile-confirm-warning" class="modal-note profile-confirm-warning" hidden></div>
+            <div class="modal-actions profile-confirm-actions">
+                <button id="profile-confirm-submit" class="btn btn-cloud" type="button" onclick="confirmOwnCharacterDetails()" hidden>Everything Is Correct</button>
+                <button id="profile-confirm-review" class="btn btn-secondary" type="button" onclick="reviewOwnCharacterDetails()">Review / Update Characters</button>
+                <button id="profile-confirm-register" class="btn btn-roster" type="button" onclick="registerOwnCharactersFromPrompt()">Register My Characters</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.8</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.9</span></div>
                 <ul>
 
-                    <li><strong>Account bar placement:</strong> removed the floating account rectangle; the signed-in name, role, Admin shortcut, and Log out button now live together in the existing Overview profile chip.</li>
-                    <li><strong>Reliable Personal View:</strong> the authenticated account's saved roster mapping is restored first, and both the view toggle and roster filter explicitly select that roster after data refreshes.</li>
-                    <li><strong>Discord avatar recovery:</strong> existing sessions that store a full Discord CDN avatar URL and new sessions that store the Discord avatar hash both render the real profile picture.</li>
-                    <li><strong>Contrast-safe Card Database:</strong> card numbers and stat badges use solid dark theme-aware fills with white numeric values in every appearance theme.</li>
-                    <li><strong>Readable Team Builder jobs:</strong> Job values render as high-contrast filled badges in Light, Dark, Eye comfort, and Pastel themes.</li>
+                    <li><strong>Member onboarding:</strong> first-time users must register characters or confirm their existing IGN, class, and Main designation before continuing.</li>
+                    <li><strong>Tracker empty state:</strong> members without active tracking see a clear empty state with actions to start tracking registered characters or add characters.</li>
+                    <li><strong>Admin character management:</strong> character registration controls have moved out of the drawer and into the administrator page, including a control to change each member’s Main character.</li>
+                    <li><strong>Release-note dismissal:</strong> the “until a new update” choice now stays dismissed when closing Salary Calculator or Help &amp; Guide.</li>
+                    <li><strong>Automatic resets:</strong> manual force-reset buttons were removed. The weekly Saturday 9:00 AM reset reminder remains visible.</li>
                 
                 </ul>
             </section>
@@ -2291,9 +2328,10 @@
                         <h5>Add members and characters</h5>
                         <p>Add a member, then use <b>Add Character</b> to enter each exact IGN, select its Class / Job, and decide whether it should be included in Tracker and Team Builder. Every character must have a class. Leave its opt-in checkbox unchecked to keep the IGN and class in the directory without creating a tracker entry.</p>
                         <p>Use <b>Edit member</b> to update the name, notes, character IGNs, classes, or opt-in settings. The per-character × button removes that character profile from the master directory; the member stays listed. Removing a character also removes its tracker entry and Team Builder eligibility.</p>
-                        <h5>Tracker registration</h5>
-                        <p>Checking <b>Include in Tracker + Team Builder</b> is the opt-in action. Unregistering a character from Tracker Registration keeps its IGN and class in Member Roster as directory-only. Re-enable it from Member Roster by checking the same box again.</p>
-                        <p>When Cloud is configured, member names, IGNs, classes, and opt-in states are shared with the guild. Card Database data and card batches are not part of that sync.</p>
+                        <h5>Enable personal tracking</h5>
+                        <p>Use the <b>Include in Tracker + Team Builder</b> checkbox for each of your own characters. A character left unchecked remains in your registration but will not appear in the Tracker or Team Builder. Use the empty-state action in Tracker to start tracking all registered characters, or use <b>Add More Characters</b> to extend your own registration.</p>
+                        <p>On first login, confirm that your IGN, Class / Job, and Main designation are accurate. Administrators manage guild-wide registration and can correct a Main designation when needed. If an administrator changes your registration, Pantheon asks you to confirm it again at your next login.</p>
+                        <p>When Cloud is configured, member names, IGNs, classes, Main designations, and opt-in states are shared with the guild. Card Database data and card batches are not part of that sync.</p>
                     </section>
                     <section class="help-topic" data-help-topic="team-builder">
                         <h4>Team Builder</h4>
@@ -2371,7 +2409,7 @@
         <div class="modal-card">
             <h3>☁️ Pantheon Cloud Sync</h3>
             <div class="modal-note">Cloud sync is managed automatically after you sign in with an approved Discord account. Members do not need a JSONBin ID, master key, or per-device cloud setup.</div>
-            <div class="modal-note">If shared data has not been migrated yet, ask a Pantheon administrator to open the Access & Migration page and import the existing guild record.</div>
+            <div class="modal-note">If shared data has not been migrated yet, ask a Pantheon administrator to open the Admin Console and import the existing guild record.</div>
             <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="closeModal('cloud-modal')">Close</button></div>
             <div id="cloud-modal-message" class="modal-note" style="display:none;"></div>
         </div>
@@ -2688,15 +2726,19 @@
                 if (!name || seen.has(key)) return null;
                 seen.add(key);
                 const rawCharacters = Array.isArray(member?.characters) ? member.characters : [];
-                const characters = [...new Set(rawCharacters.map(x => String(typeof x === 'object' ? (x?.name || x?.ign || '') : x || '').trim().slice(0, 40)).filter(Boolean))].slice(0, 100);
                 const rawProfiles = Array.isArray(member?.characterProfiles) ? member.characterProfiles : [];
+                // Keep any older profile-only records rather than silently dropping an IGN that
+                // exists in characterProfiles but was absent from the parallel characters list.
+                const profileNames = rawProfiles.map(profile => String(profile?.name || profile?.ign || '').trim().slice(0, 40)).filter(Boolean);
+                const characters = [...new Set([...rawCharacters.map(x => String(typeof x === 'object' ? (x?.name || x?.ign || '') : x || '').trim().slice(0, 40)), ...profileNames].filter(Boolean))].slice(0, 100);
                 const profileByName = new Map(rawProfiles.map(profile => [String(profile?.name || profile?.ign || '').trim().toLowerCase(), profile]));
                 const characterProfiles = characters.map(charName => {
                     const profile = profileByName.get(charName.toLowerCase()) || {};
                     return {
                         name: charName,
                         job: JOB_ORDER.includes(String(profile.job || '')) ? String(profile.job) : '',
-                        trackerEnabled: profile.trackerEnabled === true
+                        trackerEnabled: profile.trackerEnabled === true,
+                        isMain: profile.isMain === true
                     };
                 });
                 const id = String(member?.id || `member-${index}`).trim().replace(/[^a-zA-Z0-9_-]/g, '') || `member-${index}`;
@@ -2704,7 +2746,9 @@
                     id, name, characters, characterProfiles,
                     trackerRosterId: String(member?.trackerRosterId || '').trim().replace(/[^a-zA-Z0-9_-]/g, ''),
                     color: normalizeColor(member?.color),
-                    note: String(member?.note || '').trim().slice(0, 160)
+                    note: String(member?.note || '').trim().slice(0, 160),
+                    profileConfirmedDiscordId: String(member?.profileConfirmedDiscordId || ''),
+                    profileConfirmedAt: Number(member?.profileConfirmedAt) || 0
                 };
             }).filter(Boolean);
         }
@@ -2892,10 +2936,12 @@
                 btn.textContent = '👤 Personal View';
                 btn.classList.add('personal-active');
                 filterDropdown.value = identity;
+                filterDropdown.disabled = true;
             } else {
                 btn.textContent = '🌍 Universal View';
                 btn.classList.remove('personal-active');
                 filterDropdown.value = 'all';
+                filterDropdown.disabled = false;
             }
             applyRosterFilter();
         }
@@ -2919,17 +2965,18 @@
                 const filter = document.getElementById('roster-filter');
                 isPersonalView = true;
                 if (btn) { btn.textContent = '👤 Personal View'; btn.classList.add('personal-active'); }
-                if (filter) filter.value = val;
+                if (filter) { filter.value = val; filter.disabled = true; }
                 applyRosterFilter();
             } else if (isPersonalView && val) {
-                document.getElementById('roster-filter').value = val;
+                const filter = document.getElementById('roster-filter');
+                if (filter) { filter.value = val; filter.disabled = true; }
                 applyRosterFilter();
             } else if (isPersonalView && !val) {
                 isPersonalView = false;
                 const btn = document.getElementById('mode-toggle-btn');
                 if (btn) { btn.textContent = '🌍 Universal View'; btn.classList.remove('personal-active'); }
                 const filter = document.getElementById('roster-filter');
-                if (filter) filter.value = 'all';
+                if (filter) { filter.value = 'all'; filter.disabled = false; }
                 applyRosterFilter();
             }
         }
@@ -2943,7 +2990,7 @@
         }
 
         function findDiscordRosterMatch(user) {
-            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters).filter(roster => roster.characters.length > 0);
+            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters);
             const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
             // Discord display name is the default. If an admin explicitly configured a different
             // roster-match label, prefer that mapping; otherwise use the profile name first.
@@ -2984,7 +3031,7 @@
             const user = pantheonDiscordUser;
             if (!user?.id) return null;
             const identitySelect = document.getElementById('user-identity');
-            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters).filter(roster => roster.characters.length > 0);
+            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters);
             const profileMatch = findDiscordRosterMatch(user);
             const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(user.id)}`;
             const rememberedId = localStorage.getItem(accountIdentityKey) || '';
@@ -2996,16 +3043,16 @@
             const roster = profileMatch || rememberedMatch || selectedMatch;
 
             if (!roster) {
-                localStorage.removeItem(IDENTITY_KEY);
-                if (identitySelect) identitySelect.value = '';
+                localStorage.setItem(IDENTITY_KEY, '__unregistered__');
+                localStorage.setItem(accountIdentityKey, '__unregistered__');
+                if (identitySelect) identitySelect.value = '__unregistered__';
                 discordIdentityMatchStatus = 'unmatched';
-                if (isPersonalView) {
-                    isPersonalView = false;
-                    const modeButton = document.getElementById('mode-toggle-btn');
-                    if (modeButton) { modeButton.textContent = '🌍 Universal View'; modeButton.classList.remove('personal-active'); }
-                }
+                isPersonalView = true;
+                const modeButton = document.getElementById('mode-toggle-btn');
+                if (modeButton) { modeButton.textContent = '👤 Personal View'; modeButton.classList.add('personal-active'); }
                 const filter = document.getElementById('roster-filter');
-                if (filter) filter.value = 'all';
+                if (filter) filter.value = '__unregistered__';
+                activeRosterFilter = '__unregistered__';
                 applyRosterFilter();
                 return null;
             }
@@ -3033,24 +3080,23 @@
             const currentVal = filter.value;
             const savedIdentity = localStorage.getItem(IDENTITY_KEY) || '';
 
-            let options = `<option value="all">👁️ Show All Rosters</option>`;
+            let options = `<option value="all">👁️ Show All Rosters</option><option value="__unregistered__">👤 My registration (not set up)</option>`;
             const identityPrompt = discordIdentityMatchStatus === 'unmatched' ? '👤 No matching roster' : '👤 Your roster (auto)';
-            let idOptions = `<option value="">${identityPrompt}</option>`;
+            let idOptions = `<option value="">${identityPrompt}</option><option value="__unregistered__">My registration (not set up)</option>`;
 
-            cloudData.settings.rosters.forEach(r => { 
-                if (r.characters.length > 0) {
-                    options += `<option value="${escapeHTML(r.id)}">👁️ Only ${escapeHTML(r.name)}</option>`;
-                    idOptions += `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)}</option>`;
-                }
+            cloudData.settings.rosters.forEach(r => {
+                const emptyHint = r.characters.length ? '' : ' · not tracking yet';
+                options += `<option value="${escapeHTML(r.id)}">👁️ Only ${escapeHTML(r.name)}${emptyHint}</option>`;
+                idOptions += `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)}${emptyHint}</option>`;
             });
 
             filter.innerHTML = options;
             const preferredFilter = isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || currentVal) : currentVal;
-            filter.value = cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
+            filter.value = preferredFilter === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
             activeRosterFilter = filter.value;
 
             identitySel.innerHTML = idOptions;
-            identitySel.value = cloudData.settings.rosters.some(r => r.id === savedIdentity) ? savedIdentity : '';
+            identitySel.value = savedIdentity === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === savedIdentity) ? savedIdentity : '';
 
             refreshLedgerVisibility();
         }
@@ -3879,8 +3925,9 @@
                 if (['#registration', '#dungeons', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
                 else applySavedLandingPage();
                 initializeWelcomeModal();
+                maybeOpenProfileConfirmation();
                 startRemoteRefresh();
-            }).catch(() => { applyDiscordIdentityDefaults(); applySavedLandingPage(); initializeWelcomeModal(); startRemoteRefresh(); });
+            }).catch(() => { applyDiscordIdentityDefaults(); applySavedLandingPage(); initializeWelcomeModal(); maybeOpenProfileConfirmation(); startRemoteRefresh(); });
         });
 
         function rateElementId(charName) { return `rate-${encodeURIComponent(charName)}`; }
@@ -3949,6 +3996,46 @@
             const footerRow = document.getElementById('footer-row');
             const tbody = document.getElementById('tracker-body');
             if (!table) return;
+
+            const empty = characters.length === 0;
+            const toolbar = document.getElementById('tracker-toolbar');
+            const emptyState = document.getElementById('tracker-empty-state');
+            const tableWrap = document.getElementById('tracker-table-wrap');
+            const analyticsHeader = document.getElementById('tracker-analytics-header');
+            const analyticsGrid = document.getElementById('analytics-grid');
+            const resetNote = document.querySelector('.tracker-reset-note');
+            const addCharactersButton = document.getElementById('tracker-add-characters-btn');
+            if (empty) {
+                if (toolbar) toolbar.hidden = true;
+                if (tableWrap) tableWrap.hidden = true;
+                if (analyticsHeader) analyticsHeader.hidden = true;
+                if (analyticsGrid) analyticsGrid.hidden = true;
+                if (resetNote) resetNote.hidden = true;
+                if (emptyState) { emptyState.hidden = false; emptyState.classList.remove('hidden'); }
+                const own = getCurrentMemberDirectoryEntry();
+                const profiles = own?.characterProfiles || [];
+                const tracked = profiles.filter(profile => profile.trackerEnabled);
+                const title = document.getElementById('tracker-empty-title');
+                const message = document.getElementById('tracker-empty-message');
+                const startButton = document.getElementById('tracker-empty-start-btn');
+                const addButton = document.getElementById('tracker-empty-add-btn');
+                if (title) title.textContent = profiles.length ? (tracked.length ? 'No characters in this view' : 'Your tracker is empty') : 'Register your characters to get started';
+                if (message) message.textContent = profiles.length
+                    ? (tracked.length ? 'This view has no active tracking characters. Add characters or switch to your personal roster.' : 'Your characters are registered, but none are opted into Tracker and Team Builder yet. Start tracking them whenever you are ready.')
+                    : 'You have no characters registered yet. Add your IGN and class, choose your Main character, and then start tracking daily and weekly progress.';
+                if (startButton) startButton.hidden = profiles.length === 0 || tracked.length > 0;
+                if (startButton && profiles.length > 0 && tracked.length === 0) startButton.textContent = 'Start Tracking Registered Characters';
+                if (addButton) addButton.textContent = profiles.length ? '＋ Add More Characters' : 'Register My Characters';
+                if (addCharactersButton) addCharactersButton.hidden = true;
+                return;
+            }
+            if (toolbar) toolbar.hidden = false;
+            if (tableWrap) tableWrap.hidden = false;
+            if (analyticsHeader) analyticsHeader.hidden = false;
+            if (analyticsGrid) { analyticsGrid.hidden = false; analyticsGrid.style.display = isAnalyticsVisible ? 'grid' : 'none'; }
+            if (resetNote) resetNote.hidden = false;
+            if (emptyState) { emptyState.hidden = true; emptyState.classList.add('hidden'); }
+            if (addCharactersButton) addCharactersButton.hidden = false;
 
             const isUniversal = activeRosterFilter === 'all';
 
@@ -4213,9 +4300,6 @@
             });
         }
 
-        async function manualDailyReset() { if (!confirm('Force Daily Reset?')) return; executeDailyReset(); cloudData.lastDailyReset = getTargetResetTimeUTC(false); applyBoardState(); triggerAutoSync(); }
-        async function manualWeeklyReset() { const enabled = cloudData.settings.analyticsTrackingEnabled === true; if (!confirm(enabled ? 'Force Weekly Archive & Reset?' : 'Force Weekly Reset? Analytics is disabled, so no history will be saved.')) return; const rk = Math.max(Date.now(), getTargetResetTimeUTC(true)); executeWeeklyReset(rk); cloudData.lastWeeklyReset = rk; applyBoardState(); renderAnalytics(); triggerAutoSync(); }
-
         function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
         function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
 
@@ -4266,7 +4350,9 @@
             }
             const isAdmin = user?.role === 'admin';
             const adminLink = document.getElementById('overview-admin-link');
+            const drawerAdminLink = document.getElementById('drawer-admin-console');
             if (adminLink) adminLink.hidden = !isAdmin;
+            if (drawerAdminLink) drawerAdminLink.hidden = !isAdmin;
             if (subEl) subEl.textContent = isAdmin ? 'Discord account · Administrator' : 'Discord account · Member';
             refreshLedgerVisibility();
         }
@@ -4485,6 +4571,43 @@
                 if (r) colorInput.value = r.color;
                 colorInput.disabled = true;
             }
+        }
+
+        function openMyCharacterRegistration() {
+            const own = getCurrentMemberDirectoryEntry();
+            showAppPage('member-roster');
+            toggleSideMenu(false);
+            renderMemberDirectory();
+            if (own) startMemberDirectoryEdit(own.name, own.id);
+            else resetMemberDirectoryForm();
+            document.getElementById('member-directory-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function startTrackingOwnCharacters() {
+            const own = getCurrentMemberDirectoryEntry();
+            if (!own) { openMyCharacterRegistration(); return; }
+            if (!own.characterProfiles?.length) { openMyCharacterRegistration(); return; }
+            if (own.characterProfiles.every(profile => profile.trackerEnabled)) {
+                alert('All of your registered characters are already opted into Tracker and Team Builder.');
+                return;
+            }
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Start tracking registered characters for ${own.name}`))) return;
+            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const member = entries.find(item => item.id === own.id);
+            if (!member) { alert('Your roster could not be refreshed. Reload the page and try again.'); return; }
+            member.characterProfiles = member.characterProfiles.map(profile => ({ ...profile, trackerEnabled: true }));
+            member.characters = member.characterProfiles.map(profile => profile.name);
+            if (pantheonDiscordUser?.id && member.characterProfiles.some(profile => profile.isMain) && member.characterProfiles.every(profile => JOB_ORDER.includes(profile.job))) {
+                member.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
+                member.profileConfirmedAt = Date.now();
+            }
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            touchMemberDirectorySettings();
+            projectTrackerRostersFromMemberDirectory(cloudData, true);
+            applyDiscordIdentityDefaults();
+            showAppPage('tracker');
+            refreshTrackerUI();
+            triggerAutoSync();
         }
 
         async function registerCharacter() {
@@ -5783,7 +5906,7 @@
                 const key = characterName.toLowerCase();
                 if (!entry.characters.some(value => value.toLowerCase() === key) && entry.characters.length < 100) {
                     entry.characters.push(characterName);
-                    entry.characterProfiles.push({ name: characterName, job: JOB_ORDER.includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: false });
+                    entry.characterProfiles.push({ name: characterName, job: JOB_ORDER.includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: false, isMain: false });
                     changed = true;
                 }
             });
@@ -5808,10 +5931,11 @@
         function renderMemberCharacterRows(profiles = []) {
             const container = document.getElementById('member-character-editor');
             if (!container) return;
-            const rows = profiles.length ? profiles : [{ name: '', job: '', trackerEnabled: false }];
+            const rows = profiles.length ? profiles : [{ name: '', job: '', trackerEnabled: false, isMain: false }];
             container.innerHTML = rows.map((profile, index) => `<div class="member-character-row" data-member-character-row>
                 <label>Character IGN<input class="member-character-ign" type="text" maxlength="40" value="${escapeHTML(profile.name || '')}" placeholder="Exact in-game name" autocomplete="off"></label>
                 <label>Class / Job<select class="member-character-job">${buildJobOptions(profile.job || '')}</select></label>
+                <label class="member-character-main"><input class="member-character-is-main" type="radio" name="member-main-character" ${profile.isMain ? 'checked' : ''}><span>Main character</span></label>
                 <label class="member-character-opt-in"><input class="member-character-tracker" type="checkbox" ${profile.trackerEnabled ? 'checked' : ''}><span>Include in Tracker + Team Builder</span></label>
                 <button class="member-character-row-remove" type="button" data-remove-member-character-row title="Remove this row" aria-label="Remove character row">×</button>
             </div>`).join('');
@@ -5822,10 +5946,11 @@
             const rows = [...container.querySelectorAll('[data-member-character-row]')].map(row => ({
                 name: row.querySelector('.member-character-ign')?.value || '',
                 job: row.querySelector('.member-character-job')?.value || '',
-                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked
+                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked,
+                isMain: !!row.querySelector('.member-character-is-main')?.checked
             }));
             if (profile) rows.push(profile);
-            else rows.push({ name: '', job: '', trackerEnabled: false });
+            else rows.push({ name: '', job: '', trackerEnabled: false, isMain: false });
             renderMemberCharacterRows(rows);
             const inputs = container.querySelectorAll('.member-character-ign');
             inputs[inputs.length - 1]?.focus();
@@ -5834,7 +5959,8 @@
             return [...(document.querySelectorAll('#member-character-editor [data-member-character-row]'))].map(row => ({
                 name: String(row.querySelector('.member-character-ign')?.value || '').trim().slice(0, 40),
                 job: String(row.querySelector('.member-character-job')?.value || ''),
-                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked
+                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked,
+                isMain: !!row.querySelector('.member-character-is-main')?.checked
             })).filter(profile => profile.name);
         }
         function renderMemberDirectory() {
@@ -5862,8 +5988,8 @@
                     const status = tracked ? 'TRACKING' : 'DIRECTORY';
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
-                    const title = `${profile.name} · ${jobLabel} · ${tracked ? 'Included in Tracker and Team Builder' : 'Directory only'}`;
-                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} <small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
+                    const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker and Team Builder' : 'Directory only'}`;
+                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
                 const removeMemberButton = isPantheonAdmin() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
                 return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracking characters' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
@@ -5946,6 +6072,7 @@
                 if (nameInput) { nameInput.value = fixedOwner; nameInput.readOnly = true; }
             }
             if (!name) return alert('Enter a member or owner name.');
+            if (profiles.length && profiles.filter(profile => profile.isMain).length !== 1) return alert('Select exactly one Main character before saving.');
             const localNames = new Set();
             for (const profile of profiles) {
                 const key = profile.name.toLowerCase();
@@ -5956,6 +6083,7 @@
             if (hasCloudConfig() && !(await prepareGlobalChange(`${editingMemberDirectoryId ? 'Update' : 'Add'} member roster entry: ${name}`))) return;
             ensureMemberRosterMaster(cloudData);
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const previousOwnedCharacters = new Set((entries.find(member => member.id === editingMemberDirectoryId)?.characterProfiles || []).map(profile => String(profile.name || '').toLowerCase()));
             const sameName = entries.find(member => member.name.toLowerCase() === name.toLowerCase() && member.id !== editingMemberDirectoryId);
             if (sameName) return alert('That member already has a Member Roster entry. Edit the existing member instead.');
             const otherMembers = entries.filter(member => member.id !== editingMemberDirectoryId);
@@ -5964,13 +6092,19 @@
             if (duplicateCharacter) return alert(`The IGN ${duplicateCharacter.name} is already assigned to another Member Roster entry. Remove the duplicate or edit the existing owner first.`);
             const previousOwnerName = editingMemberDirectoryOriginalName.trim();
             let entry;
+            const currentDiscordId = String(pantheonDiscordUser?.id || '');
+            const isCurrentUserEntry = !isPantheonAdmin() || ownerCandidateNames().some(candidate => identityCompactKey(candidate) === identityCompactKey(name));
             if (editingMemberDirectoryId) {
                 const index = entries.findIndex(item => item.id === editingMemberDirectoryId);
                 if (index < 0) return alert('That member no longer exists. Refresh the page and try again.');
                 entry = { ...entries[index], name, characters: profiles.map(profile => profile.name), characterProfiles: profiles, note };
+                if (isCurrentUserEntry && currentDiscordId && profiles.length && profiles.filter(profile => profile.isMain).length === 1) {
+                    entry.profileConfirmedDiscordId = currentDiscordId;
+                    entry.profileConfirmedAt = Date.now();
+                }
                 entries[index] = entry;
             } else {
-                entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: profiles.map(profile => profile.name), characterProfiles: profiles, trackerRosterId: '', color: '#7aa2f7', note };
+                entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: profiles.map(profile => profile.name), characterProfiles: profiles, trackerRosterId: '', color: '#7aa2f7', note, profileConfirmedDiscordId: (isCurrentUserEntry && currentDiscordId && profiles.length && profiles.filter(profile => profile.isMain).length === 1) ? currentDiscordId : '', profileConfirmedAt: (isCurrentUserEntry && currentDiscordId && profiles.length && profiles.filter(profile => profile.isMain).length === 1) ? Date.now() : 0 };
                 entries.push(entry);
             }
             // Keep class selections in the shared Job map. The master profile stores opt-in state;
@@ -5983,17 +6117,31 @@
             }
             profiles.forEach(profile => { cloudData.settings.characterJobs[profile.name] = { job: profile.job, updatedAt: Date.now(), deviceId }; });
             const remainingProfiles = entries.flatMap(member => member.characterProfiles || []);
-            Object.keys(cloudData.settings.characterJobs).forEach(characterName => {
-                const stillPresent = remainingProfiles.some(profile => profile.name.toLowerCase() === characterName.toLowerCase());
-                if (!stillPresent) delete cloudData.settings.characterJobs[characterName];
-            });
+            if (isPantheonAdmin()) {
+                // Only administrators may do guild-wide orphan-job cleanup.
+                Object.keys(cloudData.settings.characterJobs).forEach(characterName => {
+                    const stillPresent = remainingProfiles.some(profile => profile.name.toLowerCase() === characterName.toLowerCase());
+                    if (!stillPresent) delete cloudData.settings.characterJobs[characterName];
+                });
+            } else {
+                // A member may clean up class records only for characters removed from their own entry.
+                previousOwnedCharacters.forEach(previousName => {
+                    const stillPresent = remainingProfiles.some(profile => profile.name.toLowerCase() === previousName);
+                    if (!stillPresent) {
+                        const jobKey = Object.keys(cloudData.settings.characterJobs).find(characterName => characterName.toLowerCase() === previousName);
+                        if (jobKey) delete cloudData.settings.characterJobs[jobKey];
+                    }
+                });
+            }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
+            applyDiscordIdentityDefaults();
             refreshTrackerUI();
             triggerAutoSync();
             resetMemberDirectoryForm();
             renderMemberDirectory();
+            if (isCurrentUserEntry && profiles.length && profiles.filter(profile => profile.isMain).length === 1) closeModal('profile-confirm-modal');
         }
         async function removeMemberDirectoryEntry(id) {
             if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
@@ -6031,7 +6179,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.8';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.9';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -6059,12 +6207,30 @@
             showAppPage('tracker');
             if (destination === 'tracker-personal') {
                 const identity = localStorage.getItem(IDENTITY_KEY) || '';
-                if (identity && cloudData.settings.rosters.some(r => r.id === identity)) {
-                    const identitySelect = document.getElementById('user-identity');
+                const rosterFilter = document.getElementById('roster-filter');
+                const identitySelect = document.getElementById('user-identity');
+                if (identity === '__unregistered__') {
+                    // Do not fall back to Universal View for a new member. Keep their view private and empty.
+                    isPersonalView = true;
+                    const mode = document.getElementById('mode-toggle-btn');
+                    if (mode) { mode.textContent = '👤 Personal View'; mode.classList.add('personal-active'); mode.classList.remove('active'); }
+                    if (rosterFilter) { rosterFilter.value = '__unregistered__'; rosterFilter.disabled = true; }
+                    if (identitySelect) identitySelect.value = '';
+                    applyRosterFilter();
+                } else if (identity && cloudData.settings.rosters.some(r => r.id === identity)) {
                     if (identitySelect) identitySelect.value = identity;
                     if (!isPersonalView) togglePersonalView();
-                    else { document.getElementById('roster-filter').value = identity; applyRosterFilter(); }
-                } else if (isPersonalView) togglePersonalView();
+                    if (rosterFilter) { rosterFilter.value = identity; rosterFilter.disabled = true; }
+                    applyRosterFilter();
+                } else {
+                    // Missing mappings must never silently expose all guild rosters.
+                    localStorage.setItem(IDENTITY_KEY, '__unregistered__');
+                    isPersonalView = true;
+                    const mode = document.getElementById('mode-toggle-btn');
+                    if (mode) { mode.textContent = '👤 Personal View'; mode.classList.add('personal-active'); mode.classList.remove('active'); }
+                    if (rosterFilter) { rosterFilter.value = '__unregistered__'; rosterFilter.disabled = true; }
+                    applyRosterFilter();
+                }
                 return;
             }
             if (isPersonalView) togglePersonalView();
@@ -6137,14 +6303,80 @@
             applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
         }
         const RELEASE_DISMISSAL_KEY = 'pantheon-release-popup-dismissed-version-v1';
-        function closeWelcomeReleaseNotes() {
+        function persistWelcomeReleasePreference() {
             const checkbox = document.getElementById('welcome-hide-until-update');
             try {
                 if (checkbox && checkbox.checked) localStorage.setItem(RELEASE_DISMISSAL_KEY, PANTHEON_TOOLS_VERSION);
                 else localStorage.removeItem(RELEASE_DISMISSAL_KEY);
             } catch (e) {}
+        }
+        // Save immediately when checked, not only when the Welcome modal closes. This
+        // prevents secondary modal close handlers from reopening release notes.
+        document.getElementById('welcome-hide-until-update')?.addEventListener('change', persistWelcomeReleasePreference);
+        function closeWelcomeReleaseNotes() {
+            persistWelcomeReleasePreference();
             closeModal('welcome-modal');
         }
+        function memberHasValidMainDesignation(member) {
+            const profiles = member?.characterProfiles || [];
+            return profiles.length > 0 && profiles.filter(profile => profile.isMain).length === 1 && profiles.every(profile => JOB_ORDER.includes(profile.job));
+        }
+        function renderProfileConfirmationPrompt() {
+            const member = getCurrentMemberDirectoryEntry();
+            const profiles = member?.characterProfiles || [];
+            const container = document.getElementById('profile-confirm-characters');
+            const intro = document.getElementById('profile-confirm-intro');
+            const submit = document.getElementById('profile-confirm-submit');
+            const review = document.getElementById('profile-confirm-review');
+            const register = document.getElementById('profile-confirm-register');
+            const warning = document.getElementById('profile-confirm-warning');
+            if (intro) intro.textContent = profiles.length
+                ? 'Please confirm that every IGN and class is correct and that the character marked MAIN is still your main character. You can review or update any detail before continuing.'
+                : 'Your account does not have registered characters yet. Register at least one IGN and class, and choose exactly one Main character before using the personal Tracker.';
+            if (container) container.innerHTML = profiles.length ? profiles.map(profile => `<div class="profile-confirm-character"><div><strong>${escapeHTML(profile.name)}</strong><small>${escapeHTML(profile.job || 'Class not set')} · ${profile.trackerEnabled ? 'Tracking enabled' : 'Not yet tracking'}</small></div>${profile.isMain ? '<span class="profile-confirm-main">MAIN</span>' : '<span class="modal-note" style="margin:0;">Not Main</span>'}</div>`).join('') : '<div class="profile-confirm-character"><div><strong>No characters registered</strong><small>Register your characters to unlock Personal Tracker setup.</small></div></div>';
+            if (submit) submit.hidden = !memberHasValidMainDesignation(member);
+            if (review) review.textContent = profiles.length ? 'Review / Update Characters' : 'Register My Characters';
+            if (register) register.hidden = true;
+            if (warning) {
+                const valid = memberHasValidMainDesignation(member);
+                warning.hidden = valid || !profiles.length;
+                warning.textContent = 'One Main character and a valid Class / Job for every listed character are required before confirming.';
+            }
+        }
+        function maybeOpenProfileConfirmation() {
+            const userId = String(pantheonDiscordUser?.id || '');
+            if (!userId) return;
+            const modalIds = ['welcome-modal','salary-modal','help-modal','cloud-modal','roster-modal','dungeon-modal','scholar-modal','class-setup-modal','role-config-modal'];
+            if (modalIds.some(id => { const el=document.getElementById(id); return el && !el.classList.contains('hidden'); })) return;
+            const member = getCurrentMemberDirectoryEntry();
+            if (member && String(member.profileConfirmedDiscordId || '') === userId && Number(member.profileConfirmedAt) > 0 && memberHasValidMainDesignation(member)) return;
+            renderProfileConfirmationPrompt();
+            openModal('profile-confirm-modal');
+        }
+        async function confirmOwnCharacterDetails() {
+            const member = getCurrentMemberDirectoryEntry();
+            if (!member) { alert('Your character registration could not be found. Register your characters first.'); return; }
+            if (!memberHasValidMainDesignation(member)) { alert('Please review your characters and choose exactly one Main character before confirming.'); return; }
+            if (hasCloudConfig() && !(await prepareGlobalChange(`Member confirmed character registration: ${member.name}`))) return;
+            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            const own = entries.find(item => item.id === member.id);
+            if (!own) { alert('Your registration changed while this prompt was open. Reload and try again.'); return; }
+            own.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
+            own.profileConfirmedAt = Date.now();
+            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            touchMemberDirectorySettings();
+            triggerAutoSync();
+            closeModal('profile-confirm-modal');
+        }
+        function reviewOwnCharacterDetails() {
+            closeModal('profile-confirm-modal');
+            openMyCharacterRegistration();
+        }
+        function registerOwnCharactersFromPrompt() {
+            closeModal('profile-confirm-modal');
+            openMyCharacterRegistration();
+        }
+
         function initializeWelcomeModal() {
             let saved = '', dismissedVersion = '';
             try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; dismissedVersion = localStorage.getItem(RELEASE_DISMISSAL_KEY) || ''; } catch (e) {}
@@ -6274,13 +6506,22 @@
         function closeModal(id) {
             const modal = document.getElementById(id);
             const wasOpen = !!modal && !modal.classList.contains('hidden');
+            if (id === 'welcome-modal' && wasOpen) persistWelcomeReleasePreference();
             const returnToWelcome = wasOpen && (id === 'help-modal' || id === 'salary-modal') && returnToWelcomeAfterShortcutModal;
             modal?.classList.add('hidden');
             if (id === 'welcome-modal') document.body.classList.remove('welcome-modal-open');
             if (returnToWelcome) {
                 returnToWelcomeAfterShortcutModal = false;
-                showAppPage('overview');
-                openModal('welcome-modal');
+                let dismissedVersion = '';
+                try { dismissedVersion = localStorage.getItem(RELEASE_DISMISSAL_KEY) || ''; } catch (_) {}
+                const checkbox = document.getElementById('welcome-hide-until-update');
+                if (dismissedVersion !== PANTHEON_TOOLS_VERSION && !checkbox?.checked) {
+                    showAppPage('overview');
+                    openModal('welcome-modal');
+                }
+            }
+            if (['welcome-modal','salary-modal','help-modal','tracker-empty-state'].includes(id)) {
+                setTimeout(maybeOpenProfileConfirmation, 0);
             }
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
@@ -6305,8 +6546,17 @@
     applyPantheonTheme((function () { try { return localStorage.getItem(THEME_KEY) || 'dark'; } catch (_) { return 'dark'; } })(), false);
     const homeBrand = document.getElementById('pantheon-home-link');
     if (homeBrand) {
-        const goToOverview = function () {
-            document.querySelectorAll('.modal-overlay').forEach(function (modal) { modal.classList.add('hidden'); });
+        const goToOverview = function (event) {
+            // Keep the required profile-confirmation/onboarding gate in front until
+            // the signed-in member explicitly confirms or registers their characters.
+            const profileGate = document.getElementById('profile-confirm-modal');
+            if (profileGate && !profileGate.classList.contains('hidden')) {
+                if (event) event.preventDefault();
+                return;
+            }
+            document.querySelectorAll('.modal-overlay').forEach(function (modal) {
+                if (modal.id !== 'profile-confirm-modal') modal.classList.add('hidden');
+            });
             document.body.classList.remove('welcome-modal-open');
             if (typeof toggleSideMenu === 'function') toggleSideMenu(false);
             if (typeof closeRegistrationPage === 'function') closeRegistrationPage();
@@ -6316,7 +6566,7 @@
         };
         homeBrand.addEventListener('click', goToOverview);
         homeBrand.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToOverview(); }
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToOverview(event); }
         });
     }
 })();

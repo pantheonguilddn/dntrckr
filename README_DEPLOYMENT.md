@@ -1,6 +1,17 @@
-# Pantheon Tools v1.5.8 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.9 — Cloudflare Pages + D1
 
-This release starts from the supplied Pantheon Tools v1.5.6 Cloudflare Pages + D1 bundle and carries its Discord-account allowlist gateway, D1-backed JSONBin-compatible data API, and authenticated Personal View matching forward into v1.5.7. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
+This release starts from the supplied Pantheon Tools v1.5.6 Cloudflare Pages + D1 bundle and carries the v1.5.7–v1.5.8 UI updates forward, plus the v1.5.9 member onboarding and registration protections below. It matches the Discord display name to the Member Roster owner name; when those differ, set the roster-match name in the admin allowlist. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
+
+## v1.5.9 member onboarding, reset controls, and registration permissions
+
+- The release popup stores the “Don’t show this pop-up again until a new update is released” choice when closed and will not reopen after closing Salary Calculator or Help & Guide for the same version.
+- Removed manual Force Daily Reset and Force Weekly Reset controls. The Tracker retains the reminder: daily boards reset automatically; weekly progress resets every Saturday at 9:00 AM Manila time.
+- Removed the character-registration shortcut from the main drawer. Guild-wide character registration and Main-designation controls are available only in `/admin.html` under **Character registration & Main designation**.
+- The Tracker shows an empty-state message when the signed-in member has no active characters, with actions to start tracking registered characters or register/add more characters.
+- On first login, a member is prompted to register characters or confirm each existing IGN, Class / Job, and Main designation. If an administrator changes the registration, confirmation is reset and requested again at the member’s next login.
+- Admins can add, remove, edit, and designate each member’s Main character from the Admin Console. Saves validate required classes, unique IGNs, and exactly one Main for non-empty registrations.
+- Added a server-side registration guard to shared-record writes: regular members can update their own registration and tracker data but cannot alter another member’s registration, roster, character-job mapping, or ownership. Admin endpoints retain guild-wide control.
+- Members’ edits no longer attempt guild-wide cleanup of unrelated legacy character-job entries.
 
 ## v1.5.8 account placement, identity, and contrast fixes
 
@@ -28,14 +39,14 @@ This release starts from the supplied Pantheon Tools v1.5.6 Cloudflare Pages + D
 - Overview reminders are calculated from the current Tracker's eligible weekly tasks (bounty tasks excluded from completion rates) and the existing opt-in weekly analytics archive. They are reminders rather than a fabricated audit log.
 - Tracker clicks update only the affected cell and character completion rate. Hidden tools are not rebuilt after every save; they refresh when visible or when a remote change requires reconciliation.
 - Dark, Light, Eye comfort, and Pastel remain available across the working tools and admin console. Existing font families are preserved.
-- The release popup reports `v1.5.8`; a dismissal saved for an older version does not suppress this update.
+- The release popup displays the bundled version; a dismissal saved for an older version does not suppress a newer update.
 
 ## Important before deploying
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
 - The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- This ZIP uses v1.5.6 as its base with the v1.5.7 and v1.5.8 updates listed above. Back up the current repository before replacing its files.
+- This ZIP uses v1.5.6 as its base and includes the v1.5.7–v1.5.9 updates listed above. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch
@@ -45,8 +56,8 @@ Do not replace the current production branch while testing; that could affect yo
 1. Open `https://github.com/pantheonguilddn/dntrckr` and choose **Code**.
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
-4. Extract this ZIP on your computer.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on v1.5.6 with the v1.5.7 changes described above; back up the current branch before replacing it.
+4. Extract this ZIP on your computer. The ZIP contains the app files directly at its root.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.5.9 build, based on v1.5.6 and carrying the v1.5.7–v1.5.9 updates described above; back up the current branch before replacing it.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project
