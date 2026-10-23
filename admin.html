@@ -27,6 +27,42 @@ html[data-pantheon-theme] .btn.primary{background:#5865f2;color:#fff;border-colo
 html[data-pantheon-theme] .btn.danger{color:var(--danger);border-color:var(--border)}
 .admin-logo{width:40px;height:40px;object-fit:contain;flex:0 0 40px}.brand{display:flex;align-items:center;gap:10px}.admin-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pantheon-theme-control{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.03em;white-space:nowrap}.pantheon-theme-control select{min-height:34px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);cursor:pointer}
 
+
+
+/* Pantheon Tools v1.5.4 — matching administrator console styling. */
+html{min-height:100%;background:var(--bg)}
+body{min-height:100vh;background:radial-gradient(ellipse at 10% 0%,rgba(91,111,220,.15),transparent 42%),var(--bg);padding:22px 0 48px}
+html[data-pantheon-theme="light"] body{background:radial-gradient(ellipse at 10% 0%,rgba(82,101,215,.10),transparent 42%),var(--bg)}
+html[data-pantheon-theme="eye-comfort"] body{background:radial-gradient(ellipse at 10% 0%,rgba(130,143,91,.10),transparent 42%),var(--bg)}
+html[data-pantheon-theme="pastel"] body{background:radial-gradient(ellipse at 10% 0%,rgba(186,132,205,.12),transparent 42%),var(--bg)}
+main{width:min(1060px,calc(100% - 32px));margin:0 auto 48px}
+header{position:relative;gap:18px;flex-wrap:wrap;margin:0 0 22px;padding:14px 18px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 12px 34px rgba(0,0,0,.07)}
+.brand{gap:12px;line-height:1.35;letter-spacing:.13em;font-weight:900;font-size:12px}
+.admin-logo{width:44px;height:44px;padding:3px;border:1px solid var(--border);border-radius:12px;background:var(--surface2)}
+.brand small{display:block;font-size:9px;letter-spacing:.08em;margin-top:4px;line-height:1.5}
+.kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}
+h1{font-size:clamp(27px,3vw,36px);letter-spacing:-.035em;margin:8px 0 10px}
+main>p{max-width:850px;color:var(--muted);line-height:1.75;margin-bottom:22px}
+#auth-status{border-radius:12px;padding:13px 15px;margin-bottom:20px;border:1px solid var(--border);border-left:4px solid var(--accent);background:var(--surface);box-shadow:0 6px 18px rgba(0,0,0,.04)}
+.card{padding:20px;margin:14px 0;border-radius:15px;box-shadow:0 7px 22px rgba(0,0,0,.04)}
+.card h2{font-size:14px;letter-spacing:-.01em;margin:0 0 8px}
+.card p{color:var(--muted);line-height:1.65}
+.grid{gap:12px}
+.field{gap:7px;font-size:10px;letter-spacing:.08em}
+.field input,.field select,html[data-pantheon-theme] input,html[data-pantheon-theme] select,html[data-pantheon-theme] textarea{min-height:41px;border-radius:9px;padding:9px 11px}
+.actions{gap:8px}
+.btn{min-height:38px;border-radius:9px;padding:9px 13px;transition:transform .14s ease,border-color .14s ease,background .14s ease}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn.primary{background:#5267d9;border-color:#7082ec;color:#fff}
+.btn.danger{background:#a64052;color:#fff;border-color:#bd5365}
+.toplink{border-radius:9px;font-weight:750;transition:background .14s ease,border-color .14s ease}
+.person{border-radius:11px;padding:12px;background:var(--surface2);box-shadow:0 3px 12px rgba(0,0,0,.025)}
+.badge{font-weight:850;letter-spacing:.02em}
+.status{border-radius:10px;line-height:1.6}
+.checkbox-line{line-height:1.55}
+.pantheon-theme-control select{border-radius:9px;min-height:36px;padding:7px 10px}
+@media(max-width:640px){body{padding:10px 0 30px}main{width:calc(100% - 20px)}header{padding:12px;border-radius:13px}.admin-header-actions{width:100%;justify-content:flex-start}.card{padding:15px}}
+
 </style>
 <script>try{document.documentElement.setAttribute('data-pantheon-theme',localStorage.getItem('pantheon-theme-choice-v1')||'dark')}catch(_){document.documentElement.setAttribute('data-pantheon-theme','dark')}</script>
 </head>

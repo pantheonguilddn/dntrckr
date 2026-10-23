@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.3</title>
+    <title>Pantheon Tools v1.5.4</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1212,6 +1212,218 @@
             .pantheon-auth-banner { min-height:88px; padding:14px 15px; }
         }
 
+
+
+        /* Pantheon Tools v1.5.4 — unified visual system for the real application. */
+        html { min-height: 100%; background: var(--pt-page); }
+        body {
+            min-height: 100vh !important;
+            margin: 0 !important;
+            padding: 22px clamp(12px, 2.5vw, 36px) 48px !important;
+            align-items: center !important;
+            background: radial-gradient(ellipse at 12% 0%, rgba(88,111,220,.12), transparent 42%), var(--pt-page) !important;
+            color: var(--pt-text) !important;
+        }
+        :root[data-pantheon-theme="eye-comfort"] body { background: radial-gradient(ellipse at 12% 0%, rgba(130,143,91,.13), transparent 42%), var(--pt-page) !important; }
+        :root[data-pantheon-theme="pastel"] body { background: radial-gradient(ellipse at 12% 0%, rgba(186,132,205,.15), transparent 42%), var(--pt-page) !important; }
+        :root[data-pantheon-theme="light"] body { background: radial-gradient(ellipse at 12% 0%, rgba(82,101,215,.11), transparent 42%), var(--pt-page) !important; }
+        .controls {
+            position: relative !important;
+            width: 100% !important;
+            max-width: 1600px !important;
+            margin: 0 auto 22px !important;
+            padding: 14px 18px !important;
+            gap: 18px !important;
+            border: 1px solid var(--pt-border) !important;
+            border-radius: 17px !important;
+            background: var(--pt-surface) !important;
+            box-shadow: 0 12px 34px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.025) !important;
+        }
+        .brand-area { min-width: 0 !important; gap: 11px !important; }
+        .brand-area img {
+            width: 46px !important; height: 46px !important; flex: 0 0 46px !important;
+            padding: 3px; border: 1px solid var(--pt-border); border-radius: 13px;
+            background: var(--pt-accent-soft); object-fit: contain !important;
+            filter: none !important;
+        }
+        .brand-area .brand-logo-fallback { width: 46px; height: 46px; flex: 0 0 46px !important; border-radius: 13px; }
+        .brand-copy { min-width: 130px; line-height: 1.35; }
+        .brand-name { color: var(--pt-text); font-size: .76rem; font-weight: 900; letter-spacing: .15em; }
+        .brand-subtitle { color: var(--pt-muted); margin-top: 4px; font-size: .61rem; font-weight: 750; letter-spacing: .08em; }
+        .system-status { min-width: 0 !important; }
+        .status-pill { padding: 7px 10px !important; border-color: var(--pt-border) !important; border-radius: 999px !important; background: var(--pt-surface-soft) !important; box-shadow: none !important; }
+        .status-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--pt-positive) 12%, transparent) !important; }
+        .control-actions { gap: 10px !important; }
+        .topbar-player { gap: 7px !important; flex-wrap: wrap; }
+        .toolbar-group { border-color: var(--pt-border) !important; border-radius: 11px !important; background: var(--pt-surface-soft) !important; box-shadow: none !important; }
+        .toolbar-divider { background: var(--pt-border) !important; }
+        .identity-select { background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        .roster-filter-top { background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        .pantheon-theme-control { color: var(--pt-muted) !important; font-size: .68rem !important; letter-spacing: .05em !important; }
+        .pantheon-theme-select { min-height: 36px !important; border-radius: 9px !important; padding: 7px 10px !important; }
+        .controls .btn, .btn, .menu-toggle, .team-mini-btn, .builder-select, .team-run-type {
+            border-radius: 9px !important;
+            transition: transform .14s ease, border-color .14s ease, background .14s ease, box-shadow .14s ease !important;
+        }
+        .controls .btn:hover, .btn:hover, .menu-toggle:hover, .team-mini-btn:hover { transform: translateY(-1px); }
+        button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid color-mix(in srgb, var(--pt-accent) 55%, transparent); outline-offset: 2px; }
+        .btn-sync { background: #147c64 !important; border-color: #27917a !important; color: #fff !important; }
+        .btn-view-toggle, .btn-view-toggle.personal-active, .btn-cloud, .btn-weights { background: #5267d9 !important; border-color: #7082ec !important; color: #fff !important; }
+        .btn-estate, .btn-roster, .btn-dungeon, .btn-salary { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        .btn-danger { background: #a64052 !important; border-color: #bd5365 !important; color: #fff !important; }
+        .menu-toggle { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        .tool-drawer {
+            background: var(--pt-surface) !important; border-color: var(--pt-border) !important;
+            box-shadow: -22px 0 58px rgba(0,0,0,.22) !important;
+        }
+        .tool-drawer-head { border-color: var(--pt-border) !important; }
+        .drawer-section { border-color: var(--pt-border) !important; }
+        .drawer-item { border: 1px solid transparent !important; border-radius: 11px !important; margin: 3px 0 !important; }
+        .drawer-item:hover { border-color: var(--pt-border) !important; }
+        .drawer-item.active, .drawer-item[aria-current="page"] { background: var(--pt-accent-soft) !important; border-color: color-mix(in srgb, var(--pt-accent) 35%, var(--pt-border)) !important; }
+        .drawer-icon { border-radius: 9px !important; }
+        .drawer-scrim { background: var(--pt-overlay) !important; backdrop-filter: blur(3px); }
+        .app-page { width: 100% !important; max-width: 1600px !important; margin-left: auto !important; margin-right: auto !important; }
+        .overview-page { padding: 0 0 34px !important; }
+        .overview-hero {
+            padding: clamp(16px,2.4vw,24px) !important; margin-bottom: 22px !important;
+            border: 1px solid var(--pt-border) !important; border-radius: 18px !important;
+            background: var(--pt-card-gradient) !important; box-shadow: 0 10px 30px rgba(0,0,0,.06) !important;
+        }
+        .overview-banner, .welcome-banner { border-color: var(--pt-banner-border) !important; border-radius: 12px !important; margin-bottom: 19px !important; }
+        .overview-hero h1 { color: var(--pt-text) !important; letter-spacing: -.035em !important; }
+        .overview-hero p { color: var(--pt-muted) !important; line-height: 1.75 !important; }
+        .overview-section-title { margin: 24px 2px 12px !important; color: var(--pt-accent) !important; font-size: .68rem !important; font-weight: 900 !important; letter-spacing: .17em !important; }
+        .overview-tools-grid { gap: 13px !important; }
+        .overview-tool-card {
+            min-height: 150px !important; padding: 17px !important; gap: 9px !important;
+            border: 1px solid var(--pt-border) !important; border-radius: 15px !important;
+            background: linear-gradient(155deg, var(--pt-surface-raised), var(--pt-surface)) !important;
+            color: var(--pt-text) !important; box-shadow: 0 4px 15px rgba(0,0,0,.035) !important;
+            transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease !important;
+        }
+        .overview-tool-card:hover { transform: translateY(-3px) !important; border-color: var(--pt-accent) !important; background: var(--pt-surface-raised) !important; box-shadow: 0 10px 24px rgba(0,0,0,.09) !important; }
+        .overview-tool-card strong { color: var(--pt-text) !important; font-size: .85rem !important; line-height: 1.4 !important; }
+        .overview-tool-card span { color: var(--pt-muted) !important; font-size: .73rem !important; line-height: 1.6 !important; }
+        .overview-footer { border-color: var(--pt-border) !important; border-radius: 13px !important; background: var(--pt-surface) !important; padding: 14px 16px !important; }
+        .overview-footer p { color: var(--pt-muted) !important; }
+        .welcome-whats-new { border-color: var(--pt-border) !important; border-left: 4px solid var(--pt-accent) !important; border-radius: 13px !important; background: var(--pt-notice-gradient) !important; }
+        .modal-overlay { background: var(--pt-overlay) !important; backdrop-filter: blur(4px); }
+        .modal-card {
+            border: 1px solid var(--pt-border) !important; border-radius: 18px !important;
+            background: var(--pt-surface) !important; color: var(--pt-text) !important;
+            box-shadow: 0 26px 80px rgba(0,0,0,.24) !important;
+        }
+        .registration-panel, .roster-editor-card, .member-directory-card, .char-card, .missed-item,
+        .scholar-balance-card, .team-card, .builder-format-card, .team-builder-bottom,
+        .card-wiki-controls, .card-wiki-stat-panel, .card-wiki-preset, .card-wiki-tile,
+        .card-wiki-result-row, .card-wiki-stat-group, .analytics-card, .analytics-panel {
+            border-color: var(--pt-border) !important; border-radius: 13px !important;
+        }
+        .registration-panel, .roster-editor-card, .member-directory-card, .char-card, .team-card,
+        .builder-format-card, .team-builder-bottom, .card-wiki-stat-panel, .card-wiki-preset,
+        .card-wiki-tile, .card-wiki-result-row, .card-wiki-stat-group, .analytics-card, .analytics-panel {
+            background: var(--pt-surface) !important; color: var(--pt-text) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,.035) !important;
+        }
+        .team-builder-header { margin-bottom: 18px !important; gap: 16px !important; }
+        .team-builder-header h2, .card-wiki-header h2 { color: var(--pt-text) !important; letter-spacing: -.025em; }
+        .builder-toolbar, .card-wiki-controls, .card-wiki-stat-panel { border-radius: 13px !important; }
+        .builder-toolbar { border: 1px solid var(--pt-border) !important; background: var(--pt-surface) !important; padding: 12px !important; }
+        .builder-format-card { padding: 14px 16px !important; }
+        .team-builder-grid { gap: 14px !important; }
+        .team-card { overflow: hidden; }
+        .team-card-head { background: var(--pt-surface-soft) !important; border-color: var(--pt-border) !important; }
+        .team-table-wrap, .team-table, .class-setup-table, .role-config-table { background: var(--pt-surface) !important; }
+        .team-table th, .class-setup-table th, .role-config-table th { background: var(--pt-surface-soft) !important; color: var(--pt-muted) !important; border-color: var(--pt-border) !important; }
+        .team-table td, .class-setup-table td, .role-config-table td { color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        .card-wiki-controls { background: var(--pt-surface) !important; padding: 15px !important; }
+        .card-wiki-tile:hover, .card-wiki-result-row:hover { border-color: var(--pt-accent) !important; box-shadow: 0 9px 24px rgba(0,0,0,.10) !important; }
+        .member-directory-card { overflow: hidden; }
+        .roster-editor-head { border-color: var(--pt-border) !important; }
+        .character-chip { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; border-radius: 9px !important; }
+        .character-chip button { border-radius: 7px !important; }
+        .table-responsive {
+            background: var(--pt-surface) !important; border: 1px solid var(--pt-border) !important;
+            border-radius: 14px !important; box-shadow: 0 8px 24px rgba(0,0,0,.07) !important;
+        }
+        #dn-tracker { color: var(--pt-text) !important; background: var(--pt-surface) !important; }
+        #dn-tracker th { color: var(--pt-muted) !important; border-color: var(--pt-border) !important; }
+        #dn-tracker td { color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        #dn-tracker th.bg-dark, #dn-tracker td.bg-dark, #dn-tracker .bg-dark { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; }
+        .analytics-container { gap: 13px !important; }
+        .dev-controls { border: 1px solid var(--pt-border) !important; border-radius: 13px !important; background: var(--pt-surface) !important; padding: 14px !important; }
+        input:not([type="checkbox"]):not([type="radio"]), select, textarea,
+        .builder-select, .team-run-type, .team-character-select, .team-class-select,
+        .class-setup-select, .role-config-select, .card-wiki-field input, .card-wiki-field select {
+            border-radius: 9px !important; border-color: var(--pt-border) !important;
+        }
+        input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--pt-accent) !important;
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--pt-accent) 17%, transparent) !important;
+        }
+        .builder-alert { border-radius: 13px !important; }
+        .help-nav button, .help-topic, .help-article { border-radius: 11px !important; }
+        #pantheon-auth-gate { padding: 24px !important; }
+        .pantheon-auth-layout { width: min(1120px, 100%); display: grid; grid-template-columns: minmax(0,1.05fr) minmax(340px,.8fr); gap: clamp(28px,5vw,64px); align-items: center; }
+        .pantheon-auth-intro { min-width: 0; color: var(--pt-text); }
+        .pantheon-auth-intro h2 { margin: 18px 0; max-width: 620px; color: var(--pt-text); font-size: clamp(36px,4vw,52px); line-height: 1.04; letter-spacing: -.045em; }
+        .pantheon-auth-intro h2 em { color: var(--pt-accent); font-style: normal; }
+        .pantheon-auth-lead { max-width: 560px; margin: 0 0 25px; color: var(--pt-muted); font-size: 14px; line-height: 1.8; }
+        .pantheon-auth-features { display: grid; gap: 10px; max-width: 570px; }
+        .pantheon-auth-feature { display: flex; align-items: flex-start; gap: 12px; padding: 14px 15px; border: 1px solid var(--pt-border); border-radius: 13px; background: color-mix(in srgb,var(--pt-surface) 86%,transparent); }
+        .pantheon-auth-feature-icon { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px; border-radius: 10px; background: var(--pt-accent-soft); color: var(--pt-accent); font-size: 15px; font-weight: 900; }
+        .pantheon-auth-feature strong { display: block; margin: 1px 0 4px; color: var(--pt-text); font-size: 12px; }
+        .pantheon-auth-feature p { margin: 0; color: var(--pt-muted); font-size: 11px; line-height: 1.6; }
+        .pantheon-auth-footnote { margin: 23px 0 0; color: var(--pt-muted); font-size: 10px; }
+        .pantheon-auth-card {
+            width: 100% !important; max-width: 500px; justify-self: end; padding: clamp(18px, 3vw, 28px) !important;
+            border-radius: 22px !important; border-color: var(--pt-border) !important;
+            background: var(--pt-card-gradient) !important;
+            box-shadow: 0 28px 90px rgba(0,0,0,.22) !important;
+        }
+        .pantheon-auth-banner { min-height: 112px !important; padding: 18px 20px !important; border-radius: 14px !important; border-color: var(--pt-banner-border) !important; }
+        .pantheon-auth-banner-title { color: #fff !important; text-shadow: 0 2px 12px rgba(0,0,0,.78) !important; }
+        .pantheon-auth-card h1 { color: var(--pt-text) !important; letter-spacing: -.035em !important; }
+        .pantheon-auth-copy, .pantheon-auth-note { color: var(--pt-muted) !important; }
+        .pantheon-discord-btn { border-radius: 11px !important; box-shadow: 0 9px 22px rgba(88,101,242,.18) !important; }
+        #pantheon-session-bar { border-radius: 12px !important; box-shadow: 0 12px 30px rgba(0,0,0,.16) !important; }
+        ::selection { background: var(--pt-accent-soft); color: var(--pt-text); }
+        @media (max-width: 900px) {
+            .pantheon-auth-layout { grid-template-columns: minmax(0,1fr); gap: 28px; max-width: 680px; margin: 0 auto; }
+            .pantheon-auth-intro { text-align: center; }
+            .pantheon-auth-intro h2, .pantheon-auth-lead { margin-left: auto; margin-right: auto; }
+            .pantheon-auth-features { margin: 0 auto; text-align: left; }
+            .pantheon-auth-footnote { text-align: center; }
+            .pantheon-auth-card { justify-self: center; }
+        }
+        @media (max-width: 1050px) {
+            body { padding: 14px 12px 34px !important; }
+            .controls { padding: 13px !important; border-radius: 14px !important; }
+        }
+        @media (max-width: 760px) {
+            body { padding: 10px 9px 26px !important; }
+            .controls { margin-bottom: 14px !important; }
+            .brand-area { gap: 9px !important; }
+            .brand-area img, .brand-area .brand-logo-fallback { width: 40px !important; height: 40px !important; flex-basis: 40px !important; }
+            .brand-name { font-size: .7rem; }
+            .brand-subtitle { font-size: .55rem; }
+            .control-actions { gap: 9px !important; }
+            .pantheon-theme-control { align-items: center; flex-wrap: wrap; }
+            .overview-tools-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+            .overview-tool-card { min-height: 135px !important; padding: 13px !important; }
+            .table-responsive { border-radius: 10px !important; }
+        }
+        @media (max-width: 520px) {
+            .overview-tools-grid { grid-template-columns: 1fr !important; }
+            .overview-tool-card { min-height: auto !important; }
+            .brand-copy { min-width: 0; }
+            .brand-subtitle { letter-spacing: .03em; }
+            .pantheon-auth-card { border-radius: 17px !important; }
+            .pantheon-auth-intro h2 { font-size: 36px; }
+            .pantheon-auth-feature { padding: 11px; }
+        }
+
     </style>
     <script>
     try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
@@ -1220,7 +1432,19 @@
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
-      <div class="pantheon-auth-card">
+      <div class="pantheon-auth-layout">
+        <section class="pantheon-auth-intro" aria-label="Pantheon access overview">
+          <div class="pantheon-auth-kicker">One link. Approved accounts.</div>
+          <h2>Your guild tools.<br><em>All in one place.</em></h2>
+          <p class="pantheon-auth-lead">A single workspace for Dragon Nest Classic guild coordination, raid planning, character tracking, and shared guild records.</p>
+          <div class="pantheon-auth-features">
+            <article class="pantheon-auth-feature"><span class="pantheon-auth-feature-icon" aria-hidden="true">✓</span><div><strong>Approved-account access</strong><p>Only Discord accounts on Pantheon’s administrator-managed allowlist can open shared tools and data.</p></div></article>
+            <article class="pantheon-auth-feature"><span class="pantheon-auth-feature-icon" aria-hidden="true">↻</span><div><strong>Shared guild workspace</strong><p>Use the tracker, roster, and party tools from the same place with authenticated cloud sync.</p></div></article>
+            <article class="pantheon-auth-feature"><span class="pantheon-auth-feature-icon" aria-hidden="true">◇</span><div><strong>Tools for the whole guild</strong><p>Plan parties, browse card stats, maintain registrations, and handle guild administration.</p></div></article>
+          </div>
+          <p class="pantheon-auth-footnote">Pantheon Tools is maintained for the guild community.</p>
+        </section>
+        <div class="pantheon-auth-card">
         <div class="pantheon-auth-banner"><div class="pantheon-auth-banner-title">Dragon Nest - Classic Pantheon</div></div>
         <div class="pantheon-auth-brand-row">
           <label class="pantheon-theme-control pantheon-auth-theme" for="pantheon-auth-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-auth-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
@@ -1229,6 +1453,7 @@
         <p class="pantheon-auth-copy">Sign in with Discord. Pantheon checks your account ID against the administrator-approved list before loading shared guild data. Your Discord password is never given to Pantheon.</p>
         <button class="pantheon-discord-btn" type="button" onclick="window.location.href='/auth/discord/login'"><span aria-hidden="true">◉</span> Continue with Discord</button>
         <div class="pantheon-auth-note" id="pantheon-auth-note">Only approved Discord accounts can access shared roster and tracker data.</div>
+        </div>
       </div>
     </div>
     <div id="pantheon-session-bar"><span class="p-session-name" id="pantheon-session-name">Signed in</span><a href="/admin.html" id="pantheon-admin-link" hidden>Access admin</a><button type="button" id="pantheon-signout">Sign out</button></div>
@@ -1236,6 +1461,7 @@
     <div class="controls">
         <div class="brand-area">
             <img src="guild-logo.png" alt="Pantheon guild logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="brand-logo-fallback" hidden>P</span>
+            <div class="brand-copy"><div class="brand-name">PANTHEON TOOLS</div><div class="brand-subtitle">DRAGON NEST · GUILD OPERATIONS</div></div>
             <div class="system-status">
                 <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Loading Database...</span></div>
             </div>
@@ -1575,8 +1801,9 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.3</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.4</span></div>
                 <ul>
+                    <li><strong>Unified interface:</strong> the Overview, Tracker, Team Builder, Card Database, roster, and administrative screens now share a cleaner card-based layout, more consistent controls, and polished spacing.</li>
                     <li><strong>Appearance themes:</strong> choose Light, Dark, Eye comfort, or Pastel from the top toolbar. Your preference applies to the sign-in screen, tools, and pop-up windows.</li>
                     <li><strong>Default landing page:</strong> choose or change your startup destination from the new Overview shortcut or the Tools menu. Overview remains the default when no preference is saved.</li>
                     <li><strong>Less intrusive updates:</strong> the startup pop-up now contains only release changes. You can suppress it until the next version is released.</li>
@@ -5364,7 +5591,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.2';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.4';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
