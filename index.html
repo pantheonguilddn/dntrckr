@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.1</title>
+    <title>Pantheon Tools v1.5.2</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -849,12 +849,381 @@
         #pantheon-session-bar .p-session-name{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         #pantheon-session-bar a,#pantheon-session-bar button{color:#dbe2ff;background:transparent;border:1px solid #46516a;border-radius:7px;padding:6px 8px;font:inherit;text-decoration:none;cursor:pointer}
         #pantheon-session-bar a[hidden]{display:none}
+    
+
+        /* ===== Pantheon appearance themes (color-only; typography remains unchanged) ===== */
+        :root {
+            --pt-page: #1e1e24;
+            --pt-surface: #25252f;
+            --pt-surface-raised: #292934;
+            --pt-surface-soft: #202029;
+            --pt-input: #1b1d25;
+            --pt-text: #ffffff;
+            --pt-muted: #a1a8b8;
+            --pt-border: #393944;
+            --pt-accent: #8eace0;
+            --pt-accent-soft: #303d52;
+            --pt-hover: #2c2f3a;
+            --pt-overlay: rgba(0,0,0,.72);
+            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(85,113,210,.22),transparent 44%),rgba(12,15,23,.98);
+            --pt-card-gradient: linear-gradient(135deg,#272a35,#1d2028);
+            --pt-notice-gradient: linear-gradient(135deg,#252f40,#20242e);
+            --pt-banner-border: #3d424f;
+            --pt-positive: #55d68a;
+            color-scheme: dark;
+        }
+        :root[data-pantheon-theme="light"] {
+            --pt-page: #f4f6fa; --pt-surface: #ffffff; --pt-surface-raised: #f8f9fc; --pt-surface-soft: #edf1f7;
+            --pt-input: #ffffff; --pt-text: #1a2230; --pt-muted: #5e6a7e; --pt-border: #dce2ec;
+            --pt-accent: #315e9d; --pt-accent-soft: #e8f0fd; --pt-hover: #edf2fa; --pt-overlay: rgba(24,32,47,.42);
+            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(82,101,215,.12),transparent 44%),rgba(244,246,250,.98);
+            --pt-card-gradient: linear-gradient(135deg,#ffffff,#f0f4fc); --pt-notice-gradient: linear-gradient(135deg,#eef3fc,#f8f9fc);
+            --pt-banner-border: #dce2ec; --pt-positive: #087e65; color-scheme: light;
+        }
+        :root[data-pantheon-theme="eye-comfort"] {
+            --pt-page: #f0eddf; --pt-surface: #faf7eb; --pt-surface-raised: #fdfaf0; --pt-surface-soft: #e9e4d2;
+            --pt-input: #fcf9ef; --pt-text: #30352d; --pt-muted: #6d6b5b; --pt-border: #d5cdb7;
+            --pt-accent: #63774e; --pt-accent-soft: #e4e8d7; --pt-hover: #e7e3d3; --pt-overlay: rgba(47,45,35,.42);
+            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(130,143,91,.13),transparent 44%),rgba(240,237,223,.98);
+            --pt-card-gradient: linear-gradient(135deg,#fcf9ef,#f2eddd); --pt-notice-gradient: linear-gradient(135deg,#eeead9,#faf7eb);
+            --pt-banner-border: #d5cdb7; --pt-positive: #427650; color-scheme: light;
+        }
+        :root[data-pantheon-theme="pastel"] {
+            --pt-page: #fbf3fb; --pt-surface: #fffaff; --pt-surface-raised: #fff8ff; --pt-surface-soft: #f3e8f5;
+            --pt-input: #fffaff; --pt-text: #49354e; --pt-muted: #7d6b83; --pt-border: #e4d5e8;
+            --pt-accent: #a16bb5; --pt-accent-soft: #f3e7f8; --pt-hover: #f5eafa; --pt-overlay: rgba(68,47,76,.4);
+            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(186,132,205,.16),transparent 44%),rgba(251,243,251,.98);
+            --pt-card-gradient: linear-gradient(135deg,#fffaff,#f7edf8); --pt-notice-gradient: linear-gradient(135deg,#f5eaf7,#fffaff);
+            --pt-banner-border: #e4d5e8; --pt-positive: #397762; color-scheme: light;
+        }
+        :root[data-pantheon-theme] body { background: var(--pt-page) !important; color: var(--pt-text) !important; }
+        :root[data-pantheon-theme] .controls,
+        :root[data-pantheon-theme] .tool-drawer,
+        :root[data-pantheon-theme] .tool-drawer-head,
+        :root[data-pantheon-theme] .toolbar-group,
+        :root[data-pantheon-theme] .status-pill,
+        :root[data-pantheon-theme] .team-card,
+        :root[data-pantheon-theme] .version-status,
+        :root[data-pantheon-theme] .version-list,
+        :root[data-pantheon-theme] .char-card,
+        :root[data-pantheon-theme] .missed-item,
+        :root[data-pantheon-theme] .registration-panel,
+        :root[data-pantheon-theme] .roster-editor-card,
+        :root[data-pantheon-theme] .character-chip,
+        :root[data-pantheon-theme] .scholar-balance-card,
+        :root[data-pantheon-theme] .scholar-history-list,
+        :root[data-pantheon-theme] .card-wiki-controls,
+        :root[data-pantheon-theme] .card-wiki-tile,
+        :root[data-pantheon-theme] .card-wiki-empty,
+        :root[data-pantheon-theme] .card-wiki-stat-panel,
+        :root[data-pantheon-theme] .card-wiki-stat-group,
+        :root[data-pantheon-theme] .card-wiki-stat-option,
+        :root[data-pantheon-theme] .card-wiki-preset-panel,
+        :root[data-pantheon-theme] .card-wiki-preset,
+        :root[data-pantheon-theme] .member-directory-panel,
+        :root[data-pantheon-theme] .member-character-editor-block,
+        :root[data-pantheon-theme] .member-character-row,
+        :root[data-pantheon-theme] .member-directory-card,
+        :root[data-pantheon-theme] .member-directory-char,
+        :root[data-pantheon-theme] .member-directory-field input,
+        :root[data-pantheon-theme] .card-wiki-result-row,
+        :root[data-pantheon-theme] .card-wiki-stat-value,
+        :root[data-pantheon-theme] .card-wiki-batch-row,
+        :root[data-pantheon-theme] .card-wiki-cap-tag,
+        :root[data-pantheon-theme] .card-wiki-number,
+        :root[data-pantheon-theme] .card-wiki-copy-button,
+        :root[data-pantheon-theme] .card-wiki-selected-tag,
+        :root[data-pantheon-theme] .card-wiki-tile-foot,
+        :root[data-pantheon-theme] .team-card-head,
+        :root[data-pantheon-theme] .team-card-foot,
+        :root[data-pantheon-theme] .builder-toolbar,
+        :root[data-pantheon-theme] .builder-format-card,
+        :root[data-pantheon-theme] .team-builder-bottom,
+        :root[data-pantheon-theme] .balance-card,
+        :root[data-pantheon-theme] .class-setup-table-wrap,
+        :root[data-pantheon-theme] .role-config-scroll,
+        :root[data-pantheon-theme] .help-content,
+        :root[data-pantheon-theme] .help-nav button,
+        :root[data-pantheon-theme] .overview-footer,
+        :root[data-pantheon-theme] .overview-tool-card,
+        :root[data-pantheon-theme] .overview-hero,
+        :root[data-pantheon-theme] .welcome-whats-new,
+        :root[data-pantheon-theme] .welcome-default,
+        :root[data-pantheon-theme] .welcome-shortcuts button,
+        :root[data-pantheon-theme] .modal-card,
+        :root[data-pantheon-theme] .team-balance-panel,
+        :root[data-pantheon-theme] .team-summary-pill,
+        :root[data-pantheon-theme] .owner-chip,
+        :root[data-pantheon-theme] .team-badge,
+        :root[data-pantheon-theme] .role-check,
+        :root[data-pantheon-theme] .drawer-item,
+        :root[data-pantheon-theme] .drawer-icon {
+            background: var(--pt-surface) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important;
+        }
+        :root[data-pantheon-theme] .toolbar-group,
+        :root[data-pantheon-theme] .version-list,
+        :root[data-pantheon-theme] .version-row:hover,
+        :root[data-pantheon-theme] .character-chip,
+        :root[data-pantheon-theme] .scholar-balance-card,
+        :root[data-pantheon-theme] .scholar-history-list,
+        :root[data-pantheon-theme] .card-wiki-controls,
+        :root[data-pantheon-theme] .card-wiki-stat-group,
+        :root[data-pantheon-theme] .card-wiki-preset-panel,
+        :root[data-pantheon-theme] .card-wiki-preset,
+        :root[data-pantheon-theme] .member-character-editor-block,
+        :root[data-pantheon-theme] .member-character-row,
+        :root[data-pantheon-theme] .member-directory-card,
+        :root[data-pantheon-theme] .member-directory-char,
+        :root[data-pantheon-theme] .card-wiki-number,
+        :root[data-pantheon-theme] .card-wiki-copy-button,
+        :root[data-pantheon-theme] .card-wiki-cap-tag,
+        :root[data-pantheon-theme] .card-wiki-stat-value,
+        :root[data-pantheon-theme] .card-wiki-tile-foot,
+        :root[data-pantheon-theme] .team-card-head,
+        :root[data-pantheon-theme] .team-card-foot,
+        :root[data-pantheon-theme] .builder-toolbar,
+        :root[data-pantheon-theme] .builder-format-card,
+        :root[data-pantheon-theme] .team-builder-bottom,
+        :root[data-pantheon-theme] .team-table th,
+        :root[data-pantheon-theme] .class-setup-table th,
+        :root[data-pantheon-theme] .role-config-table th,
+        :root[data-pantheon-theme] .team-summary-pill,
+        :root[data-pantheon-theme] .team-badge,
+        :root[data-pantheon-theme] .owner-chip,
+        :root[data-pantheon-theme] .drawer-icon,
+        :root[data-pantheon-theme] .drawer-item:hover,
+        :root[data-pantheon-theme] .help-nav button.active {
+            background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important;
+        }
+        :root[data-pantheon-theme] .overview-hero { background: var(--pt-card-gradient) !important; }
+        :root[data-pantheon-theme] .welcome-whats-new { background: var(--pt-notice-gradient) !important; }
+        :root[data-pantheon-theme] .card-wiki-tile,
+        :root[data-pantheon-theme] .card-wiki-result-row { background: var(--pt-card-gradient) !important; }
+        :root[data-pantheon-theme] .card-wiki-result-row:hover,
+        :root[data-pantheon-theme] .card-wiki-stat-option:has(input:checked),
+        :root[data-pantheon-theme] .card-wiki-preset:has(input:checked),
+        :root[data-pantheon-theme] .card-wiki-selected-tag,
+        :root[data-pantheon-theme] .card-wiki-stat-value.is-match { background: var(--pt-accent-soft) !important; border-color: var(--pt-accent) !important; }
+        :root[data-pantheon-theme] .member-directory-char-status.is-tracked { background: #e1f3e8 !important; color: #176544 !important; border-color: #abd7bc !important; }
+        :root[data-pantheon-theme] .version-status,
+        :root[data-pantheon-theme] .modal-note { background: var(--pt-surface-soft) !important; color: var(--pt-muted) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .card-wiki-stat-panel-head h3,
+        :root[data-pantheon-theme] .card-wiki-header h2,
+        :root[data-pantheon-theme] .card-wiki-result-row h3 { color: var(--pt-text) !important; }
+        :root[data-pantheon-theme] .card-wiki-stat-panel-head p,
+        :root[data-pantheon-theme] .card-wiki-header p,
+        :root[data-pantheon-theme] .card-wiki-field,
+        :root[data-pantheon-theme] .card-wiki-summary,
+        :root[data-pantheon-theme] .card-wiki-preset small,
+        :root[data-pantheon-theme] .card-wiki-empty { color: var(--pt-muted) !important; }
+        :root[data-pantheon-theme] .card-wiki-number,
+        :root[data-pantheon-theme] .card-wiki-result-number { color: var(--pt-muted) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .card-wiki-stat-panel,
+        :root[data-pantheon-theme] .member-directory-panel { background: var(--pt-surface) !important; }
+        :root[data-pantheon-theme] .registration-form input,
+        :root[data-pantheon-theme] .registration-form select,
+        :root[data-pantheon-theme] .member-character-row input[type="text"],
+        :root[data-pantheon-theme] .member-character-row select,
+        :root[data-pantheon-theme] .card-wiki-field input,
+        :root[data-pantheon-theme] .card-wiki-field select,
+        :root[data-pantheon-theme] .card-wiki-stat-tools select,
+        :root[data-pantheon-theme] .card-wiki-stat-tools input,
+        :root[data-pantheon-theme] .card-batch-form input,
+        :root[data-pantheon-theme] .card-batch-form textarea,
+        :root[data-pantheon-theme] .welcome-default select { background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .help-topic .help-callout { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .release-version { background: var(--pt-accent-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .version-row:hover { background: var(--pt-hover) !important; }
+        :root[data-pantheon-theme] .card-wiki-result-row,
+        :root[data-pantheon-theme] .card-wiki-tile,
+        :root[data-pantheon-theme] .card-wiki-empty,
+        :root[data-pantheon-theme] .card-wiki-copy-button,
+        :root[data-pantheon-theme] .card-wiki-stat-option,
+        :root[data-pantheon-theme] .card-wiki-preset,
+        :root[data-pantheon-theme] .member-character-row,
+        :root[data-pantheon-theme] .member-directory-card,
+        :root[data-pantheon-theme] .member-directory-char,
+        :root[data-pantheon-theme] .registration-panel,
+        :root[data-pantheon-theme] .roster-editor-card,
+        :root[data-pantheon-theme] .char-card,
+        :root[data-pantheon-theme] .missed-item,
+        :root[data-pantheon-theme] .scholar-balance-card,
+        :root[data-pantheon-theme] .scholar-history-list { color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .modal-overlay { background: var(--pt-overlay) !important; }
+        :root[data-pantheon-theme] .modal-card { background: var(--pt-surface) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; box-shadow: 0 12px 36px rgba(0,0,0,.16) !important; }
+        :root[data-pantheon-theme] .modal-card .modal-card,
+        :root[data-pantheon-theme] .modal-card .panel,
+        :root[data-pantheon-theme] .modal-card .settings-panel { background: var(--pt-surface-raised) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] #pantheon-auth-gate { background: var(--pt-auth-bg) !important; color: var(--pt-text) !important; }
+        :root[data-pantheon-theme] .pantheon-auth-card { background: var(--pt-card-gradient) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; box-shadow: 0 24px 80px rgba(0,0,0,.18) !important; }
+        :root[data-pantheon-theme] .pantheon-auth-card h1,
+        :root[data-pantheon-theme] .pantheon-auth-copy,
+        :root[data-pantheon-theme] .pantheon-auth-kicker,
+        :root[data-pantheon-theme] .pantheon-auth-note { color: var(--pt-text) !important; }
+        :root[data-pantheon-theme] .pantheon-auth-kicker { color: var(--pt-accent) !important; }
+        :root[data-pantheon-theme] #pantheon-session-bar { background: var(--pt-surface) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] #pantheon-session-bar a,
+        :root[data-pantheon-theme] #pantheon-session-bar button { color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .status-pill,
+        :root[data-pantheon-theme] .status-pill span:not(.status-dot) { color: var(--pt-muted) !important; }
+        :root[data-pantheon-theme] .overview-hero h1,
+        :root[data-pantheon-theme] .overview-hero p,
+        :root[data-pantheon-theme] .overview-section-title,
+        :root[data-pantheon-theme] .overview-tool-card strong,
+        :root[data-pantheon-theme] .overview-tool-card span,
+        :root[data-pantheon-theme] .overview-footer p,
+        :root[data-pantheon-theme] .welcome-whats-new h4,
+        :root[data-pantheon-theme] .welcome-whats-new ul,
+        :root[data-pantheon-theme] .team-builder-header h2,
+        :root[data-pantheon-theme] .team-builder-header p,
+        :root[data-pantheon-theme] .team-card-title,
+        :root[data-pantheon-theme] .card-wiki-header h2,
+        :root[data-pantheon-theme] .card-wiki-stat-panel-head h3,
+        :root[data-pantheon-theme] .card-wiki-detail-heading h3,
+        :root[data-pantheon-theme] .card-wiki-tile h3,
+        :root[data-pantheon-theme] .card-wiki-tile p,
+        :root[data-pantheon-theme] .card-wiki-result-row h3,
+        :root[data-pantheon-theme] .card-wiki-stat-group h4,
+        :root[data-pantheon-theme] .registration-panel h3,
+        :root[data-pantheon-theme] .roster-editor-card h3,
+        :root[data-pantheon-theme] .member-directory-card h3,
+        :root[data-pantheon-theme] .card-wiki-result-row,
+        :root[data-pantheon-theme] .card-wiki-stat-group,
+        :root[data-pantheon-theme] .card-wiki-stat-option,
+        :root[data-pantheon-theme] .card-wiki-preset,
+        :root[data-pantheon-theme] .member-directory-card,
+        :root[data-pantheon-theme] .member-directory-char,
+        :root[data-pantheon-theme] .member-character-row,
+        :root[data-pantheon-theme] .registration-panel,
+        :root[data-pantheon-theme] .roster-editor-card,
+        :root[data-pantheon-theme] .char-card,
+        :root[data-pantheon-theme] .missed-item,
+        :root[data-pantheon-theme] .scholar-balance-card,
+        :root[data-pantheon-theme] .team-card-sub,
+        :root[data-pantheon-theme] .team-table th,
+        :root[data-pantheon-theme] .team-table td,
+        :root[data-pantheon-theme] .team-summary .summary-label,
+        :root[data-pantheon-theme] .team-summary-pill,
+        :root[data-pantheon-theme] .team-builder-bottom,
+        :root[data-pantheon-theme] .team-builder-bottom strong,
+        :root[data-pantheon-theme] .format-description,
+        :root[data-pantheon-theme] .format-quick-help,
+        :root[data-pantheon-theme] .class-setup-table th,
+        :root[data-pantheon-theme] .class-setup-table td,
+        :root[data-pantheon-theme] .role-config-table th,
+        :root[data-pantheon-theme] .role-config-table td,
+        :root[data-pantheon-theme] .help-topic h5,
+        :root[data-pantheon-theme] .help-topic p,
+        :root[data-pantheon-theme] .drawer-kicker,
+        :root[data-pantheon-theme] .drawer-section-title,
+        :root[data-pantheon-theme] .drawer-item strong,
+        :root[data-pantheon-theme] .drawer-item small,
+        :root[data-pantheon-theme] .modal-note,
+        :root[data-pantheon-theme] .welcome-check,
+        :root[data-pantheon-theme] .builder-field,
+        :root[data-pantheon-theme] .class-setup-owner { color: var(--pt-text) !important; }
+        :root[data-pantheon-theme] .overview-section-title,
+        :root[data-pantheon-theme] .overview-tool-card span,
+        :root[data-pantheon-theme] .overview-footer p,
+        :root[data-pantheon-theme] .team-builder-header p,
+        :root[data-pantheon-theme] .team-card-sub,
+        :root[data-pantheon-theme] .team-summary .summary-label,
+        :root[data-pantheon-theme] .card-wiki-header p,
+        :root[data-pantheon-theme] .card-wiki-stat-panel-head p,
+        :root[data-pantheon-theme] .card-wiki-field,
+        :root[data-pantheon-theme] .card-wiki-summary,
+        :root[data-pantheon-theme] .card-wiki-tile-foot,
+        :root[data-pantheon-theme] .card-wiki-cap-tag,
+        :root[data-pantheon-theme] .card-wiki-stat-value,
+        :root[data-pantheon-theme] .card-wiki-preset small,
+        :root[data-pantheon-theme] .card-wiki-empty,
+        :root[data-pantheon-theme] .format-quick-help,
+        :root[data-pantheon-theme] .drawer-kicker,
+        :root[data-pantheon-theme] .drawer-section-title,
+        :root[data-pantheon-theme] .drawer-item small,
+        :root[data-pantheon-theme] .modal-note,
+        :root[data-pantheon-theme] .class-setup-owner { color: var(--pt-muted) !important; }
+        :root[data-pantheon-theme] .team-table th,
+        :root[data-pantheon-theme] .class-setup-table th,
+        :root[data-pantheon-theme] .role-config-table th { background: var(--pt-surface-soft) !important; }
+        :root[data-pantheon-theme] .team-table td,
+        :root[data-pantheon-theme] .class-setup-table td,
+        :root[data-pantheon-theme] .role-config-table td { border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] input:not([type="checkbox"]):not([type="radio"]),
+        :root[data-pantheon-theme] select,
+        :root[data-pantheon-theme] textarea,
+        :root[data-pantheon-theme] .builder-select,
+        :root[data-pantheon-theme] .team-run-type,
+        :root[data-pantheon-theme] .team-character-select,
+        :root[data-pantheon-theme] .team-class-select,
+        :root[data-pantheon-theme] .class-setup-select,
+        :root[data-pantheon-theme] .role-config-select,
+        :root[data-pantheon-theme] .builder-check,
+        :root[data-pantheon-theme] .identity-select,
+        :root[data-pantheon-theme] .roster-filter-top {
+            background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important;
+        }
+        :root[data-pantheon-theme] input[type="checkbox"],
+        :root[data-pantheon-theme] input[type="radio"] { accent-color: var(--pt-accent) !important; }
+        :root[data-pantheon-theme] .btn:not(.btn-sync):not(.btn-estate):not(.btn-view-toggle):not(.btn-cloud):not(.btn-weights):not(.help-btn),
+        :root[data-pantheon-theme] .menu-toggle,
+        :root[data-pantheon-theme] .drawer-close,
+        :root[data-pantheon-theme] .team-mini-btn,
+        :root[data-pantheon-theme] .remove-slot-btn,
+        :root[data-pantheon-theme] .mini-help,
+        :root[data-pantheon-theme] .help-btn:not(.btn-cloud) { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .btn-sync,
+        :root[data-pantheon-theme] .btn-estate,
+        :root[data-pantheon-theme] .btn-view-toggle,
+        :root[data-pantheon-theme] .btn-cloud,
+        :root[data-pantheon-theme] .btn-weights,
+        :root[data-pantheon-theme] .help-btn,
+        :root[data-pantheon-theme] .pantheon-discord-btn { color: #ffffff !important; }
+        :root[data-pantheon-theme] .drawer-item:hover,
+        :root[data-pantheon-theme] .overview-tool-card:hover,
+        :root[data-pantheon-theme] .team-mini-btn:hover,
+        :root[data-pantheon-theme] .help-nav button:hover { background: var(--pt-hover) !important; }
+        :root[data-pantheon-theme] .overview-banner,
+        :root[data-pantheon-theme] .welcome-banner { border-color: var(--pt-banner-border) !important; background-color: var(--pt-surface-soft) !important; }
+        :root[data-pantheon-theme] .team-badge.position,
+        :root[data-pantheon-theme] .team-summary-pill.warning,
+        :root[data-pantheon-theme] .builder-alert { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
+        :root[data-pantheon-theme] .status-dot { background: var(--pt-positive) !important; }
+        :root[data-pantheon-theme] .pantheon-auth-brand-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+        :root[data-pantheon-theme] .pantheon-auth-logo { display:block; width:44px; height:44px; object-fit:contain; flex:0 0 44px; }
+        :root[data-pantheon-theme] .pantheon-auth-logo-fallback,
+        :root[data-pantheon-theme] .brand-logo-fallback { width:54px; height:54px; align-items:center; justify-content:center; border-radius:10px; background:var(--pt-accent-soft); color:var(--pt-accent); font-weight:900; }
+        :root[data-pantheon-theme] .pantheon-auth-logo-fallback:not([hidden]),
+        :root[data-pantheon-theme] .brand-logo-fallback:not([hidden]) { display:inline-flex; }
+        :root[data-pantheon-theme] .pantheon-theme-control { display:inline-flex; align-items:center; gap:7px; color:var(--pt-muted); font-size:.68rem; font-weight:800; letter-spacing:.04em; flex:0 0 auto; }
+        :root[data-pantheon-theme] .pantheon-theme-select { min-height:34px; max-width:150px; padding:6px 8px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-input); color:var(--pt-text); cursor:pointer; }
+        :root[data-pantheon-theme] .pantheon-auth-theme { margin-left:auto; }
+        :root[data-pantheon-theme] .app-theme-control { margin:0 2px; }
+        :root[data-pantheon-theme] .brand-area img { width:54px !important; height:54px !important; object-fit:contain; }
+        :root[data-pantheon-theme] .brand-area .brand-logo-fallback { display:inline-flex; flex:0 0 54px; }
+        @media (max-width: 760px) {
+            :root[data-pantheon-theme] .control-actions { flex-wrap:wrap; justify-content:flex-start; }
+            :root[data-pantheon-theme] .topbar-player { flex-wrap:wrap; }
+            :root[data-pantheon-theme] .pantheon-theme-control { max-width:100%; }
+            :root[data-pantheon-theme] .pantheon-auth-brand-row { align-items:flex-start; }
+            :root[data-pantheon-theme] .pantheon-auth-theme { margin-left:0; }
+        }
+
     </style>
+    <script>
+    try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
+    catch (_) { document.documentElement.setAttribute('data-pantheon-theme', 'dark'); }
+    </script>
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
       <div class="pantheon-auth-card">
-        <div class="pantheon-auth-kicker">Pantheon · Dragon Nest Classic</div>
+        <div class="pantheon-auth-brand-row">
+          <img class="pantheon-auth-logo" src="guild-logo.png" alt="Pantheon guild logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+          <span class="pantheon-auth-logo-fallback" hidden>P</span>
+          <div class="pantheon-auth-kicker">Pantheon · Dragon Nest Classic</div>
+          <label class="pantheon-theme-control pantheon-auth-theme" for="pantheon-auth-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-auth-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
+        </div>
         <h1 id="pantheon-auth-title">Your guild tools, protected.</h1>
         <p class="pantheon-auth-copy">Sign in with Discord. Pantheon checks your account ID against the administrator-approved list before loading shared guild data. Your Discord password is never given to Pantheon.</p>
         <button class="pantheon-discord-btn" type="button" onclick="window.location.href='/auth/discord/login'"><span aria-hidden="true">◉</span> Continue with Discord</button>
@@ -865,7 +1234,7 @@
 
     <div class="controls">
         <div class="brand-area">
-            <img src="Guild Banner.png" alt="Pantheon Guild">
+            <img src="guild-logo.png" alt="Pantheon guild logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="brand-logo-fallback" hidden>P</span>
             <div class="system-status">
                 <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Loading Database...</span></div>
             </div>
@@ -882,6 +1251,7 @@
                 </select>
                 <button class="mini-help" type="button" title="Personal & Universal View Guide" onclick="openHelpModal('view')">?</button>
             </div>
+            <label class="pantheon-theme-control app-theme-control" for="pantheon-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
             <button class="menu-toggle" id="menu-toggle" type="button" onclick="toggleSideMenu()" aria-expanded="false" aria-controls="tool-drawer">
                 <span class="menu-icon">☰</span>
                 <span class="menu-toggle-label">Tools</span>
@@ -950,7 +1320,7 @@
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-universal')"><strong>📋 Tracker & Bounties</strong><span>Review daily and weekly tasks, bounty targets and notes, analytics, and guild progress. Switch between Universal and Personal View.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('team-builder')"><strong>⚔ Team Builder</strong><span>Build raid parties from tracker-registered characters, check party roles, configure class capabilities, and share setups.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('card-database')"><strong>🃏 Card Database</strong><span>Filter monster cards by level range and desired stats. Quick Builds return cards with any one of the preset stats. Card batches stay local.</span></button>
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('member-roster')"><strong>👥 Member Roster</strong><span>Maintain the guild directory, including members who have not registered characters for Tracker or Team Builder.</span></button>
+            <button class="overview-tool-card" type="button" onclick="openLandingSettings()"><strong>⚙ Default Landing Page</strong><span>Choose which Pantheon tool opens first. Change or clear your startup destination anytime.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><strong>🧮 Salary Calculator</strong><span>Calculate and split party income using the available calculator.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('help')"><strong>❔ Help & Guide</strong><span>Open the relevant guides for Tracker, Team Builder, Card Database, and roster workflows.</span></button>
         </section>
@@ -1201,61 +1571,19 @@
         </div>
     </div>
 
-    <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Welcome to Pantheon Tools">
+    <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
-            <img class="welcome-banner" src="Guild Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
-            <h3>🏛 Welcome to Pantheon Tools</h3>
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New?</h4><span class="release-version">v1.5.1</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.2</span></div>
                 <ul>
-                    <li><strong>Discord-based Personal View:</strong> after sign-in, Pantheon automatically matches your Discord profile name to your Member Roster owner name and enables Personal View for that roster. If the names differ, a roster match label or one-time manual selection is remembered for that Discord account.</li>
-                    <li><strong>Discord allowlist gateway:</strong> sign in with Discord; only account IDs approved by a Pantheon administrator can access shared guild data.</li>
-                    <li><strong>Cloudflare D1 sync:</strong> shared tracker and Member Roster records use the protected same-origin API instead of browser-held JSONBin keys. Members do not configure cloud credentials per device.</li>
-                    <li><strong>Member Roster remains the master source:</strong> characters retain their IGN and Class / Job when removed from Tracker; only opted-in characters feed Tracker and Team Builder.</li>
+                    <li><strong>Appearance themes:</strong> choose Light, Dark, Eye comfort, or Pastel from the top toolbar. Your preference applies to the sign-in screen, tools, and pop-up windows.</li>
+                    <li><strong>Default landing page:</strong> choose or change your startup destination from the new Overview shortcut or the Tools menu. Overview remains the default when no preference is saved.</li>
+                    <li><strong>Less intrusive updates:</strong> the startup pop-up now contains only release changes. You can suppress it until the next version is released.</li>
+                    <li><strong>Guild logo:</strong> the sign-in card and app header use <code>guild-logo.png</code>. The full guild banner remains in Overview and other banner locations.</li>
                 </ul>
-                <details class="welcome-previous-release"><summary>Previous release highlights (v1.4.4)</summary><ul>
-                    <li><strong>Member Roster navigation restored:</strong> open the shared guild member directory directly from the Tools side menu, without needing the Overview shortcut.</li>
-                    <li><strong>Optional weekly analytics:</strong> analytics tracking is now off by default. Enable it only if the guild wants five-week trends and priority history; normal daily and weekly task resets still work without it.</li>
-                    <li><strong>Reduce cloud record size:</strong> historical analytics is limited to five weeks, and Clear Stored History removes older archives without deleting task progress, roster data, salary logs, or other tracker settings. Clearing is an explicit action.</li>
-                    <li><strong>Compact cloud sync:</strong> the main tracker payload uses a compact, reversible format to reduce JSONBin record size. If the record still exceeds the free-plan limit, sync reports the measured size and keeps changes local instead of sending a request that will be rejected.</li>
-                    <li><strong>Share Salary Calculator receipt:</strong> use Share Receipt to copy a screenshot of the receipt only, ready to paste into Discord. If clipboard image access is unavailable, it downloads a PNG instead.</li>
-                    <li><strong>Clean first launch:</strong> a fresh browser starts without preloaded guild members, characters, or tracker task categories. Shared guild data is loaded only after the user connects through Cloud Setup.</li>
-                    <li><strong>Safe first cloud connection:</strong> when there is no meaningful local tracker data, the connected cloud database is treated as authoritative. A blank new install will not overwrite an existing guild roster or task setup during the first sync.</li>
-                    <li><strong>Offline behavior:</strong> without a cloud connection, changes made by the user remain local to that browser and are not sent to the shared guild database.</li>
-                </ul></details>
-                <details class="welcome-previous-release"><summary>Earlier update highlights (v1.3.9–v1.3.3)</summary><ul>
-                    <li><strong>Default landing checkbox alignment:</strong> the checkbox now lines up cleanly with its label, including when the text wraps.</li>
-                    <li><strong>Overview behind tool dialogs:</strong> Salary Calculator and Help &amp; Guide opened from Welcome now display the Overview page behind the dialog instead of Tracker.</li>
-                    <li><strong>Return to Welcome:</strong> closing Salary Calculator or Help after opening it from Welcome or an Overview shortcut brings you back to the Welcome popup.</li>
-                    <li><strong>Change startup destination anytime:</strong> the side menu now has Set Default Landing Page, so you can change or clear your saved landing page without refreshing.</li>
-                    <li><strong>Quick card copy:</strong> click the overlapping-squares icon beside any card name to copy the exact name for the in-game Trading House.</li>
-                    <li><strong>Simpler Card Database:</strong> removed Compare and its related controls and help text. Full five-rarity details remain available by opening a card.</li>
-                    <li><strong>Card Database layout:</strong> Desired character stat groups use wider columns, and long checkbox labels wrap inside their own boxes instead of overlapping the results table.</li>
-                    <li><strong>Overview and navigation:</strong> the guild banner, Discord invite, tool overview, and default landing behavior.</li>
-                    <li><strong>Pantheon Tools overview:</strong> the guild banner, Discord invite, and a guide to the available tools.</li>
-                    <li><strong>Guild banner scaling:</strong> the welcome popup and Overview display the full banner image without cropping.</li>
-                    <li><strong>Cleaner navigation:</strong> removed the redundant Overview/Tracker top tabs. Use the Overview tool cards or side menu to open a tool.</li>
-                    <li><strong>Quick Builds use OR matching:</strong> Magic returns cards with MATK or INT or Final Damage; Physical returns cards with PATK or STR or AGI or Final Damage; Defensive returns cards with Defense or Magic Defense or VIT or Max HP.</li>
-                    <li><strong>Local card updates:</strong> Card Database batches stay in this browser and do not sync globally. Member Roster entries sync with the shared guild data when Cloud is configured.</li>
-                </ul></details>
             </section>
-            <div class="modal-note">Choose a shortcut to open a tool, or save a default landing page below. Without a saved default, the Overview page is the starting page.</div>
-            <div class="overview-footer" style="margin-top:0"><a id="welcome-discord-link" class="btn btn-cloud" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a></div>
-            <div class="welcome-shortcuts">
-                <button type="button" onclick="runWelcomeShortcut('tracker-universal')"><strong>📋 Tracker</strong><span>Check daily and weekly progress, bounty targets, and analytics.</span></button>
-                <button type="button" onclick="runWelcomeShortcut('team-builder')"><strong>⚔ Team Builder</strong><span>Build raid parties using tracker-registered characters.</span></button>
-                <button type="button" onclick="runWelcomeShortcut('card-database')"><strong>🃏 Card Database</strong><span>Filter card stats and manage personal card batches locally.</span></button>
-                <button type="button" onclick="runWelcomeShortcut('member-roster')"><strong>👥 Member Roster</strong><span>Keep a directory of guild members, including non-tracker users.</span></button>
-                <button type="button" onclick="runWelcomeShortcut('salary')"><strong>🧮 Salary Calculator</strong><span>Calculate and split party income.</span></button>
-                <button type="button" onclick="runWelcomeShortcut('help')"><strong>❔ Help & Guide</strong><span>Open instructions for the tools and their workflows.</span></button>
-            </div>
-            <div class="welcome-default">
-                <h4 style="margin:0;">Choose a default landing page</h4>
-                <div class="welcome-default-row"><label for="welcome-default-landing">Open by default</label><select id="welcome-default-landing"><option value="overview">Overview</option><option value="tracker-universal">Tracker · Universal View</option><option value="tracker-personal">Tracker · Personal View</option><option value="team-builder">Team Builder</option><option value="card-database">Card Database</option><option value="member-roster">Member Roster</option><option value="salary">Salary Calculator</option></select></div>
-                <label class="welcome-check"><input id="welcome-default-enabled" type="checkbox"><span>Use this selection whenever I refresh or reopen the tracker.</span></label>
-                <div class="modal-note">After Discord sign-in, Pantheon selects the Member Roster owner that matches your Discord profile and enables Personal View. If your profile name differs from your owner name, select your roster once or ask an admin to set a roster match label; that fallback is remembered for your Discord account.</div>
-                <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="saveWelcomeDefault(false)">Don't save a default</button><button class="btn btn-cloud" type="button" onclick="saveWelcomeDefault(true)">Save Default</button><button class="btn btn-secondary" type="button" onclick="continueFromWelcome()">Continue</button></div>
-            </div>
+            <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
+            <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
         </div>
     </div>
 
@@ -5034,7 +5362,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.1';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.2';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -5134,19 +5462,25 @@
             try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
             applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
         }
+        const RELEASE_DISMISSAL_KEY = 'pantheon-release-popup-dismissed-version-v1';
+        function closeWelcomeReleaseNotes() {
+            const checkbox = document.getElementById('welcome-hide-until-update');
+            try {
+                if (checkbox && checkbox.checked) localStorage.setItem(RELEASE_DISMISSAL_KEY, PANTHEON_TOOLS_VERSION);
+                else localStorage.removeItem(RELEASE_DISMISSAL_KEY);
+            } catch (e) {}
+            closeModal('welcome-modal');
+        }
         function initializeWelcomeModal() {
-            let saved = '';
-            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
-            const hasSavedDefault = LANDING_OPTIONS.includes(saved);
-            const choice = hasSavedDefault ? saved : 'overview';
-            const select = document.getElementById('welcome-default-landing');
-            const checkbox = document.getElementById('welcome-default-enabled');
-            if (select) select.value = choice;
-            if (checkbox) checkbox.checked = hasSavedDefault;
-            applyLandingChoice(choice);
-            const modal = document.getElementById('welcome-modal');
+            let saved = '', dismissedVersion = '';
+            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; dismissedVersion = localStorage.getItem(RELEASE_DISMISSAL_KEY) || ''; } catch (e) {}
+            applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
             configurePantheonDiscordLinks();
-            openModal('welcome-modal');
+            const dismissed = dismissedVersion === PANTHEON_TOOLS_VERSION;
+            const checkbox = document.getElementById('welcome-hide-until-update');
+            if (checkbox) checkbox.checked = dismissed;
+            if (dismissed) closeModal('welcome-modal');
+            else openModal('welcome-modal');
         }
         function saveWelcomeDefault(save) {
             const choice = document.getElementById('welcome-default-landing')?.value || 'tracker-universal';
@@ -5275,5 +5609,26 @@
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
+
+<script>
+(function () {
+    'use strict';
+    const THEME_KEY = 'pantheon-theme-choice-v1';
+    const THEMES = ['light', 'dark', 'eye-comfort', 'pastel'];
+    function applyPantheonTheme(value, persist) {
+        const theme = THEMES.includes(value) ? value : 'dark';
+        document.documentElement.setAttribute('data-pantheon-theme', theme);
+        document.querySelectorAll('[data-pantheon-theme-select]').forEach(function (select) { select.value = theme; });
+        if (persist) {
+            try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+        }
+    }
+    document.querySelectorAll('[data-pantheon-theme-select]').forEach(function (select) {
+        select.addEventListener('change', function () { applyPantheonTheme(select.value, true); });
+    });
+    applyPantheonTheme((function () { try { return localStorage.getItem(THEME_KEY) || 'dark'; } catch (_) { return 'dark'; } })(), false);
+})();
+</script>
+
 </body>
 </html>

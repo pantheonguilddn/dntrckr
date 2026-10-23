@@ -1,4 +1,4 @@
-# Pantheon Tools v1.5.1 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.2 — Cloudflare Pages + D1
 
 This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway, a D1-backed JSONBin-compatible data API, and automatic Personal View selection based on the authenticated Discord profile. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
 
@@ -122,3 +122,10 @@ This is an account allowlist, not a live guild-membership check. Personal View a
 ## Free-tier expectation
 
 Cloudflare's published Workers Free quota includes 100,000 requests per day; D1 Free includes 5 million rows read/day, 100,000 rows written/day, and 5 GB total storage. This small guild tracker is designed to fit those limits with modest usage and no 30-second whole-record polling. Limits can change, so monitor the dashboard. Pages static-asset requests themselves do not count as Pages Functions invocations; API, OAuth, and D1-backed requests do.
+
+
+## Appearance themes (v1.5.2)
+
+The tracker and administrator console include Light, Dark, Eye comfort, and Pastel themes. The preference is stored locally under the same origin and carries between the tracker and admin page. Themes apply to the sign-in gate, app views, controls, forms, and modal dialogs. Theme overrides change colors and surfaces only; existing application typography declarations are preserved.
+
+Upload `guild-logo.png` to the same published root directory as `index.html` and `admin.html`. The tracker header, Discord sign-in gate, and administrator console reference this file. Keep `Guild Banner.png` as well; Overview and release/banner areas still use it.

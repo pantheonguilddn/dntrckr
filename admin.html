@@ -5,13 +5,34 @@
 <title>Pantheon · Access & Migration</title>
 <style>
 :root{color-scheme:dark;--bg:#0d1220;--surface:#151e30;--surface2:#1b2840;--border:#34435e;--text:#edf2ff;--muted:#9eadc8;--accent:#8898ff;--good:#6ddab4;--danger:#ff929e}
+:root[data-pantheon-theme="light"]{color-scheme:light;--bg:#f4f6fa;--surface:#fff;--surface2:#edf1f7;--border:#dce2ec;--text:#1a2230;--muted:#5e6a7e;--accent:#315e9d;--good:#087e65;--danger:#b93852}
+:root[data-pantheon-theme="eye-comfort"]{color-scheme:light;--bg:#f0eddf;--surface:#faf7eb;--surface2:#e9e4d2;--border:#d5cdb7;--text:#30352d;--muted:#6d6b5b;--accent:#63774e;--good:#427650;--danger:#a64b4b}
+:root[data-pantheon-theme="pastel"]{color-scheme:light;--bg:#fbf3fb;--surface:#fffaff;--surface2:#f3e8f5;--border:#e4d5e8;--text:#49354e;--muted:#7d6b83;--accent:#a16bb5;--good:#478d78;--danger:#c45e83}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,rgba(91,111,220,.18),transparent 42%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 main{width:min(920px,calc(100% - 32px));margin:36px auto 60px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}.brand{font-size:12px;letter-spacing:.16em;font-weight:900}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.08em;font-weight:600;margin-top:5px}h1{font-size:30px;letter-spacing:-.04em;margin:12px 0 6px}h2{font-size:15px;margin:0 0 8px}p{color:var(--muted);font-size:12px;line-height:1.7;margin:7px 0 12px}.card{padding:20px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(155deg,var(--surface),#111927);margin:14px 0}.kicker{font-size:9px;color:#aab8ff;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.field input{width:100%;min-height:40px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:#0d1422;color:var(--text);font:12px inherit;letter-spacing:normal;text-transform:none}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.btn{border:1px solid var(--border);border-radius:9px;background:var(--surface2);color:var(--text);padding:10px 13px;font-size:11px;font-weight:800;cursor:pointer}.btn.primary{background:#6676ec;border-color:#7c8aff;color:white}.btn.danger{color:#ffc5cc;border-color:#78414d}.btn:disabled{opacity:.5;cursor:wait}.status{margin:10px 0 0;padding:10px 12px;border-left:3px solid var(--accent);background:#111827;border-radius:5px;color:#c7d2e9;font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere}.status.error{border-left-color:var(--danger)}.status.ok{border-left-color:var(--good)}.hint{font-size:10px;color:#8292af}.list{display:grid;gap:7px;margin-top:12px}.person{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--border);border-radius:9px;padding:10px;background:#111928}.person strong{font-size:11px}.person small{display:block;color:var(--muted);font-size:10px;overflow-wrap:anywhere}.badge{font-size:9px;color:#c7d1ff;border:1px solid #465788;padding:4px 7px;border-radius:999px}.toplink{color:#d6ddff;font-size:11px;text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:8px 10px}.hidden{display:none!important}.checkbox-line{display:flex;align-items:flex-start;gap:8px;color:var(--muted);font-size:11px;margin-top:10px}.checkbox-line input{margin-top:2px}@media(max-width:640px){main{margin-top:20px}.grid{grid-template-columns:1fr}h1{font-size:26px}.card{padding:15px}}
+
+/* Shared Pantheon theme; color-only overrides so the admin page keeps its typography. */
+body{background:var(--bg);color:var(--text)}
+html[data-pantheon-theme="light"] body{background:radial-gradient(ellipse at 10% 0%,rgba(82,101,215,.10),transparent 42%),var(--bg)}
+html[data-pantheon-theme="eye-comfort"] body{background:radial-gradient(ellipse at 10% 0%,rgba(130,143,91,.10),transparent 42%),var(--bg)}
+html[data-pantheon-theme="pastel"] body{background:radial-gradient(ellipse at 10% 0%,rgba(186,132,205,.12),transparent 42%),var(--bg)}
+html[data-pantheon-theme] .card{background:var(--surface);border-color:var(--border);color:var(--text)}
+html[data-pantheon-theme] .field input,html[data-pantheon-theme] .field select,html[data-pantheon-theme] input,html[data-pantheon-theme] select,html[data-pantheon-theme] textarea{background:var(--surface2);color:var(--text);border-color:var(--border)}
+html[data-pantheon-theme] .status,html[data-pantheon-theme] .person{background:var(--surface2);color:var(--text);border-color:var(--border)}
+html[data-pantheon-theme] .hint,html[data-pantheon-theme] p,html[data-pantheon-theme] .brand small{color:var(--muted)}
+html[data-pantheon-theme] .kicker{color:var(--accent)}
+html[data-pantheon-theme] .badge{color:var(--accent);border-color:var(--border);background:var(--surface2)}
+html[data-pantheon-theme] .toplink,html[data-pantheon-theme] .btn:not(.primary):not(.danger){background:var(--surface2);color:var(--text);border-color:var(--border)}
+html[data-pantheon-theme] .btn.primary{background:#5865f2;color:#fff;border-color:#7780ff}
+html[data-pantheon-theme] .btn.danger{color:var(--danger);border-color:var(--border)}
+.admin-logo{width:40px;height:40px;object-fit:contain;flex:0 0 40px}.brand{display:flex;align-items:center;gap:10px}.admin-header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.pantheon-theme-control{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.03em;white-space:nowrap}.pantheon-theme-control select{min-height:34px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);cursor:pointer}
+
 </style>
+<script>try{document.documentElement.setAttribute('data-pantheon-theme',localStorage.getItem('pantheon-theme-choice-v1')||'dark')}catch(_){document.documentElement.setAttribute('data-pantheon-theme','dark')}</script>
 </head>
 <body>
 <main>
-<header><div class="brand">PANTHEON TOOLS<small>ADMINISTRATOR CONSOLE · DISCORD ALLOWLIST · D1 MIGRATION</small></div><a class="toplink" href="/">← Back to Pantheon</a></header>
+<header><div class="brand"><img class="admin-logo" src="guild-logo.png" alt="Pantheon guild logo" onerror="this.style.display='none'"><span>PANTHEON TOOLS<small>ADMINISTRATOR CONSOLE · DISCORD ALLOWLIST · D1 MIGRATION</small></span></div><div class="admin-header-actions"><label class="pantheon-theme-control" for="pantheon-admin-theme-select"><span>Appearance</span><select id="pantheon-admin-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label><a class="toplink" href="/">← Back to Pantheon</a></div></header>
 <div id="auth-status" class="status">Checking your Pantheon administrator session…</div>
 <div id="admin-content" class="hidden">
   <div class="kicker">Account access</div><h1>Access & Migration</h1><p>Only administrators can manage the permitted Discord account list or import the previous JSONBin records. Do not share the old JSONBin master key; it is used only for the one-time import form and is not saved by this page.</p>
@@ -44,5 +65,8 @@ $('migration-form').addEventListener('submit',async event=>{event.preventDefault
 $('initialize-empty').addEventListener('click',async()=>{if(!confirm('Initialize a clean empty Pantheon D1 tracker? This will fail safely if a main record already exists.'))return;const button=$('initialize-empty');button.disabled=true;try{await api('/api/admin/initialize',{method:'POST'});setStatus('initialize-status','Empty Pantheon D1 tracker initialized. Go back to Pantheon and reload.','ok');}catch(error){setStatus('initialize-status',error.message,'error');}finally{button.disabled=false;}});
 requireAdmin();
 </script>
+
+<script>(function(){const KEY='pantheon-theme-choice-v1',THEMES=['light','dark','eye-comfort','pastel'];function apply(value,save){const theme=THEMES.includes(value)?value:'dark';document.documentElement.setAttribute('data-pantheon-theme',theme);document.querySelectorAll('[data-pantheon-theme-select]').forEach(s=>s.value=theme);if(save){try{localStorage.setItem(KEY,theme)}catch(_){}}}document.querySelectorAll('[data-pantheon-theme-select]').forEach(s=>s.addEventListener('change',()=>apply(s.value,true)));apply((()=>{try{return localStorage.getItem(KEY)||'dark'}catch(_){return'dark'}})(),false)})();</script>
+
 </body>
 </html>
