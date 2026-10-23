@@ -1,4 +1,4 @@
-# Pantheon Tools v1.6.5 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.6 — Cloudflare Pages + D1
 
 This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
 
@@ -78,7 +78,7 @@ This bundle carries forward the supplied v1.5.6 Cloudflare Pages + D1 base and t
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
 - The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- This ZIP is the v1.6.5 build and carries forward the v1.5.7–v1.6.4 changes documented below. Back up the current repository before replacing its files.
+- This ZIP is the v1.6.6 build and carries forward the v1.5.7–v1.6.4 changes documented below. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch
@@ -89,7 +89,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer. The ZIP contains the app files directly at its root.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.6.5 build, carrying forward the current app, access-control functions, and dashboard updates described in this README; back up the current branch before replacing it.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.6.6 build, carrying forward the current app, access-control functions, and dashboard updates described in this README; back up the current branch before replacing it.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project
@@ -228,3 +228,14 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - Split the lower Overview dashboard into two side-by-side panels on desktop: Activity Insights (personal priority reminders, low-completion outliers, and trend advice) and Character Completion (per-character weekly rates, remaining tasks, and trend/next-task guidance). On narrower screens, the panels stack for readability.
 - Kept status values connected to the existing shared-data and sync-state logic, and retained Bounty exclusion from weekly completion rates. The admin-only Tools sidebar and Admin Console launcher remain unchanged.
 - Updated release version and notes to v1.6.5.
+
+
+## v1.6.6 Universal View progress permissions
+
+- Universal View remains available for reading other members’ task completion, completion rates, and bounty notes. It is view-only for characters not owned by the signed-in member. Their checkboxes are disabled, bounty target fields are read-only, and right-click task-state cycling is ignored.
+- Tracker event handlers now re-check character ownership before changing a checkmark, cycling a task state, or saving a bounty note. The authenticated administrator retains cross-member management ability.
+- The Cloudflare API validates the full shared-record write and rejects attempts by regular members to change task cells belonging to another member, even if the browser UI is modified or bypassed. Normal members also cannot advance the guild-wide reset markers or edit another roster’s per-member reset markers.
+- Daily and weekly automatic resets for regular members now apply only to their own tracked characters, using per-roster reset markers. The administrator’s automatic global reset can still reset all characters. Weekly snapshots merge character-by-character so one member’s snapshot does not overwrite another member’s values for the same week.
+- Added the new `memberResetMarkers` field to the compact record encoding and merging logic. Existing global reset markers are preserved for compatibility.
+- Updated the release version to v1.6.6.
+- Weekly archive snapshots also enforce ownership: members can add/update their own character's weekly rate/state, but cannot change another character's archived progress, alter the global task order, or delete a shared archive week. Archive pruning is administrator-only.

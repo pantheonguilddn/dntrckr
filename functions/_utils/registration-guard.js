@@ -108,12 +108,23 @@ export function registrationWriteViolation(previousRecord, nextRecord, session) 
   const before = obj(previousRecord?.settings);
   const after = obj(nextRecord?.settings);
 
+  // Reset markers are administrator-owned globally. Regular members use a separate
+  // per-roster marker so automatic resets cannot advance the whole guild's reset state.
+  const beforeDailyReset = Number(previousRecord?.lastDailyReset) || 0;
+  const afterDailyReset = Number(nextRecord?.lastDailyReset) || 0;
+  const beforeWeeklyReset = Number(previousRecord?.lastWeeklyReset) || 0;
+  const afterWeeklyReset = Number(nextRecord?.lastWeeklyReset) || 0;
+  if (beforeDailyReset > 0 && beforeDailyReset !== afterDailyReset) return 'The guild-wide daily reset marker is administrator-managed.';
+  if (beforeWeeklyReset > 0 && beforeWeeklyReset !== afterWeeklyReset) return 'The guild-wide weekly reset marker is administrator-managed.';
+
   // Keep guild-wide configuration administrator-managed at the API boundary too.
   // Members still may update their own registrations and routine tracking progress,
   // but cannot bypass hidden management controls by editing the shared record directly.
   const adminManagedSettings = [
     ['categories', 'Dungeon Registration', value => arr(value)],
-    ['lootWeights', 'Loot Weights', value => obj(value)]
+    ['lootWeights', 'Loot Weights', value => obj(value)],
+    ['analyticsHistoryClearedAt', 'Analytics history clearing', value => Number(value) || 0],
+    ['analyticsHistoryClearedBy', 'Analytics history clearing', value => String(value || '')]
   ];
   for (const [field, label, normalize] of adminManagedSettings) {
     if (stable(normalize(before[field])) !== stable(normalize(after[field]))) {
@@ -215,6 +226,14 @@ export function registrationWriteViolation(previousRecord, nextRecord, session) 
 
   const beforeOwnedMembers = beforeMembers.filter(member => memberMatchesOwner(member, candidates));
   const afterOwnedMembers = afterMembers.filter(member => memberMatchesOwner(member, candidates));
+  const ownedResetRosterIds = new Set([...beforeOwnedMembers, ...afterOwnedMembers].map(member => String(member?.trackerRosterId || '').trim()).filter(Boolean));
+  const beforeResetMarkers = obj(before.memberResetMarkers);
+  const afterResetMarkers = obj(after.memberResetMarkers);
+  for (const rosterId of new Set([...Object.keys(beforeResetMarkers), ...Object.keys(afterResetMarkers)])) {
+    if (stable(beforeResetMarkers[rosterId]) !== stable(afterResetMarkers[rosterId]) && !ownedResetRosterIds.has(rosterId)) {
+      return 'Members can update automatic reset markers only for their own registered characters.';
+    }
+  }
   const beforeOwnedRosterIds = new Set(beforeOwnedMembers.map(member => String(member?.trackerRosterId || '')).filter(Boolean));
   const beforeOwnedRosterNames = new Set(beforeOwnedMembers.map(member => key(member?.name)).filter(Boolean));
   const afterOwnedRosterIds = new Set(afterOwnedMembers.map(member => String(member?.trackerRosterId || '')).filter(Boolean));
@@ -264,6 +283,46 @@ export function registrationWriteViolation(previousRecord, nextRecord, session) 
 
   const allowedCharacterNames = new Set();
   for (const member of [...beforeOwnedMembers, ...afterOwnedMembers]) for (const name of registrationNames(member)) allowedCharacterNames.add(name);
+
+  // Universal View is read-only for characters that do not belong to the caller.
+  // Enforce this against the full shared record at the API boundary as well as in the UI,
+  // so a hand-crafted request cannot mark, unmark, reset, or edit another person's tasks.
+  const beforeCells = obj(previousRecord?.cells);
+  const afterCells = obj(nextRecord?.cells);
+  for (const characterName of new Set([...Object.keys(beforeCells), ...Object.keys(afterCells)])) {
+    if (stable(obj(beforeCells[characterName])) !== stable(obj(afterCells[characterName])) && !allowedCharacterNames.has(key(characterName))) {
+      return `You can view progress for "${String(characterName).slice(0, 40)}", but only its registered owner or an administrator can change it.`;
+    }
+  }
+
+  // Weekly snapshots feed Activity Insights, so members may contribute their own
+  // character snapshots but cannot rewrite or remove another owner's history.
+  const beforeArchive = obj(previousRecord?.weeklyArchive);
+  const afterArchive = obj(nextRecord?.weeklyArchive);
+  for (const weekKey of new Set([...Object.keys(beforeArchive), ...Object.keys(afterArchive)])) {
+    const oldWeek = beforeArchive[weekKey];
+    const newWeek = afterArchive[weekKey];
+    if (oldWeek && !newWeek) return 'Only an administrator can remove archived weekly analytics.';
+    if (!oldWeek || !newWeek) {
+      const entry = obj(newWeek);
+      for (const field of ['rates', 'states']) for (const characterName of Object.keys(obj(entry[field]))) {
+        if (!allowedCharacterNames.has(key(characterName))) return `Members cannot add weekly analytics for another character: "${String(characterName).slice(0, 40)}".`;
+      }
+      continue;
+    }
+    if (stable(oldWeek.taskOrder) !== stable(newWeek.taskOrder)) {
+      return 'Weekly analytics task order is administrator-managed.';
+    }
+    for (const field of ['rates', 'states']) {
+      const oldMap = obj(oldWeek[field]), newMap = obj(newWeek[field]);
+      for (const characterName of new Set([...Object.keys(oldMap), ...Object.keys(newMap)])) {
+        if (stable(oldMap[characterName]) !== stable(newMap[characterName]) && !allowedCharacterNames.has(key(characterName))) {
+          return `Members cannot change weekly analytics for another character: "${String(characterName).slice(0, 40)}".`;
+        }
+      }
+    }
+  }
+
   const oldJobs = obj(before.characterJobs);
   const newJobs = obj(after.characterJobs);
   for (const name of new Set([...Object.keys(oldJobs), ...Object.keys(newJobs)])) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.5</title>
+    <title>Pantheon Tools v1.6.6</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1564,6 +1564,10 @@
         :root[data-pantheon-theme] #dn-tracker .bounty-input::placeholder { color:var(--pt-muted) !important; opacity:.9; }
         :root[data-pantheon-theme] #dn-tracker .bounty-input:focus { outline:2px solid color-mix(in srgb,var(--pt-accent) 55%,transparent); outline-offset:1px; background:var(--pt-surface) !important; }
         :root[data-pantheon-theme] #dn-tracker input[type="checkbox"] { accent-color:var(--pt-accent) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell.read-only-cell { cursor:not-allowed !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell.read-only-cell:hover { background:var(--pt-surface) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.read-only-cell input[type="checkbox"] { cursor:not-allowed !important; opacity:.62; }
+        :root[data-pantheon-theme] #dn-tracker .bounty-input[readonly] { cursor:default; opacity:.82; }
         .salary-receipt { padding:15px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-soft); color:var(--pt-text); }
         .salary-receipt-title { margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--pt-border); color:var(--pt-text); }
         .salary-receipt > div:not(.salary-receipt-divider) { display:flex; justify-content:space-between; gap:14px; margin-bottom:5px; color:var(--pt-text); font-size:.82rem; }
@@ -2243,7 +2247,7 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.5</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.6</span></div>
                 <ul>
                     <li><strong>Shared character editor:</strong> add a new character directly from the confirmation popup or Tracker. Saving syncs the ordered character list, class, Main designation, and tracking opt-in to the shared Member Roster and refreshes Tracker.</li>
                     <li><strong>Character confirmation editor:</strong> review and edit IGN, Class / Job, Main designation, Tracker opt-in, and character order during first-login confirmation.</li>
@@ -2256,6 +2260,8 @@
                     <li><strong>Release-note dismissal:</strong> the “until a new update” choice stays dismissed when closing Salary Calculator or Help &amp; Guide.</li>
                     <li><strong>Automatic resets:</strong> manual force-reset buttons were removed. The weekly Saturday 9:00 AM reset reminder remains visible.</li>
                     <li><strong>Activity Insights:</strong> the Overview now focuses on the signed-in member’s tracked characters, completion pace, quiet weeks, lower-completion outliers, recent archived trends, and task-weighted next steps. Management tools are available through the administrator-only Admin Console launcher. The Overview layout now places account status beside the signed-in profile and separates Activity Insights from Character Completion.</li>
+                    <li><strong>Universal View permissions:</strong> members can review everyone’s completion but can only change checkboxes, bounty notes, and task states for their own registered characters. Other characters are visibly read-only.</li>
+                    <li><strong>Character-specific automatic resets:</strong> daily and weekly resets apply to the signed-in member’s own characters. Reset markers no longer let one member’s browser reset or change another member’s progress.</li>
                     <li><strong>Version History theme contrast:</strong> revision names, timestamps, savepoint badges, status messages, and revision-detail cards now remain readable in Dark, Light, Eye comfort, and Pastel themes.</li>
                 
                 </ul>
@@ -2901,7 +2907,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -3063,11 +3069,10 @@
             return [pantheonDiscordUser?.label, pantheonDiscordUser?.username]
                 .map(value => String(value || '').trim()).filter(Boolean);
         }
-        function getAuthenticatedMemberDirectoryEntry() {
-            // Insights must follow the authenticated Discord account, never a stale local
-            // roster selector. This keeps a shared device from showing another member's
-            // completion or outlier advice after an account switch.
-            const entries = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
+        function getAuthenticatedMemberDirectoryEntry(data = cloudData) {
+            // Resolve against the supplied record (usually cloudData, sometimes the merge
+            // candidate being synced) and never infer ownership from a stale roster selector.
+            const entries = normalizeMemberDirectory(data?.settings?.memberDirectory);
             const candidates = ownerCandidateNames();
             for (const candidate of candidates) {
                 const exact = entries.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
@@ -3098,6 +3103,94 @@
         }
         function getCurrentOwnerName() {
             return String(getCurrentMemberDirectoryEntry()?.name || ownerCandidateNames()[0] || ownerCandidateNames()[1] || '').trim();
+        }
+        function memberRegisteredCharacterNames(member) {
+            if (!member) return new Set();
+            const names = [
+                ...(Array.isArray(member.characters) ? member.characters : []),
+                ...(Array.isArray(member.characterProfiles) ? member.characterProfiles.map(profile => profile?.name || profile?.ign || '') : [])
+            ];
+            return new Set(names.map(identityMatchKey).filter(Boolean));
+        }
+        function getCharacterOwnerMember(charName) {
+            const nameKey = identityMatchKey(charName);
+            if (!nameKey) return null;
+            return normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(member => memberRegisteredCharacterNames(member).has(nameKey)) || null;
+        }
+        function canEditCharacterProgress(charName) {
+            if (isPantheonAdmin()) return true;
+            const own = getAuthenticatedMemberDirectoryEntry();
+            return !!own && memberRegisteredCharacterNames(own).has(identityMatchKey(charName));
+        }
+        function getMemberTrackedCharacterNames(member = getCurrentMemberDirectoryEntry()) {
+            if (!member) return [];
+            const roster = normalizeRosters(cloudData.settings?.rosters).find(item => item.id === member.trackerRosterId);
+            if (roster) return [...roster.characters];
+            return (member.characterProfiles || []).filter(profile => profile.trackerEnabled === true).map(profile => profile.name).filter(Boolean);
+        }
+        function setAllMemberResetMarkers(daily, weekly) {
+            const markers = { ...safeObject(cloudData.settings.memberResetMarkers) };
+            normalizeMemberDirectory(cloudData.settings.memberDirectory).forEach(member => {
+                const key = String(member.trackerRosterId || '').trim();
+                if (!key) return;
+                const old = safeObject(markers[key]);
+                markers[key] = {
+                    daily: Math.max(Number(old.daily) || 0, Number(daily) || 0),
+                    weekly: Math.max(Number(old.weekly) || 0, Number(weekly) || 0)
+                };
+            });
+            cloudData.settings.memberResetMarkers = markers;
+        }
+        function enforceMemberSafeSyncWrite(candidate, remote) {
+            if (isPantheonAdmin()) return candidate;
+            const own = getAuthenticatedMemberDirectoryEntry(candidate);
+            const ownedNames = memberRegisteredCharacterNames(own);
+            const safeCells = { ...safeObject(candidate.cells) };
+            const remoteCells = safeObject(remote?.cells);
+            // Preserve every non-owned character exactly as stored in the cloud. This also
+            // cleans stale browser caches left by older builds that reset every character.
+            for (const name of new Set([...Object.keys(safeCells), ...Object.keys(remoteCells)])) {
+                if (ownedNames.has(identityMatchKey(name))) continue;
+                if (Object.prototype.hasOwnProperty.call(remoteCells, name)) safeCells[name] = remoteCells[name];
+                else delete safeCells[name];
+            }
+            candidate.cells = safeCells;
+            // Weekly history follows the same ownership rule. Members contribute only their
+            // own rates/states while the server's archived values for everyone else are retained.
+            const remoteArchive = safeObject(remote?.weeklyArchive);
+            const candidateArchive = safeObject(candidate.weeklyArchive);
+            const safeArchive = {};
+            for (const weekKey of new Set([...Object.keys(remoteArchive), ...Object.keys(candidateArchive)])) {
+                const r = safeObject(remoteArchive[weekKey]);
+                const c = safeObject(candidateArchive[weekKey]);
+                if (remoteArchive[weekKey]) {
+                    const rates = { ...safeObject(r.rates) }, states = { ...safeObject(r.states) };
+                    Object.entries(safeObject(c.rates)).forEach(([name, value]) => { if (ownedNames.has(identityMatchKey(name))) rates[name] = value; });
+                    Object.entries(safeObject(c.states)).forEach(([name, value]) => { if (ownedNames.has(identityMatchKey(name))) states[name] = value; });
+                    safeArchive[weekKey] = {
+                        ...r, createdAt: Math.max(Number(r.createdAt) || 0, Number(c.createdAt) || 0),
+                        taskOrder: Array.isArray(r.taskOrder) ? r.taskOrder : Array.isArray(c.taskOrder) ? c.taskOrder : [],
+                        rates, states
+                    };
+                } else if (candidateArchive[weekKey]) {
+                    const rates = {}, states = {};
+                    Object.entries(safeObject(c.rates)).forEach(([name, value]) => { if (ownedNames.has(identityMatchKey(name))) rates[name] = value; });
+                    Object.entries(safeObject(c.states)).forEach(([name, value]) => { if (ownedNames.has(identityMatchKey(name))) states[name] = value; });
+                    safeArchive[weekKey] = { ...c, rates, states };
+                }
+            }
+            candidate.weeklyArchive = safeArchive;
+            // Members never advance global reset markers; their automatic resets are tracked
+            // per roster so opening Universal View cannot affect another member's progress.
+            candidate.lastDailyReset = Number(remote?.lastDailyReset) || candidate.lastDailyReset;
+            candidate.lastWeeklyReset = Number(remote?.lastWeeklyReset) || candidate.lastWeeklyReset;
+            const remoteMarkers = safeObject(remote?.settings?.memberResetMarkers);
+            const localMarkers = safeObject(candidate.settings?.memberResetMarkers);
+            const markers = { ...remoteMarkers };
+            const rosterId = String(own?.trackerRosterId || '').trim();
+            if (rosterId && localMarkers[rosterId]) markers[rosterId] = localMarkers[rosterId];
+            candidate.settings.memberResetMarkers = markers;
+            return candidate;
         }
         function canManageMemberRecord(member) {
             if (isPantheonAdmin()) return true;
@@ -3372,7 +3465,7 @@
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
             updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
-            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj'
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -3474,6 +3567,7 @@
             norm.settings.memberDirectoryUpdatedAt = Number(sets.memberDirectoryUpdatedAt) || 0;
             norm.settings.memberDirectoryUpdatedBy = String(sets.memberDirectoryUpdatedBy || '');
             norm.settings.memberRosterMasterVersion = Number(sets.memberRosterMasterVersion) || 0;
+            norm.settings.memberResetMarkers = safeObject(sets.memberResetMarkers);
             norm.settings.categories = Array.isArray(sets.categories) ? normalizeCategories(sets.categories) : [];
             norm.settings.categoriesUpdatedAt = Number(sets.categoriesUpdatedAt) || 0;
             norm.settings.categoriesUpdatedBy = String(sets.categoriesUpdatedBy || '');
@@ -3664,7 +3758,17 @@
 
             merged.weeklyArchive = { ...remote.weeklyArchive, ...local.weeklyArchive };
             Object.keys(merged.weeklyArchive).forEach(k => {
-                if (local.weeklyArchive[k] && remote.weeklyArchive[k]) merged.weeklyArchive[k] = (Number(local.weeklyArchive[k].createdAt)||0) >= (Number(remote.weeklyArchive[k].createdAt)||0) ? local.weeklyArchive[k] : remote.weeklyArchive[k];
+                if (local.weeklyArchive[k] && remote.weeklyArchive[k]) {
+                    const l = safeObject(local.weeklyArchive[k]), r = safeObject(remote.weeklyArchive[k]);
+                    const newest = (Number(l.createdAt) || 0) >= (Number(r.createdAt) || 0) ? l : r;
+                    merged.weeklyArchive[k] = {
+                        ...r, ...l, ...newest,
+                        createdAt: Math.max(Number(l.createdAt) || 0, Number(r.createdAt) || 0),
+                        taskOrder: Array.isArray(newest.taskOrder) ? [...newest.taskOrder] : [...weeklyTaskNames],
+                        rates: { ...safeObject(r.rates), ...safeObject(l.rates) },
+                        states: { ...safeObject(r.states), ...safeObject(l.states) }
+                    };
+                }
                 if (merged.settings.analyticsHistoryClearedAt && (Number(merged.weeklyArchive[k]?.createdAt) || Number(k) || 0) <= merged.settings.analyticsHistoryClearedAt) delete merged.weeklyArchive[k];
             });
             if (merged.settings.analyticsHistoryClearedAt) merged.history = {};
@@ -3686,6 +3790,15 @@
             merged.settings.memberDirectoryUpdatedAt = Math.max(lmdTime, rmdTime);
             merged.settings.memberDirectoryUpdatedBy = String(mdSrc.memberDirectoryUpdatedBy || '');
             merged.settings.memberRosterMasterVersion = Math.max(Number(local.settings.memberRosterMasterVersion) || 0, Number(remote.settings.memberRosterMasterVersion) || 0);
+            merged.settings.memberResetMarkers = {};
+            new Set([...Object.keys(safeObject(local.settings.memberResetMarkers)), ...Object.keys(safeObject(remote.settings.memberResetMarkers))]).forEach(rosterId => {
+                const lm = safeObject(local.settings.memberResetMarkers[rosterId]);
+                const rm = safeObject(remote.settings.memberResetMarkers[rosterId]);
+                merged.settings.memberResetMarkers[rosterId] = {
+                    daily: Math.max(Number(lm.daily) || 0, Number(rm.daily) || 0),
+                    weekly: Math.max(Number(lm.weekly) || 0, Number(rm.weekly) || 0)
+                };
+            });
 
             const lcTime = Number(local.settings.categoriesUpdatedAt) || 0, rcTime = Number(remote.settings.categoriesUpdatedAt) || 0;
             const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
@@ -3712,6 +3825,9 @@
         }
 
         function trimWeeklyArchive(data = cloudData) {
+            // Members may contribute their own character snapshot to a shared week, but
+            // only an administrator may prune the shared archive itself.
+            if (!isPantheonAdmin()) return;
             const e = Object.entries(safeObject(data.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
             while (e.length > MAX_ARCHIVE_WEEKS) delete data.weeklyArchive[e.shift()[0]];
         }
@@ -4023,6 +4139,7 @@
                         // is versioned.
                         const ext={externalPatch:null};
                         let candidate=hasMeaningfulLocalData?mergeData(cloudData,remote):remote;
+                        candidate = enforceMemberSafeSyncWrite(candidate, remote);
                         let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
                         if(pendingGlobalBeforeSnapshot){
@@ -4037,7 +4154,11 @@
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
                             lastSeenRemoteMarker=remoteSyncMarker(latest);unsavedCloudChanges=false;
-                            cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();persistLocalData();if(remoteChangedSinceUI)refreshTrackerUI();else updateOverviewStatusCards();
+                            cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();
+                            const resetChangesAfterRefresh = checkAutoResets();
+                            persistLocalData();
+                            if(remoteChangedSinceUI || resetChangesAfterRefresh) refreshTrackerUI(); else updateOverviewStatusCards();
+                            if(resetChangesAfterRefresh){unsavedCloudChanges=true;setTimeout(()=>forceSync(false),180);}
                             // Revision logging happens after the core sync and can fail safely.
                             if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
                             const flushed=await flushRevisionQueue();
@@ -4294,6 +4415,10 @@
                 footerRow.appendChild(rateTh);
             });
             
+            const characterAccess = new Map(characters.map(char => [char.name, {
+                canEdit: canEditCharacterProgress(char.name),
+                owner: getCharacterOwnerMember(char.name)
+            }]));
             const grouped = {};
             cloudData.settings.categories.forEach(cat => {
                 const visibleTasks = (cat.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(cat, taskName));
@@ -4321,16 +4446,30 @@
                         characters.forEach(char => {
                             const td = document.createElement('td'); td.className = 'interactive-cell char-col';
                             td.dataset.char = char.name; td.dataset.task = taskName; td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false';
-                            td.addEventListener('contextmenu', handleRightClick);
+                            const access = characterAccess.get(char.name) || { canEdit: false, owner: null };
+                            const canEdit = access.canEdit;
+                            const owner = access.owner;
+                            if (canEdit) {
+                                td.title = 'Right-click to cycle task status.';
+                                td.addEventListener('contextmenu', handleRightClick);
+                            } else {
+                                td.classList.add('read-only-cell');
+                                td.title = `View-only progress · ${owner?.name || 'Registered owner'} controls this character`;
+                                td.setAttribute('aria-label', `View-only progress for ${char.name}, task ${taskName}`);
+                            }
                             
                             const cb = document.createElement('input'); cb.type = 'checkbox';
-                            cb.dataset.char = char.name; cb.dataset.task = taskName; cb.addEventListener('change', handleCheck);
+                            cb.dataset.char = char.name; cb.dataset.task = taskName; cb.disabled = !canEdit;
+                            cb.title = canEdit ? 'Mark this task complete' : 'View only: only the character owner or an administrator can edit progress.';
+                            cb.addEventListener('change', handleCheck);
                             td.appendChild(cb);
                             
                             if (isBounty) {
                                 const input = document.createElement('input'); input.type = 'text'; input.className = 'bounty-input';
-                                input.placeholder = 'Target...'; input.dataset.char = char.name; input.dataset.task = taskName;
+                                input.placeholder = canEdit ? 'Target...' : 'View only'; input.dataset.char = char.name; input.dataset.task = taskName;
                                 input.value = getCellRecord(char.name, taskName).note || '';
+                                input.readOnly = !canEdit;
+                                if (!canEdit) input.title = 'View only: only the character owner or an administrator can edit bounty notes.';
                                 input.addEventListener('contextmenu', e => e.stopPropagation());
                                 input.addEventListener('change', handleNoteChange);
                                 td.appendChild(input);
@@ -4361,7 +4500,13 @@
         }
 
         function handleNoteChange(e) {
-            setCellNote(e.target.dataset.char, e.target.dataset.task, e.target.value);
+            const charName = e.target.dataset.char, taskName = e.target.dataset.task;
+            if (!canEditCharacterProgress(charName)) {
+                e.target.value = getCellRecord(charName, taskName).note || '';
+                setStatus('🔒 View-only: you can edit bounty notes only for your own registered characters.');
+                return;
+            }
+            setCellNote(charName, taskName, e.target.value);
             triggerAutoSync();
         }
 
@@ -4370,6 +4515,12 @@
         // ==========================================
         function handleCheck(e) {
             const c = e.target.dataset.char, t = e.target.dataset.task;
+            if (!canEditCharacterProgress(c)) {
+                e.target.checked = getCellState(c, t) === 'done';
+                e.target.disabled = true;
+                setStatus('🔒 View-only: Universal View lets you review others’ progress, not change it.');
+                return;
+            }
             const prev = getCellState(c, t);
             setCellState(c, t, e.target.checked ? 'done' : 'open');
             
@@ -4399,7 +4550,9 @@
         }
 
         function handleRightClick(e) {
-            e.preventDefault(); const c = e.currentTarget.dataset.char, t = e.currentTarget.dataset.task;
+            const c = e.currentTarget.dataset.char, t = e.currentTarget.dataset.task;
+            if (!canEditCharacterProgress(c)) { e.preventDefault(); return; }
+            e.preventDefault();
             const s = getCellState(c, t);
             const newState = s === 'open' || s === 'done' ? 'marked' : s === 'marked' ? 'reset' : s === 'reset' ? 'excluded' : 'open';
             setCellState(c, t, newState);
@@ -4475,49 +4628,86 @@
         function updateRates() { characters.forEach(c => updateRateForCharacter(c.name)); }
 
         function checkAutoResets() {
-            let changed = false; const dt = getTargetResetTimeUTC(false), wt = getTargetResetTimeUTC(true);
-            if (cloudData.lastDailyReset < dt) { executeDailyReset(); cloudData.lastDailyReset = dt; changed = true; }
-            if (cloudData.lastWeeklyReset < wt) { executeWeeklyReset(wt); cloudData.lastWeeklyReset = wt; changed = true; }
-            if (changed) persistLocalData();
+            let changed = false;
+            const dt = getTargetResetTimeUTC(false), wt = getTargetResetTimeUTC(true);
+            if (isPantheonAdmin()) {
+                if (cloudData.lastDailyReset < dt) { executeDailyReset(); cloudData.lastDailyReset = dt; changed = true; }
+                if (cloudData.lastWeeklyReset < wt) { executeWeeklyReset(wt); cloudData.lastWeeklyReset = wt; changed = true; }
+                if (changed) setAllMemberResetMarkers(cloudData.lastDailyReset, cloudData.lastWeeklyReset);
+                if (changed) persistLocalData();
+                return changed;
+            }
+            // Regular members reset only their own registered characters. Per-member markers
+            // prevent one member's browser from advancing the guild-wide reset marker for everyone.
+            const member = getCurrentMemberDirectoryEntry();
+            const rosterId = String(member?.trackerRosterId || '').trim();
+            if (!rosterId) return false;
+            const allMarkers = safeObject(cloudData.settings.memberResetMarkers);
+            const saved = safeObject(allMarkers[rosterId]);
+            let daily = Number(saved.daily) || Number(cloudData.lastDailyReset) || 0;
+            let weekly = Number(saved.weekly) || Number(cloudData.lastWeeklyReset) || 0;
+            const ownCharacters = getMemberTrackedCharacterNames(member);
+            if (daily < dt) { executeDailyReset(ownCharacters); daily = dt; changed = true; }
+            if (weekly < wt) { executeWeeklyReset(wt, ownCharacters); weekly = wt; changed = true; }
+            if (changed) {
+                allMarkers[rosterId] = { daily, weekly };
+                cloudData.settings.memberResetMarkers = allMarkers;
+                persistLocalData();
+            }
+            return changed;
         }
 
-        function getAllKnownCharacterNames() { return [...new Set([...characters.map(c => c.name), ...Object.keys(safeObject(cloudData.cells))])]; }
-        function executeDailyReset() {
+        function getAllKnownCharacterNames() {
+            return [...new Set([
+                ...normalizeRosters(cloudData.settings?.rosters).flatMap(roster => roster.characters),
+                ...characters.map(c => c.name), ...Object.keys(safeObject(cloudData.cells))
+            ])];
+        }
+        function executeDailyReset(characterNames = null) {
             const ts = Date.now();
-            document.querySelectorAll('.task-row.is-daily .task-name').forEach(el => {
-                getAllKnownCharacterNames().forEach(c => { if (getCellState(c, el.textContent.trim()) === 'done') setCellState(c, el.textContent.trim(), 'open', ts); });
-            });
+            const targets = Array.isArray(characterNames) ? characterNames : getAllKnownCharacterNames();
+            const dailyTasks = cloudData.settings.categories
+                .filter(category => category.group === 'Dailies')
+                .flatMap(category => (category.tasks || []).filter(task => trackBountyBoards || !isBountyBoardSlot(category, task)));
+            targets.forEach(character => dailyTasks.forEach(task => {
+                if (getCellState(character, task) === 'done') setCellState(character, task, 'open', ts);
+            }));
         }
 
-        function executeWeeklyReset(rk = getTargetResetTimeUTC(true)) {
+        function executeWeeklyReset(rk = getTargetResetTimeUTC(true), characterNames = null) {
             const k = String(rk);
-            if (cloudData.settings.analyticsTrackingEnabled && !cloudData.weeklyArchive[k]) {
-                const rates = {}, states = {};
-                characters.forEach(c => {
+            const targets = Array.isArray(characterNames) ? characterNames : getAllKnownCharacterNames();
+            if (cloudData.settings.analyticsTrackingEnabled) {
+                const existing = safeObject(cloudData.weeklyArchive[k]);
+                const rates = { ...safeObject(existing.rates) }, states = { ...safeObject(existing.states) };
+                targets.forEach(name => {
                     let ct = 0, dn = 0;
-                    getCompletionTaskNames().forEach(t => {
-                        const s = getCellState(c.name, t);
-                        if (s !== 'excluded') { ct++; if (s === 'done') dn++; }
+                    getCompletionTaskNames().forEach(task => {
+                        const state = getCellState(name, task);
+                        if (state !== 'excluded') { ct++; if (state === 'done') dn++; }
                     });
-                    rates[c.name] = ct ? Math.round((dn / ct) * 100) : 0;
-                    states[c.name] = weeklyTaskNames.map(t => { const s = getCellState(c.name, t); return s==='done'?'d':s==='excluded'?'x':'m'; }).join('');
+                    rates[name] = ct ? Math.round((dn / ct) * 100) : 0;
+                    states[name] = weeklyTaskNames.map(task => { const state = getCellState(name, task); return state === 'done' ? 'd' : state === 'excluded' ? 'x' : 'm'; }).join('');
                 });
-                cloudData.weeklyArchive[k] = { createdAt: Date.now(), taskOrder: [...weeklyTaskNames], rates, states };
+                cloudData.weeklyArchive[k] = {
+                    ...existing, createdAt: Number(existing.createdAt) || Date.now(),
+                    taskOrder: [...weeklyTaskNames], rates, states
+                };
                 trimWeeklyArchive();
             }
             const ts = Date.now();
             const bountyCategory = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
             const bountyTasks = new Set(bountyCategory?.tasks || []);
-            getAllKnownCharacterNames().forEach(c => {
-                weeklyTaskNames.forEach(t => {
-                    const s = getCellState(c, t);
-                    if (s !== 'open' && s !== 'excluded') setCellState(c, t, 'open', ts);
+            targets.forEach(character => {
+                weeklyTaskNames.forEach(task => {
+                    const state = getCellState(character, task);
+                    if (state !== 'open' && state !== 'excluded') setCellState(character, task, 'open', ts);
                 });
-                // Clear every bounty target field even if an admin has accidentally marked its category as Daily.
-                bountyTasks.forEach(t => {
-                    if (!getCellRecord(c, t).note) return;
-                    setCellNote(c, t, '');
-                    const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(t)}"]`);
+                // Clear only this reset's characters' bounty target fields.
+                bountyTasks.forEach(task => {
+                    if (!getCellRecord(character, task).note) return;
+                    setCellNote(character, task, '');
+                    const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(character)}"][data-task="${CSS.escape(task)}"]`);
                     if (input) input.value = '';
                 });
             });
@@ -6486,7 +6676,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.5';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.6';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
