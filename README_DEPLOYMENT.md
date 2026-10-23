@@ -1,4 +1,4 @@
-# Pantheon Tools v1.5.2 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.3 — Cloudflare Pages + D1
 
 This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway, a D1-backed JSONBin-compatible data API, and automatic Personal View selection based on the authenticated Discord profile. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
 
@@ -6,7 +6,7 @@ This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
-- The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`.
+- The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The visible text **Dragon Nest - Classic Pantheon** is separate HTML text layered over that background, so it remains visible and editable.
 - If the current root `index.html` in GitHub is newer than the supplied v1.4.6-based HTML, do not overwrite it blindly. Reconcile the frontend edits with that newer tracker version first.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
@@ -18,7 +18,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on the full v1.4.6 tracker available for this work; if the branch contains a newer tracker version, do not overwrite it blindly.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, `guild-logo.png`, and the `functions/` directory. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on the full v1.4.6 tracker available for this work; if the branch contains a newer tracker version, do not overwrite it blindly.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project
@@ -124,7 +124,13 @@ This is an account allowlist, not a live guild-membership check. Personal View a
 Cloudflare's published Workers Free quota includes 100,000 requests per day; D1 Free includes 5 million rows read/day, 100,000 rows written/day, and 5 GB total storage. This small guild tracker is designed to fit those limits with modest usage and no 30-second whole-record polling. Limits can change, so monitor the dashboard. Pages static-asset requests themselves do not count as Pages Functions invocations; API, OAuth, and D1-backed requests do.
 
 
-## Appearance themes (v1.5.2)
+## Sign-in banner background (v1.5.3)
+
+- Place the supplied image file named `banner.png` in the same root folder as `index.html` in the GitHub repository.
+- The image is used only as the sign-in banner background. The front-facing text `Dragon Nest - Classic Pantheon` remains HTML text layered over the image.
+- If `banner.png` is absent, a dark gradient fallback is shown until the image is added.
+
+## Appearance themes (v1.5.3)
 
 The tracker and administrator console include Light, Dark, Eye comfort, and Pastel themes. The preference is stored locally under the same origin and carries between the tracker and admin page. Themes apply to the sign-in gate, app views, controls, forms, and modal dialogs. Theme overrides change colors and surfaces only; existing application typography declarations are preserved.
 

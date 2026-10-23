@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.2</title>
+    <title>Pantheon Tools v1.5.3</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -839,6 +839,8 @@
         #pantheon-auth-gate{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(ellipse at 10% 0%,rgba(85,113,210,.22),transparent 44%),rgba(12,15,23,.98);color:#eef2ff;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
         #pantheon-auth-gate[hidden]{display:none!important}
         .pantheon-auth-card{width:min(490px,100%);padding:28px;border:1px solid #39445b;border-radius:20px;background:linear-gradient(155deg,#1a2233,#111720);box-shadow:0 24px 80px rgba(0,0,0,.35)}
+        .pantheon-auth-banner{display:flex;align-items:center;min-height:106px;padding:18px 20px;margin:0 0 16px;border:1px solid rgba(190,204,255,.3);border-radius:14px;overflow:hidden;background-color:#26324c;background-image:linear-gradient(90deg,rgba(7,11,22,.86) 0%,rgba(7,11,22,.55) 58%,rgba(7,11,22,.18) 100%),url("banner.png");background-position:center;background-size:cover;background-repeat:no-repeat}
+        .pantheon-auth-banner-title{max-width:100%;font-size:clamp(19px,4vw,25px);font-weight:900;line-height:1.15;letter-spacing:.015em;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.75);overflow-wrap:anywhere}
         .pantheon-auth-kicker{font-size:10px;font-weight:900;letter-spacing:.18em;color:#aab8ff;text-transform:uppercase}
         .pantheon-auth-card h1{font-size:30px;line-height:1.08;margin:13px 0 11px;color:#f4f6ff}
         .pantheon-auth-copy{color:#aeb8ca;font-size:13px;line-height:1.7;margin:0 0 19px}
@@ -1207,6 +1209,7 @@
             :root[data-pantheon-theme] .pantheon-theme-control { max-width:100%; }
             :root[data-pantheon-theme] .pantheon-auth-brand-row { align-items:flex-start; }
             :root[data-pantheon-theme] .pantheon-auth-theme { margin-left:0; }
+            .pantheon-auth-banner { min-height:88px; padding:14px 15px; }
         }
 
     </style>
@@ -1218,10 +1221,8 @@
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
       <div class="pantheon-auth-card">
+        <div class="pantheon-auth-banner"><div class="pantheon-auth-banner-title">Dragon Nest - Classic Pantheon</div></div>
         <div class="pantheon-auth-brand-row">
-          <img class="pantheon-auth-logo" src="guild-logo.png" alt="Pantheon guild logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
-          <span class="pantheon-auth-logo-fallback" hidden>P</span>
-          <div class="pantheon-auth-kicker">Pantheon · Dragon Nest Classic</div>
           <label class="pantheon-theme-control pantheon-auth-theme" for="pantheon-auth-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-auth-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
         </div>
         <h1 id="pantheon-auth-title">Your guild tools, protected.</h1>
@@ -1574,12 +1575,13 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.2</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.3</span></div>
                 <ul>
                     <li><strong>Appearance themes:</strong> choose Light, Dark, Eye comfort, or Pastel from the top toolbar. Your preference applies to the sign-in screen, tools, and pop-up windows.</li>
                     <li><strong>Default landing page:</strong> choose or change your startup destination from the new Overview shortcut or the Tools menu. Overview remains the default when no preference is saved.</li>
                     <li><strong>Less intrusive updates:</strong> the startup pop-up now contains only release changes. You can suppress it until the next version is released.</li>
-                    <li><strong>Guild logo:</strong> the sign-in card and app header use <code>guild-logo.png</code>. The full guild banner remains in Overview and other banner locations.</li>
+                    <li><strong>Sign-in banner:</strong> <code>banner.png</code> is now the banner background, while the visible title remains the editable text “Dragon Nest - Classic Pantheon”.</li>
+                    <li><strong>Guild logo:</strong> the app header continues to use <code>guild-logo.png</code>. The full guild banner remains in Overview and other banner locations.</li>
                 </ul>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
