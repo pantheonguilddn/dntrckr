@@ -1,4 +1,13 @@
-# Pantheon Tools v1.6.2 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.4 — Cloudflare Pages + D1
+
+This release replaces Recent Workspace Activity with personalized Activity Insights, scopes Tracker identity to the authenticated Discord account instead of stale local roster selection, hides the Tools sidebar from member sessions, and provides an administrator-only tool launcher in the Admin Console. It also carries forward the Version History and Revision Details theme-contrast improvements from v1.6.3.
+
+## v1.6.3 Version History theme contrast
+
+- Fixed revision names, revision metadata, R-number labels, empty-state text, notes, and status text that were using hard-coded light colors and becoming unreadable on Pastel, Eye comfort, and Light backgrounds.
+- Updated SAVEPOINT, GLOBAL CHANGE, and EXTERNAL CHANGE badges to use a solid high-contrast fill with white text.
+- Applied theme-aware surface and border colors to revision detail cards, with separate readable colors for added and removed values.
+- Updated the release indicator and internal app version to v1.6.3.
 
 This release is based on v1.6.1 and extends the inline character-registration editor so members can add characters directly from the confirmation prompt or Tracker. Saving updates the canonical shared Member Roster and reprojects the Tracker roster. Character registration uses the authenticated shared-storage endpoint and queues a cloud sync after Save; check the app sync status and retry if the remote write fails.
 
@@ -201,3 +210,12 @@ Upload `guild-logo.png` to the same published root directory as `index.html` and
 ## Earlier v1.5.4 interface update
 
 This release refreshes the presentation of the existing Tracker, Team Builder, Card Database, roster, overview, dialogs, and administrator console with a consistent card-based layout, unified spacing, refined inputs and controls, and the existing four appearance themes. It preserves the existing tool logic, Cloudflare Pages Functions, D1 binding, and Discord OAuth flow. The v1.5.6 sign-in banner displays the complete `banner.png` image with no overlaid title. In v1.5.7 the Overview specifically uses `Guild Banner.png`; keep both image files in the project root.
+
+## v1.6.4 changes
+- Replaced Recent Workspace Activity with personalized Activity Insights for the signed-in member’s opted-in characters only. Includes completion summaries, quiet/no-progress characters, lower-completion outliers, next-step recommendations informed by loot weights, and comparisons between saved weekly snapshots where available. It avoids assuming a missed task means the member forgot; advice distinguishes inactivity from an intentional change in priority. Bounty tasks remain excluded from completion percentages.
+- Hid the Tools sidebar from regular members; members can navigate their everyday workflows through the Overview cards. Added an Overview Member Roster card and an authorized Ledger card for Cho, Bio, and Cheean.
+- Moved all former sidebar destinations into a tool launcher in the administrator-only Admin Console. The links use role-checked routes for Dungeon Registration, Loot Weights, Version History, and Sync Now.
+- Added client-side administrator checks to open/save/reset functions for Dungeon Registration, Loot Weights, and Version History. This is a UI-level safeguard in addition to existing API-side admin protections.
+- Activity Insights and Tracker Personal View are resolved from the current authenticated Discord account and its configured roster-match label; the app no longer falls back to a stale locally selected roster when identity matching fails. Unmatched accounts stay in their own unregistered Personal View until their roster mapping is corrected.
+- Updated the HTML document title and release version to v1.6.4.
+

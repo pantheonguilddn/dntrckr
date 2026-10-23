@@ -29,7 +29,7 @@ html[data-pantheon-theme] .btn.danger{color:var(--danger);border-color:var(--bor
 
 
 
-/* Pantheon Tools v1.5.9 — matching administrator console styling. */
+/* Pantheon Tools v1.6.4 — matching administrator console styling. */
 html{min-height:100%;background:var(--bg)}
 body{min-height:100vh;background:radial-gradient(ellipse at 15% 3%,rgba(82,103,217,.20),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(87,214,164,.09),transparent 38%),var(--bg);padding:22px 0 48px}
 html[data-pantheon-theme="light"] body{background:radial-gradient(ellipse at 10% 0%,rgba(82,101,215,.10),transparent 42%),var(--bg)}
@@ -69,6 +69,11 @@ main>p{max-width:850px;color:var(--muted);line-height:1.75;margin-bottom:22px}
 <style id="admin-character-styles">
 .character-admin-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.character-owner-card{padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);margin:10px 0}.character-owner-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.character-owner-head h3{font-size:13px;margin:0}.character-owner-head small{display:block;color:var(--muted);font-size:10px;font-weight:500;margin-top:3px}.admin-character-rows{display:grid;gap:8px}.admin-character-row{display:grid;grid-template-columns:minmax(130px,1.2fr) minmax(135px,1fr) auto auto auto;align-items:end;gap:8px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}.admin-character-row .field{min-width:0}.admin-character-row .field input,.admin-character-row .field select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;min-height:38px;padding:8px;font:12px inherit;letter-spacing:normal;text-transform:none}.admin-main-choice,.admin-track-choice{display:flex;align-items:center;gap:6px;color:var(--text);font-size:10px;font-weight:800;white-space:nowrap;min-height:38px}.admin-main-choice input,.admin-track-choice input{accent-color:var(--accent)}.admin-remove-character{border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--danger);padding:8px 10px;font-weight:900;cursor:pointer;min-height:38px}.character-admin-status{margin:10px 0;padding:10px 12px;border-left:3px solid var(--accent);border-radius:6px;background:var(--surface2);color:var(--text);font-size:11px;white-space:pre-wrap}.character-admin-empty{padding:12px;color:var(--muted);font-size:11px}@media(max-width:760px){.admin-character-row{grid-template-columns:1fr 1fr}.admin-character-row .field:first-child{grid-column:1/-1}.admin-main-choice,.admin-track-choice{min-height:32px}.admin-remove-character{grid-column:1/-1}}
 </style>
+
+<style id="pantheon-admin-tool-launcher-style">
+.tool-launcher-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.tool-launcher-link{display:flex;flex-direction:column;gap:5px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);text-decoration:none;font-size:12px;font-weight:850;transition:border-color .15s,transform .15s}.tool-launcher-link:hover{border-color:var(--accent);transform:translateY(-1px)}.tool-launcher-link small{font-size:10px;font-weight:500;color:var(--muted);line-height:1.5}.tool-launcher-intro{font-size:11px;color:var(--muted);line-height:1.65}@media(max-width:760px){.tool-launcher-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:470px){.tool-launcher-grid{grid-template-columns:1fr}}
+</style>
+
 </head>
 <body>
 <main>
@@ -82,20 +87,39 @@ main>p{max-width:850px;color:var(--muted);line-height:1.75;margin-bottom:22px}
     <div id="allowlist-status" class="status hidden"></div><div id="allowlist-list" class="list"></div>
     <p class="hint">Pantheon normally matches a Discord profile name to the same-named Member Roster owner automatically. Use Roster match name only if those names differ; enter the exact owner name once. To copy a Discord ID, enable User Settings → Advanced → Developer Mode, then right-click the user's profile and choose Copy User ID.</p>
   </section>
+  <section class="card" id="admin-tool-launcher">
+    <h2>2. Tool launcher</h2>
+    <p class="tool-launcher-intro">The sidebar has been removed from member accounts. Launch tools from here when working as an administrator. Each link opens Pantheon in a separate tab, where the app checks the signed-in role again. Global changes to dungeon tasks, loot weights, and version savepoints are restricted to administrators.</p>
+    <div class="tool-launcher-grid">
+      <a class="tool-launcher-link" href="/#overview" target="_blank" rel="noopener">Overview<small>Return to the workspace dashboard.</small></a>
+      <a class="tool-launcher-link" href="/#tracker" target="_blank" rel="noopener">Tracker<small>Open the task board in your Personal View.</small></a>
+      <a class="tool-launcher-link" href="/#team-builder" target="_blank" rel="noopener">Team Builder<small>Build parties and inspect role coverage.</small></a>
+      <a class="tool-launcher-link" href="/#card-wiki" target="_blank" rel="noopener">Card Database<small>Search card stats and build options.</small></a>
+      <a class="tool-launcher-link" href="/#member-roster" target="_blank" rel="noopener">Member Roster<small>Manage owner registrations and character opt-ins.</small></a>
+      <a class="tool-launcher-link" href="/#salary-calculator" target="_blank" rel="noopener">Salary Calculator<small>Calculate and split party income.</small></a>
+      <a class="tool-launcher-link" href="/#ledger" target="_blank" rel="noopener">Ledger<small>Available only to the authorized Ledger accounts.</small></a>
+      <a class="tool-launcher-link" href="/#sync-now" target="_blank" rel="noopener">Sync Now<small>Request an immediate shared-data refresh.</small></a>
+      <a class="tool-launcher-link" href="/#version-history" target="_blank" rel="noopener">Version History<small>Inspect and restore global savepoints.</small></a>
+      <a class="tool-launcher-link" href="/#landing-settings" target="_blank" rel="noopener">Default Landing Page<small>Set where your Pantheon session opens.</small></a>
+      <a class="tool-launcher-link" href="/#dungeons" target="_blank" rel="noopener">Dungeon Registration<small>Maintain daily and weekly task categories.</small></a>
+      <a class="tool-launcher-link" href="/#loot-weights" target="_blank" rel="noopener">Loot Weights<small>Adjust task prioritization weights.</small></a>
+      <a class="tool-launcher-link" href="/#help" target="_blank" rel="noopener">Tracker Guide<small>Read the member-facing instructions.</small></a>
+    </div>
+  </section>
   <section class="card" id="character-admin-panel">
-    <h2>2. Character registration &amp; Main designation</h2>
+    <h2>3. Character registration &amp; Main designation</h2>
     <p>Admin-only controls for every member’s registered IGNs, class / job, tracking opt-in, and Main designation. Changing a registration requires that member to confirm their details again at their next login.</p>
     <div class="character-admin-toolbar"><button class="btn" type="button" id="refresh-character-list">Refresh character registrations</button><span class="hint" id="character-admin-count">Loading registrations…</span></div>
     <div id="character-admin-status" class="character-admin-status hidden"></div>
     <div id="character-admin-list" class="list"></div>
   </section>
   <section class="card">
-    <h2>3. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
+    <h2>4. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
     <form id="migration-form"><div class="grid"><label class="field">Existing main JSONBin ID<input id="old-bin-id" autocomplete="off" placeholder="Existing tracker Bin ID" required></label><label class="field">Existing JSONBin Master Key<input id="old-bin-key" type="password" autocomplete="off" placeholder="Used for this import only" required></label></div><label class="checkbox-line"><input type="checkbox" id="confirm-migration" required><span>I understand this imports the selected main record into Pantheon D1 and overwrites the new Pantheon main record if it already exists.</span></label><div class="actions"><button class="btn primary" type="submit">Import main record and revision journal</button></div></form>
     <div id="migration-status" class="status hidden"></div>
   </section>
   <section class="card">
-    <h2>4. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
+    <h2>5. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
   </section>
 </div>
 </main>

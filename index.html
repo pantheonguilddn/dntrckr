@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.9</title>
+    <title>Pantheon Tools v1.6.4</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1644,6 +1644,105 @@
 
 </style>
 
+
+<style id="pantheon-v163-version-history-theme">
+/* v1.6.3: explicitly theme Version History and Revision Details content.
+   Several child labels used hard-coded pale text on a pale theme surface. */
+:root[data-pantheon-theme] #version-history-modal .version-list {
+  background: var(--pt-surface-soft) !important;
+  color: var(--pt-text) !important;
+  border-color: var(--pt-border) !important;
+}
+:root[data-pantheon-theme] #version-history-modal .version-row {
+  background: var(--pt-surface) !important;
+  color: var(--pt-text) !important;
+  border-color: var(--pt-border) !important;
+}
+:root[data-pantheon-theme] #version-history-modal .version-row:hover {
+  background: var(--pt-hover) !important;
+}
+:root[data-pantheon-theme] #version-history-modal .version-number,
+:root[data-pantheon-theme] #version-history-modal .version-main strong {
+  color: var(--pt-text) !important;
+}
+:root[data-pantheon-theme] #version-history-modal .version-main small,
+:root[data-pantheon-theme] #version-history-modal .version-empty,
+:root[data-pantheon-theme] #version-history-modal .version-note {
+  color: var(--pt-muted) !important;
+}
+:root[data-pantheon-theme] #version-history-modal .version-status {
+  background: var(--pt-surface-soft) !important;
+  color: var(--pt-text) !important;
+  border-color: var(--pt-border) !important;
+  border-left-color: var(--pt-accent) !important;
+}
+:root[data-pantheon-theme] #version-history-modal .version-badge {
+  display: inline-block;
+  background: #344866 !important;
+  color: #ffffff !important;
+  border-color: #344866 !important;
+}
+:root[data-pantheon-theme="light"] #version-history-modal .version-badge { background:#354f83 !important; border-color:#354f83 !important; color:#fff !important; }
+:root[data-pantheon-theme="eye-comfort"] #version-history-modal .version-badge { background:#4d603a !important; border-color:#4d603a !important; color:#fff !important; }
+:root[data-pantheon-theme="pastel"] #version-history-modal .version-badge { background:#684578 !important; border-color:#684578 !important; color:#fff !important; }
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content {
+  color: var(--pt-text) !important;
+}
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content h4,
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content strong {
+  color: var(--pt-text) !important;
+}
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="color:#9aa0aa"],
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="color:#8b92a0"],
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="color:#b8beca"] {
+  color: var(--pt-muted) !important;
+}
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="color:#b5e5c5"] {
+  color: var(--pt-positive) !important;
+}
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="color:#f7bab4"] {
+  color: var(--pt-negative, #a42335) !important;
+}
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="background:#1b1c23"] {
+  background: var(--pt-surface-soft) !important;
+  border-color: var(--pt-border) !important;
+}
+:root[data-pantheon-theme] #revision-detail-modal #revision-detail-content [style*="border:1px solid #414555"] {
+  border-color: var(--pt-border) !important;
+}
+</style>
+
+
+<style id="pantheon-v164-activity-insights-and-admin-navigation">
+  .overview-tool-card[hidden] { display:none !important; }
+  .activity-insights-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:0 0 14px; }
+  .activity-insight-stat { min-width:0; border:1px solid var(--pt-border); border-radius:12px; padding:11px 12px; background:var(--pt-surface-raised); color:var(--pt-text); }
+  .activity-insight-stat small { display:block; color:var(--pt-muted); font-size:.57rem; font-weight:850; letter-spacing:.07em; text-transform:uppercase; }
+  .activity-insight-stat strong { display:block; margin-top:5px; color:var(--pt-text); font-size:1.2rem; font-weight:950; line-height:1.15; overflow-wrap:anywhere; }
+  .activity-insight-stat span { display:block; margin-top:4px; color:var(--pt-muted); font-size:.58rem; line-height:1.45; }
+  .activity-insight-section-title { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:14px 0 4px; color:var(--pt-text); font-size:.67rem; font-weight:900; }
+  .activity-insight-section-note { color:var(--pt-muted); font-size:.57rem; font-weight:600; }
+  .activity-insight-item { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-top:1px solid var(--pt-border); min-width:0; }
+  .activity-insight-item:first-child { border-top:0; }
+  .activity-insight-marker { display:grid; place-items:center; flex:0 0 30px; width:30px; height:30px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft); color:var(--pt-text); font-size:.78rem; font-weight:900; }
+  .activity-insight-copy { min-width:0; flex:1; }
+  .activity-insight-copy strong { display:block; color:var(--pt-text); font-size:.68rem; line-height:1.45; }
+  .activity-insight-copy p { margin:4px 0 0; color:var(--pt-muted); font-size:.63rem; line-height:1.65; overflow-wrap:anywhere; }
+  .activity-insight-meta { display:block; margin-top:5px; color:var(--pt-muted); font-size:.56rem; line-height:1.5; }
+  .activity-insight-badge { display:inline-flex; align-items:center; border-radius:999px; padding:4px 7px; background:#475569; border:1px solid #64748b; color:#fff !important; font-size:.52rem; font-weight:900; letter-spacing:.04em; white-space:nowrap; }
+  .activity-insight-badge.risk { background:#8c3636; border-color:#b45a5a; color:#fff !important; }
+  .activity-insight-badge.watch { background:#815d22; border-color:#ad843b; color:#fff !important; }
+  .activity-insight-badge.good { background:#2e694d; border-color:#4b9671; color:#fff !important; }
+  .activity-insight-progress { display:flex; align-items:center; gap:9px; margin-top:8px; }
+  .activity-insight-progress-track { height:7px; min-width:0; flex:1; overflow:hidden; border-radius:99px; border:1px solid var(--pt-border); background:var(--pt-surface-soft); }
+  .activity-insight-progress-fill { height:100%; border-radius:99px; background:var(--pt-accent); }
+  .activity-insight-progress strong { flex:0 0 40px; text-align:right; font-size:.65rem; }
+  .activity-insight-empty { border:1px dashed var(--pt-border); border-radius:12px; padding:14px; background:var(--pt-surface-raised); color:var(--pt-muted); font-size:.66rem; line-height:1.65; }
+  .activity-insight-action { display:inline-flex; margin-top:8px; padding:7px 10px; align-items:center; justify-content:center; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface-soft); color:var(--pt-text); font-size:.62rem; font-weight:850; cursor:pointer; }
+  body.pantheon-member-session #menu-toggle[hidden], body.pantheon-member-session #tool-drawer[hidden], body.pantheon-member-session #drawer-scrim[hidden] { display:none !important; }
+  @media(max-width:640px) { .activity-insights-summary { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .activity-insight-stat { padding:9px 8px; } .activity-insight-stat strong { font-size:1.02rem; } .activity-insight-stat small { font-size:.5rem; letter-spacing:.02em; } }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1691,14 +1790,14 @@
                 <button class="mini-help" type="button" title="Personal & Universal View Guide" onclick="openHelpModal('view')">?</button>
             </div>
             <label class="pantheon-theme-control app-theme-control" for="pantheon-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
-            <button class="menu-toggle" id="menu-toggle" type="button" onclick="toggleSideMenu()" aria-expanded="false" aria-controls="tool-drawer">
+            <button class="menu-toggle" id="menu-toggle" hidden type="button" onclick="toggleSideMenu()" aria-expanded="false" aria-controls="tool-drawer">
                 <span class="menu-icon">☰</span>
                 <span class="menu-toggle-label">Tools</span>
             </button>
         </div>
     </div>
 
-    <aside class="tool-drawer" id="tool-drawer" aria-hidden="true">
+    <aside class="tool-drawer" id="tool-drawer" hidden aria-hidden="true">
         <div class="tool-drawer-head">
             <div>
                 <div class="drawer-kicker">PANTHEON</div>
@@ -1744,7 +1843,7 @@
         </div>
     </aside>
 
-    <div class="drawer-scrim" id="drawer-scrim" onclick="toggleSideMenu(false)"></div>
+    <div class="drawer-scrim" id="drawer-scrim" hidden onclick="toggleSideMenu(false)"></div>
 
 
     <main id="overview-page" class="app-page overview-page">
@@ -1766,18 +1865,21 @@
         <section class="overview-feature-banner" aria-label="Guild banner">
             <img class="overview-banner" src="Guild%20Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
         </section>
-        <div class="overview-section-title"><span>Your guild workspace</span><span class="overview-tool-count">6 tools available</span></div>
+        <div class="overview-section-title"><span>Your guild workspace</span><span class="overview-tool-count">Available to your account</span></div>
         <section class="overview-tools-grid" aria-label="Pantheon tool overview">
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-personal')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▤</span><strong>Tracker &amp; Bounties</strong><span>Review daily and weekly tasks, bounty targets, completion rates, and guild progress.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('team-builder')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚔</span><strong>Team Builder</strong><span>Build raid parties from registered characters and check role coverage.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('card-database')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▧</span><strong>Card Database</strong><span>Filter monster cards by level range and desired stats. Local card batches stay local.</span></button>
+            <button class="overview-tool-card" type="button" onclick="showAppPage('member-roster')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">👥</span><strong>Member Roster</strong><span>Confirm, add, reorder, and opt your characters into tracking.</span></button>
             <button class="overview-tool-card" type="button" onclick="openLandingSettings()"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚙</span><strong>Default Landing Page</strong><span>Choose which Pantheon tool opens first and change the preference anytime.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▣</span><strong>Salary Calculator</strong><span>Calculate party income, deductions, and member splits.</span></button>
+            <button class="overview-tool-card" id="overview-ledger-tool" type="button" onclick="openScholarModal()" hidden><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">💰</span><strong>Ledger</strong><span>Review your authorized shared salary records.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('help')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">?</span><strong>Help &amp; Guide</strong><span>Find instructions for Tracker, Team Builder, the Card Database, and roster workflows.</span></button>
         </section>
         <section class="overview-bottom-grid">
             <div class="overview-panel overview-activity-panel">
-                <div class="overview-panel-heading"><div><h2>Recent Workspace Activity</h2><p>Useful reminders based on Tracker and weekly analytics</p></div><span class="overview-panel-kicker">GUILD CHECK-IN</span></div>
+                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>Completion pace, quiet characters, emerging outliers, and practical next steps for your own tracked roster.</p></div><span class="overview-panel-kicker">YOUR TRACKING</span></div>
+                <div class="activity-insights-summary" id="overview-insights-summary" aria-label="Personal tracker summary"></div>
                 <div class="overview-activity-list" id="overview-activity" aria-live="polite">
                     <div class="overview-activity-row"><span class="overview-activity-icon">✓</span><div><strong>Weekly tracker review</strong><p>Check for outstanding weekly tasks before the reset.</p></div></div>
                     <div class="overview-activity-row"><span class="overview-activity-icon">↻</span><div><strong>Low-completion follow-up</strong><p>Review characters who may need a guild check-in.</p></div></div>
@@ -2068,7 +2170,7 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.2</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.4</span></div>
                 <ul>
                     <li><strong>Shared character editor:</strong> add a new character directly from the confirmation popup or Tracker. Saving syncs the ordered character list, class, Main designation, and tracking opt-in to the shared Member Roster and refreshes Tracker.</li>
                     <li><strong>Character confirmation editor:</strong> review and edit IGN, Class / Job, Main designation, Tracker opt-in, and character order during first-login confirmation.</li>
@@ -2080,6 +2182,8 @@
                     <li><strong>Bounty Boards:</strong> hidden by default, including on browsers that opted in during an earlier release. Enable them explicitly with Track Bounty Boards.</li>
                     <li><strong>Release-note dismissal:</strong> the “until a new update” choice stays dismissed when closing Salary Calculator or Help &amp; Guide.</li>
                     <li><strong>Automatic resets:</strong> manual force-reset buttons were removed. The weekly Saturday 9:00 AM reset reminder remains visible.</li>
+                    <li><strong>Activity Insights:</strong> the Overview now focuses on the signed-in member’s tracked characters, completion pace, quiet weeks, lower-completion outliers, recent archived trends, and task-weighted next steps. Management tools have moved to the administrator-only sidebar and Admin Console launcher.</li>
+                    <li><strong>Version History theme contrast:</strong> revision names, timestamps, savepoint badges, status messages, and revision-detail cards now remain readable in Dark, Light, Eye comfort, and Pastel themes.</li>
                 
                 </ul>
             </section>
@@ -2886,23 +2990,36 @@
             return [pantheonDiscordUser?.label, pantheonDiscordUser?.username]
                 .map(value => String(value || '').trim()).filter(Boolean);
         }
-        function getCurrentMemberDirectoryEntry() {
+        function getAuthenticatedMemberDirectoryEntry() {
+            // Insights must follow the authenticated Discord account, never a stale local
+            // roster selector. This keeps a shared device from showing another member's
+            // completion or outlier advice after an account switch.
             const entries = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
-            const identity = String(localStorage.getItem(IDENTITY_KEY) || '');
-            const roster = normalizeRosters(cloudData.settings?.rosters).find(item => item.id === identity);
-            if (roster) {
-                const linked = entries.find(member => member.trackerRosterId === roster.id || identityMatchKey(member.name) === identityMatchKey(roster.name));
-                if (linked) return linked;
-            }
-            for (const candidate of ownerCandidateNames()) {
+            const candidates = ownerCandidateNames();
+            for (const candidate of candidates) {
                 const exact = entries.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
                 if (exact.length === 1) return exact[0];
             }
-            for (const candidate of ownerCandidateNames()) {
+            for (const candidate of candidates) {
                 const compact = identityCompactKey(candidate);
                 if (!compact) continue;
                 const close = entries.filter(member => identityCompactKey(member.name) === compact);
                 if (close.length === 1) return close[0];
+            }
+            return null;
+        }
+        function getCurrentMemberDirectoryEntry() {
+            const entries = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
+            // Resolve the logged-in Discord account first. Only fall back to a locally
+            // selected roster if its linked owner also matches this authenticated account.
+            const authenticated = getAuthenticatedMemberDirectoryEntry();
+            if (authenticated) return authenticated;
+            const candidates = ownerCandidateNames();
+            const identity = String(localStorage.getItem(IDENTITY_KEY) || '');
+            const roster = normalizeRosters(cloudData.settings?.rosters).find(item => item.id === identity);
+            if (roster) {
+                const linked = entries.find(member => member.trackerRosterId === roster.id || identityMatchKey(member.name) === identityMatchKey(roster.name));
+                if (linked && candidates.some(candidate => identityMatchKey(linked.name) === identityMatchKey(candidate) || identityCompactKey(linked.name) === identityCompactKey(candidate))) return linked;
             }
             return null;
         }
@@ -2922,7 +3039,9 @@
             const candidates = [...ownerCandidateNames(), linked?.name || ''];
             const canSee = candidates.some(name => allowed.has(identityCompactKey(name)));
             const button = document.getElementById('btn-ledger');
+            const overviewCard = document.getElementById('overview-ledger-tool');
             if (button) button.hidden = !canSee;
+            if (overviewCard) overviewCard.hidden = !canSee;
             return canSee;
         }
         function initializeBountyBoardsToggle() {
@@ -3065,16 +3184,11 @@
             const user = pantheonDiscordUser;
             if (!user?.id) return null;
             const identitySelect = document.getElementById('user-identity');
-            const eligibleRosters = normalizeRosters(cloudData.settings?.rosters);
-            const profileMatch = findDiscordRosterMatch(user);
             const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(user.id)}`;
-            const rememberedId = localStorage.getItem(accountIdentityKey) || '';
-            const rememberedMatch = eligibleRosters.find(roster => roster.id === rememberedId) || null;
-            // The generic identity key is cleared whenever Discord account IDs change at login,
-            // so it is a safe last-resort mapping for an existing member on this same account.
-            const selectedId = localStorage.getItem(IDENTITY_KEY) || '';
-            const selectedMatch = eligibleRosters.find(roster => roster.id === selectedId) || null;
-            const roster = profileMatch || rememberedMatch || selectedMatch;
+            // Never infer a member's identity from a previously selected browser roster. Only
+            // a roster linked to the current authenticated Discord name / allowlisted label is
+            // accepted; unmatched accounts remain in their own unregistered Personal View.
+            const roster = findDiscordRosterMatch(user);
 
             if (!roster) {
                 localStorage.setItem(IDENTITY_KEY, '__unregistered__');
@@ -3094,7 +3208,7 @@
             localStorage.setItem(IDENTITY_KEY, roster.id);
             localStorage.setItem(accountIdentityKey, roster.id);
             if (identitySelect) identitySelect.value = roster.id;
-            discordIdentityMatchStatus = profileMatch ? 'matched' : 'remembered';
+            discordIdentityMatchStatus = 'matched';
 
             // Set state directly instead of toggling. This prevents stale UI state from leaving
             // the Tracker in Universal View even when the correct member identity says Cho.
@@ -3898,7 +4012,7 @@
             document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged(); });
         }
 
-        function openVersionHistoryModal(){toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
+        function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
         function triggerAutoSync() { unsavedCloudChanges = true; persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
@@ -3957,7 +4071,7 @@
             loadLiveTracker().then(() => {
                 applyDiscordIdentityDefaults();
                 const routeHash = location.hash;
-                if (['#registration', '#dungeons', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
+                if (['#registration', '#dungeons', '#loot-weights', '#version-history', '#sync-now', '#landing-settings', '#salary-calculator', '#ledger', '#help', '#overview', '#tracker', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
                 else applySavedLandingPage();
                 initializeWelcomeModal();
                 maybeOpenProfileConfirmation();
@@ -4384,10 +4498,18 @@
                 else avatarEl.textContent = (name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase();
             }
             const isAdmin = user?.role === 'admin';
+            document.body.classList.toggle('pantheon-admin-session', isAdmin);
+            document.body.classList.toggle('pantheon-member-session', !isAdmin);
             const adminLink = document.getElementById('overview-admin-link');
             const drawerAdminLink = document.getElementById('drawer-admin-console');
+            const menuToggle = document.getElementById('menu-toggle');
+            const drawer = document.getElementById('tool-drawer');
+            const scrim = document.getElementById('drawer-scrim');
             if (adminLink) adminLink.hidden = !isAdmin;
             if (drawerAdminLink) drawerAdminLink.hidden = !isAdmin;
+            if (menuToggle) menuToggle.hidden = !isAdmin;
+            if (drawer) drawer.hidden = !isAdmin;
+            if (scrim) scrim.hidden = !isAdmin;
             if (subEl) subEl.textContent = isAdmin ? 'Discord account · Administrator' : 'Discord account · Member';
             refreshLedgerVisibility();
         }
@@ -4408,31 +4530,90 @@
         }
         function renderOverviewActivity() {
             const cont = document.getElementById('overview-activity');
+            const summary = document.getElementById('overview-insights-summary');
             if (!cont) return;
+            const esc = value => escapeHTML(String(value ?? ''));
+            const owner = getAuthenticatedMemberDirectoryEntry();
+            const enabledNames = owner
+                ? (owner.characterProfiles || []).filter(profile => profile.trackerEnabled && profile.name).map(profile => profile.name)
+                : [];
+            const uniqueNames = [...new Map(enabledNames.map(name => [String(name).trim().toLocaleLowerCase(), String(name).trim()])).values()].filter(Boolean);
             const tasks = typeof getCompletionTaskNames === 'function' ? getCompletionTaskNames() : [];
-            const metrics = (Array.isArray(characters) ? characters : []).map(char => {
-                let eligible = 0, done = 0;
-                tasks.forEach(task => {
-                    const state = getCellState(char.name, task);
-                    if (state !== 'excluded') { eligible++; if (state === 'done') done++; }
-                });
-                return { name: char.name, eligible, done, pending: Math.max(0, eligible - done), rate: eligible ? Math.round(done / eligible * 100) : 100 };
-            });
-            const withPending = metrics.filter(item => item.eligible > 0 && item.pending > 0);
-            const low = metrics.filter(item => item.eligible > 0 && item.rate < 40).sort((a,b) => a.rate - b.rate || a.name.localeCompare(b.name)).slice(0,3);
-            const rates = metrics.filter(item => item.eligible > 0);
-            const avg = rates.length ? Math.round(rates.reduce((sum,item) => sum + item.rate,0) / rates.length) : null;
             const analyticsOn = cloudData?.settings?.analyticsTrackingEnabled === true;
-            const archives = Object.entries(safeObject(cloudData?.weeklyArchive)).sort((a,b) => Number(a[0]) - Number(b[0]));
-            const historyText = analyticsOn
-                ? (archives.length ? `Weekly analytics is enabled with ${archives.length} archived week${archives.length === 1 ? '' : 's'}. Open Analytics to review participation trends and loot-weighted priorities.` : 'Weekly analytics is enabled, but no archived weeks are available yet. Review the next weekly trend after an archive is created.')
-                : 'Weekly analytics tracking is currently off. The Tracker still works; enable opt-in tracking to retain weekly trend history.';
-            const activity = [
-                { icon:'✓', title:'Weekly tracker review', body: metrics.length ? `${avg}% average weekly completion across ${rates.length} character${rates.length === 1 ? '' : 's'} with eligible tasks. ${withPending.length} character${withPending.length === 1 ? ' has' : 's have'} outstanding weekly tasks to review.` : 'No characters are currently registered in the Tracker. Check Member Roster and tracker opt-ins.', meta:'Tracker reminder · Bounty tasks excluded from completion rate' },
-                { icon:'↻', title:'Low-completion follow-up', body: low.length ? `Below 40% completion: ${low.map(item => `${item.name} (${item.rate}%)`).join(', ')}. Consider a guild check-in.` : (metrics.length ? 'No tracked characters currently fall below 40% weekly completion.' : 'Once characters are opted in, low-completion follow-ups will appear here.'), meta:`Participation reminder · ${low.length} follow-up${low.length === 1 ? '' : 's'}` },
-                { icon:'▤', title:'Weekly analytics history', body:historyText, meta: analyticsOn ? `Analytics enabled · ${archives.length} archived week${archives.length === 1 ? '' : 's'}` : 'Analytics opt-in is off' }
-            ];
-            cont.innerHTML = activity.map(item => `<div class="overview-activity-row"><span class="overview-activity-icon" aria-hidden="true">${escapeHTML(item.icon)}</span><div><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.body)}</p><span class="overview-activity-meta">${escapeHTML(item.meta)}</span></div></div>`).join('');
+            const archives = Object.entries(safeObject(cloudData?.weeklyArchive))
+                .sort((a, b) => Number(a[0]) - Number(b[0]))
+                .filter(([, archive]) => archive && typeof archive === 'object');
+            const weekStart = Number(cloudData?.lastWeeklyReset) || getTargetResetTimeUTC(true);
+            const profiles = owner?.characterProfiles || [];
+            const metrics = uniqueNames.map(name => {
+                let eligible = 0, done = 0, thisWeekActivity = false, latestTouch = 0, excluded = 0, marked = 0;
+                const states = tasks.map(task => {
+                    const record = getCellRecord(name, task);
+                    const state = record?.state || 'open';
+                    const updatedAt = Number(record?.updatedAt) || 0;
+                    if (updatedAt > latestTouch) latestTouch = updatedAt;
+                    if (updatedAt >= weekStart && ['done', 'marked', 'excluded'].includes(state)) thisWeekActivity = true;
+                    if (state === 'excluded') excluded++;
+                    else { eligible++; if (state === 'done') done++; if (state === 'marked') marked++; }
+                    return { task, state, updatedAt };
+                });
+                const pendingTasks = states.filter(item => item.state !== 'done' && item.state !== 'excluded').sort((a, b) => (getLootWeight(b.task) - getLootWeight(a.task)) || a.task.localeCompare(b.task));
+                const rate = eligible ? Math.round(done / eligible * 100) : 0;
+                const snapshots = archives.map(([, archive]) => archive?.rates?.[name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
+                const trend = snapshots.length >= 2 ? snapshots[snapshots.length - 1] - snapshots[snapshots.length - 2] : null;
+                const profile = profiles.find(item => item.name.toLocaleLowerCase() === name.toLocaleLowerCase());
+                return { name, isMain: !!profile?.isMain, eligible, done, pending: Math.max(0, eligible - done), rate, excluded, marked, thisWeekActivity, latestTouch, pendingTasks, trend };
+            });
+            const totalEligible = metrics.reduce((sum, item) => sum + item.eligible, 0);
+            const totalDone = metrics.reduce((sum, item) => sum + item.done, 0);
+            const totalPending = metrics.reduce((sum, item) => sum + item.pending, 0);
+            const average = totalEligible ? Math.round(totalDone / totalEligible * 100) : null;
+            const main = metrics.find(item => item.isMain);
+            const priorities = [];
+            metrics.forEach(item => {
+                const nextTask = item.pendingTasks[0]?.task || '';
+                if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity) {
+                    priorities.push({ rank: 0, tone:'risk', icon:'◷', label:'No progress recorded', title:`${item.name}${item.isMain ? ' · Main' : ''} has no recorded weekly progress`, body:`Nothing is marked complete for this week yet. If you meant to keep this character active, start with ${nextTask ? `“${nextTask}”` : 'one eligible weekly task'}. If the character is intentionally parked, turn off its Tracker opt-in so it stops looking overdue.`, meta:`0/${item.eligible} eligible tasks complete · this is a prompt, not a judgment` });
+                } else if (item.eligible > 0 && item.rate < 40) {
+                    priorities.push({ rank: 1, tone:'risk', icon:'!', label:'Low completion', title:`${item.name}${item.isMain ? ' · Main' : ''} is falling behind`, body:`${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). ${nextTask ? `Highest-weight open task to tackle next: “${nextTask}”.` : 'Review remaining eligible tasks before reset.'} If priorities changed, consider pausing tracking instead of carrying this character as an ongoing reminder.`, meta:`${item.pending} outstanding · Bounty tasks excluded` });
+                } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0) {
+                    priorities.push({ rank: 2, tone:'watch', icon:'↗', label:'Needs a nudge', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A manageable next step is “${nextTask}”, currently among the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} If the character is not a current focus, consider turning off its tracking opt-in.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
+                }
+                if (item.trend !== null && item.trend <= -20) {
+                    priorities.push({ rank: 1, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, a changed priority, or simply a missed update. Review the next reset cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
+                }
+            });
+            priorities.sort((a,b) => a.rank-b.rank || a.title.localeCompare(b.title));
+            const shownPriorities = priorities.slice(0, 5);
+            if (summary) {
+                const stats = [
+                    { label:'Tracked characters', value:String(metrics.length), detail: main ? `Main: ${main.name}` : 'Characters opted into Tracker' },
+                    { label:'Weekly completion', value:average === null ? '—' : `${average}%`, detail: totalEligible ? `${totalDone} of ${totalEligible} eligible tasks` : 'No eligible weekly tasks' },
+                    { label:'Still open', value:String(totalPending), detail: 'Bounty Boards are excluded' }
+                ];
+                summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
+            }
+            if (!owner || metrics.length === 0) {
+                cont.innerHTML = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters from Member Roster to get completion insights, outlier reminders, and task-specific advice here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
+                return;
+            }
+            let html = '';
+            html += `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted</span></div>`;
+            if (shownPriorities.length) {
+                html += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
+            } else {
+                html += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>Nothing needs urgent attention</strong><p>Your currently tracked characters are either on pace or have no open eligible tasks. Keep the same cadence and check back before the Saturday reset.</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
+            }
+            html += `<div class="activity-insight-section-title"><span>Character completion</span><span class="activity-insight-section-note">Sorted by lowest completion</span></div>`;
+            const sortedMetrics = [...metrics].sort((a,b) => a.rate-b.rate || Number(b.isMain)-Number(a.isMain) || a.name.localeCompare(b.name));
+            html += sortedMetrics.map(item => {
+                const badge = item.done === 0 && !item.thisWeekActivity ? ['No activity','risk'] : item.rate < 40 ? ['At risk','risk'] : item.rate < 70 ? ['Watch','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
+                const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
+                const pendingName = item.pendingTasks[0]?.task;
+                const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
+                return `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
+            }).join('');
+            cont.innerHTML = html;
         }
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
@@ -4542,6 +4723,7 @@
             document.querySelectorAll('select[data-weight-task]').forEach(sel => sel.addEventListener('change', () => { const l = document.querySelector(`[data-weight-label="${CSS.escape(sel.dataset.weightTask)}"]`); if(l) l.textContent = ['Minor','Low','Medium','High','Critical'][sel.value-1]; }));
         }
         async function saveLootWeights() {
+            if (!isPantheonAdmin()) { alert('Loot Weights can only be changed by a Pantheon administrator.'); return; }
             const next = { ...(cloudData.settings.lootWeights || {}) };
             document.querySelectorAll('select[data-weight-task]').forEach(sel => { next[sel.dataset.weightTask] = clampWeight(sel.value); });
             const same = weeklyTaskNames.every(t => clampWeight(next[t]) === clampWeight(cloudData.settings.lootWeights[t]));
@@ -4551,12 +4733,13 @@
             renderAnalytics(); triggerAutoSync(); closeModal('weights-modal');
         }
         async function resetLootWeights() {
+            if (!isPantheonAdmin()) { alert('Loot Weights can only be changed by a Pantheon administrator.'); return; }
             if (!confirm('Reset?')) return;
             if (!(await prepareGlobalChange('Reset Loot Weights'))) return;
             const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(DEFAULT_LOOT_WEIGHTS[t]||3); cloudData.settings.lootWeightUpdatedAt[t] = ts; });
             buildLootWeightEditor(); renderAnalytics(); triggerAutoSync();
         }
-        function openWeightsModal() { buildLootWeightEditor(); openModal('weights-modal'); }
+        function openWeightsModal() { if (!isPantheonAdmin()) { alert('Loot Weights is available only to Pantheon administrators.'); return; } buildLootWeightEditor(); openModal('weights-modal'); }
 
         // --- Drag & Drop Variables ---
         let dragSrcData = null; 
@@ -4745,6 +4928,7 @@
         }
 
         function renderDungeonRegistration() {
+            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             renderPastelPalette();
             const sel = document.getElementById('reg-dungeon-cat-select'), list = document.getElementById('dungeon-management-list');
             if(!sel||!list) return;
@@ -4775,6 +4959,7 @@
         }
 
         async function registerDungeonTask() {
+            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             const v = document.getElementById('reg-dungeon-task-name').value.trim(); if(!v) return alert('Enter task name.');
             if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === v.toLowerCase()))) return alert('Task exists.');
             const catChoice = document.getElementById('reg-dungeon-cat-select').value;
@@ -4797,6 +4982,7 @@
         }
         
         async function saveCategoryGroup(id) {
+            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             const c = findCategory(id); if(!c) return;
             const name = document.querySelector(`[data-cat-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || c.name;
             const color = normalizeColor(document.querySelector(`[data-cat-color="${CSS.escape(id)}"]`).value, '#ffffff');
@@ -4806,6 +4992,7 @@
             latest.name = name; latest.color = color; latest.group = group; touchCategorySettings(); refreshTrackerUI(); triggerAutoSync();
         }
         async function removeTaskFromCategory(id, t) {
+            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             const c = findCategory(id); if(c && confirm(`Remove ${t}?`)) {
                 if (!(await prepareGlobalChange(`Remove dungeon task ${t}`))) return;
                 const latest = findCategory(id); if (!latest) return alert('Category no longer exists. Refresh and try again.');
@@ -4813,6 +5000,7 @@
             }
         }
         async function removeCategoryGroup(id) {
+            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             if(!confirm('Remove category?')) return;
             const c = findCategory(id); if (!c) return;
             if (!(await prepareGlobalChange(`Remove dungeon category ${c.name}`))) return;
@@ -6216,7 +6404,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.2';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.4';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -6656,15 +6844,31 @@
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
         function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
-        function openDungeonPage() { renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function openDungeonPage() { if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
-            closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal');
-            if (location.hash === '#registration') { showAppPage('tracker'); renderRosterRegistration(); openModal('roster-modal'); }
-            else if (location.hash === '#dungeons') { showAppPage('tracker'); renderDungeonRegistration(); openModal('dungeon-modal'); }
-            else if (location.hash === '#team-builder') showAppPage('team-builder');
-            else if (location.hash === '#card-wiki') showAppPage('card-wiki');
-            else if (location.hash === '#member-roster') showAppPage('member-roster');
+            closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('weights-modal'); closeModal('version-history-modal');
+            const route = location.hash || '#overview';
+            const adminOnlyRoutes = new Set(['#dungeons', '#loot-weights', '#version-history', '#sync-now']);
+            if (adminOnlyRoutes.has(route) && !isPantheonAdmin()) {
+                history.replaceState(null, '', location.pathname + location.search);
+                showAppPage('overview');
+                alert('That management tool is available only to Pantheon administrators.');
+                return;
+            }
+            if (route === '#registration') { showAppPage('tracker'); renderRosterRegistration(); openModal('roster-modal'); }
+            else if (route === '#dungeons') { showAppPage('tracker'); openDungeonPage(); }
+            else if (route === '#loot-weights') { showAppPage('tracker'); openWeightsModal(); }
+            else if (route === '#version-history') { showAppPage('overview'); openVersionHistoryModal(); }
+            else if (route === '#sync-now') { showAppPage('overview'); forceSync(true); }
+            else if (route === '#landing-settings') { showAppPage('overview'); openLandingSettings(); }
+            else if (route === '#salary-calculator') { showAppPage('overview'); openSalaryModal(); }
+            else if (route === '#ledger') { showAppPage('overview'); openScholarModal(); }
+            else if (route === '#help') { showAppPage('overview'); openHelpModal('start'); }
+            else if (route === '#team-builder') showAppPage('team-builder');
+            else if (route === '#card-wiki') showAppPage('card-wiki');
+            else if (route === '#member-roster') showAppPage('member-roster');
+            else if (route === '#overview') showAppPage('overview');
             else showAppPage('tracker');
         }
 
@@ -6689,7 +6893,15 @@
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
             const btn = document.getElementById('menu-toggle');
+            if (!isPantheonAdmin()) {
+                if (drawer) { drawer.classList.remove('open'); drawer.hidden = true; drawer.setAttribute('aria-hidden', 'true'); }
+                if (scrim) { scrim.classList.remove('open'); scrim.hidden = true; }
+                if (btn) { btn.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+                document.body.classList.remove('drawer-open');
+                return;
+            }
             if (!drawer || !scrim || !btn) return;
+            drawer.hidden = false; scrim.hidden = false; btn.hidden = false;
             const shouldOpen = typeof force === 'boolean' ? force : !drawer.classList.contains('open');
             drawer.classList.toggle('open', shouldOpen);
             scrim.classList.toggle('open', shouldOpen);

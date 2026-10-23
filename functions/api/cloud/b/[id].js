@@ -1,11 +1,15 @@
 import { getRecord, jsonResponse, resolveRecordId, storeRecord } from '../../../_utils/auth.js';
 import { decodePantheonCompactRecord } from '../../../_utils/compact.js';
 import { registrationWriteViolation } from '../../../_utils/registration-guard.js';
+import { denyNonAdminRevisionJournalAccess } from '../../../_utils/admin-tool-access.js';
 
 const MAIN_ID = 'pantheon-main';
 
-export async function onRequestGet({ params, env }) {
+export async function onRequestGet(context) {
+  const { params, env } = context;
   const requestedId = String(params.id || '');
+  const denied = await denyNonAdminRevisionJournalAccess(context, requestedId);
+  if (denied) return denied;
   const row = await getRecord(env, requestedId);
   if (!row) return jsonResponse({ message: 'Record not found.' }, 404);
   try { return jsonResponse({ metadata: { id: requestedId, name: row.name, private: true, updatedAt: row.updated_at }, record: JSON.parse(row.record_json) }); }
@@ -16,6 +20,8 @@ export async function onRequestPut(context) {
   const { params, request, env } = context;
   const requestedId = String(params.id || '');
   const targetId = await resolveRecordId(env, requestedId);
+  const denied = await denyNonAdminRevisionJournalAccess(context, requestedId);
+  if (denied) return denied;
   const current = await env.PANTHEON_DB.prepare('SELECT id, name, record_json FROM data_records WHERE id = ? LIMIT 1').bind(targetId).first();
   if (!current) return jsonResponse({ message: 'Record not found.' }, 404);
   let record;

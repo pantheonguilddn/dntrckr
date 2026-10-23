@@ -107,6 +107,43 @@ export function registrationWriteViolation(previousRecord, nextRecord, session) 
   if (!initialCandidates.length) return 'Your Discord identity could not be linked to a member name. Ask an administrator to configure your roster match.';
   const before = obj(previousRecord?.settings);
   const after = obj(nextRecord?.settings);
+
+  // Keep guild-wide configuration administrator-managed at the API boundary too.
+  // Members still may update their own registrations and routine tracking progress,
+  // but cannot bypass hidden management controls by editing the shared record directly.
+  const adminManagedSettings = [
+    ['categories', 'Dungeon Registration', value => arr(value)],
+    ['lootWeights', 'Loot Weights', value => obj(value)]
+  ];
+  for (const [field, label, normalize] of adminManagedSettings) {
+    if (stable(normalize(before[field])) !== stable(normalize(after[field]))) {
+      return `${label} can only be changed by a Pantheon administrator.`;
+    }
+  }
+  const beforeTeamBuilder = obj(before.teamBuilder);
+  const afterTeamBuilder = obj(after.teamBuilder);
+  if (!!beforeTeamBuilder.splitPartyMechanic !== !!afterTeamBuilder.splitPartyMechanic) {
+    return 'The Split Party Mechanic setting can only be changed by a Pantheon administrator.';
+  }
+  const versionFields = [
+    'lastCheckpointAt', 'lastCheckpointBy', 'lastCheckpointLabel', 'lastCheckpointKind',
+    'lastVersionedWriteAt', 'lastGlobalSignature', 'globalBaselineSignature',
+    'revisionBinId', 'revisionBinUpdatedAt', 'revisionBinUpdatedBy', 'versioningEnabled'
+  ];
+  const versionProjection = value => {
+    const source = obj(value);
+    const out = {};
+    for (const field of versionFields) {
+      if (field.endsWith('At')) out[field] = Number(source[field]) || 0;
+      else if (field === 'versioningEnabled') out[field] = source[field] !== false;
+      else out[field] = String(source[field] || '');
+    }
+    return out;
+  };
+  if (stable(versionProjection(before.versionControl)) !== stable(versionProjection(after.versionControl))) {
+    return 'Version History and savepoint controls are administrator-managed.';
+  }
+
   const beforeMembers = arr(before.memberDirectory);
   const afterMembers = arr(after.memberDirectory);
   const candidates = resolveOwnerCandidates(session, beforeMembers);
