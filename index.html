@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.4</title>
+    <title>Pantheon Tools v1.6.5</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1743,6 +1743,72 @@
   @media(max-width:640px) { .activity-insights-summary { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .activity-insight-stat { padding:9px 8px; } .activity-insight-stat strong { font-size:1.02rem; } .activity-insight-stat small { font-size:.5rem; letter-spacing:.02em; } }
 </style>
 
+
+<style id="pantheon-v165-overview-layout">
+  /* v1.6.5: compact account status, utility widgets, and split insights/completion layout. */
+  .overview-profile-chip {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr);
+    align-content:start;
+    gap:9px !important;
+    width:min(610px,100%);
+    flex:0 1 610px;
+    box-sizing:border-box;
+    padding:12px !important;
+    border-radius:15px !important;
+  }
+  .overview-profile-main { display:flex; align-items:center; gap:10px; min-width:0; }
+  .overview-profile-copy { flex:1 1 auto !important; min-width:0; }
+  .overview-profile-actions { margin-left:auto; }
+  .overview-profile-status-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; min-width:0; }
+  .overview-status-card {
+    display:flex; align-items:flex-start; gap:6px; min-width:0; padding:8px 7px !important;
+    border-radius:10px !important; background:var(--pt-surface-raised) !important;
+  }
+  .overview-status-symbol { width:23px !important; height:23px !important; flex:0 0 23px !important; border-radius:7px !important; font-size:.69rem !important; }
+  .overview-status-card > div { display:grid; gap:2px; min-width:0; }
+  .overview-status-label { font-size:.48rem !important; letter-spacing:.07em !important; }
+  .overview-status-card strong { font-size:.61rem !important; line-height:1.3; }
+  .overview-status-card small { font-size:.52rem !important; line-height:1.35 !important; }
+  .overview-profile-widget-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+  .overview-mini-widget {
+    display:inline-flex; align-items:center; gap:7px; min-height:31px; padding:6px 9px;
+    border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft);
+    color:var(--pt-text); font:inherit; cursor:pointer; text-align:left; text-decoration:none;
+    transition:background .15s ease,border-color .15s ease;
+  }
+  .overview-mini-widget > span { display:grid; place-items:center; width:20px; height:20px; flex:0 0 20px; border-radius:6px; background:var(--pt-accent-soft); color:var(--pt-accent); font-size:.68rem; font-weight:900; }
+  .overview-mini-widget strong { color:var(--pt-text); font-size:.61rem; font-weight:900; }
+  .overview-mini-widget small { color:var(--pt-muted); font-size:.55rem; }
+  .overview-mini-widget:hover { border-color:var(--pt-accent); background:var(--pt-hover); }
+  .overview-mini-widget[hidden] { display:none !important; }
+  .overview-bottom-grid { grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr) !important; gap:14px !important; }
+  .overview-completion-panel { min-width:0; }
+  .overview-character-completion { display:grid; gap:0; min-width:0; }
+  .overview-character-completion .activity-insight-item { padding:13px 0; }
+  .overview-character-completion .activity-insight-item:first-child { padding-top:0; }
+  .overview-character-completion .activity-insight-meta { overflow-wrap:anywhere; }
+  .overview-tool-card[hidden] { display:none !important; }
+  @media(max-width:1050px) {
+    .overview-profile-chip { width:min(100%,650px); flex:1 1 100%; }
+    .overview-dashboard-head { align-items:stretch; }
+  }
+  @media(max-width:880px) {
+    .overview-bottom-grid { grid-template-columns:minmax(0,1fr) !important; }
+    .overview-profile-chip { max-width:100%; }
+  }
+  @media(max-width:560px) {
+    .overview-profile-status-row { grid-template-columns:1fr; }
+    .overview-status-card { align-items:center; padding:7px 9px !important; }
+    .overview-status-card > div { grid-template-columns:minmax(0,1fr); }
+    .overview-profile-main { flex-wrap:wrap; }
+    .overview-profile-actions { margin-left:auto; }
+    .overview-profile-widget-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .overview-mini-widget { min-width:0; }
+    .overview-mini-widget small { display:none; }
+  }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1853,12 +1919,23 @@
                 <h1>Welcome to Pantheon Tools</h1>
                 <p>Your home for Dragon Nest Classic guild coordination. Track weekly progress, register characters, build raid parties, browse card stats, maintain the member directory, and calculate party income.</p>
             </div>
-            <div class="overview-profile-chip" aria-label="Signed-in Discord account">
-                <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
-                <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
-                <div class="overview-profile-actions">
-                    <a href="/admin.html" id="overview-admin-link" hidden>Admin</a>
-                    <button type="button" id="overview-signout" class="overview-signout">Log out</button>
+            <div class="overview-profile-chip" aria-label="Signed-in Discord account and workspace status">
+                <div class="overview-profile-main">
+                    <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
+                    <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
+                    <div class="overview-profile-actions">
+                        <a href="/admin.html" id="overview-admin-link" hidden>Admin</a>
+                        <button type="button" id="overview-signout" class="overview-signout">Log out</button>
+                    </div>
+                </div>
+                <div class="overview-profile-status-row" aria-label="Workspace status">
+                    <div class="overview-status-card" title="Shared guild data connection"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
+                    <div class="overview-status-card" title="Latest synchronization state"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
+                    <div class="overview-status-card" title="Your authenticated access level"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
+                </div>
+                <div class="overview-profile-widget-row" aria-label="Quick help and account tools">
+                    <button class="overview-mini-widget" id="overview-help-widget" type="button" onclick="runWelcomeShortcut('help')"><span aria-hidden="true">?</span><strong>Help &amp; Guide</strong><small>Quick guide</small></button>
+                    <button class="overview-mini-widget overview-ledger-widget" id="overview-ledger-widget" type="button" onclick="openScholarModal()" hidden><span aria-hidden="true">💰</span><strong>Ledger</strong><small>Shared salary records</small></button>
                 </div>
             </div>
         </section>
@@ -1873,26 +1950,22 @@
             <button class="overview-tool-card" type="button" onclick="showAppPage('member-roster')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">👥</span><strong>Member Roster</strong><span>Confirm, add, reorder, and opt your characters into tracking.</span></button>
             <button class="overview-tool-card" type="button" onclick="openLandingSettings()"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚙</span><strong>Default Landing Page</strong><span>Choose which Pantheon tool opens first and change the preference anytime.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▣</span><strong>Salary Calculator</strong><span>Calculate party income, deductions, and member splits.</span></button>
-            <button class="overview-tool-card" id="overview-ledger-tool" type="button" onclick="openScholarModal()" hidden><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">💰</span><strong>Ledger</strong><span>Review your authorized shared salary records.</span></button>
-            <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('help')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">?</span><strong>Help &amp; Guide</strong><span>Find instructions for Tracker, Team Builder, the Card Database, and roster workflows.</span></button>
         </section>
-        <section class="overview-bottom-grid">
-            <div class="overview-panel overview-activity-panel">
-                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>Completion pace, quiet characters, emerging outliers, and practical next steps for your own tracked roster.</p></div><span class="overview-panel-kicker">YOUR TRACKING</span></div>
+        <section class="overview-bottom-grid" aria-label="Personal tracker dashboard">
+            <section class="overview-panel overview-activity-panel">
+                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>Personalized reminders, completion outliers, and practical next steps for the characters you track.</p></div><span class="overview-panel-kicker">YOUR ACTIVITY</span></div>
                 <div class="activity-insights-summary" id="overview-insights-summary" aria-label="Personal tracker summary"></div>
                 <div class="overview-activity-list" id="overview-activity" aria-live="polite">
                     <div class="overview-activity-row"><span class="overview-activity-icon">✓</span><div><strong>Weekly tracker review</strong><p>Check for outstanding weekly tasks before the reset.</p></div></div>
-                    <div class="overview-activity-row"><span class="overview-activity-icon">↻</span><div><strong>Low-completion follow-up</strong><p>Review characters who may need a guild check-in.</p></div></div>
-                    <div class="overview-activity-row"><span class="overview-activity-icon">▤</span><div><strong>Analytics history</strong><p>Review participation trends when weekly tracking is enabled.</p></div></div>
+                    <div class="overview-activity-row"><span class="overview-activity-icon">↻</span><div><strong>Low-completion follow-up</strong><p>Review characters who may need a check-in or tracking pause.</p></div></div>
                 </div>
-            </div>
-            <aside class="overview-side-stack">
-                <section class="overview-status-stack" aria-label="Workspace status">
-                    <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
-                    <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
-                    <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
-                </section>
-            </aside>
+            </section>
+            <section class="overview-panel overview-completion-panel">
+                <div class="overview-panel-heading"><div><h2>Character Completion</h2><p>See which opted-in characters are on pace and which may need attention.</p></div><span class="overview-panel-kicker">LOWEST FIRST</span></div>
+                <div id="overview-character-completion" class="overview-character-completion" aria-live="polite">
+                    <div class="activity-insight-empty">Your character completion details will appear here after your registered characters are loaded.</div>
+                </div>
+            </section>
         </section>
     </main>
 
@@ -2170,7 +2243,7 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.4</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.5</span></div>
                 <ul>
                     <li><strong>Shared character editor:</strong> add a new character directly from the confirmation popup or Tracker. Saving syncs the ordered character list, class, Main designation, and tracking opt-in to the shared Member Roster and refreshes Tracker.</li>
                     <li><strong>Character confirmation editor:</strong> review and edit IGN, Class / Job, Main designation, Tracker opt-in, and character order during first-login confirmation.</li>
@@ -2182,7 +2255,7 @@
                     <li><strong>Bounty Boards:</strong> hidden by default, including on browsers that opted in during an earlier release. Enable them explicitly with Track Bounty Boards.</li>
                     <li><strong>Release-note dismissal:</strong> the “until a new update” choice stays dismissed when closing Salary Calculator or Help &amp; Guide.</li>
                     <li><strong>Automatic resets:</strong> manual force-reset buttons were removed. The weekly Saturday 9:00 AM reset reminder remains visible.</li>
-                    <li><strong>Activity Insights:</strong> the Overview now focuses on the signed-in member’s tracked characters, completion pace, quiet weeks, lower-completion outliers, recent archived trends, and task-weighted next steps. Management tools have moved to the administrator-only sidebar and Admin Console launcher.</li>
+                    <li><strong>Activity Insights:</strong> the Overview now focuses on the signed-in member’s tracked characters, completion pace, quiet weeks, lower-completion outliers, recent archived trends, and task-weighted next steps. Management tools are available through the administrator-only Admin Console launcher. The Overview layout now places account status beside the signed-in profile and separates Activity Insights from Character Completion.</li>
                     <li><strong>Version History theme contrast:</strong> revision names, timestamps, savepoint badges, status messages, and revision-detail cards now remain readable in Dark, Light, Eye comfort, and Pastel themes.</li>
                 
                 </ul>
@@ -3034,14 +3107,15 @@
             return ownerCandidateNames().some(candidate => identityCompactKey(candidate) && identityCompactKey(member.name) === identityCompactKey(candidate));
         }
         function refreshLedgerVisibility() {
+            // Ledger access is keyed to the authenticated Member Roster profile only.
+            // A stale locally selected roster must never expose another member's ledger widget.
             const allowed = new Set(['cho', 'bio', 'cheean']);
-            const linked = getCurrentMemberDirectoryEntry();
-            const candidates = [...ownerCandidateNames(), linked?.name || ''];
-            const canSee = candidates.some(name => allowed.has(identityCompactKey(name)));
+            const linked = getAuthenticatedMemberDirectoryEntry();
+            const canSee = !!linked && allowed.has(identityCompactKey(linked.name || ''));
             const button = document.getElementById('btn-ledger');
-            const overviewCard = document.getElementById('overview-ledger-tool');
+            const overviewWidget = document.getElementById('overview-ledger-widget');
             if (button) button.hidden = !canSee;
-            if (overviewCard) overviewCard.hidden = !canSee;
+            if (overviewWidget) overviewWidget.hidden = !canSee;
             return canSee;
         }
         function initializeBountyBoardsToggle() {
@@ -4530,8 +4604,9 @@
         }
         function renderOverviewActivity() {
             const cont = document.getElementById('overview-activity');
+            const completionCont = document.getElementById('overview-character-completion');
             const summary = document.getElementById('overview-insights-summary');
-            if (!cont) return;
+            if (!cont && !completionCont) return;
             const esc = value => escapeHTML(String(value ?? ''));
             const owner = getAuthenticatedMemberDirectoryEntry();
             const enabledNames = owner
@@ -4594,26 +4669,33 @@
                 summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
             }
             if (!owner || metrics.length === 0) {
-                cont.innerHTML = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters from Member Roster to get completion insights, outlier reminders, and task-specific advice here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
+                const noData = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters from Member Roster to get completion insights, outlier reminders, and task-specific advice here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
+                if (cont) cont.innerHTML = noData;
+                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Character-level completion will appear here once at least one registered character is opted into Tracker. No roster or progress data is shown for other members.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
-            let html = '';
-            html += `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted</span></div>`;
+            let insightHtml = `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted</span></div>`;
             if (shownPriorities.length) {
-                html += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
+                insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
-                html += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>Nothing needs urgent attention</strong><p>Your currently tracked characters are either on pace or have no open eligible tasks. Keep the same cadence and check back before the Saturday reset.</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
+                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>Nothing needs urgent attention</strong><p>Your currently tracked characters are either on pace or have no open eligible tasks. Keep the same cadence and check back before the Saturday reset.</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
             }
-            html += `<div class="activity-insight-section-title"><span>Character completion</span><span class="activity-insight-section-note">Sorted by lowest completion</span></div>`;
+            if (cont) cont.innerHTML = insightHtml;
+
             const sortedMetrics = [...metrics].sort((a,b) => a.rate-b.rate || Number(b.isMain)-Number(a.isMain) || a.name.localeCompare(b.name));
-            html += sortedMetrics.map(item => {
-                const badge = item.done === 0 && !item.thisWeekActivity ? ['No activity','risk'] : item.rate < 40 ? ['At risk','risk'] : item.rate < 70 ? ['Watch','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
-                const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
-                const pendingName = item.pendingTasks[0]?.task;
-                const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
-                return `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
-            }).join('');
-            cont.innerHTML = html;
+            let completionHtml = '';
+            if (sortedMetrics.length) {
+                completionHtml = sortedMetrics.map(item => {
+                    const badge = item.done === 0 && !item.thisWeekActivity ? ['No activity','risk'] : item.rate < 40 ? ['At risk','risk'] : item.rate < 70 ? ['Watch','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
+                    const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
+                    const pendingName = item.pendingTasks[0]?.task;
+                    const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
+                    return `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
+                }).join('');
+            } else {
+                completionHtml = `<div class="activity-insight-empty">No eligible weekly tasks are currently configured for the characters you track.</div>`;
+            }
+            if (completionCont) completionCont.innerHTML = completionHtml;
         }
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
@@ -6404,7 +6486,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.4';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.5';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
