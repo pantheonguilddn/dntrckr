@@ -1,6 +1,16 @@
-# Pantheon Tools v1.5.6 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.7 — Cloudflare Pages + D1
 
-This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway, a D1-backed JSONBin-compatible data API, and automatic Personal View selection based on the authenticated Discord profile. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
+This release starts from the supplied Pantheon Tools v1.5.6 Cloudflare Pages + D1 bundle and carries its Discord-account allowlist gateway, D1-backed JSONBin-compatible data API, and authenticated Personal View matching forward into v1.5.7. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
+
+## v1.5.7 interface, personalization, and access updates
+
+- Overview banner uses the existing `Guild Banner.png` file from the repository root.
+- Tracker starts in Personal View when a verified Discord account has a linked roster. Legacy saved Tracker Universal startup preferences are upgraded to Personal View.
+- The Tracker has a `Track Bounty Boards` toggle. Bounty 1–6 rows are hidden by default and can be shown on demand.
+- Tracker table surfaces, completion states, bounty text boxes, and Salary Calculator receipt now follow the selected appearance theme.
+- Signed-in Discord profile picture, account name, Admin shortcut, and Log out control are visible in the top toolbar.
+- Tracker Registration and Member Roster are owner-scoped for regular members; administrators retain the guild-wide controls. Ledger is limited to Cho, Bio, and Cheean.
+- Removed the redundant Join Pantheon Discord panel from Overview.
 
 ## v1.5.6 interface and performance updates
 
@@ -10,14 +20,14 @@ This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a
 - Overview reminders are calculated from the current Tracker's eligible weekly tasks (bounty tasks excluded from completion rates) and the existing opt-in weekly analytics archive. They are reminders rather than a fabricated audit log.
 - Tracker clicks update only the affected cell and character completion rate. Hidden tools are not rebuilt after every save; they refresh when visible or when a remote change requires reconciliation.
 - Dark, Light, Eye comfort, and Pastel remain available across the working tools and admin console. Existing font families are preserved.
-- The release popup uses `v1.5.6`, so dismissals of earlier versions do not suppress this update.
+- The release popup reports `v1.5.7`; a dismissal saved for an older version does not suppress this update.
 
 ## Important before deploying
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
-- The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- If the current root `index.html` in GitHub is newer than the supplied v1.4.6-based HTML, do not overwrite it blindly. Reconcile the frontend edits with that newer tracker version first.
+- The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
+- This ZIP uses v1.5.6 as its base with the v1.5.7 updates listed above. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch
@@ -28,7 +38,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on the full v1.4.6 tracker available for this work; if the branch contains a newer tracker version, do not overwrite it blindly.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on v1.5.6 with the v1.5.7 changes described above; back up the current branch before replacing it.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project
@@ -102,7 +112,7 @@ Never put the Client Secret into GitHub, HTML, a public file, or the D1 tables.
 
 If your guild currently has JSONBin data, migrate it before adding other members.
 
-1. While signed in as the bootstrap admin, open `https://YOUR-PROJECT.pages.dev/admin.html` or choose **Access admin** from the bottom-right session bar.
+1. While signed in as the bootstrap admin, open `https://YOUR-PROJECT.pages.dev/admin.html` or choose **Admin** beside the logged-in Discord profile in the top toolbar.
 2. Under **Move the old guild record from JSONBin to D1**, enter the existing main tracker Bin ID and its JSONBin Master Key.
 3. Confirm the checkbox and click **Import main record and revision journal**.
 4. The page fetches the existing main record and, if configured in the main record, its separate revision journal. It sends those records to the authenticated D1 import endpoint. The old JSONBin records are read only and left untouched.
@@ -134,11 +144,10 @@ This is an account allowlist, not a live guild-membership check. Personal View a
 Cloudflare's published Workers Free quota includes 100,000 requests per day; D1 Free includes 5 million rows read/day, 100,000 rows written/day, and 5 GB total storage. This small guild tracker is designed to fit those limits with modest usage and no 30-second whole-record polling. Limits can change, so monitor the dashboard. Pages static-asset requests themselves do not count as Pages Functions invocations; API, OAuth, and D1-backed requests do.
 
 
-## Sign-in and Overview banner (v1.5.6)
+## Sign-in and Overview banners (v1.5.7)
 
-- Place the supplied image file named `banner.png` in the same root folder as `index.html` in the GitHub repository.
-- The image is used only as the sign-in banner background. The front-facing text `Dragon Nest - Classic Pantheon` remains HTML text layered over the image.
-- If `banner.png` is absent, a dark gradient fallback is shown until the image is added.
+- Place `banner.png` in the same root folder as `index.html`; it is used for the Discord sign-in banner and is displayed with `contain` so the full image fits. No title text is overlaid on the image.
+- Keep `Guild Banner.png` in that same root folder. The Overview uses that exact filename for the guild banner. The v1.5.6 ZIP did not include `Guild Banner.png`, so verify the existing repository asset is retained when uploading this release.
 
 ## Appearance themes (v1.5.4)
 
@@ -149,4 +158,4 @@ Upload `guild-logo.png` to the same published root directory as `index.html` and
 
 ## Earlier v1.5.4 interface update
 
-This release refreshes the presentation of the existing Tracker, Team Builder, Card Database, roster, overview, dialogs, and administrator console with a consistent card-based layout, unified spacing, refined inputs and controls, and the existing four appearance themes. It preserves the existing tool logic, Cloudflare Pages Functions, D1 binding, and Discord OAuth flow. The v1.5.6 sign-in and Overview banners display the complete `banner.png` image with no overlaid title; place `banner.png` in the project root beside `index.html` if it is not already in your repository.
+This release refreshes the presentation of the existing Tracker, Team Builder, Card Database, roster, overview, dialogs, and administrator console with a consistent card-based layout, unified spacing, refined inputs and controls, and the existing four appearance themes. It preserves the existing tool logic, Cloudflare Pages Functions, D1 binding, and Discord OAuth flow. The v1.5.6 sign-in banner displays the complete `banner.png` image with no overlaid title. In v1.5.7 the Overview specifically uses `Guild Banner.png`; keep both image files in the project root.

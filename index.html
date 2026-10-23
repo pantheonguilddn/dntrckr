@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.6</title>
+    <title>Pantheon Tools v1.5.7</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1483,6 +1483,56 @@
         @media(max-width:900px) { .overview-bottom-grid { grid-template-columns:1fr; } .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .overview-side-stack { grid-template-columns:minmax(0,1fr); } }
         @media(max-width:640px) { .overview-dashboard-head { margin-top:13px; } .overview-dashboard-copy h1 { font-size:1.8rem; } .overview-profile-chip { width:100%; } .overview-feature-banner { min-height:92px; padding:6px; margin-bottom:20px; } .overview-feature-banner .overview-banner { height:clamp(80px,25vw,115px); } .overview-tools-grid { grid-template-columns:1fr !important; } .overview-tool-card { min-height:125px !important; } .overview-panel { padding:15px; } .overview-section-title { letter-spacing:.1em !important; } .overview-tool-count { font-size:.58rem; } }
 
+
+        /* v1.5.7: keep tracker controls, data cells, receipts, and signed-in identity aligned to the selected theme. */
+        .pantheon-session-bar { position:static !important; display:none; align-items:center; gap:7px; max-width:100%; min-width:0; padding:5px 7px; border:1px solid var(--pt-border); border-radius:11px; background:var(--pt-surface); color:var(--pt-text); box-shadow:none; font:inherit; }
+        .pantheon-session-avatar { display:block; width:30px; height:30px; flex:0 0 30px; object-fit:cover; border-radius:50%; border:1px solid var(--pt-border); background:var(--pt-surface-soft); }
+        #pantheon-session-bar .p-session-name { max-width:130px; color:var(--pt-text); font-size:.68rem; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        #pantheon-session-bar a, #pantheon-session-bar button { color:var(--pt-text); background:var(--pt-surface-soft); border:1px solid var(--pt-border); border-radius:8px; padding:7px 9px; font:inherit; font-size:.65rem; font-weight:750; text-decoration:none; white-space:nowrap; cursor:pointer; }
+        #pantheon-session-bar a[hidden] { display:none !important; }
+        #btn-ledger[hidden] { display:none !important; }
+        .overview-avatar { overflow:hidden; }
+        .overview-avatar .overview-avatar-image { display:block; width:100%; height:100%; object-fit:cover; border-radius:inherit; }
+        .tracker-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:11px; width:100%; max-width:1600px; margin:0 auto 12px; padding:12px 14px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); color:var(--pt-text); box-sizing:border-box; }
+        .bounty-boards-toggle { min-height:36px; font-weight:800; }
+        :root[data-pantheon-theme] #track-bounty-boards-btn[aria-pressed="true"] { background:var(--pt-accent) !important; border-color:var(--pt-accent) !important; color:#fff !important; }
+        .tracker-toolbar-hint { color:var(--pt-muted); font-size:.67rem; line-height:1.5; }
+        :root[data-pantheon-theme] #dn-tracker { color:var(--pt-text) !important; background:var(--pt-surface) !important; border-color:var(--pt-border) !important; }
+        :root[data-pantheon-theme] #dn-tracker th,
+        :root[data-pantheon-theme] #dn-tracker td { color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+        :root[data-pantheon-theme] #dn-tracker .tracker-title,
+        :root[data-pantheon-theme] #dn-tracker #roster-row th.bold,
+        :root[data-pantheon-theme] #dn-tracker #header-row th,
+        :root[data-pantheon-theme] #dn-tracker #footer-row th { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; }
+        :root[data-pantheon-theme] #dn-tracker .col-group,
+        :root[data-pantheon-theme] #dn-tracker .col-category { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; }
+        :root[data-pantheon-theme] #dn-tracker tr.task-row { background:var(--pt-surface) !important; color:var(--pt-text) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.task-name { background:var(--pt-surface) !important; color:var(--pt-text) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell { background:var(--pt-surface) !important; color:var(--pt-text) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell:hover { background:var(--pt-hover) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell.done { background:color-mix(in srgb,var(--pt-positive) 24%,var(--pt-surface)) !important; border-color:var(--pt-positive) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell.marked { background:color-mix(in srgb,var(--pt-accent) 19%,var(--pt-surface)) !important; border-color:var(--pt-accent) !important; box-shadow:inset 0 0 0 1px var(--pt-accent) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell.reset { background:var(--pt-accent-soft) !important; border-color:var(--pt-accent) !important; box-shadow:inset 0 0 0 1px var(--pt-accent) !important; }
+        :root[data-pantheon-theme] #dn-tracker td.interactive-cell.excluded { background:repeating-linear-gradient(45deg,var(--pt-surface-soft),var(--pt-surface-soft) 10px,var(--pt-hover) 10px,var(--pt-hover) 20px) !important; color:var(--pt-muted) !important; }
+        :root[data-pantheon-theme] #dn-tracker .bounty-input { box-sizing:border-box; width:92%; max-width:100%; padding:4px 3px; background:var(--pt-input) !important; color:var(--pt-text) !important; border:1px solid var(--pt-border) !important; border-radius:5px; caret-color:var(--pt-accent); }
+        :root[data-pantheon-theme] #dn-tracker .bounty-input::placeholder { color:var(--pt-muted) !important; opacity:.9; }
+        :root[data-pantheon-theme] #dn-tracker .bounty-input:focus { outline:2px solid color-mix(in srgb,var(--pt-accent) 55%,transparent); outline-offset:1px; background:var(--pt-surface) !important; }
+        :root[data-pantheon-theme] #dn-tracker input[type="checkbox"] { accent-color:var(--pt-accent) !important; }
+        .salary-receipt { padding:15px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-soft); color:var(--pt-text); }
+        .salary-receipt-title { margin:0 0 10px; padding-bottom:8px; border-bottom:1px solid var(--pt-border); color:var(--pt-text); }
+        .salary-receipt > div:not(.salary-receipt-divider) { display:flex; justify-content:space-between; gap:14px; margin-bottom:5px; color:var(--pt-text); font-size:.82rem; }
+        .salary-receipt-divider { border-bottom:1px solid var(--pt-border); margin:10px 0; }
+        .salary-receipt .receipt-strong { color:var(--pt-text); font-weight:850; }
+        .salary-receipt .receipt-negative { color:var(--pt-negative); }
+        .salary-receipt .receipt-positive { color:var(--pt-positive); font-weight:850; }
+        .salary-receipt .salary-receipt-payout { margin-top:10px !important; padding-top:8px; border-top:1px solid var(--pt-border); font-size:1rem !important; font-weight:850; }
+        .salary-receipt .receipt-highlight { color:var(--pt-accent); font-weight:900; font-size:1.08rem; }
+        :root[data-pantheon-theme="light"] { --pt-negative:#b42335; }
+        :root[data-pantheon-theme="eye-comfort"] { --pt-negative:#9a4a3c; }
+        :root[data-pantheon-theme="pastel"] { --pt-negative:#a64d76; }
+        :root[data-pantheon-theme="dark"] { --pt-negative:#ef929c; }
+        @media(max-width:1050px) { .pantheon-session-bar { order:-1; } }
+        @media(max-width:760px) { .pantheon-session-bar { width:100%; box-sizing:border-box; } #pantheon-session-bar .p-session-name { max-width:unset; flex:1; } }
     </style>
     <script>
     try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
@@ -1515,8 +1565,6 @@
         </div>
       </div>
     </div>
-    <div id="pantheon-session-bar"><span class="p-session-name" id="pantheon-session-name">Signed in</span><a href="/admin.html" id="pantheon-admin-link" hidden>Access admin</a><button type="button" id="pantheon-signout">Sign out</button></div>
-
     <div class="controls">
         <div class="brand-area">
             <div class="brand-copy" id="pantheon-home-link" role="button" tabindex="0" aria-label="Return to Overview" title="Return to Overview"><div class="brand-name">Pantheon Tools</div><div class="brand-subtitle">Dragon Nest - Classic SEA [Guild Operations]</div></div>
@@ -1527,6 +1575,12 @@
 
         <div class="control-actions">
             <div class="topbar-player">
+                <div id="pantheon-session-bar" class="pantheon-session-bar" aria-label="Signed-in Discord account">
+                    <img id="pantheon-session-avatar" class="pantheon-session-avatar" alt="Discord profile picture" referrerpolicy="no-referrer">
+                    <span class="p-session-name" id="pantheon-session-name">Signed in</span>
+                    <a href="/admin.html" id="pantheon-admin-link" hidden>Admin</a>
+                    <button type="button" id="pantheon-signout">Log out</button>
+                </div>
                 <select id="user-identity" class="btn identity-select" onchange="saveIdentity()">
                     <option value="">👤 Your roster (auto)</option>
                 </select>
@@ -1564,7 +1618,7 @@
 
             <div class="drawer-section">
                 <div class="drawer-section-title">Party</div>
-                <button class="drawer-item drawer-item-gold" type="button" onclick="openScholarModal()"><span class="drawer-icon">💰</span><span><strong>Ledger</strong><small>Shared salary records</small></span></button>
+                <button id="btn-ledger" class="drawer-item drawer-item-gold" type="button" onclick="openScholarModal()" hidden><span class="drawer-icon">💰</span><span><strong>Ledger</strong><small>Shared salary records</small></span></button>
                 <button class="drawer-item" type="button" onclick="openSalaryModal()"><span class="drawer-icon">🧮</span><span><strong>Salary Calculator</strong><small>Split party income</small></span></button>
             </div>
 
@@ -1606,7 +1660,7 @@
             </div>
         </section>
         <section class="overview-feature-banner" aria-label="Guild banner">
-            <img class="overview-banner" src="banner.png" alt="Dragon Nest - Classic Pantheon banner" onerror="this.style.display='none'">
+            <img class="overview-banner" src="Guild%20Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
         </section>
         <div class="overview-section-title"><span>Your guild workspace</span><span class="overview-tool-count">6 tools available</span></div>
         <section class="overview-tools-grid" aria-label="Pantheon tool overview">
@@ -1627,11 +1681,6 @@
                 </div>
             </div>
             <aside class="overview-side-stack">
-                <section class="overview-panel overview-discord-panel">
-                    <div class="overview-discord-heading"><div><h2>Join the Pantheon Discord</h2><p>Talk with the guild, coordinate raids, and keep up with Pantheon announcements.</p></div><span class="overview-discord-mark" aria-hidden="true">↗</span></div>
-                    <a id="overview-discord-link" class="btn btn-cloud overview-discord-button" href="https://discord.gg/pYFdSG6CX" target="_blank" rel="noopener noreferrer">Join Pantheon Discord ↗</a>
-                    <p id="overview-discord-note" class="overview-discord-note" hidden>Ask a Pantheon administrator for the current Discord invite.</p>
-                </section>
                 <section class="overview-status-stack" aria-label="Workspace status">
                     <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
                     <div class="overview-status-card"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
@@ -1642,6 +1691,10 @@
     </main>
 
     <main id="tracker-page" class="app-page hidden-page">
+    <div class="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
+        <button id="track-bounty-boards-btn" class="btn btn-secondary bounty-boards-toggle" type="button" aria-pressed="false" onclick="toggleBountyBoards()">Track Bounty Boards</button>
+        <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
+    </div>
     <div class="table-responsive">
         <table id="dn-tracker">
             <colgroup id="table-colgroup"></colgroup>
@@ -1825,7 +1878,7 @@
 
     <main id="member-roster-page" class="app-page hidden-page">
         <div class="team-builder-header">
-            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p>A shared guild member directory. Add everyone here, then register only the characters whose progress should appear in Tracker and Team Builder.</p></div>
+            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p id="member-roster-description">A shared guild member directory. Add everyone here, then register only the characters whose progress should appear in Tracker and Team Builder.</p></div>
             <div class="builder-header-actions"><span class="local-only-badge">SHARED WHEN CLOUD IS CONNECTED</span></div>
         </div>
         <section class="member-directory-panel">
@@ -1888,7 +1941,7 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.6</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.7</span></div>
                 <ul>
 
                     <li><strong>Full-fit banner:</strong> the sign-in and Overview banners now show the entire <code>banner.png</code> image with no overlaid title text.</li>
@@ -1985,14 +2038,14 @@
                     </div>
                 </div>
             </div>
-            <div id="salary-receipt" style="background: #17171d; color: #f0f0f0; border: 1px solid #444; border-radius: 5px; padding: 15px;">
-                <h4 style="margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 8px;">Breakdown Receipt</h4>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Gross Income:</span> <span id="out-gross" style="color: #fff; font-weight: bold;">0.00g</span></div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Salary Holder Cut (<span id="out-cut-pct">5</span>%):</span> <span id="out-cut" style="color: #ea9999;">-0.00g</span></div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Seal Stamp Cost (<span id="out-stamps">0</span> @ <span id="out-stamp-rate">5</span>g):</span> <span id="out-stamp-cost" style="color: #ea9999;">-0.00g</span></div>
-                <div style="border-bottom: 1px solid #333; margin: 10px 0;"></div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Net Income (Pool):</span> <span id="out-net" style="color: #b6d7a8; font-weight: bold;">0.00g</span></div>
-                <div style="display: flex; justify-content: space-between; font-size: 1.2rem; margin-top: 10px;"><span>Payout per member:</span> <span id="out-split" style="color: #ffd966; font-weight: bold;">0.00g</span></div>
+            <div id="salary-receipt" class="salary-receipt">
+                <h4 class="salary-receipt-title">Breakdown Receipt</h4>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Gross Income:</span> <span id="out-gross" class="receipt-strong">0.00g</span></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Salary Holder Cut (<span id="out-cut-pct">5</span>%):</span> <span id="out-cut" class="receipt-negative">-0.00g</span></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Seal Stamp Cost (<span id="out-stamps">0</span> @ <span id="out-stamp-rate">5</span>g):</span> <span id="out-stamp-cost" class="receipt-negative">-0.00g</span></div>
+                <div class="salary-receipt-divider"></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Net Income (Pool):</span> <span id="out-net" class="receipt-positive">0.00g</span></div>
+                <div class="salary-receipt-payout"><span>Payout per member:</span><span id="out-split" class="receipt-highlight">0.00g</span></div>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-cloud" type="button" onclick="shareSalaryReceiptAsImage()">📸 Share Receipt</button>
@@ -2523,6 +2576,8 @@
         let activeRosterFilter = 'all'; 
         let isAnalyticsVisible = true;
         let isPersonalView = false;
+        const TRACK_BOUNTY_BOARDS_KEY = 'pantheon-track-bounty-boards-v1';
+        let trackBountyBoards = false;
         const deviceId = getOrCreateDeviceId();
 
         let cloudData = createEmptyData();
@@ -2687,6 +2742,79 @@
 
         function flattenRosters(rosters) { return normalizeRosters(rosters).flatMap(r => r.characters.map(name => ({ name, color: r.color, rosterId: r.id, rosterName: r.name }))); }
 
+        // --- Discord-aware identity and permission helpers ---
+        function isPantheonAdmin() { return pantheonDiscordUser?.role === 'admin'; }
+        function ownerCandidateNames() {
+            return [pantheonDiscordUser?.label, pantheonDiscordUser?.username]
+                .map(value => String(value || '').trim()).filter(Boolean);
+        }
+        function getCurrentMemberDirectoryEntry() {
+            const entries = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
+            const identity = String(localStorage.getItem(IDENTITY_KEY) || '');
+            const roster = normalizeRosters(cloudData.settings?.rosters).find(item => item.id === identity);
+            if (roster) {
+                const linked = entries.find(member => member.trackerRosterId === roster.id || identityMatchKey(member.name) === identityMatchKey(roster.name));
+                if (linked) return linked;
+            }
+            for (const candidate of ownerCandidateNames()) {
+                const exact = entries.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
+                if (exact.length === 1) return exact[0];
+            }
+            for (const candidate of ownerCandidateNames()) {
+                const compact = identityCompactKey(candidate);
+                if (!compact) continue;
+                const close = entries.filter(member => identityCompactKey(member.name) === compact);
+                if (close.length === 1) return close[0];
+            }
+            return null;
+        }
+        function getCurrentOwnerName() {
+            return String(getCurrentMemberDirectoryEntry()?.name || ownerCandidateNames()[0] || ownerCandidateNames()[1] || '').trim();
+        }
+        function canManageMemberRecord(member) {
+            if (isPantheonAdmin()) return true;
+            if (!member) return false;
+            const own = getCurrentMemberDirectoryEntry();
+            if (own) return member.id === own.id;
+            return ownerCandidateNames().some(candidate => identityCompactKey(candidate) && identityCompactKey(member.name) === identityCompactKey(candidate));
+        }
+        function refreshLedgerVisibility() {
+            const allowed = new Set(['cho', 'bio', 'cheean']);
+            const linked = getCurrentMemberDirectoryEntry();
+            const candidates = [...ownerCandidateNames(), linked?.name || ''];
+            const canSee = candidates.some(name => allowed.has(identityCompactKey(name)));
+            const button = document.getElementById('btn-ledger');
+            if (button) button.hidden = !canSee;
+            return canSee;
+        }
+        function initializeBountyBoardsToggle() {
+            try { trackBountyBoards = localStorage.getItem(TRACK_BOUNTY_BOARDS_KEY) === 'true'; } catch (_) { trackBountyBoards = false; }
+            updateBountyBoardsButton();
+        }
+        function updateBountyBoardsButton() {
+            const button = document.getElementById('track-bounty-boards-btn');
+            if (!button) return;
+            button.textContent = trackBountyBoards ? 'Hide Bounty Boards' : 'Track Bounty Boards';
+            button.setAttribute('aria-pressed', trackBountyBoards ? 'true' : 'false');
+            button.title = trackBountyBoards ? 'Hide Bounty 1–6 rows from the tracker' : 'Show Bounty 1–6 rows in the tracker';
+        }
+        function toggleBountyBoards() {
+            trackBountyBoards = !trackBountyBoards;
+            try { localStorage.setItem(TRACK_BOUNTY_BOARDS_KEY, trackBountyBoards ? 'true' : 'false'); } catch (_) {}
+            updateBountyBoardsButton();
+            buildTrackerTable();
+            applyBoardState();
+        }
+        function isBountyBoardSlot(category, taskName) {
+            const name = String(taskName || '').trim();
+            const categoryName = String(category?.name || '').trim();
+            // Match Bounty 1–6, Bounty Board 1–6, Bounty Claim 1–6, and numbered
+            // tasks under a category explicitly named Bounty/Bounties.
+            if (/\bbounty(?:\s+(?:board|claim))?\s*[1-6]\b/i.test(name)) return true;
+            const numberOnly = /^(?:bounty\s*)?([1-6])$/i.exec(name);
+            return /\bbount(?:y|ies)\b/i.test(categoryName) && !!numberOnly;
+        }
+
         // --- Personal View Logic ---
         function togglePersonalView() {
             const identity = localStorage.getItem(IDENTITY_KEY);
@@ -2723,11 +2851,7 @@
                 discordIdentityMatchStatus = val ? 'manual' : 'unmatched';
             }
 
-            const allowedLedgers = ['cho', 'cheean', 'bio'];
-            const ledgerBtn = document.getElementById('btn-ledger');
-            if (ledgerBtn) {
-                ledgerBtn.style.display = allowedLedgers.includes(val.toLowerCase()) ? 'inline-block' : 'none';
-            }
+            refreshLedgerVisibility();
 
             if (val && wasUnmatched && !isPersonalView) {
                 // A one-time fallback identity choice should immediately become the Personal View.
@@ -2861,11 +2985,7 @@
             identitySel.innerHTML = idOptions;
             identitySel.value = cloudData.settings.rosters.some(r => r.id === savedIdentity) ? savedIdentity : '';
 
-            const allowedLedgers = ['cho', 'cheean', 'bio'];
-            const ledgerBtn = document.getElementById('btn-ledger');
-            if (ledgerBtn) {
-                ledgerBtn.style.display = allowedLedgers.includes(savedIdentity.toLowerCase()) ? 'inline-block' : 'none';
-            }
+            refreshLedgerVisibility();
         }
 
         function applyRosterFilter() { 
@@ -3662,10 +3782,11 @@
                 gate.hidden = true;
                 const bar = document.getElementById('pantheon-session-bar');
                 bar.style.display = 'flex';
-                document.getElementById('pantheon-session-name').textContent = state.user?.username || 'Signed in with Discord';
+                document.getElementById('pantheon-session-name').textContent = state.user?.label || state.user?.username || 'Signed in with Discord';
                 document.getElementById('pantheon-admin-link').hidden = state.user?.role !== 'admin';
-                if (state.user?.role === 'admin') document.getElementById('pantheon-admin-link').textContent = 'Access admin';
+                if (state.user?.role === 'admin') document.getElementById('pantheon-admin-link').textContent = 'Admin';
                 updateOverviewProfile(state.user);
+                refreshLedgerVisibility();
                 updateOverviewStatusCards();
                 document.getElementById('pantheon-signout').addEventListener('click', async () => {
                     try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch (_) {}
@@ -3679,6 +3800,7 @@
             }
         }
         document.addEventListener('DOMContentLoaded', async () => {
+            initializeBountyBoardsToggle();
             const canEnter = await pantheonCheckSessionAndBoot();
             if (!canEnter) return;
             hydrateCardWikiData();
@@ -3799,9 +3921,11 @@
             
             const grouped = {};
             cloudData.settings.categories.forEach(cat => {
-                if(cat.tasks.length === 0) return;
+                const visibleTasks = (cat.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(cat, taskName));
+                if (visibleTasks.length === 0) return;
+                const visibleCategory = { ...cat, visibleTasks };
                 if (!grouped[cat.group]) grouped[cat.group] = { totalTasks: 0, categories: [] };
-                grouped[cat.group].categories.push(cat); grouped[cat.group].totalTasks += cat.tasks.length;
+                grouped[cat.group].categories.push(visibleCategory); grouped[cat.group].totalTasks += visibleTasks.length;
             });
             
             for (const [groupName, groupData] of Object.entries(grouped)) {
@@ -3809,13 +3933,13 @@
                 groupData.categories.forEach(cat => {
                     let isFirstCat = true;
                     const isBounty = cat.name.toLowerCase().includes('bounty');
-                    cat.tasks.forEach(taskName => {
+                    cat.visibleTasks.forEach(taskName => {
                         const tr = document.createElement('tr');
                         tr.className = `task-row ${groupName === 'Dailies' ? 'is-daily' : 'is-weekly'}`;
                         tr.style.background = cat.color; tr.style.color = getContrastText(cat.color);
                         
                         if (isFirstGroup) { const td = document.createElement('td'); td.rowSpan = groupData.totalTasks; td.className = 'col-group'; td.textContent = groupName; tr.appendChild(td); isFirstGroup = false; }
-                        if (isFirstCat) { const td = document.createElement('td'); td.rowSpan = cat.tasks.length; td.className = 'col-category'; td.textContent = cat.name; tr.appendChild(td); isFirstCat = false; }
+                        if (isFirstCat) { const td = document.createElement('td'); td.rowSpan = cat.visibleTasks.length; td.className = 'col-category'; td.textContent = cat.name; tr.appendChild(td); isFirstCat = false; }
                         
                         const tdTask = document.createElement('td'); tdTask.className = 'task-name'; tdTask.textContent = taskName; tdTask.title = taskName; tr.appendChild(tdTask);
                         
@@ -4030,14 +4154,48 @@
         function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
         function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
 
+        function discordAvatarUrl(user, size = 96) {
+            const id = String(user?.id || '');
+            const hash = String(user?.avatar || '');
+            if (!/^\d{5,25}$/.test(id)) return '';
+            if (/^[a-zA-Z0-9_]+$/.test(hash)) {
+                const extension = hash.startsWith('a_') ? 'gif' : 'png';
+                return `https://cdn.discordapp.com/avatars/${id}/${hash}.${extension}?size=${size}`;
+            }
+            try { return `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(id) % 6n)}.png`; } catch (_) { return ''; }
+        }
+        function paintDiscordAvatar(image, user, fallbackName) {
+            if (!image) return;
+            const url = discordAvatarUrl(user, 96);
+            if (url) {
+                image.hidden = false;
+                image.dataset.avatarFallback = 'false';
+                image.onerror = () => {
+                    if (image.dataset.avatarFallback !== 'true' && /^\d{5,25}$/.test(String(user?.id || ''))) {
+                        image.dataset.avatarFallback = 'true';
+                        try { image.src = `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(String(user.id)) % 6n)}.png`; return; } catch (_) {}
+                    }
+                    image.hidden = true;
+                };
+                image.src = url;
+            } else image.hidden = true;
+        }
         function updateOverviewProfile(user) {
-            const name = String(user?.username || user?.global_name || 'Pantheon Member').trim() || 'Pantheon Member';
+            const name = String(user?.label || user?.username || user?.global_name || 'Pantheon Member').trim() || 'Pantheon Member';
             const nameEl = document.getElementById('overview-profile-name');
             const avatarEl = document.getElementById('overview-avatar');
             const subEl = document.getElementById('overview-profile-sub');
             if (nameEl) nameEl.textContent = name;
-            if (avatarEl) avatarEl.textContent = (name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase();
+            if (avatarEl) {
+                const url = discordAvatarUrl(user, 96);
+                if (url) avatarEl.innerHTML = `<img class="overview-avatar-image" src="${escapeHTML(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent='${escapeHTML((name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase())}'">`;
+                else avatarEl.textContent = (name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase();
+            }
+            const sessionName = document.getElementById('pantheon-session-name');
+            if (sessionName) sessionName.textContent = name;
+            paintDiscordAvatar(document.getElementById('pantheon-session-avatar'), user, name);
             if (subEl) subEl.textContent = user?.role === 'admin' ? 'Discord account · Administrator' : 'Discord account · Verified';
+            refreshLedgerVisibility();
         }
         function updateOverviewStatusCards() {
             const getText = id => document.getElementById(id)?.textContent || '';
@@ -4157,8 +4315,12 @@
         // ==========================================
         // 💰 ESTATE LEDGER
         // ==========================================
-        function openScholarModal() { renderScholarLedger(); openModal('scholar-modal'); }
+        function openScholarModal() {
+            if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; }
+            renderScholarLedger(); openModal('scholar-modal');
+        }
         function submitScholarLog(player) {
+            if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; }
             const g = parseFloat(document.getElementById(`scholar-gold-${player}`)?.value) || 0, d = parseFloat(document.getElementById(`scholar-dia-${player}`)?.value) || 0, e = parseFloat(document.getElementById(`scholar-eol-${player}`)?.value) || 0, n = document.getElementById(`scholar-note-${player}`)?.value.trim() || '';
             if (!g && !d && !e) return;
             cloudData.scholarship[player].logs[Date.now().toString(36)+Math.random().toString(36).substr(2,5)] = { timestamp: Date.now(), type: document.getElementById(`scholar-type-${player}`).value, gold: g, dia: d, eol: e, note: n };
@@ -4166,7 +4328,7 @@
             ['gold', 'dia', 'eol', 'note'].forEach(f => { const el = document.getElementById(`scholar-${f}-${player}`); if(el) el.value = ''; });
             renderScholarLedger(); persistLocalData(); forceSync(false);
         }
-        function deleteScholarLog(player, id) { if (!confirm('Remove log?')) return; if (cloudData.scholarship[player].logs[id]) { cloudData.scholarship[player].logs[id].deleted = true; cloudData.updatedAt = Date.now(); renderScholarLedger(); persistLocalData(); forceSync(false); } }
+        function deleteScholarLog(player, id) { if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; } if (!confirm('Remove log?')) return; if (cloudData.scholarship[player].logs[id]) { cloudData.scholarship[player].logs[id].deleted = true; cloudData.updatedAt = Date.now(); renderScholarLedger(); persistLocalData(); forceSync(false); } }
         function renderScholarLedger() {
             ['cheean', 'bio', 'idontheal'].forEach(p => {
                 let bg=0, bd=0, be=0; const logs = Object.entries(cloudData.scholarship[p]?.logs||{}).filter(([,d])=>!d.deleted).map(([id,d])=>({id,...d})).sort((a,b)=>b.timestamp-a.timestamp);
@@ -4214,12 +4376,18 @@
             if (!list) return;
             ensureMemberRosterMaster(cloudData);
             projectTrackerRostersFromMemberDirectory(cloudData, false);
-            const rosters = getRosters();
+            const allRosters = getRosters();
+            const currentMember = getCurrentMemberDirectoryEntry();
+            const rosters = isPantheonAdmin() ? allRosters : allRosters.filter(roster => {
+                const owner = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === roster.id || identityMatchKey(entry.name) === identityMatchKey(roster.name));
+                return owner ? canManageMemberRecord(owner) : (!!currentMember && (currentMember.trackerRosterId === roster.id || identityMatchKey(currentMember.name) === identityMatchKey(roster.name)));
+            });
             list.innerHTML = rosters.length ? rosters.map(r => {
-                const member = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === r.id);
-                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span><input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button><button class="btn btn-secondary" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Unregister All</button></div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="true" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')" title="Opt out of Tracker while keeping this character in Member Roster">×</button></span>`).join('') : '<div style="color:#aaa;">No characters opted in.</div>'}</div></div>`;
-            }).join('') : '<div style="color:#aaa;">Add a member in Member Roster first.</div>';
-            attachDragDropListeners();
+                const member = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === r.id || identityMatchKey(entry.name) === identityMatchKey(r.name));
+                const adminControls = isPantheonAdmin() ? `<input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button><button class="btn btn-secondary" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Unregister All</button>` : '';
+                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span>${adminControls}</div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="${isPantheonAdmin() ? 'true' : 'false'}" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}${(isPantheonAdmin() || canManageMemberRecord(member)) ? `<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')" title="Opt out of your character from Tracker while keeping it in Member Roster">×</button>` : ''}</span>`).join('') : '<div style="color:#aaa;">No characters opted in.</div>'}</div></div>`;
+            }).join('') : (isPantheonAdmin() ? '<div style="color:var(--pt-muted);">Add a member in Member Roster first.</div>' : '<div style="color:var(--pt-muted);">No roster is linked to this Discord account yet. Register your own characters in Member Roster or ask an administrator to link your account.</div>');
+            if (isPantheonAdmin()) attachDragDropListeners();
         }
 
         function handleRegistrationRosterChange(reset=true) {
@@ -4254,6 +4422,7 @@
         }
 
         async function saveRosterGroup(id) {
+            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can change shared roster colors.'); return; }
             const roster = findRoster(id); if (!roster) return;
             const colorInput = document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`);
             const color = normalizeColor(colorInput?.value, roster.color);
@@ -4269,6 +4438,10 @@
         }
         async function removeCharacterFromRoster(id, n) {
             const roster = findRoster(id); if (!roster) return;
+            if (!isPantheonAdmin()) {
+                const owner = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.trackerRosterId === roster.id || identityMatchKey(member.name) === identityMatchKey(roster.name));
+                if (!canManageMemberRecord(owner)) { alert('You can only unregister characters in your own roster.'); return; }
+            }
             const ownerKey = roster.name.trim().toLowerCase();
             const characterKey = String(n || '').trim().toLowerCase();
             const initialMembers = normalizeMemberDirectory(cloudData.settings.memberDirectory);
@@ -4308,6 +4481,7 @@
         }
         async function removeRosterGroup(id) {
             const roster = findRoster(id); if (!roster) return;
+            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can unregister an entire roster.'); return; }
             const names = [...roster.characters];
             if (!names.length) return alert('This member has no opted-in characters to unregister. The member itself remains in Member Roster.');
             if (!confirm(`Unregister all ${names.length} character(s) owned by ${roster.name} from Tracker and Team Builder? Their IGNs and classes will remain in Member Roster as directory-only entries.`)) return;
@@ -5594,7 +5768,17 @@
             const list = document.getElementById('member-directory-list'); if (!list) return;
             const query = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
             const all = getMemberDirectoryView();
-            const members = all.filter(member => [member.name, member.note || '', ...(member.characters || []), ...(member.characterProfiles || []).map(profile => `${profile.job} ${profile.trackerEnabled ? 'tracking' : 'directory'}`)].join(' ').toLowerCase().includes(query));
+            const scoped = isPantheonAdmin() ? all : all.filter(member => canManageMemberRecord(member));
+            const members = scoped.filter(member => [member.name, member.note || '', ...(member.characters || []), ...(member.characterProfiles || []).map(profile => `${profile.job} ${profile.trackerEnabled ? 'tracking' : 'directory'}`)].join(' ').toLowerCase().includes(query));
+            const memberNameInput = document.getElementById('member-directory-name');
+            if (memberNameInput && !isPantheonAdmin()) { memberNameInput.readOnly = true; if (!editingMemberDirectoryId) memberNameInput.value = getCurrentOwnerName(); }
+            else if (memberNameInput) memberNameInput.readOnly = false;
+            const memberHeading = document.getElementById('member-directory-form-title');
+            const memberDescription = document.getElementById('member-roster-description');
+            if (memberDescription) memberDescription.textContent = isPantheonAdmin()
+                ? 'Shared guild directory. Manage member records and decide which characters appear in Tracker and Team Builder.'
+                : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
+            if (memberHeading && !isPantheonAdmin() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
             const trackingCount = members.reduce((sum, member) => sum + (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length, 0);
             const count = document.getElementById('member-directory-count');
@@ -5606,10 +5790,11 @@
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
                     const title = `${profile.name} · ${jobLabel} · ${tracked ? 'Included in Tracker and Team Builder' : 'Directory only'}`;
-                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} <small style="color:#8f9aaf;">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
+                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} <small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
-                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracking characters' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">Edit member</button><button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button></div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
-            }).join('') : '<div class="member-directory-empty">No members match that search. Add a member above; character entries are optional.</div>';
+                const removeMemberButton = isPantheonAdmin() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
+                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracking characters' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
+            }).join('') : `<div class="member-directory-empty">${isPantheonAdmin() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
         }
         function resetMemberDirectoryForm() {
             editingMemberDirectoryId = null;
@@ -5618,12 +5803,18 @@
             document.getElementById('member-directory-form-title').textContent = 'Add a guild member';
             document.getElementById('member-directory-submit').textContent = 'Add member';
             document.getElementById('member-directory-cancel').hidden = true;
+            const ownerInput = document.getElementById('member-directory-name');
+            if (ownerInput) {
+                ownerInput.readOnly = !isPantheonAdmin();
+                ownerInput.value = isPantheonAdmin() ? '' : getCurrentOwnerName();
+            }
+            if (!isPantheonAdmin()) document.getElementById('member-directory-form-title').textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             renderMemberCharacterRows([]);
         }
         function startMemberDirectoryEdit(name, recordId = '') {
             const view = getMemberDirectoryView().find(member => member.name.toLowerCase() === String(name).toLowerCase());
             const record = recordId ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.id === recordId) : view;
-            if (!view) return;
+            if (!view || !canManageMemberRecord(record || view)) { alert('You can only edit the characters linked to your own Discord account.'); return; }
             editingMemberDirectoryId = record?.id || view.id || null;
             editingMemberDirectoryOriginalName = view.name;
             document.getElementById('member-directory-name').value = record?.name || view.name;
@@ -5647,6 +5838,7 @@
             const initialEntry = initialEntries.find(member => member.name.trim().toLowerCase() === ownerKey);
             const initialProfile = initialEntry?.characterProfiles.find(profile => profile.name.trim().toLowerCase() === charKey);
             if (!initialEntry || !initialProfile) return alert('That character is no longer in Member Roster. Refresh and try again.');
+            if (!canManageMemberRecord(initialEntry)) return alert('You can only remove characters from your own Member Roster entry.');
             if (!confirm(`Remove ${initialProfile.name} from ${initialEntry.name}'s Member Roster? If opted in, this also removes it from Tracker and Team Builder. The member will remain listed.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Remove character ${initialProfile.name} from member ${initialEntry.name}`))) return;
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
@@ -5667,9 +5859,19 @@
         }
         async function saveMemberDirectoryForm(event) {
             event.preventDefault();
-            const name = document.getElementById('member-directory-name').value.trim().slice(0, 60);
+            let name = document.getElementById('member-directory-name').value.trim().slice(0, 60);
             const profiles = collectMemberCharacterRows();
             const note = document.getElementById('member-directory-note').value.trim().slice(0, 160);
+            if (!isPantheonAdmin()) {
+                const own = getCurrentMemberDirectoryEntry();
+                const fixedOwner = String(own?.name || getCurrentOwnerName()).trim().slice(0, 60);
+                if (!fixedOwner) return alert('Your Discord account could not be linked to an owner name. Ask an administrator to configure your account label.');
+                if (editingMemberDirectoryId && (!own || own.id !== editingMemberDirectoryId)) return alert('You can only update the characters linked to your own Discord account.');
+                if (own && !editingMemberDirectoryId) { editingMemberDirectoryId = own.id; editingMemberDirectoryOriginalName = own.name; }
+                name = fixedOwner;
+                const nameInput = document.getElementById('member-directory-name');
+                if (nameInput) { nameInput.value = fixedOwner; nameInput.readOnly = true; }
+            }
             if (!name) return alert('Enter a member or owner name.');
             const localNames = new Set();
             for (const profile of profiles) {
@@ -5721,6 +5923,7 @@
             renderMemberDirectory();
         }
         async function removeMemberDirectoryEntry(id) {
+            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.id === id);
             if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any opted-in characters will also be removed from Tracker and Team Builder.`)) return;
@@ -5755,13 +5958,13 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-universal', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.5.6';
+        const PANTHEON_TOOLS_VERSION = 'v1.5.7';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
             const url = String(PANTHEON_DISCORD_URL || '').trim();
             const valid = /^https:\/\/(?:discord\.gg\/[A-Za-z0-9-]+|discord\.com\/invite\/[A-Za-z0-9-]+)/i.test(url);
-            [['welcome-discord-link','welcome-discord-note'],['overview-discord-link','overview-discord-note']].forEach(([linkId,noteId]) => {
+            [['welcome-discord-link','welcome-discord-note']].forEach(([linkId,noteId]) => {
                 const link = document.getElementById(linkId), note = document.getElementById(noteId);
                 if (link) { link.hidden = !valid; if (valid) link.href = url; else link.removeAttribute('href'); }
                 if (note) note.hidden = valid;
@@ -5853,6 +6056,11 @@
         function applySavedLandingPage() {
             let saved = '';
             try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
+            // Upgrade older Universal View startup preferences to Personal View per the current guild default.
+            if (saved === 'tracker-universal') {
+                saved = 'tracker-personal';
+                try { localStorage.setItem(LANDING_PREFERENCE_KEY, saved); } catch (e) {}
+            }
             applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
         }
         const RELEASE_DISMISSAL_KEY = 'pantheon-release-popup-dismissed-version-v1';
