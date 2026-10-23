@@ -1,7 +1,15 @@
-"d1_databases": [
-  {
-    "binding": "PANTHEON_DB",
-    "database_name": "pantheon-db",
-    "database_id": "9921af63-d4dc-4fe6-89d9-31b07a5c10b9"
-  }
-]
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "YOUR-WORKER-NAME",
+  "compatibility_date": "2026-10-23",
+  "assets": {
+    "directory": "."
+  },
+  "d1_databases": [
+    {
+      "binding": "PANTHEON_DB",
+      "database_name": "pantheon-db",
+      "database_id": "9921af63-d4dc-4fe6-89d9-31b07a5c10b9"
+    }
+  ]
+}
