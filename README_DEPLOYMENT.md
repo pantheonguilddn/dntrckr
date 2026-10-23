@@ -1,6 +1,12 @@
-# Pantheon Tools v1.5.4 — Cloudflare Pages + D1
+# Pantheon Tools v1.5.5 — Cloudflare Pages + D1
 
 This bundle is built from the full Pantheon Tools v1.4.6 tracker HTML and adds a Discord-account allowlist gateway, a D1-backed JSONBin-compatible data API, and automatic Personal View selection based on the authenticated Discord profile. It matches the Discord display name to the Member Roster owner name; when those differ, the admin allowlist label can provide a roster-match fallback, or a one-time manual selection is remembered per Discord account in that browser. It does **not** require a Wrangler configuration file. Bind D1 through the Cloudflare Pages dashboard.
+
+## v1.5.5 visual updates
+
+- The redundant P badge was removed from the application header; the PANTHEON TOOLS brand text is the home control and returns signed-in users to Overview.
+- The Light, Dark, Eye comfort, and Pastel color palettes now match the approved access/Overview mockup. Typography and font sizes were not changed.
+- The Overview layout and existing Discord invite link are preserved.
 
 ## Important before deploying
 
@@ -18,7 +24,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, `guild-logo.png`, and the `functions/` directory. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on the full v1.4.6 tracker available for this work; if the branch contains a newer tracker version, do not overwrite it blindly.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is based on the full v1.4.6 tracker available for this work; if the branch contains a newer tracker version, do not overwrite it blindly.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project

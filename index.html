@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.5.4</title>
+    <title>Pantheon Tools v1.5.5</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -855,48 +855,48 @@
 
         /* ===== Pantheon appearance themes (color-only; typography remains unchanged) ===== */
         :root {
-            --pt-page: #1e1e24;
-            --pt-surface: #25252f;
-            --pt-surface-raised: #292934;
-            --pt-surface-soft: #202029;
-            --pt-input: #1b1d25;
-            --pt-text: #ffffff;
-            --pt-muted: #a1a8b8;
-            --pt-border: #393944;
-            --pt-accent: #8eace0;
-            --pt-accent-soft: #303d52;
-            --pt-hover: #2c2f3a;
-            --pt-overlay: rgba(0,0,0,.72);
-            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(85,113,210,.22),transparent 44%),rgba(12,15,23,.98);
-            --pt-card-gradient: linear-gradient(135deg,#272a35,#1d2028);
-            --pt-notice-gradient: linear-gradient(135deg,#252f40,#20242e);
-            --pt-banner-border: #3d424f;
-            --pt-positive: #55d68a;
+            --pt-page: #0b1020;
+            --pt-surface: #111a2d;
+            --pt-surface-raised: #151f35;
+            --pt-surface-soft: #1b2742;
+            --pt-input: #171b28;
+            --pt-text: #eef2ff;
+            --pt-muted: #a7b4d0;
+            --pt-border: #2a3857;
+            --pt-accent: #8d9aff;
+            --pt-accent-soft: #26374f;
+            --pt-hover: #24314d;
+            --pt-overlay: rgba(3,6,15,.78);
+            --pt-auth-bg: radial-gradient(ellipse at 15% 3%,rgba(82,103,217,.20),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(87,214,164,.09),transparent 38%),#0b1020;
+            --pt-card-gradient: linear-gradient(160deg,#18223a,#0f1729);
+            --pt-notice-gradient: linear-gradient(160deg,#1b2742,#151f35);
+            --pt-banner-border: #344261;
+            --pt-positive: #57d6a4;
             color-scheme: dark;
         }
         :root[data-pantheon-theme="light"] {
-            --pt-page: #f4f6fa; --pt-surface: #ffffff; --pt-surface-raised: #f8f9fc; --pt-surface-soft: #edf1f7;
-            --pt-input: #ffffff; --pt-text: #1a2230; --pt-muted: #5e6a7e; --pt-border: #dce2ec;
-            --pt-accent: #315e9d; --pt-accent-soft: #e8f0fd; --pt-hover: #edf2fa; --pt-overlay: rgba(24,32,47,.42);
-            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(82,101,215,.12),transparent 44%),rgba(244,246,250,.98);
-            --pt-card-gradient: linear-gradient(135deg,#ffffff,#f0f4fc); --pt-notice-gradient: linear-gradient(135deg,#eef3fc,#f8f9fc);
+            --pt-page: #f4f6fb; --pt-surface: #ffffff; --pt-surface-raised: #ffffff; --pt-surface-soft: #edf1f8;
+            --pt-input: #f8f9fc; --pt-text: #1a2230; --pt-muted: #657187; --pt-border: #dce2ec;
+            --pt-accent: #5265d7; --pt-accent-soft: #e8f0fd; --pt-hover: #f0f3fb; --pt-overlay: rgba(22,32,49,.40);
+            --pt-auth-bg: radial-gradient(ellipse at 15% 3%,rgba(82,101,215,.12),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(55,160,133,.09),transparent 38%),#f4f6fb;
+            --pt-card-gradient: linear-gradient(160deg,#ffffff,#f0f4fc); --pt-notice-gradient: linear-gradient(160deg,#eef3fc,#f8f9fc);
             --pt-banner-border: #dce2ec; --pt-positive: #087e65; color-scheme: light;
         }
         :root[data-pantheon-theme="eye-comfort"] {
             --pt-page: #f0eddf; --pt-surface: #faf7eb; --pt-surface-raised: #fdfaf0; --pt-surface-soft: #e9e4d2;
-            --pt-input: #fcf9ef; --pt-text: #30352d; --pt-muted: #6d6b5b; --pt-border: #d5cdb7;
+            --pt-input: #f5f0e2; --pt-text: #30352d; --pt-muted: #6d6b5b; --pt-border: #d5cdb7;
             --pt-accent: #63774e; --pt-accent-soft: #e4e8d7; --pt-hover: #e7e3d3; --pt-overlay: rgba(47,45,35,.42);
-            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(130,143,91,.13),transparent 44%),rgba(240,237,223,.98);
-            --pt-card-gradient: linear-gradient(135deg,#fcf9ef,#f2eddd); --pt-notice-gradient: linear-gradient(135deg,#eeead9,#faf7eb);
+            --pt-auth-bg: radial-gradient(ellipse at 15% 3%,rgba(130,143,91,.13),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(191,154,92,.10),transparent 38%),#f0eddf;
+            --pt-card-gradient: linear-gradient(160deg,#fcf9ef,#f2eddd); --pt-notice-gradient: linear-gradient(160deg,#eeead9,#faf7eb);
             --pt-banner-border: #d5cdb7; --pt-positive: #427650; color-scheme: light;
         }
         :root[data-pantheon-theme="pastel"] {
             --pt-page: #fbf3fb; --pt-surface: #fffaff; --pt-surface-raised: #fff8ff; --pt-surface-soft: #f3e8f5;
-            --pt-input: #fffaff; --pt-text: #49354e; --pt-muted: #7d6b83; --pt-border: #e4d5e8;
-            --pt-accent: #a16bb5; --pt-accent-soft: #f3e7f8; --pt-hover: #f5eafa; --pt-overlay: rgba(68,47,76,.4);
-            --pt-auth-bg: radial-gradient(ellipse at 10% 0%,rgba(186,132,205,.16),transparent 44%),rgba(251,243,251,.98);
-            --pt-card-gradient: linear-gradient(135deg,#fffaff,#f7edf8); --pt-notice-gradient: linear-gradient(135deg,#f5eaf7,#fffaff);
-            --pt-banner-border: #e4d5e8; --pt-positive: #397762; color-scheme: light;
+            --pt-input: #fcf4fc; --pt-text: #49354e; --pt-muted: #7d6b83; --pt-border: #e4d5e8;
+            --pt-accent: #a16bb5; --pt-accent-soft: #f3e7f8; --pt-hover: #f5eafa; --pt-overlay: rgba(68,47,76,.40);
+            --pt-auth-bg: radial-gradient(ellipse at 15% 3%,rgba(186,132,205,.16),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(132,201,190,.13),transparent 38%),#fbf3fb;
+            --pt-card-gradient: linear-gradient(160deg,#fffaff,#f7edf8); --pt-notice-gradient: linear-gradient(160deg,#f5eaf7,#fffaff);
+            --pt-banner-border: #e4d5e8; --pt-positive: #478d78; color-scheme: light;
         }
         :root[data-pantheon-theme] body { background: var(--pt-page) !important; color: var(--pt-text) !important; }
         :root[data-pantheon-theme] .controls,
@@ -1214,19 +1214,19 @@
 
 
 
-        /* Pantheon Tools v1.5.4 — unified visual system for the real application. */
+        /* Pantheon Tools v1.5.5 — shared appearance and navigation system. */
         html { min-height: 100%; background: var(--pt-page); }
         body {
             min-height: 100vh !important;
             margin: 0 !important;
             padding: 22px clamp(12px, 2.5vw, 36px) 48px !important;
             align-items: center !important;
-            background: radial-gradient(ellipse at 12% 0%, rgba(88,111,220,.12), transparent 42%), var(--pt-page) !important;
+            background: radial-gradient(ellipse at 15% 3%, rgba(82,103,217,.20), transparent 45%), radial-gradient(ellipse at 90% 8%, rgba(87,214,164,.09), transparent 38%), var(--pt-page) !important;
             color: var(--pt-text) !important;
         }
-        :root[data-pantheon-theme="eye-comfort"] body { background: radial-gradient(ellipse at 12% 0%, rgba(130,143,91,.13), transparent 42%), var(--pt-page) !important; }
-        :root[data-pantheon-theme="pastel"] body { background: radial-gradient(ellipse at 12% 0%, rgba(186,132,205,.15), transparent 42%), var(--pt-page) !important; }
-        :root[data-pantheon-theme="light"] body { background: radial-gradient(ellipse at 12% 0%, rgba(82,101,215,.11), transparent 42%), var(--pt-page) !important; }
+        :root[data-pantheon-theme="eye-comfort"] body { background: radial-gradient(ellipse at 15% 3%, rgba(130,143,91,.13), transparent 45%), radial-gradient(ellipse at 90% 8%, rgba(191,154,92,.10), transparent 38%), var(--pt-page) !important; }
+        :root[data-pantheon-theme="pastel"] body { background: radial-gradient(ellipse at 15% 3%, rgba(186,132,205,.16), transparent 45%), radial-gradient(ellipse at 90% 8%, rgba(132,201,190,.13), transparent 38%), var(--pt-page) !important; }
+        :root[data-pantheon-theme="light"] body { background: radial-gradient(ellipse at 15% 3%, rgba(82,101,215,.12), transparent 45%), radial-gradient(ellipse at 90% 8%, rgba(55,160,133,.09), transparent 38%), var(--pt-page) !important; }
         .controls {
             position: relative !important;
             width: 100% !important;
@@ -1248,6 +1248,9 @@
         }
         .brand-area .brand-logo-fallback { width: 46px; height: 46px; flex: 0 0 46px !important; border-radius: 13px; }
         .brand-copy { min-width: 130px; line-height: 1.35; }
+        .brand-copy[role="button"] { cursor: pointer; border-radius: 9px; padding: 3px 5px; margin-left: -5px; transition: background .15s ease; }
+        .brand-copy[role="button"]:hover { background: var(--pt-hover); }
+        .brand-copy[role="button"]:focus-visible { outline: 3px solid color-mix(in srgb, var(--pt-accent) 55%, transparent); outline-offset: 2px; }
         .brand-name { color: var(--pt-text); font-size: .76rem; font-weight: 900; letter-spacing: .15em; }
         .brand-subtitle { color: var(--pt-muted); margin-top: 4px; font-size: .61rem; font-weight: 750; letter-spacing: .08em; }
         .system-status { min-width: 0 !important; }
@@ -1460,8 +1463,7 @@
 
     <div class="controls">
         <div class="brand-area">
-            <img src="guild-logo.png" alt="Pantheon guild logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="brand-logo-fallback" hidden>P</span>
-            <div class="brand-copy"><div class="brand-name">PANTHEON TOOLS</div><div class="brand-subtitle">DRAGON NEST · GUILD OPERATIONS</div></div>
+            <div class="brand-copy" id="pantheon-home-link" role="button" tabindex="0" aria-label="Return to Overview" title="Return to Overview"><div class="brand-name">PANTHEON TOOLS</div><div class="brand-subtitle">DRAGON NEST · GUILD OPERATIONS</div></div>
             <div class="system-status">
                 <div class="status-pill"><span class="status-dot"></span><span id="sync-status">Loading Database...</span></div>
             </div>
@@ -1801,14 +1803,15 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.4</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.5.5</span></div>
                 <ul>
                     <li><strong>Unified interface:</strong> the Overview, Tracker, Team Builder, Card Database, roster, and administrative screens now share a cleaner card-based layout, more consistent controls, and polished spacing.</li>
                     <li><strong>Appearance themes:</strong> choose Light, Dark, Eye comfort, or Pastel from the top toolbar. Your preference applies to the sign-in screen, tools, and pop-up windows.</li>
                     <li><strong>Default landing page:</strong> choose or change your startup destination from the new Overview shortcut or the Tools menu. Overview remains the default when no preference is saved.</li>
                     <li><strong>Less intrusive updates:</strong> the startup pop-up now contains only release changes. You can suppress it until the next version is released.</li>
                     <li><strong>Sign-in banner:</strong> <code>banner.png</code> is now the banner background, while the visible title remains the editable text “Dragon Nest - Classic Pantheon”.</li>
-                    <li><strong>Guild logo:</strong> the app header continues to use <code>guild-logo.png</code>. The full guild banner remains in Overview and other banner locations.</li>
+                    <li><strong>Cleaner header:</strong> removed the redundant P badge. Select the Pantheon Tools brand text to return to Overview from another tool.</li>
+                    <li><strong>Theme consistency:</strong> Dark, Light, Eye comfort, and Pastel now use the same palette and ambient background style as the approved Overview mockup, with typography and layout preserved.</li>
                 </ul>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
@@ -5856,6 +5859,22 @@
         select.addEventListener('change', function () { applyPantheonTheme(select.value, true); });
     });
     applyPantheonTheme((function () { try { return localStorage.getItem(THEME_KEY) || 'dark'; } catch (_) { return 'dark'; } })(), false);
+    const homeBrand = document.getElementById('pantheon-home-link');
+    if (homeBrand) {
+        const goToOverview = function () {
+            document.querySelectorAll('.modal-overlay').forEach(function (modal) { modal.classList.add('hidden'); });
+            document.body.classList.remove('welcome-modal-open');
+            if (typeof toggleSideMenu === 'function') toggleSideMenu(false);
+            if (typeof closeRegistrationPage === 'function') closeRegistrationPage();
+            if (typeof closeDungeonPage === 'function') closeDungeonPage();
+            try { history.replaceState(null, '', location.pathname + location.search); } catch (_) {}
+            if (typeof showAppPage === 'function') showAppPage('overview');
+        };
+        homeBrand.addEventListener('click', goToOverview);
+        homeBrand.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToOverview(); }
+        });
+    }
 })();
 </script>
 
