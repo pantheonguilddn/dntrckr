@@ -1,4 +1,12 @@
-# Pantheon Tools v1.6.6 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
+
+## v1.6.8 Team Builder roster separation
+
+- Team Builder now lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
+- The **Include in Tracker** checkbox controls Tracker participation only; it does not control Team Builder eligibility.
+- Class Setup uses the canonical Member Roster directory, so classes can be configured for characters not opted into Tracker.
+- Updated current-facing roster and help text to explain the distinction. The What's New popup is kept compact: a short tool description plus this release's main change. This package is based on v1.6.6 and does not carry forward later package changes.
+
 
 This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
 
