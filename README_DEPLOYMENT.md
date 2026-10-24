@@ -1,14 +1,39 @@
-# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
+# Pantheon Tools v1.7.1 — Cloudflare Pages + D1
+
+
+## v1.7.1 profile-triggered Rate-Up events
+
+- Rate-Up schedules are now managed through one administrator-only button in the Overview profile beside the existing account actions; the Analytics page no longer embeds an event planner.
+- Members see a compact event alert only when +50% Item Drop Rate UP or +30% Enhancement Rate UP is active, starts within 24 hours, or ends within 24 hours. Advice remains integrated with Reset Readiness.
+- The item-drop advice retains the daily-cycle cutoff calculation for Friday LZ delay and the Monday 00:00 Manila deadline for Sunday-cycle LZs. Lucky Zones remain an untracked 24-minute-per-character daily time commitment.
+
+## v1.7.0 Lucky Zone planning and Rate-Up event schedules
+
+- Lucky Zones are **not** treated as Tracker tasks. Reset Readiness assumes three solo runs at about eight minutes each and reserves a 24-minute daily baseline per registered character in the member’s view, including characters not opted into Tracker. The budget is explicitly separate from tracked Daily completion and calls out any other tracked Daily tasks still open.
+- Recommendations now account for the daily time floor before suggesting weekly raids. They prioritize a realistic next high-value weekly rather than implying that a full roster raid sweep should fit alongside Dailies every session.
+- Added a **Rate-Up Event Planner** to Analytics. Administrators can enable or disable **+50% Item Drop Rate UP** and **+30% Enhancement Rate UP** separately. Each event can repeat every weekend (Saturday 00:00 through Monday 00:00 Manila time) or use a custom start/end range.
+- Event timing is interpreted in Asia/Manila (GMT+8), independent of the admin’s computer timezone. Item Drop advice can recommend delaying the current Friday-cycle Lucky Zones until Saturday 00:00, or warn that Sunday-cycle Lucky Zones need to be completed before the event ends at Monday 00:00. If the bonus window has already ended, it explicitly avoids recommending an impossible delay.
+- Enhancement advice supports preparation before a scheduled window and using the +30% window for planned enhancement attempts. Event switches and dates are shared guild-wide, saved through cloud sync, and protected as administrator-managed settings at the server guard.
+- Existing v1.6.9 accessibility improvements, Main character highlighting, admin View as preview, and cautious priority estimates are retained.
+
+The package preserves the existing Cloudflare Pages/D1 structure and historical features. The ZIP contains all existing repository paths; the updated files are `index.html`, `README_DEPLOYMENT.md`, and `functions/_utils/registration-guard.js`.
+
+## v1.6.9 readability, Main markers, member preview, reset analytics
+
+- Improved readability in Light, Eye comfort, and Pastel with a larger base font, heavier helper text, higher-contrast muted text, clearer borders, and less washed-out small text. Pastel now has a more distinct lavender/rose palette rather than near-transparent surfaces.
+- Added a distinct ★ Main accent and border highlight in Tracker, Overview completion and priority insights, Member Roster character chips/member cards, Team Builder, and Analytics readiness cards.
+- Added an administrator-only **Admin preview** selector. It previews a selected member’s saved theme and member-scoped Overview, Tracker, Analytics, and Member Roster. The preview is read-only for Tracker progress, roster edits, team plans, shared analytics settings, and protected admin tools. It is a local preview, not a session impersonation.
+- Analytics leads with Reset Readiness and cautiously estimates priorities from loot weights, Main designation, and up to five saved weekly analytics snapshots. Weekly history collection remains opt-in.
+- Saves a member’s appearance theme in that member’s own Member Roster entry and restricts those theme fields at the registration permission boundary.
 
 ## v1.6.8 Team Builder roster separation
 
-- Team Builder now lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
+- Team Builder lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
 - The **Include in Tracker** checkbox controls Tracker participation only; it does not control Team Builder eligibility.
 - Class Setup uses the canonical Member Roster directory, so classes can be configured for characters not opted into Tracker.
-- Updated current-facing roster and help text to explain the distinction. The What's New popup is kept compact: a short tool description plus this release's main change. This package is based on v1.6.6 and does not carry forward later package changes.
+- Updated current-facing roster and help text to explain the distinction. The What’s New popup remains compact, with a short tool description and the release’s main change.
 
-
-This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
+This release also retains the compact Overview dashboard: Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
 
 ## v1.6.3 Version History theme contrast
 
@@ -86,7 +111,7 @@ This bundle carries forward the supplied v1.5.6 Cloudflare Pages + D1 base and t
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
 - The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- This ZIP is the v1.6.6 build and carries forward the v1.5.7–v1.6.4 changes documented below. Back up the current repository before replacing its files.
+- This ZIP is the v1.7.0 build and carries forward the current v1.6.9 behavior plus the historical features documented below. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch
@@ -97,7 +122,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer. The ZIP contains the app files directly at its root.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.6.6 build, carrying forward the current app, access-control functions, and dashboard updates described in this README; back up the current branch before replacing it.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.7.0 build. The ZIP also includes the updated registration permission guard; preserve the current branch and D1 database before replacing files.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project

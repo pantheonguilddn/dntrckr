@@ -8,6 +8,24 @@ const stable = value => {
   if (!value || typeof value !== 'object') return JSON.stringify(value);
   return `{${Object.keys(value).sort().map(name => `${JSON.stringify(name)}:${stable(value[name])}`).join(',')}}`;
 };
+const rateUpProjection = value => {
+  const source = obj(value);
+  const normalizeEvent = event => {
+    const item = obj(event);
+    return {
+      enabled: item.enabled === true,
+      schedule: item.schedule === 'custom' ? 'custom' : 'weekend',
+      startAt: Math.max(0, Number(item.startAt) || 0),
+      endAt: Math.max(0, Number(item.endAt) || 0)
+    };
+  };
+  return {
+    itemDrop: normalizeEvent(source.itemDrop),
+    enhancement: normalizeEvent(source.enhancement),
+    updatedAt: Math.max(0, Number(source.updatedAt) || 0),
+    updatedBy: String(source.updatedBy || '')
+  };
+};
 function cleanNames(value) {
   return arr(value).map(item => String(typeof item === 'object' ? (item?.name || item?.ign || '') : item || '').trim()).filter(Boolean);
 }
@@ -25,6 +43,8 @@ function memberProjection(member) {
     color: /^#[0-9a-f]{6}$/i.test(String(member.color || '')) ? String(member.color).toLowerCase() : '#7aa2f7',
     profileConfirmedDiscordId: String(member.profileConfirmedDiscordId || ''),
     profileConfirmedAt: Number(member.profileConfirmedAt) || 0,
+    appearanceTheme: ['dark', 'light', 'eye-comfort', 'pastel'].includes(String(member.appearanceTheme || '')) ? String(member.appearanceTheme) : '',
+    appearanceThemeUpdatedAt: Number(member.appearanceThemeUpdatedAt) || 0,
     characters: names.map(name => {
       const profile = byName.get(key(name)) || {};
       return {
@@ -123,6 +143,7 @@ export function registrationWriteViolation(previousRecord, nextRecord, session) 
   const adminManagedSettings = [
     ['categories', 'Dungeon Registration', value => arr(value)],
     ['lootWeights', 'Loot Weights', value => obj(value)],
+    ['rateUpEvents', 'Rate-Up Event schedule', value => rateUpProjection(value)],
     ['analyticsHistoryClearedAt', 'Analytics history clearing', value => Number(value) || 0],
     ['analyticsHistoryClearedBy', 'Analytics history clearing', value => String(value || '')]
   ];
