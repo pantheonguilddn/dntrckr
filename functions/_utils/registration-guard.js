@@ -120,31 +120,11 @@ export function registrationWriteViolation(previousRecord, nextRecord, session) 
   // Keep guild-wide configuration administrator-managed at the API boundary too.
   // Members still may update their own registrations and routine tracking progress,
   // but cannot bypass hidden management controls by editing the shared record directly.
-function normalizeRateUpEventsForGuard(value) {
-  const source = obj(value);
-  const event = raw => {
-    const item = obj(raw);
-    return {
-      enabled: item.enabled === true,
-      schedule: item.schedule === 'custom' ? 'custom' : 'weekend',
-      startAt: Math.max(0, Number(item.startAt) || 0),
-      endAt: Math.max(0, Number(item.endAt) || 0)
-    };
-  };
-  return {
-    itemDrop: event(source.itemDrop),
-    enhancement: event(source.enhancement),
-    updatedAt: Math.max(0, Number(source.updatedAt) || 0),
-    updatedBy: String(source.updatedBy || '')
-  };
-}
-
   const adminManagedSettings = [
     ['categories', 'Dungeon Registration', value => arr(value)],
     ['lootWeights', 'Loot Weights', value => obj(value)],
     ['analyticsHistoryClearedAt', 'Analytics history clearing', value => Number(value) || 0],
-    ['analyticsHistoryClearedBy', 'Analytics history clearing', value => String(value || '')],
-    ['rateUpEvents', 'Rate-Up Event Schedule', normalizeRateUpEventsForGuard]
+    ['analyticsHistoryClearedBy', 'Analytics history clearing', value => String(value || '')]
   ];
   for (const [field, label, normalize] of adminManagedSettings) {
     if (stable(normalize(before[field])) !== stable(normalize(after[field]))) {

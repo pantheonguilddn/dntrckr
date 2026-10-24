@@ -1,4 +1,4 @@
-# Pantheon Tools v1.6.9 (based on v1.6.8) — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
 
 ## v1.6.8 Team Builder roster separation
 
@@ -247,10 +247,3 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - Added the new `memberResetMarkers` field to the compact record encoding and merging logic. Existing global reset markers are preserved for compatibility.
 - Updated the release version to v1.6.6.
 - Weekly archive snapshots also enforce ownership: members can add/update their own character's weekly rate/state, but cannot change another character's archived progress, alter the global task order, or delete a shared archive week. Archive pruning is administrator-only.
-
-## v1.6.9 Rate-Up Event Planner
-
-- Shared administrator settings for +50% Item Drop Rate UP and +30% Enhancement Rate UP, with recurring weekend or custom Manila-time windows.
-- Overview advice reserves about 24 minutes per registered character for Lucky Zones, including characters not opted into Tracker, and counts open tracked Daily task entries separately.
-- Lucky Zone advice respects the 09:00 Manila daily reset and the event cutoff; if time is insufficient, it prioritizes Main/high-value characters rather than assuming a full-roster LZ sweep and raids will both fit.
-- Event schedules are administrator-only at the user interface and Cloudflare API guard.
