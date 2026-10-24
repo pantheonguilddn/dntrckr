@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8</title>
+    <title>Pantheon Tools v1.6.6</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1813,111 +1813,6 @@
   }
 </style>
 
-
-<style id="pantheon-v167-berlin-workshop">
-.berlin-overview-card .overview-tool-icon { background:linear-gradient(145deg,#6b4824,#bc8547) !important; color:#fff !important; }
-.berlin-hero { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr); gap:20px; align-items:center; overflow:hidden; position:relative; margin:10px 0 18px; padding:clamp(20px,3.5vw,34px); border:1px solid var(--pt-border); border-radius:18px; background:radial-gradient(circle at 82% 18%,color-mix(in srgb,#d99540 25%,transparent),transparent 35%),linear-gradient(125deg,var(--pt-surface-raised),var(--pt-surface)); color:var(--pt-text); }
-.berlin-eyebrow { color:var(--pt-warning); font-size:.62rem; font-weight:950; letter-spacing:.17em; }
-.berlin-hero h1 { margin:9px 0; color:var(--pt-text); font-size:clamp(1.6rem,3vw,2.5rem); letter-spacing:-.04em; }
-.berlin-hero p { max-width:620px; margin:0; color:var(--pt-muted); font-size:.85rem; line-height:1.7; }
-.berlin-hero-pills { display:flex; flex-wrap:wrap; gap:7px; margin-top:16px; }
-.berlin-hero-pills span { border:1px solid var(--pt-border); border-radius:999px; padding:6px 9px; background:var(--pt-surface); color:var(--pt-text); font-size:.64rem; font-weight:850; }
-.berlin-blacksmith-art { position:relative; min-height:160px; display:grid; place-items:center; overflow:hidden; border:1px solid color-mix(in srgb,#ce8a3d 38%,var(--pt-border)); border-radius:14px; background:radial-gradient(circle at 50% 65%,rgba(235,146,55,.23),transparent 42%),linear-gradient(160deg,#171b28,#292437); color:#fff; }
-.berlin-glow { position:absolute; width:145px; height:145px; border-radius:50%; background:rgba(242,132,39,.16); filter:blur(14px); }
-.berlin-anvil { position:relative; display:grid; place-items:center; width:90px; height:90px; border:1px solid rgba(255,208,128,.32); border-radius:24px; background:linear-gradient(145deg,#7d5035,#422c31); box-shadow:0 0 40px rgba(255,139,52,.2),inset 0 1px rgba(255,255,255,.16); color:#ffe0a5; font-size:3.5rem; text-shadow:0 4px 14px rgba(0,0,0,.5); }
-.berlin-sparks { position:absolute; top:17px; right:25px; color:#ffc76e; font-size:1.25rem; letter-spacing:.6rem; animation:berlin-sparkle 2.6s ease-in-out infinite; }
-.berlin-art-caption { position:absolute; bottom:11px; color:#c5b8b4; font-size:.52rem; font-weight:950; letter-spacing:.24em; }
-@keyframes berlin-sparkle { 0%,100%{opacity:.45;transform:translateY(2px)} 50%{opacity:1;transform:translateY(-3px)} }
-.berlin-toolbar { display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,.7fr); gap:12px; margin-bottom:12px; }
-.berlin-balance-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
-.berlin-balance { display:flex; align-items:center; gap:8px; min-width:0; border:1px solid var(--pt-border); border-radius:12px; padding:11px; background:var(--pt-surface); color:var(--pt-text); }
-.berlin-balance-icon { display:grid; place-items:center; width:30px; height:30px; flex:0 0 30px; border-radius:9px; background:var(--pt-accent-soft); color:var(--pt-accent); font-weight:950; }
-.berlin-balance small,.berlin-selected-item small { display:block; color:var(--pt-muted); font-size:.52rem; font-weight:950; letter-spacing:.07em; line-height:1.35; }
-.berlin-balance strong { display:block; color:var(--pt-text); margin-top:3px; font-size:1.08rem; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
-.berlin-checkin-box { display:flex; align-items:center; justify-content:space-between; gap:12px; border:1px solid color-mix(in srgb,#c88b42 42%,var(--pt-border)); border-radius:12px; background:linear-gradient(135deg,color-mix(in srgb,#c88b42 11%,var(--pt-surface)),var(--pt-surface)); padding:11px 13px; }
-.berlin-checkin-box strong { display:block; color:var(--pt-text); font-size:.82rem; }
-.berlin-checkin-box small { display:block; color:var(--pt-muted); margin-top:4px; font-size:.62rem; line-height:1.45; }
-.berlin-checkin-box .btn { flex:0 0 auto; font-size:.68rem; padding:9px 12px; }
-.berlin-alert { margin:0 0 14px; border:1px solid var(--pt-border); border-left:4px solid var(--pt-accent); border-radius:9px; padding:9px 12px; background:var(--pt-surface); color:var(--pt-muted); font-size:.72rem; line-height:1.5; }
-.berlin-alert[data-kind="success"] { border-left-color:var(--pt-positive); color:var(--pt-text); }
-.berlin-alert[data-kind="error"] { border-left-color:var(--pt-negative); color:var(--pt-text); }
-.berlin-alert[data-kind="warning"] { border-left-color:var(--pt-warning); color:var(--pt-text); }
-.berlin-forge-panel { transition:box-shadow .18s ease,border-color .18s ease; }
-.berlin-forge-panel.is-rolling { border-color:#d99a42; box-shadow:0 0 0 1px color-mix(in srgb,#d99a42 60%,transparent),0 0 28px color-mix(in srgb,#d99a42 20%,transparent); }
-.berlin-forge-panel.is-rolling .berlin-selected-icon { animation:berlin-hammer .42s ease-in-out infinite alternate; }
-.berlin-forge-panel.result-success { border-color:var(--pt-positive); box-shadow:0 0 0 1px color-mix(in srgb,var(--pt-positive) 50%,transparent),0 0 20px color-mix(in srgb,var(--pt-positive) 17%,transparent); }
-.berlin-forge-panel.result-failure { border-color:var(--pt-warning); box-shadow:0 0 0 1px color-mix(in srgb,var(--pt-warning) 45%,transparent); }
-.berlin-forge-panel.result-destroyed { border-color:var(--pt-negative); box-shadow:0 0 0 1px color-mix(in srgb,var(--pt-negative) 55%,transparent),0 0 22px color-mix(in srgb,var(--pt-negative) 19%,transparent); }
-.berlin-forge-panel.result-destroyed .berlin-selected-item { animation:berlin-shake .32s ease-in-out 2; }
-@keyframes berlin-hammer { from { transform:translateY(-2px) rotate(-3deg); } to { transform:translateY(3px) rotate(3deg); } }
-@keyframes berlin-shake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-4px); } 75% { transform:translateX(4px); } }
-@media(prefers-reduced-motion:reduce) { .berlin-forge-panel.is-rolling .berlin-selected-icon,.berlin-forge-panel.result-destroyed .berlin-selected-item { animation:none !important; } }
-.berlin-game-grid,.berlin-secondary-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr); gap:14px; align-items:start; margin-bottom:14px; }
-.berlin-panel { min-width:0; padding:17px; border:1px solid var(--pt-border); border-radius:15px; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 4px 14px rgba(0,0,0,.035); }
-.berlin-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:13px; }
-.berlin-panel-head h2 { margin:0; color:var(--pt-text); font-size:1rem; }
-.berlin-panel-head p { margin:5px 0 0; color:var(--pt-muted); font-size:.67rem; line-height:1.55; }
-.berlin-counter,.berlin-live-tag { flex:0 0 auto; border:1px solid var(--pt-border); border-radius:999px; padding:5px 8px; background:var(--pt-surface-soft); color:var(--pt-muted); font-size:.54rem; font-weight:950; letter-spacing:.05em; white-space:nowrap; }
-.berlin-live-tag { display:flex; align-items:center; gap:6px; color:var(--pt-positive); }
-.berlin-live-tag span { width:6px; height:6px; border-radius:100%; background:var(--pt-positive); box-shadow:0 0 8px color-mix(in srgb,var(--pt-positive) 50%,transparent); }
-.berlin-inventory { display:grid; gap:8px; }
-.berlin-equipment { display:flex; gap:10px; align-items:center; width:100%; min-width:0; padding:11px; border:1px solid var(--pt-border); border-radius:11px; background:var(--pt-surface-raised); color:var(--pt-text); cursor:pointer; text-align:left; transition:border-color .15s ease,transform .15s ease,background .15s ease; }
-.berlin-equipment:hover { border-color:var(--pt-accent); transform:translateY(-1px); }
-.berlin-equipment[aria-pressed="true"] { border-color:var(--pt-accent); box-shadow:inset 0 0 0 1px var(--pt-accent); background:var(--pt-accent-soft); }
-.berlin-equipment.is-broken { opacity:.7; filter:saturate(.6); }
-.berlin-equipment-icon { display:grid; place-items:center; width:42px; height:46px; flex:0 0 42px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface); font-size:1.35rem; }
-.berlin-equipment-info { flex:1; min-width:0; }
-.berlin-equipment-info strong { display:block; color:var(--pt-text); font-size:.78rem; overflow-wrap:anywhere; }
-.berlin-equipment-info small { display:block; margin-top:4px; color:var(--pt-muted); font-size:.6rem; }
-.berlin-equipment-level { display:grid; justify-items:end; gap:4px; flex:0 0 auto; }
-.berlin-plus { color:var(--pt-text); font-size:1rem; font-weight:950; font-variant-numeric:tabular-nums; }
-.berlin-rarity { font-size:.52rem; font-weight:950; border-radius:5px; padding:3px 5px; color:#fff; background:#525b6a; }
-.berlin-rarity.unique { background:#4c67b6; }.berlin-rarity.legend { background:#98612d; }
-.berlin-empty { border:1px dashed var(--pt-border); border-radius:10px; padding:18px; background:var(--pt-surface-raised); color:var(--pt-muted); text-align:center; font-size:.72rem; line-height:1.6; }
-.berlin-selected-item { display:flex; align-items:center; gap:12px; min-width:0; padding:13px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface-raised); }
-.berlin-selected-icon { display:grid; place-items:center; width:54px; height:58px; flex:0 0 54px; border-radius:11px; background:linear-gradient(145deg,#69472f,#312735); color:#ffe1a4; font-size:2rem; }
-.berlin-selected-item > div:last-child { flex:1; min-width:0; }
-.berlin-selected-item strong { display:block; margin-top:3px; color:var(--pt-text); font-size:.9rem; }
-.berlin-selected-item span { display:block; margin-top:4px; color:var(--pt-muted); font-size:.63rem; }
-.berlin-chance-card { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:11px 0; }
-.berlin-chance-card > div { min-width:0; padding:9px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft); }
-.berlin-chance-card small { display:block; color:var(--pt-muted); font-size:.49rem; font-weight:950; letter-spacing:.04em; }
-.berlin-chance-card strong { display:block; margin-top:5px; color:var(--pt-text); font-size:.9rem; overflow-wrap:anywhere; }
-.berlin-protect-option { display:flex; align-items:flex-start; gap:9px; padding:10px 11px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface); cursor:pointer; }
-.berlin-protect-option input { margin-top:3px; accent-color:var(--pt-accent); }
-.berlin-protect-option strong { display:block; color:var(--pt-text); font-size:.68rem; }
-.berlin-protect-option small { display:block; margin-top:4px; color:var(--pt-muted); font-size:.58rem; line-height:1.5; }
-.berlin-enhance-btn { display:block; width:100%; margin-top:11px; padding:12px; border:1px solid #a96f2b; border-radius:10px; background:linear-gradient(135deg,#a96e2e,#c58c43); color:#fff; font-weight:950; font-size:.78rem; letter-spacing:.01em; box-shadow:0 4px 12px rgba(169,110,46,.18); }
-.berlin-enhance-btn:hover:not(:disabled) { filter:brightness(1.08); transform:translateY(-1px); }
-.berlin-enhance-btn:disabled { opacity:.48; cursor:not-allowed; box-shadow:none; }
-.berlin-rate-note { margin-top:11px; padding:10px 11px; border-radius:9px; background:var(--pt-surface-soft); border:1px solid var(--pt-border); }
-.berlin-rate-note strong { display:block; font-size:.61rem; color:var(--pt-warning); }
-.berlin-rate-note p { margin:5px 0 0; color:var(--pt-muted); font-size:.57rem; line-height:1.6; }
-.berlin-text-button { margin-top:9px; border:0; padding:4px 0; background:transparent; color:var(--pt-accent); font-weight:850; font-size:.64rem; cursor:pointer; }
-.berlin-rates-table { margin-top:7px; max-height:230px; overflow:auto; border:1px solid var(--pt-border); border-radius:8px; }
-.berlin-rates-table table { width:100%; border-collapse:collapse; font-size:.61rem; }
-.berlin-rates-table th,.berlin-rates-table td { padding:7px 9px; border-bottom:1px solid var(--pt-border); text-align:left; color:var(--pt-text); }
-.berlin-rates-table th { background:var(--pt-surface-soft); position:sticky; top:0; }
-.berlin-history,.berlin-leaderboard { display:grid; gap:7px; }
-.berlin-history-row,.berlin-leader-row { display:flex; align-items:center; gap:9px; padding:9px 10px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-raised); min-width:0; }
-.berlin-history-icon { display:grid; place-items:center; width:28px; height:28px; flex:0 0 28px; border-radius:8px; background:var(--pt-surface-soft); color:var(--pt-accent); font-weight:950; }
-.berlin-history-copy,.berlin-leader-copy { flex:1; min-width:0; }
-.berlin-history-copy strong,.berlin-leader-copy strong { display:block; color:var(--pt-text); font-size:.65rem; overflow-wrap:anywhere; }
-.berlin-history-copy small,.berlin-leader-copy small { display:block; color:var(--pt-muted); font-size:.56rem; margin-top:3px; line-height:1.5; }
-.berlin-history-outcome { flex:0 0 auto; border-radius:999px; padding:4px 6px; background:var(--pt-surface-soft); color:var(--pt-muted); font-size:.52rem; font-weight:950; }
-.berlin-history-outcome.success { background:#286448; color:#fff; }.berlin-history-outcome.failure { background:#815d22; color:#fff; }.berlin-history-outcome.destroyed { background:#8c3636; color:#fff; }
-.berlin-rank { display:grid; place-items:center; width:27px; height:27px; flex:0 0 27px; border-radius:8px; border:1px solid var(--pt-border); background:var(--pt-surface); color:var(--pt-text); font-size:.65rem; font-weight:950; }
-.berlin-leader-row:first-child .berlin-rank { background:#b98735; border-color:#b98735; color:#fff; }
-.berlin-records { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-bottom:10px; }
-.berlin-record { min-width:0; padding:9px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft); }
-.berlin-record small { display:block; color:var(--pt-muted); font-size:.48rem; line-height:1.4; font-weight:950; letter-spacing:.04em; }
-.berlin-record strong { display:block; margin-top:6px; color:var(--pt-text); font-size:.63rem; overflow-wrap:anywhere; }
-.berlin-record span { display:block; margin-top:4px; color:var(--pt-muted); font-size:.55rem; line-height:1.4; }
-.berlin-footnote { padding:10px 12px; margin-top:4px; color:var(--pt-muted); font-size:.6rem; line-height:1.6; border-top:1px solid var(--pt-border); }
-@media(max-width:950px) { .berlin-game-grid,.berlin-secondary-grid { grid-template-columns:1fr; }.berlin-toolbar { grid-template-columns:1fr; }.berlin-hero { grid-template-columns:minmax(0,1fr) 200px; } }
-@media(max-width:640px) { .berlin-records { grid-template-columns:1fr; } .berlin-hero { grid-template-columns:1fr; }.berlin-blacksmith-art { min-height:125px; }.berlin-balance-row { grid-template-columns:1fr; }.berlin-checkin-box { align-items:stretch; flex-direction:column; }.berlin-checkin-box .btn { width:100%; }.berlin-panel { padding:13px; }.berlin-chance-card strong { font-size:.77rem; } }
-</style>
-
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1985,7 +1880,6 @@
             <div class="drawer-section">
                 <div class="drawer-section-title">Pages</div>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('tracker'); toggleSideMenu(false)"><span class="drawer-icon">📋</span><span><strong>Tracker</strong><small>Daily & weekly board</small></span></button>
-                <button class="drawer-item drawer-item-gold" type="button" onclick="showAppPage('berlin-workshop'); toggleSideMenu(false)"><span class="drawer-icon">⚒</span><span><strong>Berlin’s Workshop</strong><small>Enhancement simulator</small></span></button>
                 <button class="drawer-item" type="button" onclick="showAppPage('team-builder'); toggleSideMenu(false)"><span class="drawer-icon">⚔</span><span><strong>Team Builder</strong><small>Build two parties</small></span></button>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('card-wiki'); toggleSideMenu(false)"><span class="drawer-icon">🃏</span><span><strong>Card Database</strong><small>Find cards for character builds</small></span></button>
                 <button class="drawer-item drawer-item-green" type="button" onclick="showAppPage('member-roster'); toggleSideMenu(false)"><span class="drawer-icon">👥</span><span><strong>Member Roster</strong><small>Guild member directory</small></span></button>
@@ -2057,7 +1951,6 @@
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-personal')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▤</span><strong>Tracker &amp; Bounties</strong><span>Review daily and weekly tasks, bounty targets, completion rates, and guild progress.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('team-builder')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚔</span><strong>Team Builder</strong><span>Build raid parties from registered characters and check role coverage.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('card-database')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▧</span><strong>Card Database</strong><span>Filter monster cards by level range and desired stats. Local card batches stay local.</span></button>
-            <button class="overview-tool-card berlin-overview-card" type="button" onclick="openBerlinWorkshop()"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚒</span><strong>Berlin’s Workshop</strong><span>Claim daily supplies, enhance virtual gear, and compete for the guild’s luckiest streak.</span></button>
             <button class="overview-tool-card" type="button" onclick="showAppPage('member-roster')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">👥</span><strong>Member Roster</strong><span>Confirm, add, reorder, and opt your characters into tracking.</span></button>
             <button class="overview-tool-card" type="button" onclick="openLandingSettings()"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">⚙</span><strong>Default Landing Page</strong><span>Choose which Pantheon tool opens first and change the preference anytime.</span></button>
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('salary')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▣</span><strong>Salary Calculator</strong><span>Calculate party income, deductions, and member splits.</span></button>
@@ -2136,7 +2029,7 @@
         <div class="team-builder-header">
             <div>
                 <h2>⚔ Team Builder <button class="mini-help" type="button" title="Team Builder Guide" onclick="openHelpModal('team-builder')">?</button></h2>
-                <p>Build raid parties from every character in Member Roster, whether or not they are tracked.</p>
+                <p>Build coordinated parties directly from the characters registered in the tracker.</p>
             </div>
             <div class="builder-header-actions">
                 <button class="team-mini-btn" type="button" onclick="shareTeamBuilderAsImage()">📸 Share Setup</button>
@@ -2218,7 +2111,7 @@
         </div>
 
         <div class="team-builder-bottom">
-            <strong>How it works:</strong> Characters come from Member Roster. Tracker opt-in controls weekly progress tracking only; every character in the directory is available here. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
+            <strong>How it works:</strong> Characters come from Member Roster and are available after a member opts them into Tracker + Team Builder. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
         </div>
     </main>
 
@@ -2276,64 +2169,22 @@
 
     <main id="member-roster-page" class="app-page hidden-page">
         <div class="team-builder-header">
-            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p id="member-roster-description">A shared guild member directory. Add everyone here. Tracker opt-in controls whose progress appears in Tracker; all directory characters are available in Team Builder.</p></div>
+            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p id="member-roster-description">A shared guild member directory. Add everyone here, then register only the characters whose progress should appear in Tracker and Team Builder.</p></div>
             <div class="builder-header-actions"><span class="local-only-badge">SHARED WHEN CLOUD IS CONNECTED</span></div>
         </div>
         <section class="member-directory-panel">
             <h3 id="member-directory-form-title">Add a guild member</h3>
-            <p>Member Roster is the master list. Add each character's exact IGN and Class / Job here. Opt in only the characters whose progress should be tracked; all saved characters remain available in Team Builder.</p>
+            <p>Member Roster is the master list. Add each character's exact IGN and Class / Job here, then opt in only the characters that should appear in Tracker and Team Builder.</p>
             <form id="member-directory-form" class="member-directory-form" onsubmit="saveMemberDirectoryForm(event)">
                 <label class="member-directory-field">Member / owner name<input id="member-directory-name" type="text" maxlength="60" placeholder="Discord / owner name" required></label>
                 <label class="member-directory-field">Role / notes (optional)<input id="member-directory-note" type="text" maxlength="160" placeholder="e.g. Returning member, raid lead"></label>
-                <div class="member-character-editor-block"><div class="member-character-editor-heading"><strong>Character IGNs and classes</strong><button class="btn btn-secondary" type="button" onclick="addMemberCharacterRow()">＋ Add Character</button></div><div class="member-directory-note">Each character needs a Class / Job. Leave the Tracker checkbox off when you do not want to record progress for a character; it will still be available in Team Builder.</div><div id="member-character-editor" class="member-character-editor"></div></div>
+                <div class="member-character-editor-block"><div class="member-character-editor-heading"><strong>Character IGNs and classes</strong><button class="btn btn-secondary" type="button" onclick="addMemberCharacterRow()">＋ Add Character</button></div><div class="member-directory-note">Each character needs a Class / Job. Leave the tracker checkbox off for directory-only characters.</div><div id="member-character-editor" class="member-character-editor"></div></div>
                 <div class="member-directory-actions"><button id="member-directory-submit" class="btn btn-roster" type="submit">Add member</button><button id="member-directory-cancel" class="btn btn-secondary" type="button" onclick="resetMemberDirectoryForm()" hidden>Cancel edit</button></div>
             </form>
         </section>
         <div class="member-directory-toolbar"><input id="member-directory-search" class="card-wiki-stat-search member-directory-search" type="search" placeholder="Search members, characters, or notes…" oninput="renderMemberDirectory()" autocomplete="off"><span id="member-directory-count" class="member-directory-count"></span></div>
         <section id="member-directory-list" class="member-directory-list" aria-live="polite"></section>
-        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the master source of truth for members, character IGNs, and classes. Check <b>Include in Tracker</b> only for characters whose progress should be tracked. Tracker reads opted-in characters; Team Builder reads all characters saved in this shared roster. Changes sync when Cloud is connected.</div>
-    </main>
-
-    <main id="berlin-workshop-page" class="app-page hidden-page">
-        <section class="berlin-hero">
-            <div class="berlin-hero-copy">
-                <div class="berlin-eyebrow">PANTHEON MINI-GAME · VIRTUAL ITEMS ONLY</div>
-                <h1>⚒ Berlin’s Workshop</h1>
-                <p>Claim your daily supplies, choose your gear, and see how far Berlin will let you push it. The only thing at risk is your simulated inventory.</p>
-                <div class="berlin-hero-pills"><span>🎁 Daily check-in</span><span>⚒ +0 to +15</span><span>🏆 Guild leaderboard</span></div>
-            </div>
-            <div class="berlin-blacksmith-art" aria-hidden="true"><div class="berlin-glow"></div><div class="berlin-anvil">⚒</div><div class="berlin-sparks">✦ · ✧ · ✦</div><div class="berlin-art-caption">BERLIN’S FORGE</div></div>
-        </section>
-        <div class="berlin-toolbar">
-            <div class="berlin-balance-row">
-                <div class="berlin-balance"><span class="berlin-balance-icon">◈</span><div><small>SIMULATION GOLD</small><strong id="berlin-gold">—</strong></div></div>
-                <div class="berlin-balance"><span class="berlin-balance-icon">◆</span><div><small>ENHANCEMENT STONES</small><strong id="berlin-stones">—</strong></div></div>
-                <div class="berlin-balance"><span class="berlin-balance-icon">🛡</span><div><small>PROTECTION JELLIES</small><strong id="berlin-jellies">—</strong></div></div>
-            </div>
-            <div class="berlin-checkin-box"><div><strong id="berlin-checkin-title">Daily check-in</strong><small id="berlin-checkin-subtitle">Get today’s virtual supplies.</small></div><button type="button" class="btn btn-cloud" id="berlin-checkin-btn" onclick="claimBerlinCheckin()">🎁 Claim daily supplies</button></div>
-        </div>
-        <div class="berlin-alert" id="berlin-message" role="status" aria-live="polite">Loading your workshop inventory…</div>
-        <section class="berlin-game-grid">
-            <div class="berlin-panel berlin-inventory-panel">
-                <div class="berlin-panel-head"><div><h2>Your Equipment</h2><p>Select a piece of gear to enhance. Every result is saved to your Discord-linked workshop profile.</p></div><span class="berlin-counter" id="berlin-gear-count">0 items</span></div>
-                <div id="berlin-inventory" class="berlin-inventory" aria-live="polite"><div class="berlin-empty">Your inventory will appear here after your first check-in.</div></div>
-            </div>
-            <div class="berlin-panel berlin-forge-panel">
-                <div class="berlin-panel-head"><div><h2>Enhancement Chamber</h2><p id="berlin-selected-caption">Select equipment from your inventory.</p></div><span class="berlin-live-tag"><span></span> BERLIN ONLINE</span></div>
-                <div id="berlin-selected-item" class="berlin-selected-item"><div class="berlin-selected-icon">⚔</div><div><small>SELECTED EQUIPMENT</small><strong>No equipment selected</strong><span>Choose an item on the left.</span></div></div>
-                <div class="berlin-chance-card"><div><small>NEXT ATTEMPT</small><strong id="berlin-next-level">—</strong></div><div><small>SUCCESS CHANCE</small><strong id="berlin-success-rate">—</strong></div><div><small>GOLD COST</small><strong id="berlin-gold-cost">—</strong></div></div>
-                <label class="berlin-protect-option"><input type="checkbox" id="berlin-use-jelly" onchange="renderBerlinSelectedItem()"><span><strong>Use Item Protection Magic Jelly</strong><small>Prevents destruction on failure; level penalties may still apply.</small></span></label>
-                <button type="button" id="berlin-enhance-btn" class="berlin-enhance-btn" onclick="enhanceBerlinItem()" disabled>⚒ Enhance Equipment</button>
-                <div class="berlin-rate-note"><strong>Rate profile: Classic +15 legacy table</strong><p>Classic SEA’s official notes confirm +6-and-below success, the +9 floor for already +9+ gear, and jelly protection from destruction. The complete Lv.70 rate table is not published there. This uses one legacy approximation for all grades; verify the current grade-specific odds before treating the percentages as exact.</p></div>
-                <button type="button" class="berlin-text-button" onclick="toggleBerlinRates()" aria-expanded="false" id="berlin-rates-toggle">View enhancement rates</button>
-                <div class="berlin-rates-table" id="berlin-rates-table" hidden></div>
-            </div>
-        </section>
-        <section class="berlin-secondary-grid">
-            <div class="berlin-panel"><div class="berlin-panel-head"><div><h2>Forge Log</h2><p>Your most recent check-ins and enhancement outcomes.</p></div><span class="berlin-counter">LATEST 10</span></div><div id="berlin-history" class="berlin-history"><div class="berlin-empty">No workshop activity yet.</div></div></div>
-            <div class="berlin-panel"><div class="berlin-panel-head"><div><h2>Guild Luck Board</h2><p>Highest enhancement, best streak, and the most tragic forge losses.</p></div><button class="small-btn" type="button" onclick="loadBerlinGameState()">↻ Refresh</button></div><div id="berlin-leaderboard" class="berlin-leaderboard"><div class="berlin-empty">Leaderboard loading…</div></div></div>
-        </section>
-        <div class="berlin-footnote">This is a Pantheon-only mini-game. It does not connect to the Dragon Nest client, grant real game items, or spend real Gold/Cash. Your workshop inventory is saved to your authenticated Discord account.</div>
+        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the master source of truth for members, character IGNs, and classes. Check <b>Include in Tracker + Team Builder</b> for each opted-in character; unchecked characters remain listed as directory-only. Team Builder and Tracker both read their eligible character list from this shared roster. Changes sync when Cloud is connected.</div>
     </main>
 
     <div class="modal-overlay hidden" id="card-wiki-batches-modal" role="dialog" aria-modal="true" aria-label="Manage Card Batches">
@@ -2364,7 +2215,7 @@
                     <option value="team-builder">Team Builder</option>
                     <option value="card-database">Card Database</option>
                     <option value="member-roster">Member Roster</option>
-                    <option value="salary">Salary Calculator</option><option value="berlin-workshop">Berlin’s Workshop</option>
+                    <option value="salary">Salary Calculator</option>
                 </select>
                 <label class="welcome-check"><input id="landing-settings-enabled" type="checkbox"><span>Use this selection as my default landing page.</span></label>
                 <div id="landing-settings-status" class="modal-note" aria-live="polite">No default is saved. Overview will open by default.</div>
@@ -2396,9 +2247,8 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.6</span></div>
                 <ul>
-                    <li><strong>Team Builder directory:</strong> Team Builder now lists every character saved in Member Roster, independent of Tracker opt-in. Tracker continues to use only opted-in characters.</li>
                     <li><strong>Shared character editor:</strong> add a new character directly from the confirmation popup or Tracker. Saving syncs the ordered character list, class, Main designation, and tracking opt-in to the shared Member Roster and refreshes Tracker.</li>
                     <li><strong>Character confirmation editor:</strong> review and edit IGN, Class / Job, Main designation, Tracker opt-in, and character order during first-login confirmation.</li>
                     <li><strong>Bounty tracking:</strong> Bounty Boards start hidden by default unless a member explicitly enables them in this version.</li>
@@ -2413,7 +2263,6 @@
                     <li><strong>Universal View permissions:</strong> members can review everyone’s completion but can only change checkboxes, bounty notes, and task states for their own registered characters. Other characters are visibly read-only.</li>
                     <li><strong>Character-specific automatic resets:</strong> daily and weekly resets apply to the signed-in member’s own characters. Reset markers no longer let one member’s browser reset or change another member’s progress.</li>
                     <li><strong>Version History theme contrast:</strong> revision names, timestamps, savepoint badges, status messages, and revision-detail cards now remain readable in Dark, Light, Eye comfort, and Pastel themes.</li>
-                    <li><strong>Berlin’s Workshop:</strong> a Discord-linked enhancement simulator with daily check-in rewards, virtual equipment and materials, enhancement attempts, simulated protection jellies, enhancement history, and a guild luck leaderboard. It never changes real Dragon Nest inventory.</li>
                 
                 </ul>
             </section>
@@ -2617,7 +2466,6 @@
                     <button type="button" data-help-target="team-builder" onclick="showHelpTopic('team-builder')">Team Builder</button>
                     <button type="button" data-help-target="versions" onclick="showHelpTopic('versions')">Version History</button>
                     <button type="button" data-help-target="salary" onclick="showHelpTopic('salary')">Salary Calculator</button>
-                    <button type="button" data-help-target="berlin-workshop" onclick="showHelpTopic('berlin-workshop')">Berlin’s Workshop</button>
                 </div>
                 <div class="help-content">
                     <section class="help-topic" data-help-topic="start">
@@ -2628,12 +2476,12 @@
                     </section>
                     <section class="help-topic" data-help-topic="registration">
                         <h4>Tracker Registration</h4>
-                        <p>Member Roster is the master list for member names, character IGNs, and Classes / Jobs. Tracker opt-in controls progress tracking only. Team Builder can use any character saved in Member Roster.</p>
+                        <p>Member Roster is the master list for member names, character IGNs, and Classes / Jobs. Register characters by editing their owner in Member Roster and checking <b>Include in Tracker + Team Builder</b>. Only opted-in characters appear in the tracker and Team Builder.</p>
                         <div class="help-step"><b>1.</b> Open <b>Member Roster</b> and add or edit the member.</div>
                         <div class="help-step"><b>2.</b> Add each character's exact in-game name and select its <b>Class / Job</b>.</div>
-                        <div class="help-step"><b>3.</b> Check <b>Include in Tracker</b> for characters whose progress should be tracked.</div>
-                        <div class="help-step"><b>4.</b> Save the member. Tracker updates according to opt-in state, while Team Builder reads every saved character.</div>
-                        <p>Use this panel only to adjust Tracker roster colors, reorder tracked characters, or opt characters out of Tracker. Opting out here keeps the IGN and class in Member Roster and Team Builder.</p>
+                        <div class="help-step"><b>3.</b> Check <b>Include in Tracker + Team Builder</b> for characters who opt in.</div>
+                        <div class="help-step"><b>4.</b> Save the member. The tracker and Team Builder update from the same master record.</div>
+                        <p>Use this panel only to adjust registered group colors, reorder opted-in characters, or unregister characters. Unregistering here keeps the IGN and class in Member Roster as directory-only.</p>
                         <div class="help-callout"><b>Guild-wide setting:</b> member directory and tracker opt-in changes affect connected clients after cloud sync.</div>
                     </section>
                     <section class="help-topic" data-help-topic="dungeons">
@@ -2695,18 +2543,18 @@
                         <h4>Member Roster</h4>
                         <p>Member Roster is the guild's master directory and the source of truth for member names, character IGNs, character Classes / Jobs, and opt-in status. Add every guild member here whether or not they use the tracker.</p>
                         <h5>Add members and characters</h5>
-                        <p>Add a member, then use <b>Add Character</b> to enter each exact IGN, select its Class / Job, and decide whether its progress should be tracked. Every character must have a class. An unchecked character stays in Member Roster and remains available in Team Builder without appearing in Tracker progress views.</p>
-                        <p>Use <b>Edit member</b> to update the name, notes, character IGNs, classes, or opt-in settings. The per-character × button removes that character profile from the master directory; the member stays listed. Removing a character deletes it from the master directory, so it is removed from Team Builder and any Tracker entry.</p>
+                        <p>Add a member, then use <b>Add Character</b> to enter each exact IGN, select its Class / Job, and decide whether it should be included in Tracker and Team Builder. Every character must have a class. Leave its opt-in checkbox unchecked to keep the IGN and class in the directory without creating a tracker entry.</p>
+                        <p>Use <b>Edit member</b> to update the name, notes, character IGNs, classes, or opt-in settings. The per-character × button removes that character profile from the master directory; the member stays listed. Removing a character also removes its tracker entry and Team Builder eligibility.</p>
                         <h5>Enable personal tracking</h5>
-                        <p>Use the <b>Include in Tracker</b> checkbox for each of your own characters. A character left unchecked remains in Member Roster and Team Builder but will not appear in Tracker progress views. Use the empty-state action in Tracker to start tracking registered characters, or use <b>Add More Characters</b> to extend your own registration.</p>
+                        <p>Use the <b>Include in Tracker + Team Builder</b> checkbox for each of your own characters. A character left unchecked remains in your registration but will not appear in the Tracker or Team Builder. Use the empty-state action in Tracker to start tracking all registered characters, or use <b>Add More Characters</b> to extend your own registration.</p>
                         <p>On first login, confirm that your IGN, Class / Job, and Main designation are accurate. Administrators manage guild-wide registration and can correct a Main designation when needed. If an administrator changes your registration, Pantheon asks you to confirm it again at your next login.</p>
                         <p>When Cloud is configured, member names, IGNs, classes, Main designations, and opt-in states are shared with the guild. Card Database data and card batches are not part of that sync.</p>
                     </section>
                     <section class="help-topic" data-help-topic="team-builder">
                         <h4>Team Builder</h4>
-                        <p>Team Builder uses every character saved in Member Roster, including characters that are not opted into Tracker. Member names, character IGNs, and Classes / Jobs all originate in the shared directory; Tracker opt-in does not control Team Builder eligibility.</p>
+                        <p>Team Builder uses only characters opted into tracking from Member Roster. The member list, character IGNs, and Classes / Jobs originate in Member Roster; directory-only characters remain unavailable for team slots until their opt-in checkbox is checked.</p>
                         <h5>Set each character's Job</h5>
-                        <p>Choose the Class / Job in Member Roster when adding or editing a character. The Team Builder's class configuration uses the same Job mapping, and class changes are written back to the master character profile to keep the directory and builder consistent. The Class dropdown can also narrow the eligible character list.</p>
+                        <p>Choose the Class / Job in Member Roster when adding or editing a character. The Team Builder's class configuration uses the same Job mapping, and class changes are written back to the master character profile to keep the two views consistent. The Class dropdown can also narrow the eligible character list.</p>
                         <h5>Choose a Party Format</h5>
                         <p><b>4 Man Normal</b> is for casual normal nests. <b>4 Man Hardcore</b> is for higher-intensity 4-man content such as Hell Nests and Dragon Memoria. <b>8 Man Normal</b> is for Classic Raids with more composition flexibility. <b>8 Man Hardcore</b> uses both teams for high-end mechanics and exposes physical / magical DPS balance.</p>
                         <h5>Build the two teams</h5>
@@ -2732,15 +2580,6 @@
                         <p><b>Gross Income − Salary Holder Cut − Seal Stamp Cost = Net Income Pool</b></p>
                         <p>The Net Income Pool is then divided by the party size to show the <b>Payout per member</b>.</p>
                         <div class="help-callout"><b>Tip:</b> enter the actual numbers from the party run and use the displayed payout. The calculator updates automatically as you type.</div>
-                    </section>
-                    <section class="help-topic" data-help-topic="berlin-workshop">
-                        <h4>Berlin’s Workshop</h4>
-                        <p>Berlin’s Workshop is a mini-game with its own Discord-linked inventory. Its gold, stones, jellies, and equipment are virtual and never change your live Dragon Nest character or inventory.</p>
-                        <div class="help-step"><b>1.</b> Claim your daily crate after the 9:00 AM Manila reset. The server limits this to one claim per game day.</div>
-                        <div class="help-step"><b>2.</b> Select a piece of equipment and review the next target level, success chance, and simulation-gold cost before enhancing.</div>
-                        <div class="help-step"><b>3.</b> For eligible attempts, toggle Item Protection Magic Jelly if you want to spend one to protect against destruction.</div>
-                        <div class="help-step"><b>4.</b> Check Forge Log for your own results and Guild Luck Board for the highest enhancement, longest success streak, and Berlin’s Hall of Shame.</div>
-                        <div class="help-callout"><b>Rates note:</b> Classic SEA’s official system notice confirms +6 and below is guaranteed, +9 and above cannot fall below +9 on failure, and Magic Jelly prevents destruction on failure at +6 and above. It does not publish a complete percentage table. The displayed +7 to +15 percentages are a configurable legacy approximation, not a verified statement of current server rates.</div>
                     </section>
                 </div>
             </div>
@@ -2811,7 +2650,7 @@
     <div class="modal-overlay hidden" id="roster-modal" role="dialog">
         <div class="modal-card wide-modal">
             <h3>🧾 Tracker Registration</h3>
-            <div class="modal-note">Member Roster is the source of truth for member names, character IGNs, and Class / Job. Add or edit characters there. The <b>Include in Tracker</b> checkbox controls progress tracking only; Team Builder uses all characters saved in Member Roster. This panel is for arranging and managing Tracker opt-in for characters already listed in Member Roster.</div>
+            <div class="modal-note">Member Roster is the source of truth for member names, character IGNs, and Class / Job. Add or edit characters there and check <b>Include in Tracker + Team Builder</b> to opt a character in. This panel is for arranging and managing already registered characters.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
                     <h4>Add or register characters</h4>
@@ -4427,7 +4266,7 @@
             loadLiveTracker().then(() => {
                 applyDiscordIdentityDefaults();
                 const routeHash = location.hash;
-                if (['#registration', '#dungeons', '#loot-weights', '#version-history', '#sync-now', '#landing-settings', '#salary-calculator', '#ledger', '#help', '#overview', '#tracker', '#team-builder', '#card-wiki', '#member-roster', '#berlin-workshop'].includes(routeHash)) handlePageRoute();
+                if (['#registration', '#dungeons', '#loot-weights', '#version-history', '#sync-now', '#landing-settings', '#salary-calculator', '#ledger', '#help', '#overview', '#tracker', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
                 else applySavedLandingPage();
                 initializeWelcomeModal();
                 maybeOpenProfileConfirmation();
@@ -4526,7 +4365,7 @@
                 const addButton = document.getElementById('tracker-empty-add-btn');
                 if (title) title.textContent = profiles.length ? (tracked.length ? 'No characters in this view' : 'Your tracker is empty') : 'Register your characters to get started';
                 if (message) message.textContent = profiles.length
-                    ? (tracked.length ? 'This view has no active tracking characters. Add characters or switch to your personal roster.' : 'Your characters are in Member Roster, but none are opted into Tracker yet. They remain available in Team Builder. Start tracking them whenever you are ready.')
+                    ? (tracked.length ? 'This view has no active tracking characters. Add characters or switch to your personal roster.' : 'Your characters are registered, but none are opted into Tracker and Team Builder yet. Start tracking them whenever you are ready.')
                     : 'You have no characters registered yet. Add your IGN and class, choose your Main character, and then start tracking daily and weekly progress.';
                 if (startButton) startButton.hidden = profiles.length === 0 || tracked.length > 0;
                 if (startButton && profiles.length > 0 && tracked.length === 0) startButton.textContent = 'Start Tracking Registered Characters';
@@ -5241,7 +5080,7 @@
             if (!own) { openMyCharacterRegistration(); return; }
             if (!own.characterProfiles?.length) { openMyCharacterRegistration(); return; }
             if (own.characterProfiles.every(profile => profile.trackerEnabled)) {
-                alert('All of your registered characters are already opted into Tracker.');
+                alert('All of your registered characters are already opted into Tracker and Team Builder.');
                 return;
             }
             if (hasCloudConfig() && !(await prepareGlobalChange(`Start tracking registered characters for ${own.name}`))) return;
@@ -5297,7 +5136,7 @@
             const initialMember = initialMembers.find(member => member.name.trim().toLowerCase() === ownerKey || member.trackerRosterId === id);
             const initialProfile = initialMember?.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterKey);
             if (!initialMember || !initialProfile) return alert('That character is no longer in Member Roster. Refresh and try again.');
-            if (!confirm(`Opt ${initialProfile.name} out of Tracker? Its IGN and Class / Job will remain in Member Roster and Team Builder.`)) return;
+            if (!confirm(`Unregister ${initialProfile.name} from Tracker and Team Builder? Its IGN and Class / Job will remain in Member Roster as a directory-only character.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Unregister ${initialProfile.name} from Tracker`))) return;
             const members = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = members.find(item => item.id === initialMember.id);
@@ -5333,7 +5172,7 @@
             if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can unregister an entire roster.'); return; }
             const names = [...roster.characters];
             if (!names.length) return alert('This member has no opted-in characters to unregister. The member itself remains in Member Roster.');
-            if (!confirm(`Opt all ${names.length} character(s) owned by ${roster.name} out of Tracker? Their IGNs and classes will remain in Member Roster and Team Builder.`)) return;
+            if (!confirm(`Unregister all ${names.length} character(s) owned by ${roster.name} from Tracker and Team Builder? Their IGNs and classes will remain in Member Roster as directory-only entries.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Unregister all tracking characters for ${roster.name}`))) return;
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.trackerRosterId === id || item.name.trim().toLowerCase() === roster.name.trim().toLowerCase());
@@ -5507,35 +5346,17 @@
         // ==========================================
         // ⚔ TEAM BUILDER
         // ==========================================
-        // Team Builder eligibility is independent of Tracker opt-in.
-        // The Member Roster is the master character directory; Tracker rosters remain a projection of trackerEnabled profiles only.
         function allRegisteredCharacters() {
             ensureMemberRosterMaster(cloudData);
-            const rosters = normalizeRosters(cloudData.settings.rosters);
-            const rosterById = new Map(rosters.map(roster => [roster.id, roster]));
+            const rosterById = new Map(normalizeRosters(cloudData.settings.rosters).map(roster => [roster.id, roster]));
             return normalizeMemberDirectory(cloudData.settings.memberDirectory).flatMap(member => {
-                const roster = rosterById.get(member.trackerRosterId) || rosters.find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
-                return (member.characterProfiles || []).filter(profile => String(profile.name || '').trim()).map(profile => ({
-                    name: profile.name,
-                    color: member.color || roster?.color || '#7aa2f7',
-                    rosterId: roster?.id || member.trackerRosterId || member.id,
-                    rosterName: member.name
+                const roster = rosterById.get(member.trackerRosterId) || normalizeRosters(cloudData.settings.rosters).find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                return (member.characterProfiles || []).filter(profile => profile.trackerEnabled).map(profile => ({
+                    name: profile.name, color: member.color || roster?.color || '#7aa2f7', rosterId: roster?.id || member.trackerRosterId, rosterName: member.name
                 }));
             });
         }
-        function getCharacterJob(name) {
-            const key = String(name || '').trim().toLowerCase();
-            if (!key) return '';
-            // Read the canonical Member Roster profile first; only scan the legacy map if needed.
-            const members = Array.isArray(cloudData.settings.memberDirectory) ? cloudData.settings.memberDirectory : [];
-            for (const member of members) {
-                const profiles = Array.isArray(member?.characterProfiles) ? member.characterProfiles : [];
-                const profile = profiles.find(item => String(item?.name || item?.ign || '').trim().toLowerCase() === key);
-                if (profile && JOB_DATABASE[String(profile.job || '')]) return String(profile.job);
-            }
-            const mapped = Object.entries(safeObject(cloudData.settings.characterJobs)).find(([characterName]) => String(characterName).trim().toLowerCase() === key)?.[1];
-            return JOB_DATABASE[mapped?.job] ? mapped.job : '';
-        }
+        function getCharacterJob(name) { return cloudData.settings.characterJobs?.[name]?.job || ''; }
 
         async function setCharacterJob(name, job) {
             if (!JOB_DATABASE[job]) return;
@@ -5697,8 +5518,8 @@
             const list = document.getElementById('class-setup-list');
             if (!list) return;
             const filter = document.getElementById('class-setup-roster-filter')?.value || 'all';
-            const allChars = allRegisteredCharacters();
-            const chars = filter === 'all' ? allChars : allChars.filter(character => character.rosterId === filter);
+            const rosterSet = filter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === filter);
+            const chars = flattenRosters(rosterSet);
             list.innerHTML = chars.length ? chars.map(c => {
                 const job = getCharacterJob(c.name), meta = getJobMeta(job);
                 return `<tr><td><strong>${escapeHTML(c.name)}</strong></td><td class="class-setup-owner">${escapeHTML(c.rosterName)}</td><td><select class="class-setup-select" data-class-char="${escapeHTML(c.name)}" onchange="setCharacterJob('${escapeHTML(c.name)}', this.value)">${buildJobOptions(job)}</select></td><td>${meta ? escapeHTML(meta.className) : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? '<span class="class-setup-status ok">Configured</span>' : '<span class="class-setup-status missing">Needs Job</span>'}</td></tr>`;
@@ -6612,7 +6433,7 @@
                 <label>Character IGN<input class="member-character-ign" type="text" maxlength="40" value="${escapeHTML(profile.name || '')}" placeholder="Exact in-game name" autocomplete="off"></label>
                 <label>Class / Job<select class="member-character-job">${buildJobOptions(profile.job || '')}</select></label>
                 <label class="member-character-main"><input class="member-character-is-main" type="radio" name="member-main-character" ${profile.isMain ? 'checked' : ''}><span>Main character</span></label>
-                <label class="member-character-opt-in"><input class="member-character-tracker" type="checkbox" ${profile.trackerEnabled ? 'checked' : ''}><span>Include in Tracker</span></label>
+                <label class="member-character-opt-in"><input class="member-character-tracker" type="checkbox" ${profile.trackerEnabled ? 'checked' : ''}><span>Include in Tracker + Team Builder</span></label>
                 <button class="member-character-row-remove" type="button" data-remove-member-character-row title="Remove this row" aria-label="Remove character row">×</button>
             </div>`).join('');
         }
@@ -6651,24 +6472,24 @@
             const memberHeading = document.getElementById('member-directory-form-title');
             const memberDescription = document.getElementById('member-roster-description');
             if (memberDescription) memberDescription.textContent = isPantheonAdmin()
-                ? 'Shared guild directory. Manage member records and decide which characters appear in Tracker; all directory characters are available in Team Builder.'
+                ? 'Shared guild directory. Manage member records and decide which characters appear in Tracker and Team Builder.'
                 : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
             if (memberHeading && !isPantheonAdmin() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
             const trackingCount = members.reduce((sum, member) => sum + (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length, 0);
             const count = document.getElementById('member-directory-count');
-            if (count) count.textContent = `${members.length} members · ${characterCount} characters · ${trackingCount} opted in to Tracker`;
+            if (count) count.textContent = `${members.length} members · ${characterCount} characters · ${trackingCount} opted in to Tracker / Team Builder`;
             list.innerHTML = members.length ? members.map(member => {
                 const characterChips = (member.characterProfiles || []).map(profile => {
                     const tracked = profile.trackerEnabled;
-                    const status = tracked ? 'TRACKING' : 'NOT TRACKED';
+                    const status = tracked ? 'TRACKING' : 'DIRECTORY';
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
-                    const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Not tracked · still available in Team Builder'}`;
+                    const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker and Team Builder' : 'Directory only'}`;
                     return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
                 const removeMemberButton = isPantheonAdmin() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
-                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div></div><div class="member-directory-chars-title">Character IGNs / classes / Tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
+                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracking characters' : 'Directory only'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
             }).join('') : `<div class="member-directory-empty">${isPantheonAdmin() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
         }
         function resetMemberDirectoryForm() {
@@ -6714,7 +6535,7 @@
             const initialProfile = initialEntry?.characterProfiles.find(profile => profile.name.trim().toLowerCase() === charKey);
             if (!initialEntry || !initialProfile) return alert('That character is no longer in Member Roster. Refresh and try again.');
             if (!canManageMemberRecord(initialEntry)) return alert('You can only remove characters from your own Member Roster entry.');
-            if (!confirm(`Remove ${initialProfile.name} from ${initialEntry.name}'s Member Roster? This also removes the character from Team Builder and, when opted in, from Tracker. The member will remain listed.`)) return;
+            if (!confirm(`Remove ${initialProfile.name} from ${initialEntry.name}'s Member Roster? If opted in, this also removes it from Tracker and Team Builder. The member will remain listed.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Remove character ${initialProfile.name} from member ${initialEntry.name}`))) return;
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const entry = entries.find(member => member.id === initialEntry.id);
@@ -6823,7 +6644,7 @@
             if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.id === id);
-            if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? All of the member’s characters will be removed from Team Builder and any active Tracker entries.`)) return;
+            if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any opted-in characters will also be removed from Tracker and Team Builder.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Remove member and characters: ${member.name}`))) return;
             cloudData.settings.memberDirectory = entries.filter(item => item.id !== id);
             const remaining = cloudData.settings.memberDirectory.flatMap(item => item.characterProfiles || []);
@@ -6854,8 +6675,8 @@
         });
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
-        const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary', 'berlin-workshop'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8';
+        const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
+        const PANTHEON_TOOLS_VERSION = 'v1.6.6';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -6877,7 +6698,6 @@
             if (destination === 'team-builder') { showAppPage('team-builder'); return; }
             if (destination === 'card-database') { showAppPage('card-wiki'); return; }
             if (destination === 'member-roster') { showAppPage('member-roster'); return; }
-            if (destination === 'berlin-workshop') { showAppPage('berlin-workshop'); return; }
             if (destination === 'salary') {
                 showAppPage('overview');
                 openSalaryModal();
@@ -7040,10 +6860,10 @@
             if (title) title.textContent = manageMode ? 'Manage Your Characters' : 'Confirm Your Character Registration';
             if (intro) intro.textContent = profiles.length
                 ? (manageMode
-                    ? 'Add characters, correct IGNs, change Class / Job, choose your Main, and opt each character into Tracker separately. All saved characters remain available in Team Builder. Use the arrows to set the order shown in Tracker. Saving updates the shared Member Roster and Tracker.'
+                    ? 'Add characters, correct IGNs, change Class / Job, choose your Main, and opt each character into Tracker + Team Builder. Use the arrows to set the order shown in Tracker. Saving updates the shared Member Roster and Tracker.'
                     : 'Check your characters below. You can add characters, correct each IGN, change the Class / Job, choose your Main, decide which characters should be tracked, and reorder them. Saving updates the shared Member Roster and Tracker.')
                 : (manageMode
-                    ? 'No characters are registered yet. Add an entry below, select its Class / Job, choose your Main character, and decide whether to track it in Tracker. All saved characters remain available in Team Builder.'
+                    ? 'No characters are registered yet. Add an entry below, select its Class / Job, choose your Main character, and decide whether it should appear in Tracker + Team Builder.'
                     : 'Your account does not have registered characters yet. Add an entry below, select its Class / Job, and choose exactly one Main character before using the personal Tracker.');
             if (container) container.innerHTML = profiles.length ? profiles.map((profile, index) => {
                 const jobOptions = '<option value="">Select Class / Job…</option>' + JOB_ORDER.map(job => `<option value="${escapeHTML(job)}" ${job === profile.job ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
@@ -7276,8 +7096,7 @@
                 tracker: document.getElementById('tracker-page'),
                 'team-builder': document.getElementById('team-builder-page'),
                 'card-wiki': document.getElementById('card-wiki-page'),
-                'member-roster': document.getElementById('member-roster-page'),
-                'berlin-workshop': document.getElementById('berlin-workshop-page')
+                'member-roster': document.getElementById('member-roster-page')
             };
             if (!pages[page]) page = 'tracker';
             // On every entry to Tracker, force the signed-in Discord account's own roster.
@@ -7290,7 +7109,6 @@
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
-            else if (page === 'berlin-workshop') { history.replaceState(null, '', '#berlin-workshop'); loadBerlinGameState(); }
             else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster') history.replaceState(null, '', location.pathname + location.search);
         }
 
@@ -7322,7 +7140,6 @@
             else if (route === '#team-builder') showAppPage('team-builder');
             else if (route === '#card-wiki') showAppPage('card-wiki');
             else if (route === '#member-roster') showAppPage('member-roster');
-            else if (route === '#berlin-workshop') showAppPage('berlin-workshop');
             else if (route === '#overview') showAppPage('overview');
             else showAppPage('tracker');
         }
@@ -7435,39 +7252,6 @@
             if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToOverview(event); }
         });
     }
-})();
-</script>
-
-<script id="pantheon-berlin-workshop-runtime">
-(function(){
-  'use strict';
-  const API='/api/berlin/state';
-  const RATE_LABELS={7:45,8:40,9:35,10:30,11:25,12:20,13:15,14:5,15:1};
-  let state=null, selectedId='', gameDayKey='', busy=false, hasPersistedProfile=false;
-  let lastResponse=null;
-  const $=id=>document.getElementById(id);
-  const num=n=>new Intl.NumberFormat('en-US').format(Number(n)||0);
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function setMessage(text,kind='info'){const el=$('berlin-message');if(!el)return;el.textContent=text;el.dataset.kind=kind;}
-  function callApi(method,body){return fetch(API,{method,credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.message||d.error||`Workshop request failed (${r.status})`);return d;});}
-  function getSelected(){return state?.profile?.equipment?.find(e=>e.id===selectedId&&!e.broken)||null;}
-  function renderSummary(){if(!state?.profile)return;const p=state.profile;$('berlin-gold').textContent=num(p.gold);$('berlin-stones').textContent=num(p.stones);$('berlin-jellies').textContent=num(p.jellies);$('berlin-gear-count').textContent=`${(p.equipment||[]).filter(e=>!e.broken).length} usable item${(p.equipment||[]).filter(e=>!e.broken).length===1?'':'s'}`;const ready=state.hasClaimedToday!==true;const btn=$('berlin-checkin-btn');btn.disabled=busy||!ready;btn.textContent=ready?'🎁 Claim daily supplies':'✓ Claimed this reset';$('berlin-checkin-title').textContent=ready?'Your daily supply crate is ready':'Daily crate claimed';$('berlin-checkin-subtitle').textContent=ready?'Collect virtual gold, stones, a jelly, and a random equipment drop.':'Come back after the 9:00 AM Manila daily reset.';}
-  function renderInventory(){const target=$('berlin-inventory');if(!target||!state?.profile)return;const items=state.profile.equipment||[];if(!items.length){target.innerHTML='<div class="berlin-empty">No equipment yet. Claim your daily supplies to start building an inventory.</div>';return;}target.innerHTML=items.slice().sort((a,b)=>(Number(b.level)||0)-(Number(a.level)||0)).map(item=>`<button type="button" class="berlin-equipment ${item.broken?'is-broken':''}" data-berlin-item="${esc(item.id)}" aria-pressed="${item.id===selectedId}" ${item.broken?'disabled':''} onclick="selectBerlinItem('${esc(item.id)}')"><span class="berlin-equipment-icon">${item.broken?'💥':item.slot==='Armor'?'🛡':item.slot==='Secondary Weapon'?'🔮':'⚔'}</span><span class="berlin-equipment-info"><strong>${esc(item.name)}</strong><small>${esc(item.slot)} · ${item.broken?'Destroyed':`${esc(item.grade)} grade`}</small></span><span class="berlin-equipment-level"><strong class="berlin-plus">${item.broken?'LOST':`+${Number(item.level)||0}`}</strong><span class="berlin-rarity ${String(item.grade).toLowerCase()}">${esc(item.grade)}</span></span></button>`).join('');}
-  function renderBerlinSelectedItem(){const item=getSelected(),placeholder=$('berlin-selected-item'),button=$('berlin-enhance-btn'),jelly=$('berlin-use-jelly');if(!item){placeholder.innerHTML='<div class="berlin-selected-icon">⚔</div><div><small>SELECTED EQUIPMENT</small><strong>No equipment selected</strong><span>Choose an item on the left.</span></div>';$('berlin-selected-caption').textContent='Select equipment from your inventory.';$('berlin-next-level').textContent='—';$('berlin-success-rate').textContent='—';$('berlin-gold-cost').textContent='—';button.disabled=true;return;}const target=item.level+1;const rate=target<=6?100:Number(state.rates?.[target]??RATE_LABELS[target]??0);const cost=berlinGoldCost(target);placeholder.innerHTML=`<div class="berlin-selected-icon">${item.slot==='Armor'?'🛡':'⚔'}</div><div><small>SELECTED EQUIPMENT · ${esc(item.grade)}</small><strong>${esc(item.name)} +${item.level}</strong><span>${esc(item.slot)} · Next target +${target}${target>=9?' · Failure floor +9':''}</span></div>`;$('berlin-selected-caption').textContent=`${item.name} · ${item.grade} ${item.slot}`;$('berlin-next-level').textContent=target>15?'MAX +15':`+${target}`;$('berlin-success-rate').textContent=target>15?'—':`${rate}%`;$('berlin-gold-cost').textContent=target>15?'—':num(cost);if(target>=7&&target<=15){jelly.disabled=Number(state.profile.jellies)<=0; if(jelly.disabled)jelly.checked=false;}else{jelly.checked=false;jelly.disabled=true;}const missing=Number(state.profile.stones)<berlinStoneCost(target)||Number(state.profile.gold)<cost;button.disabled=busy||target>15||missing||!hasPersistedProfile;button.textContent=target>15?'✓ Maximum Enhancement':missing?'Not enough materials or gold':'⚒ Enhance Equipment';if(!hasPersistedProfile)button.disabled=true;}
-  function berlinGoldCost(target){return 100*Math.max(1,target)*Math.max(1,target);}
-  function berlinStoneCost(target){return target<=6?1:target<=9?2:target<=12?3:4;}
-  function renderHistory(){const el=$('berlin-history');const rows=(state?.profile?.history||[]).slice(0,10);if(!rows.length){el.innerHTML='<div class="berlin-empty">No workshop activity yet. Your first check-in will start the log.</div>';return;}el.innerHTML=rows.map(r=>`<div class="berlin-history-row"><span class="berlin-history-icon">${r.kind==='checkin'?'🎁':r.outcome==='success'?'✓':r.outcome==='destroyed'?'💥':'⚒'}</span><div class="berlin-history-copy"><strong>${esc(r.title||'Workshop activity')}</strong><small>${esc(r.detail||'')} · ${esc(r.when||'Recently')}</small></div>${r.outcome?`<span class="berlin-history-outcome ${esc(r.outcome)}">${esc(r.outcome.toUpperCase())}</span>`:''}</div>`).join('');}
-  function renderLeaderboard(){const el=$('berlin-leaderboard');const list=state?.leaderboard||[];if(!list.length){el.innerHTML='<div class="berlin-empty">No forge legends yet. Check in and make the first attempt.</div>';return;}const topLevel=[...list].sort((a,b)=>(b.bestLevel||0)-(a.bestLevel||0))[0];const topStreak=[...list].sort((a,b)=>(b.bestStreak||0)-(a.bestStreak||0))[0];const hallOfShame=[...list].sort((a,b)=>(b.destructions||0)-(a.destructions||0))[0];const records=`<div class="berlin-records"><div class="berlin-record"><small>HIGHEST ENHANCEMENT</small><strong>${esc(topLevel.label||'Adventurer')}</strong><span>+${Number(topLevel.bestLevel)||0} peak</span></div><div class="berlin-record"><small>BEST SUCCESS STREAK</small><strong>${esc(topStreak.label||'Adventurer')}</strong><span>${Number(topStreak.bestStreak)||0} consecutive wins</span></div><div class="berlin-record"><small>BERLIN’S HALL OF SHAME</small><strong>${esc(hallOfShame.label||'Adventurer')}</strong><span>${Number(hallOfShame.destructions)||0} gear losses</span></div></div>`;const ranking=[...list].sort((a,b)=>(b.bestLevel||0)-(a.bestLevel||0)||(b.bestStreak||0)-(a.bestStreak||0)||(b.successes||0)-(a.successes||0));el.innerHTML=records+ranking.slice(0,10).map((p,i)=>`<div class="berlin-leader-row"><span class="berlin-rank">${i+1}</span><div class="berlin-leader-copy"><strong>${esc(p.label||p.username||'Adventurer')}</strong><small>Peak +${Number(p.bestLevel)||0} · ${Number(p.successes)||0} wins · ${Number(p.destructions)||0} destructions</small></div><span class="berlin-plus">${Number(p.bestStreak)||0}🔥</span></div>`).join('');}
-  function renderRates(){const el=$('berlin-rates-table');if(!el)return;const rates=state?.rates||{7:45,8:40,9:35,10:30,11:25,12:20,13:15,14:5,15:1};el.innerHTML='<table><thead><tr><th>Target</th><th>Success</th><th>Failure behavior</th></tr></thead><tbody>'+Array.from({length:15},(_,i)=>{const target=i+1,success=target<=6?100:Number(rates[target]||0),effect=target<=6?'Guaranteed':target>=14?'25% break · may lose 1–3 levels':target>=12?'25% break · may lose 1–2 levels':target>=10?'25% break · downgrade floor +9':target>=9?'25% break · +9 floor applies at +9+':'25% break · failure may hold level';return `<tr><td>+${target}</td><td>${success}%</td><td>${effect}${target>=7?' · Jelly prevents destruction':''}</td></tr>`;}).join('')+'</tbody></table>';}
-  function renderAll(){if(!state?.profile)return;renderSummary();renderInventory();renderBerlinSelectedItem();renderHistory();renderLeaderboard();renderRates();}
-  async function loadBerlinGameState(){if(busy)return;setMessage('Loading your Discord-linked workshop profile…');try{const data=await callApi('GET');state=data;hasPersistedProfile=!!data.persisted;if(!state.profile){throw new Error('Workshop profile was not returned.');}if(!selectedId||!state.profile.equipment.some(e=>e.id===selectedId&&!e.broken))selectedId=(state.profile.equipment.find(e=>!e.broken)||{}).id||'';renderAll();setMessage(data.hasClaimedToday?'Your workshop is synced. Your daily crate is already claimed.':'Your workshop is synced. Today’s virtual supply crate is ready.','success');}catch(error){setMessage(`${error.message}. If this is a new deployment, publish the Berlin’s Workshop API function and apply the updated D1 schema.`, 'error');}}
-  async function submitAction(body,successText){if(busy)return;busy=true;const forge=$('berlin-workshop-page')?.querySelector('.berlin-forge-panel');if(forge){forge.classList.remove('result-success','result-failure','result-destroyed');forge.classList.add('is-rolling');}renderSummary();renderBerlinSelectedItem();try{const data=await callApi('POST',body);state=data;hasPersistedProfile=!!data.persisted;if(body.action==='enhance')selectedId=body.itemId;if(!state.profile.equipment.some(e=>e.id===selectedId&&!e.broken))selectedId=(state.profile.equipment.find(e=>!e.broken)||{}).id||'';renderAll();const outcome=data.result?.outcome||'success';setMessage(data.result?.message||successText||'Workshop saved.',outcome==='destroyed'?'error':outcome==='failure'?'warning':'success');if(forge){forge.classList.remove('is-rolling');forge.classList.add(`result-${outcome==='destroyed'?'destroyed':outcome==='failure'?'failure':'success'}`);window.setTimeout(()=>forge.classList.remove('result-success','result-failure','result-destroyed'),1800);}}catch(error){setMessage(error.message,'error');if(forge)forge.classList.remove('is-rolling');if(error.message.includes('changed in another session'))await loadBerlinGameState();}finally{busy=false;renderAll();}}
-  function claimBerlinCheckin(){submitAction({action:'checkin'},'Daily supplies claimed.');}
-  function enhanceBerlinItem(){const item=getSelected();if(!item){setMessage('Select an available item first.','error');return;}submitAction({action:'enhance',itemId:item.id,useJelly:!!$('berlin-use-jelly')?.checked},'Enhancement attempt completed.');}
-  function selectBerlinItem(id){selectedId=String(id||'');renderInventory();renderBerlinSelectedItem();}
-  function toggleBerlinRates(){const table=$('berlin-rates-table'),button=$('berlin-rates-toggle');const show=table.hidden;table.hidden=!show;button.setAttribute('aria-expanded',String(show));button.textContent=show?'Hide enhancement rates':'View enhancement rates';}
-  function openBerlinWorkshop(){if(typeof toggleSideMenu==='function')toggleSideMenu(false);if(typeof showAppPage==='function')showAppPage('berlin-workshop');else location.hash='#berlin-workshop';}
-  window.openBerlinWorkshop=openBerlinWorkshop;window.loadBerlinGameState=loadBerlinGameState;window.claimBerlinCheckin=claimBerlinCheckin;window.enhanceBerlinItem=enhanceBerlinItem;window.selectBerlinItem=selectBerlinItem;window.renderBerlinSelectedItem=renderBerlinSelectedItem;window.toggleBerlinRates=toggleBerlinRates;
 })();
 </script>
 
