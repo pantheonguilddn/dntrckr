@@ -1,32 +1,8 @@
-# Pantheon Tools v1.7.0 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
 
-## v1.7.0 Lucky Zone planning and Rate-Up event schedules
+This release separates Team Builder availability from Tracker opt-in: every character saved in Member Roster is available to team building, while only opted-in characters appear in Tracker progress. It also carries forward the Overview and account-dashboard updates from v1.6.7.
 
-- Lucky Zones are **not** treated as Tracker tasks. Reset Readiness assumes three solo runs at about eight minutes each and reserves a 24-minute daily baseline per registered character in the member’s view, including characters not opted into Tracker. The budget is explicitly separate from tracked Daily completion and calls out any other tracked Daily tasks still open.
-- Recommendations now account for the daily time floor before suggesting weekly raids. They prioritize a realistic next high-value weekly rather than implying that a full roster raid sweep should fit alongside Dailies every session.
-- Added a **Rate-Up Event Planner** to Analytics. Administrators can enable or disable **+50% Item Drop Rate UP** and **+30% Enhancement Rate UP** separately. Each event can repeat every weekend (Saturday 00:00 through Monday 00:00 Manila time) or use a custom start/end range.
-- Event timing is interpreted in Asia/Manila (GMT+8), independent of the admin’s computer timezone. Item Drop advice can recommend delaying the current Friday-cycle Lucky Zones until Saturday 00:00, or warn that Sunday-cycle Lucky Zones need to be completed before the event ends at Monday 00:00. If the bonus window has already ended, it explicitly avoids recommending an impossible delay.
-- Enhancement advice supports preparation before a scheduled window and using the +30% window for planned enhancement attempts. Event switches and dates are shared guild-wide, saved through cloud sync, and protected as administrator-managed settings at the server guard.
-- Existing v1.6.9 accessibility improvements, Main character highlighting, admin View as preview, and cautious priority estimates are retained.
-
-The package preserves the existing Cloudflare Pages/D1 structure and historical features. The ZIP contains all existing repository paths; the updated files are `index.html`, `README_DEPLOYMENT.md`, and `functions/_utils/registration-guard.js`.
-
-## v1.6.9 readability, Main markers, member preview, reset analytics
-
-- Improved readability in Light, Eye comfort, and Pastel with a larger base font, heavier helper text, higher-contrast muted text, clearer borders, and less washed-out small text. Pastel now has a more distinct lavender/rose palette rather than near-transparent surfaces.
-- Added a distinct ★ Main accent and border highlight in Tracker, Overview completion and priority insights, Member Roster character chips/member cards, Team Builder, and Analytics readiness cards.
-- Added an administrator-only **Admin preview** selector. It previews a selected member’s saved theme and member-scoped Overview, Tracker, Analytics, and Member Roster. The preview is read-only for Tracker progress, roster edits, team plans, shared analytics settings, and protected admin tools. It is a local preview, not a session impersonation.
-- Analytics leads with Reset Readiness and cautiously estimates priorities from loot weights, Main designation, and up to five saved weekly analytics snapshots. Weekly history collection remains opt-in.
-- Saves a member’s appearance theme in that member’s own Member Roster entry and restricts those theme fields at the registration permission boundary.
-
-## v1.6.8 Team Builder roster separation
-
-- Team Builder lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
-- The **Include in Tracker** checkbox controls Tracker participation only; it does not control Team Builder eligibility.
-- Class Setup uses the canonical Member Roster directory, so classes can be configured for characters not opted into Tracker.
-- Updated current-facing roster and help text to explain the distinction. The What’s New popup remains compact, with a short tool description and the release’s main change.
-
-This release also retains the compact Overview dashboard: Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
+This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
 
 ## v1.6.3 Version History theme contrast
 
@@ -99,12 +75,36 @@ This bundle carries forward the supplied v1.5.6 Cloudflare Pages + D1 base and t
 - Dark, Light, Eye comfort, and Pastel remain available across the working tools and admin console. Existing font families are preserved.
 - The release popup displays the bundled version; a dismissal saved for an older version does not suppress a newer update.
 
+## v1.6.8 — Team Builder directory independent of Tracker opt-in
+
+- Team Builder now reads all character profiles in the shared Member Roster, including characters whose `trackerEnabled` flag is false.
+- Tracker behavior is unchanged: only profiles opted into Tracker are projected into the Tracker rosters and counted in tracking views.
+- Team Builder class/job resolution now prefers the canonical Member Roster profile and falls back to the legacy character-job map for older records.
+- Class Setup includes directory-only characters so their Team Builder Job metadata can be reviewed and corrected.
+- Updated Member Roster, Tracker Registration, Team Builder, and Admin Console copy so the checkbox is clearly labeled **Include in Tracker** and no longer implies that it controls Team Builder.
+
+## v1.6.7 — Berlin’s Workshop
+
+- Added Berlin’s Workshop as a member-accessible mini-game, available from the Overview tool cards and the Tools drawer.
+- Daily check-in grants simulation-only gold, enhancement stones, a protection jelly, and one random virtual equipment drop. Claims are limited by the 9:00 AM Manila daily reset.
+- Virtual equipment can be enhanced up to +15; attempts, costs, outcomes, inventory, forge history, and leaderboard summaries are stored per authenticated Discord account in D1. This does not interact with the live Dragon Nest client or deliver real items.
+- Added `functions/api/berlin/state.js` and the `berlin_game_profiles` D1 table. The endpoint enforces the current Discord session, derives the profile key from the authenticated Discord ID, calculates enhancement results server-side, validates daily claims, and uses optimistic version checks to reduce duplicate concurrent attempts.
+- Classic SEA’s official system notice confirms +6-and-below guaranteed success, that failures on gear already at +9 and above will not drop it below +9, and that Item Protection Magic Jelly prevents destruction on failure for +6 and above. The notice does not publish the complete percentage table. This mini-game currently applies one **legacy approximation across all simulated equipment grades** for +7 to +15 (45%, 40%, 35%, 30%, 25%, 20%, 15%, 5%, 1%) and a simulated 25% break band, clearly labeled for verification; do not treat these as verified current Lv.70 live-server odds or grade-specific live rates. Reference: [official Classic SEA enhancement system notice](https://seaclassic.dragonnest.com/news/notice/all/16?locale=EN). A legacy community table is available [here](https://seadragonnest.blogspot.com/2011/10/enhancement.html), but it is historical and may not match current Classic rates. To calibrate the simulator, edit `SUCCESS_RATES` and `BREAK_CHANCE` in `functions/api/berlin/state.js` after confirming the live rates for your equipment grade and target level.
+
+### Berlin’s Workshop deployment requirements
+
+1. Upload the new `functions/api/berlin/state.js` and updated `index.html` with the rest of the bundle.
+2. Run the updated `schema.sql` against the existing `pantheon-db`. It safely creates `berlin_game_profiles` if it does not already exist. The API also ensures this table on request as a migration safeguard.
+3. Confirm the Cloudflare Pages project still has the `PANTHEON_DB` D1 binding.
+4. Test check-in once, reload the browser, and confirm the profile remains. Try a second check-in during the same game day; the server should reject it.
+5. This mini-game is independent of the old JSONBin Tracker records and does not alter them.
+
 ## Important before deploying
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
 - The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- This ZIP is the v1.7.0 build and carries forward the current v1.6.9 behavior plus the historical features documented below. Back up the current repository before replacing its files.
+- This ZIP is the v1.6.8 build and carries forward the v1.5.7–v1.6.4 changes documented below. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch
@@ -115,7 +115,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer. The ZIP contains the app files directly at its root.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.7.0 build. The ZIP also includes the updated registration permission guard; preserve the current branch and D1 database before replacing files.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.6.8 build, including Berlin’s Workshop and the current app/access-control updates described in this README; back up the current branch before replacing it.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project
