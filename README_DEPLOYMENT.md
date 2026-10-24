@@ -1,4 +1,11 @@
-# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
+# Pantheon Tools v1.7.3 — Cloudflare Pages + D1
+
+
+## v1.7.3 — verified v1.6.8 checkpoint rebuild
+
+This release reapplies the accessibility, Main-character emphasis, admin member preview, reset-aware Analytics, Rate-Up event reminder and UI-description editing feedback to the v1.6.8 checkpoint whose What's New popup contains a brief tool description and a concise release summary. See `Pantheon_Tools_v1.7.3_README.md` for complete feature and validation notes.
+
+Rate-Up events are shared and admin-managed. Weekend schedules are Saturday 00:00 through Monday 00:00 Manila time; members receive a subtle reminder ribbon and task advice that reserves about 24 minutes for Lucky Zones per registered character. Admins can toggle View as and UI-description editing through the compact profile popover.
 
 ## v1.6.8 Team Builder roster separation
 
