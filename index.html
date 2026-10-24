@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8</title>
+    <title>Pantheon Tools v1.6.9</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1815,6 +1815,39 @@
   }
 </style>
 
+
+<style id="pantheon-v169-rate-event-planner">
+  :root[data-pantheon-theme] .rate-event-section { margin-top:14px; border:1px solid var(--pt-border); border-radius:13px; padding:13px; background:var(--pt-surface); }
+  :root[data-pantheon-theme] .rate-event-section h4 { margin:0 0 8px; color:var(--pt-text); font-size:.93rem; font-weight:900; }
+  :root[data-pantheon-theme] .rate-event-intro { margin:0 0 11px; color:var(--pt-muted); font-size:.76rem; line-height:1.55; }
+  :root[data-pantheon-theme] .rate-event-status-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(225px,1fr)); gap:9px; }
+  :root[data-pantheon-theme] .rate-event-status-card { padding:11px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-raised); min-width:0; }
+  :root[data-pantheon-theme] .rate-event-status-card strong { display:block; color:var(--pt-text); font-size:.84rem; font-weight:900; }
+  :root[data-pantheon-theme] .rate-event-status-card span { display:block; margin-top:5px; color:var(--pt-muted); font-size:.75rem; line-height:1.5; }
+  :root[data-pantheon-theme] .rate-event-status-card.is-active { border-color:var(--pt-positive); box-shadow:inset 3px 0 var(--pt-positive); }
+  :root[data-pantheon-theme] .rate-event-admin { margin-top:12px; padding-top:12px; border-top:1px dashed var(--pt-border); }
+  :root[data-pantheon-theme] .rate-event-admin h5, :root[data-pantheon-theme] .rate-event-planning h5 { margin:0 0 10px; color:var(--pt-text); font-size:.85rem; font-weight:900; }
+  :root[data-pantheon-theme] .rate-event-admin-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; }
+  :root[data-pantheon-theme] .rate-event-edit-card { min-width:0; padding:12px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-raised); }
+  :root[data-pantheon-theme] .rate-event-edit-card h6 { margin:0 0 9px; color:var(--pt-text); font-size:.82rem; font-weight:900; }
+  :root[data-pantheon-theme] .rate-event-enabled-label { display:flex; align-items:center; gap:8px; color:var(--pt-text); font-size:.78rem; font-weight:800; margin-bottom:10px; }
+  :root[data-pantheon-theme] .rate-event-edit-card label { display:block; color:var(--pt-muted); font-size:.72rem; font-weight:750; margin:8px 0 4px; }
+  :root[data-pantheon-theme] .rate-event-edit-card select, :root[data-pantheon-theme] .rate-event-edit-card input:not([type="checkbox"]) { width:100%; max-width:100%; min-height:35px; box-sizing:border-box; border:1px solid var(--pt-border); border-radius:8px; padding:7px 9px; color:var(--pt-text); background:var(--pt-input); font-size:.78rem; }
+  :root[data-pantheon-theme] .rate-event-edit-card input[type="checkbox"] { width:17px; min-height:17px; margin:0; accent-color:var(--pt-main-accent); }
+  :root[data-pantheon-theme] .rate-event-custom-range[hidden] { display:none!important; }
+  :root[data-pantheon-theme] .rate-event-admin-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:11px; }
+  :root[data-pantheon-theme] .rate-event-admin-actions .btn { min-height:38px; }
+  :root[data-pantheon-theme] .rate-event-footnote { margin:10px 0 0; color:var(--pt-muted); font-size:.72rem; line-height:1.5; }
+  :root[data-pantheon-theme] .rate-event-planning { margin-top:12px; padding:12px; border-radius:10px; background:var(--pt-surface-soft); border:1px solid var(--pt-border); }
+  :root[data-pantheon-theme] .rate-event-budget-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin:0 0 10px; }
+  :root[data-pantheon-theme] .rate-event-budget-stat { min-width:0; border:1px solid var(--pt-border); border-radius:9px; padding:9px; background:var(--pt-surface-raised); }
+  :root[data-pantheon-theme] .rate-event-budget-stat small { display:block; color:var(--pt-muted); font-size:.68rem; line-height:1.4; }
+  :root[data-pantheon-theme] .rate-event-budget-stat strong { display:block; margin-top:4px; color:var(--pt-text); font-size:1rem; line-height:1.35; overflow-wrap:anywhere; }
+  :root[data-pantheon-theme] .analytics-event-advice { padding:10px 12px; border-radius:9px; background:var(--pt-surface-raised); border:1px solid var(--pt-border); margin:7px 0; color:var(--pt-text); font-size:.79rem; line-height:1.6; }
+  :root[data-pantheon-theme] .rate-event-planning-note { margin:8px 0 0; color:var(--pt-muted); font-size:.74rem; line-height:1.55; }
+  @media(max-width:780px) { :root[data-pantheon-theme] .rate-event-admin-grid { grid-template-columns:1fr; } }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1965,6 +1998,7 @@
                     <div class="overview-activity-row"><span class="overview-activity-icon">✓</span><div><strong>Weekly tracker review</strong><p>Check for outstanding weekly tasks before the reset.</p></div></div>
                     <div class="overview-activity-row"><span class="overview-activity-icon">↻</span><div><strong>Low-completion follow-up</strong><p>Review characters who may need a check-in or tracking pause.</p></div></div>
                 </div>
+                <div id="overview-rate-event-planner"></div>
             </section>
             <section class="overview-panel overview-completion-panel">
                 <div class="overview-panel-heading"><div><h2>Character Completion</h2><p>See which opted-in characters are on pace and which may need attention.</p></div><span class="overview-panel-kicker">LOWEST FIRST</span></div>
@@ -2249,9 +2283,9 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>New in v1.6.8:</strong> Tracker opt-in controls Tracker participation only. All registered characters remain available in Team Builder and Class Setup.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>New in v1.6.9:</strong> Rate-Up Event Planner adds shared Item Drop and Enhancement schedules, Manila-time Lucky Zone deadlines, and roster-aware daily workload guidance.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -2894,7 +2928,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -3545,6 +3579,7 @@
             norm.settings.analyticsTrackingUpdatedBy = String(sets.analyticsTrackingUpdatedBy || '');
             norm.settings.analyticsHistoryClearedAt = Number(sets.analyticsHistoryClearedAt) || 0;
             norm.settings.analyticsHistoryClearedBy = String(sets.analyticsHistoryClearedBy || '');
+            norm.settings.rateUpEvents = normalizeRateUpEvents(sets.rateUpEvents);
             norm.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sets.lootWeights) };
             norm.settings.lootWeightUpdatedAt = safeObject(sets.lootWeightUpdatedAt);
             norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : [];
@@ -3711,6 +3746,9 @@
             const clearSource = localClearAt >= remoteClearAt ? local.settings : remote.settings;
             merged.settings.analyticsHistoryClearedAt = Math.max(localClearAt, remoteClearAt);
             merged.settings.analyticsHistoryClearedBy = String(clearSource.analyticsHistoryClearedBy || '');
+            const lEventAt = Number(local.settings.rateUpEvents?.updatedAt)||0, rEventAt = Number(remote.settings.rateUpEvents?.updatedAt)||0;
+            const eventSource = (lEventAt > rEventAt || (lEventAt === rEventAt && String(local.settings.rateUpEvents?.updatedBy||'') >= String(remote.settings.rateUpEvents?.updatedBy||''))) ? local.settings.rateUpEvents : remote.settings.rateUpEvents;
+            merged.settings.rateUpEvents = normalizeRateUpEvents(eventSource);
             merged.lastDailyReset = Math.max(local.lastDailyReset, remote.lastDailyReset);
             merged.lastWeeklyReset = Math.max(local.lastWeeklyReset, remote.lastWeeklyReset);
             merged.updatedAt = Math.max(local.updatedAt, remote.updatedAt);
@@ -4779,11 +4817,257 @@
             set('overview-permissions-value', isAdmin ? 'Administrator' : 'Member');
             set('overview-permissions-detail', isAdmin ? 'Guild management access' : 'Authenticated guild account');
         }
+
+        // ===== Rate-Up Event Planner (shared guild setting, times always Manila/GMT+8) =====
+        function createDefaultRateUpEvents() {
+            return {
+                itemDrop: { enabled:false, schedule:'weekend', startAt:0, endAt:0 },
+                enhancement: { enabled:false, schedule:'weekend', startAt:0, endAt:0 },
+                updatedAt:0, updatedBy:''
+            };
+        }
+        function normalizeRateUpEvent(event) {
+            const item = safeObject(event);
+            return {
+                enabled:item.enabled === true,
+                schedule:item.schedule === 'custom' ? 'custom' : 'weekend',
+                startAt:Math.max(0, Number(item.startAt)||0),
+                endAt:Math.max(0, Number(item.endAt)||0)
+            };
+        }
+        function normalizeRateUpEvents(value) {
+            const raw = safeObject(value);
+            return {
+                itemDrop:normalizeRateUpEvent(raw.itemDrop),
+                enhancement:normalizeRateUpEvent(raw.enhancement),
+                updatedAt:Math.max(0, Number(raw.updatedAt)||0),
+                updatedBy:String(raw.updatedBy||'')
+            };
+        }
+        function getManilaDateKey(timestamp = Date.now()) {
+            const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(timestamp));
+            const values = Object.fromEntries(parts.map(part=>[part.type,part.value]));
+            return `${values.year}-${values.month}-${values.day}`;
+        }
+        function shiftManilaDateKey(dateKey, days) {
+            const date = new Date(`${dateKey}T12:00:00Z`);
+            date.setUTCDate(date.getUTCDate()+days);
+            return `${date.getUTCFullYear()}-${String(date.getUTCMonth()+1).padStart(2,'0')}-${String(date.getUTCDate()).padStart(2,'0')}`;
+        }
+        function manilaDateTimeToEpoch(dateKey, hour, minute=0) {
+            return Date.parse(`${dateKey}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00+08:00`);
+        }
+        function getCurrentDailyCycleWindowManila(now = Date.now()) {
+            let dateKey = getManilaDateKey(now);
+            let startAt = manilaDateTimeToEpoch(dateKey,9,0);
+            if (now < startAt) { dateKey = shiftManilaDateKey(dateKey,-1); startAt = manilaDateTimeToEpoch(dateKey,9,0); }
+            return { dateKey, startAt, endAt:startAt+24*60*60*1000 };
+        }
+        function getWeekendRateEventWindow(dateKey) {
+            const day = new Date(`${dateKey}T12:00:00Z`).getUTCDay();
+            const daysSinceSaturday = (day+1)%7;
+            const saturdayKey = shiftManilaDateKey(dateKey,-daysSinceSaturday);
+            return { startAt:manilaDateTimeToEpoch(saturdayKey,0,0), endAt:manilaDateTimeToEpoch(shiftManilaDateKey(saturdayKey,2),0,0) };
+        }
+        function getRelevantRateEventWindow(event, cycle) {
+            if (!event?.enabled) return null;
+            if (event.schedule === 'custom') {
+                if (!(event.startAt>0 && event.endAt>event.startAt)) return null;
+                if (event.startAt < cycle.endAt && event.endAt > cycle.startAt) return { startAt:event.startAt, endAt:event.endAt };
+                return null;
+            }
+            const base = getWeekendRateEventWindow(cycle.dateKey);
+            const candidates = [-7,0,7].map(days=>({startAt:base.startAt+days*86400000,endAt:base.endAt+days*86400000}));
+            return candidates.find(window=>window.startAt<cycle.endAt && window.endAt>cycle.startAt) || null;
+        }
+        function getRateEventStatus(event, now = Date.now()) {
+            if (!event?.enabled) return { state:'off', label:'Disabled', window:null };
+            let window = null;
+            if (event.schedule === 'custom') {
+                if (!(event.startAt>0 && event.endAt>event.startAt)) return { state:'needs-schedule', label:'Add a valid start and end time', window:null };
+                window = {startAt:event.startAt,endAt:event.endAt};
+            } else {
+                const dateKey = getManilaDateKey(now);
+                const base = getWeekendRateEventWindow(dateKey);
+                const nextStart = now < base.startAt ? base.startAt : (now < base.endAt ? base.startAt : base.startAt+7*86400000);
+                window = now >= base.startAt && now < base.endAt ? base : {startAt:nextStart,endAt:nextStart+2*86400000};
+            }
+            if (now < window.startAt) return {state:'scheduled', label:`Starts ${formatManilaDateTime(window.startAt)}`, window};
+            if (now < window.endAt) return {state:'active', label:`Active · ends ${formatManilaDateTime(window.endAt)}`, window};
+            return {state:'ended', label:`Ended ${formatManilaDateTime(window.endAt)}`, window};
+        }
+        function formatManilaDateTime(timestamp) {
+            if (!timestamp) return 'not set';
+            return `${new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(timestamp))} Manila`;
+        }
+        function formatManilaDateTimeInput(timestamp) {
+            if (!timestamp) return '';
+            const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(timestamp));
+            const v=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+            return `${v.year}-${v.month}-${v.day}T${v.hour}:${v.minute}`;
+        }
+        function parseManilaDateTimeInput(value) {
+            const text = String(value||'').trim();
+            if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(text)) return 0;
+            const parsed = Date.parse(`${text}:00+08:00`);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+        function getPlannerRegisteredCharacterNames() {
+            const owner = getAuthenticatedMemberDirectoryEntry();
+            let raw = [];
+            if (owner) raw = [
+                ...(Array.isArray(owner.characters) ? owner.characters : []),
+                ...(Array.isArray(owner.characterProfiles) ? owner.characterProfiles.map(profile=>profile?.name || profile?.ign || '') : [])
+            ];
+            else if (isPantheonAdmin()) raw = normalizeMemberDirectory(cloudData.settings?.memberDirectory).flatMap(member=>[
+                ...(Array.isArray(member.characters) ? member.characters : []),
+                ...(Array.isArray(member.characterProfiles) ? member.characterProfiles.map(profile=>profile?.name || profile?.ign || '') : [])
+            ]);
+            else raw = characters.map(character=>character?.name || '');
+            const map = new Map();
+            raw.map(name=>String(name||'').trim()).filter(Boolean).forEach(name=>map.set(name.toLocaleLowerCase(),name));
+            return [...map.values()];
+        }
+        function getPlannerTrackedCharacterNames() {
+            const owner = getAuthenticatedMemberDirectoryEntry();
+            if (owner) return [...new Set((owner.characterProfiles||[]).filter(profile=>profile.trackerEnabled && profile.name).map(profile=>String(profile.name).trim()))];
+            if (isPantheonAdmin()) return [...new Set(characters.map(character=>String(character?.name||'').trim()).filter(Boolean))];
+            return [];
+        }
+        function getPlannerDailyTaskNames() {
+            return [...new Set((cloudData.settings?.categories||[])
+                .filter(category=>category?.group==='Dailies' && !/bounty/i.test(String(category?.name||'')))
+                .flatMap(category=>Array.isArray(category.tasks)?category.tasks:[])
+                .map(task=>String(task||'').trim()).filter(task=>task && !isBountyTask(task)))];
+        }
+        function formatPlannerMinutes(minutes) {
+            const n=Math.max(0,Math.round(Number(minutes)||0));
+            if(n<60) return `${n} min`;
+            const h=Math.floor(n/60),m=n%60;
+            return m?`${h}h ${m}m`:`${h}h`;
+        }
+        function buildRateEventStatusCards(now = Date.now()) {
+            const events = normalizeRateUpEvents(cloudData.settings?.rateUpEvents);
+            const definitions = [
+                {key:'itemDrop',title:'+50% Item Drop Rate UP',detail:'Lucky Zones and eligible drop farming should be timed inside this bonus window.'},
+                {key:'enhancement',title:'+30% Enhancement Rate UP',detail:'Prepare eligible gear, materials, and gold before attempting upgrades.'}
+            ];
+            return `<div class="rate-event-status-grid">${definitions.map(def=>{
+                const status=getRateEventStatus(events[def.key],now);
+                return `<article class="rate-event-status-card${status.state==='active'?' is-active':''}"><strong>${escapeHTML(def.title)}</strong><span>${escapeHTML(status.label)}</span><span>${escapeHTML(def.detail)}</span></article>`;
+            }).join('')}</div>`;
+        }
+        function buildRateEventAdminCard(key, title, event) {
+            const config=normalizeRateUpEvent(event), schedule=config.schedule;
+            return `<div class="rate-event-edit-card"><h6>${escapeHTML(title)}</h6><label class="rate-event-enabled-label"><input type="checkbox" id="rate-event-${key}-enabled" ${config.enabled?'checked':''}> Enable this event for planning</label><label for="rate-event-${key}-schedule">Schedule</label><select id="rate-event-${key}-schedule" onchange="toggleRateEventCustomRange('${key}')"><option value="weekend" ${schedule==='weekend'?'selected':''}>Every weekend: Sat 00:00 to Mon 00:00 Manila</option><option value="custom" ${schedule==='custom'?'selected':''}>Custom date and time window</option></select><div id="rate-event-${key}-custom-range" class="rate-event-custom-range" ${schedule!=='custom'?'hidden':''}><label for="rate-event-${key}-start">Starts (Manila, GMT+8)</label><input id="rate-event-${key}-start" type="datetime-local" step="60" value="${escapeHTML(formatManilaDateTimeInput(config.startAt))}"><label for="rate-event-${key}-end">Ends (Manila, GMT+8)</label><input id="rate-event-${key}-end" type="datetime-local" step="60" value="${escapeHTML(formatManilaDateTimeInput(config.endAt))}"></div></div>`;
+        }
+        function buildRateEventAdminControls() {
+            if (!isPantheonAdmin()) return '';
+            const events=normalizeRateUpEvents(cloudData.settings?.rateUpEvents);
+            return `<div class="rate-event-admin"><h5>Administrator event schedule</h5><div class="rate-event-admin-grid">${buildRateEventAdminCard('itemDrop','+50% Item Drop Rate UP',events.itemDrop)}${buildRateEventAdminCard('enhancement','+30% Enhancement Rate UP',events.enhancement)}</div><div class="rate-event-admin-actions"><button class="btn btn-cloud" type="button" onclick="saveRateUpEventSettings()">Save event settings</button></div><p class="rate-event-footnote">Settings are shared guild-wide. Weekend mode means Saturday 00:00 through Monday 00:00, Asia/Manila (GMT+8). Custom date/time fields use Manila time regardless of the administrator's device timezone.</p></div>`;
+        }
+        function toggleRateEventCustomRange(key) {
+            const mode=document.getElementById(`rate-event-${key}-schedule`)?.value;
+            const range=document.getElementById(`rate-event-${key}-custom-range`);
+            if(range) range.hidden=mode!=='custom';
+        }
+        async function saveRateUpEventSettings() {
+            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can edit shared event schedules.'); return; }
+            const readEvent=(key,label)=>{
+                const enabled=!!document.getElementById(`rate-event-${key}-enabled`)?.checked;
+                const schedule=document.getElementById(`rate-event-${key}-schedule`)?.value==='custom'?'custom':'weekend';
+                const startText=document.getElementById(`rate-event-${key}-start`)?.value||'';
+                const endText=document.getElementById(`rate-event-${key}-end`)?.value||'';
+                const startAt=parseManilaDateTimeInput(startText), endAt=parseManilaDateTimeInput(endText);
+                if(enabled && schedule==='custom') {
+                    if(!startAt || !endAt) throw new Error(`${label}: enter both a start and end time in Manila time.`);
+                    if(endAt<=startAt) throw new Error(`${label}: the end must be later than the start.`);
+                }
+                return {enabled,schedule,startAt,endAt};
+            };
+            let next;
+            try { next={itemDrop:readEvent('itemDrop','Item Drop Rate UP'),enhancement:readEvent('enhancement','Enhancement Rate UP'),updatedAt:Date.now(),updatedBy:deviceId}; }
+            catch(error) { alert(error.message); return; }
+            cloudData.settings.rateUpEvents=normalizeRateUpEvents(next);
+            persistLocalData();
+            renderRateEventPlanner();
+            triggerAutoSync();
+            setStatus(hasCloudConfig()?'🟡 Shared event schedule saved locally · syncing…':'⚪ Event schedule saved locally · Cloud sync is not connected');
+        }
+        function buildRateEventPlannerAdvice(now, dailyCycle, events, itemStatus, enhancementStatus, itemWindow, enhancementWindow, names, luckyMinutes, trackedNames, openDailyCount) {
+            const advice=[];
+            const dailyReset=formatManilaDateTime(dailyCycle.endAt);
+            if (!names.length) {
+                advice.push('<strong>Roster setup:</strong> No registered characters are available for this view yet. The event schedule still applies, but the Lucky Zone workload estimate will populate when Member Roster is linked.');
+            } else {
+                advice.push(`<strong>Daily time budget:</strong> reserve about ${escapeHTML(formatPlannerMinutes(luckyMinutes))} for Lucky Zones alone across ${names.length} registered character${names.length===1?'':'s'} (${names.length} × 3 solo runs × ~8 minutes). This includes characters not opted into Tracker. Lucky Zones are deliberately untracked, so this time is not included in completion percentages.`);
+            }
+            if (openDailyCount>0) advice.push(`<strong>Other dailies:</strong> ${openDailyCount} tracked Daily task entr${openDailyCount===1?'y is':'ies are'} still open across the tracked characters. Their duration varies and is not included in the Lucky Zone estimate; reserve this time before committing to raids.`);
+
+            if (events.itemDrop.enabled) {
+                if (itemWindow && now < itemWindow.startAt && itemWindow.startAt < dailyCycle.endAt) {
+                    const deadline=Math.min(itemWindow.endAt,dailyCycle.endAt);
+                    const available=Math.max(0,Math.floor((deadline-itemWindow.startAt)/60000));
+                    const fits=luckyMinutes<=available;
+                    advice.push(`<strong>Lucky Zone timing:</strong> delay the current cycle's LZs until +50% Item Drop Rate UP starts at ${escapeHTML(formatManilaDateTime(itemWindow.startAt))}. The current daily cycle resets at ${escapeHTML(dailyReset)}; there are about ${escapeHTML(formatPlannerMinutes(available))} after the event starts to finish this cycle's runs. The ${escapeHTML(formatPlannerMinutes(luckyMinutes))} full-roster baseline ${fits?'fits under that estimate':'does not fit in that window'}. If time is short, prioritize the Main and other high-value characters instead of assuming a full-roster sweep plus raids will fit.`);
+                } else if (itemWindow && now >= itemWindow.startAt && now < itemWindow.endAt) {
+                    const deadline=Math.min(itemWindow.endAt,dailyCycle.endAt);
+                    const available=Math.max(0,Math.floor((deadline-now)/60000));
+                    const eventIsDeadline=itemWindow.endAt<=dailyCycle.endAt;
+                    const fits=luckyMinutes<=available;
+                    advice.push(`<strong>Lucky Zone deadline:</strong> the +50% Item Drop window is active. Complete the current cycle's LZs before ${escapeHTML(formatManilaDateTime(deadline))}${eventIsDeadline?' because the event ends then':' to avoid losing this daily cycle’s runs at reset'}. About ${escapeHTML(formatPlannerMinutes(available))} remain, against a ${escapeHTML(formatPlannerMinutes(luckyMinutes))} full-roster LZ baseline. ${fits?'The estimate fits before the cutoff, but other Dailies still need time.':'A full sweep may not fit; prioritize Main/high-value characters and do not plan a full raid list as if every alt can be cleared.'} For the Sunday cycle, finish before Monday 00:00 Manila time.`);
+                } else if (itemWindow && now >= itemWindow.endAt) {
+                    advice.push(`<strong>Lucky Zone timing:</strong> the relevant +50% Item Drop window ended at ${escapeHTML(formatManilaDateTime(itemWindow.endAt))}. Do not keep postponing runs for a bonus that has ended; complete due LZs at the normal rate before the next daily reset at ${escapeHTML(dailyReset)}.`);
+                } else if (itemStatus.state==='scheduled' && itemStatus.window) {
+                    advice.push(`<strong>Next Item Drop window:</strong> starts at ${escapeHTML(formatManilaDateTime(itemStatus.window.startAt))}. Today's daily cycle does not overlap that window, so complete today's LZs normally before ${escapeHTML(dailyReset)}. Only delay a cycle when its run window actually overlaps the event start.`);
+                } else if (itemStatus.state==='ended') {
+                    advice.push(`<strong>Item Drop event:</strong> the configured event has ended. Complete any due LZs at the normal rate rather than missing the daily cycle while waiting for a finished bonus.`);
+                } else {
+                    advice.push('<strong>Item Drop event:</strong> the event is enabled but its schedule needs a valid time window. Ask an administrator to review the event settings.');
+                }
+            } else {
+                advice.push(`<strong>Normal Lucky Zone plan:</strong> complete due LZs within the current daily cycle ending ${escapeHTML(dailyReset)}. Do not delay them unless an enabled Item Drop event overlaps that cycle.`);
+            }
+
+            if (events.enhancement.enabled) {
+                if (enhancementWindow && now < enhancementWindow.startAt) {
+                    advice.push(`<strong>Enhancement preparation:</strong> +30% Enhancement Rate UP is scheduled to start at ${escapeHTML(formatManilaDateTime(enhancementWindow.startAt))}. Line up target gear, required materials, and gold beforehand. Hold non-urgent attempts until the window starts; don't spend resources on low-impact upgrades just because the bonus is coming.`);
+                } else if (enhancementStatus.state==='active') {
+                    advice.push(`<strong>Enhancement window:</strong> +30% Enhancement Rate UP is active until ${escapeHTML(formatManilaDateTime(enhancementStatus.window.endAt))}. Use the window for worthwhile, preselected upgrades that advance the build, and prioritize equipment/materials before enhancement attempts. Keep enough time for LZs and required Dailies.`);
+                } else if (enhancementStatus.state==='ended') {
+                    advice.push(`<strong>Enhancement window:</strong> the configured +30% bonus ended at ${escapeHTML(formatManilaDateTime(enhancementStatus.window?.endAt||0))}. Avoid assuming the bonus still applies; use normal rates only for urgent, worthwhile upgrades, or prepare for the next window.`);
+                } else if (enhancementStatus.state==='scheduled' && enhancementStatus.window) {
+                    advice.push(`<strong>Enhancement preparation:</strong> the next +30% window starts at ${escapeHTML(formatManilaDateTime(enhancementStatus.window.startAt))}. Prepare materials and gold now; avoid spending early unless the upgrade is needed immediately.`);
+                } else {
+                    advice.push('<strong>Enhancement schedule:</strong> the event is enabled but does not have a valid time window. Ask an administrator to review the event settings.');
+                }
+            }
+            advice.push('<strong>Progression priority:</strong> after reserving LZ time and other required Dailies, choose one high-value weekly objective or a planned raid block based on the time left. Do not assume all alts can finish every grind and raid in the same session; parked alts should remain low priority unless they have a specific high-value reason to run.');
+            return advice.map(item=>`<div class="analytics-event-advice">${item}</div>`).join('');
+        }
+        function renderRateEventPlanner() {
+            const cont=document.getElementById('overview-rate-event-planner');
+            if(!cont) return;
+            const now=Date.now(), dailyCycle=getCurrentDailyCycleWindowManila(now);
+            const events=normalizeRateUpEvents(cloudData.settings?.rateUpEvents);
+            const itemStatus=getRateEventStatus(events.itemDrop,now), enhancementStatus=getRateEventStatus(events.enhancement,now);
+            const itemWindow=getRelevantRateEventWindow(events.itemDrop,dailyCycle), enhancementWindow=getRelevantRateEventWindow(events.enhancement,dailyCycle);
+            const names=getPlannerRegisteredCharacterNames(), trackedNames=getPlannerTrackedCharacterNames();
+            const luckyMinutes=names.length*24;
+            const dailyTasks=getPlannerDailyTaskNames();
+            let openDailyCount=0;
+            trackedNames.forEach(name=>dailyTasks.forEach(task=>{const state=getCellState(name,task);if(state!=='done'&&state!=='excluded')openDailyCount++;}));
+            const budgetLabel=names.length?`${names.length} registered`:'No roster linked';
+            const advice=buildRateEventPlannerAdvice(now,dailyCycle,events,itemStatus,enhancementStatus,itemWindow,enhancementWindow,names,luckyMinutes,trackedNames,openDailyCount);
+            cont.innerHTML=`<section class="rate-event-section"><h4>Rate-Up Event Planner</h4><p class="rate-event-intro">Event schedules use Asia/Manila (GMT+8). The game daily cycle resets at 09:00 Manila (04:00 Qatar). Lucky Zones are not added to the tracker, but the planner reserves 3 solo runs × about 8 minutes for every registered character, including characters not opted into Tracker.</p>${buildRateEventStatusCards(now)}<div class="rate-event-planning"><h5>Realistic workload and next steps</h5><div class="rate-event-budget-grid"><div class="rate-event-budget-stat"><small>Characters included</small><strong>${escapeHTML(budgetLabel)}</strong></div><div class="rate-event-budget-stat"><small>Lucky Zone time floor</small><strong>${escapeHTML(formatPlannerMinutes(luckyMinutes))}</strong></div><div class="rate-event-budget-stat"><small>Other tracked Dailies open</small><strong>${openDailyCount}</strong></div></div>${advice}<p class="rate-event-planning-note">Time estimates cover Lucky Zones only. Loading, travel, raid duration, and remaining Daily tasks vary, so treat raid suggestions as a next priority after the daily baseline, not an instruction to clear every character.</p></div>${buildRateEventAdminControls()}</section>`;
+        }
+
         function renderOverviewActivity() {
             const cont = document.getElementById('overview-activity');
             const completionCont = document.getElementById('overview-character-completion');
             const summary = document.getElementById('overview-insights-summary');
             if (!cont && !completionCont) return;
+            renderRateEventPlanner();
             const esc = value => escapeHTML(String(value ?? ''));
             const owner = getAuthenticatedMemberDirectoryEntry();
             const enabledNames = owner
@@ -6679,7 +6963,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
