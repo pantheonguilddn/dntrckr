@@ -1,6 +1,12 @@
 # Pantheon Tools v1.6.8 — Cloudflare Pages + D1
 
-This release separates Team Builder availability from Tracker opt-in: every character saved in Member Roster is available to team building, while only opted-in characters appear in Tracker progress. It also carries forward the Overview and account-dashboard updates from v1.6.7.
+## v1.6.8 Team Builder roster separation
+
+- Team Builder now lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
+- The **Include in Tracker** checkbox controls Tracker participation only; it does not control Team Builder eligibility.
+- Class Setup uses the canonical Member Roster directory, so classes can be configured for characters not opted into Tracker.
+- Updated current-facing roster and help text to explain the distinction. The What's New popup is kept compact: a short tool description plus this release's main change. This package is based on v1.6.6 and does not carry forward later package changes.
+
 
 This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
 
@@ -75,36 +81,12 @@ This bundle carries forward the supplied v1.5.6 Cloudflare Pages + D1 base and t
 - Dark, Light, Eye comfort, and Pastel remain available across the working tools and admin console. Existing font families are preserved.
 - The release popup displays the bundled version; a dismissal saved for an older version does not suppress a newer update.
 
-## v1.6.8 — Team Builder directory independent of Tracker opt-in
-
-- Team Builder now reads all character profiles in the shared Member Roster, including characters whose `trackerEnabled` flag is false.
-- Tracker behavior is unchanged: only profiles opted into Tracker are projected into the Tracker rosters and counted in tracking views.
-- Team Builder class/job resolution now prefers the canonical Member Roster profile and falls back to the legacy character-job map for older records.
-- Class Setup includes directory-only characters so their Team Builder Job metadata can be reviewed and corrected.
-- Updated Member Roster, Tracker Registration, Team Builder, and Admin Console copy so the checkbox is clearly labeled **Include in Tracker** and no longer implies that it controls Team Builder.
-
-## v1.6.7 — Berlin’s Workshop
-
-- Added Berlin’s Workshop as a member-accessible mini-game, available from the Overview tool cards and the Tools drawer.
-- Daily check-in grants simulation-only gold, enhancement stones, a protection jelly, and one random virtual equipment drop. Claims are limited by the 9:00 AM Manila daily reset.
-- Virtual equipment can be enhanced up to +15; attempts, costs, outcomes, inventory, forge history, and leaderboard summaries are stored per authenticated Discord account in D1. This does not interact with the live Dragon Nest client or deliver real items.
-- Added `functions/api/berlin/state.js` and the `berlin_game_profiles` D1 table. The endpoint enforces the current Discord session, derives the profile key from the authenticated Discord ID, calculates enhancement results server-side, validates daily claims, and uses optimistic version checks to reduce duplicate concurrent attempts.
-- Classic SEA’s official system notice confirms +6-and-below guaranteed success, that failures on gear already at +9 and above will not drop it below +9, and that Item Protection Magic Jelly prevents destruction on failure for +6 and above. The notice does not publish the complete percentage table. This mini-game currently applies one **legacy approximation across all simulated equipment grades** for +7 to +15 (45%, 40%, 35%, 30%, 25%, 20%, 15%, 5%, 1%) and a simulated 25% break band, clearly labeled for verification; do not treat these as verified current Lv.70 live-server odds or grade-specific live rates. Reference: [official Classic SEA enhancement system notice](https://seaclassic.dragonnest.com/news/notice/all/16?locale=EN). A legacy community table is available [here](https://seadragonnest.blogspot.com/2011/10/enhancement.html), but it is historical and may not match current Classic rates. To calibrate the simulator, edit `SUCCESS_RATES` and `BREAK_CHANCE` in `functions/api/berlin/state.js` after confirming the live rates for your equipment grade and target level.
-
-### Berlin’s Workshop deployment requirements
-
-1. Upload the new `functions/api/berlin/state.js` and updated `index.html` with the rest of the bundle.
-2. Run the updated `schema.sql` against the existing `pantheon-db`. It safely creates `berlin_game_profiles` if it does not already exist. The API also ensures this table on request as a migration safeguard.
-3. Confirm the Cloudflare Pages project still has the `PANTHEON_DB` D1 binding.
-4. Test check-in once, reload the browser, and confirm the profile remains. Try a second check-in during the same game day; the server should reject it.
-5. This mini-game is independent of the old JSONBin Tracker records and does not alter them.
-
 ## Important before deploying
 
 - Keep your current site and JSONBin records as backups until testing is complete.
 - Keep the existing D1 database named `pantheon-db`; do not delete it.
 - The HTML and function code in this bundle need to be added to the root of the GitHub repository. Preserve other existing assets such as `Guild Banner.png`. The sign-in banner background expects your `banner.png` file in that same repository root, alongside `index.html`. The Overview banner uses `Guild Banner.png` (exact filename, including spaces), so keep that existing image at the repository root as well. The sign-in banner contains no overlaid title text; use an image that already includes any artwork or lettering you want visible.
-- This ZIP is the v1.6.8 build and carries forward the v1.5.7–v1.6.4 changes documented below. Back up the current repository before replacing its files.
+- This ZIP is the v1.6.6 build and carries forward the v1.5.7–v1.6.4 changes documented below. Back up the current repository before replacing its files.
 - Static HTML is not a secret. The real gate is that every shared-data API endpoint requires a valid Discord session and an enabled account in the D1 allowlist.
 
 ## A. Prepare a safe GitHub branch
@@ -115,7 +97,7 @@ Do not replace the current production branch while testing; that could affect yo
 2. Open the branch selector (normally it says `main`). Enter `cloudflare-secure` and choose **Create branch: cloudflare-secure from main**. If your default branch has another name, create the new branch from that default branch instead.
 3. Switch to the new `cloudflare-secure` branch and confirm the broken `wrangler.jsonc` from the previous attempt is absent. This bundle intentionally has no Wrangler file.
 4. Extract this ZIP on your computer. The ZIP contains the app files directly at its root.
-5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.6.8 build, including Berlin’s Workshop and the current app/access-control updates described in this README; back up the current branch before replacing it.
+5. In GitHub, choose **Add file → Upload files**. Upload the *contents* of the extracted `Pantheon_Cloudflare_Pages` folder to the repository root, not the enclosing folder itself. This includes `index.html`, `admin.html`, `schema.sql`, and the `functions/` directory. The old P badge image is no longer used. Also upload your `banner.png` to that same root folder. Keep `Guild Banner.png` and other unrelated assets. The supplied `index.html` is the v1.6.6 build, carrying forward the current app, access-control functions, and dashboard updates described in this README; back up the current branch before replacing it.
 6. Commit these changes to `cloudflare-secure`, not `main`. Leave the existing production branch untouched while testing.
 
 ## B. Create the Cloudflare Pages project
