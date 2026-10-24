@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.7.0</title>
+    <title>Pantheon Tools v1.6.8</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1353,8 +1353,7 @@
             border-radius: 14px !important; box-shadow: 0 8px 24px rgba(0,0,0,.07) !important;
         }
         #dn-tracker { color: var(--pt-text) !important; background: var(--pt-surface) !important; }
-        #dn-tracker th:not(.char-col) { color: var(--pt-muted) !important; border-color: var(--pt-border) !important; }
-        #dn-tracker th.char-col { border-color: var(--pt-border) !important; }
+        #dn-tracker th { color: var(--pt-muted) !important; border-color: var(--pt-border) !important; }
         #dn-tracker td { color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
         #dn-tracker th.bg-dark, #dn-tracker td.bg-dark, #dn-tracker .bg-dark { background: var(--pt-surface-soft) !important; color: var(--pt-text) !important; }
         .analytics-container { gap: 13px !important; }
@@ -1816,222 +1815,6 @@
   }
 </style>
 
-<style id="pantheon-v169-accessibility-main-view-as-analytics">
-  /* Higher-contrast type across the three light themes. Preserve the Dark palette. */
-  :root { --pt-main-accent:#f1c45b; --pt-main-accent-soft:rgba(241,196,91,.15); }
-  :root[data-pantheon-theme="light"] {
-    --pt-page:#f1f4fa; --pt-surface:#ffffff; --pt-surface-raised:#ffffff; --pt-surface-soft:#e5ebf6;
-    --pt-input:#f8faff; --pt-text:#182235; --pt-muted:#43516a; --pt-border:#bbc7da;
-    --pt-accent:#3f54c2; --pt-accent-soft:#dce5ff; --pt-hover:#e7edf9; --pt-positive:#087555;
-    --pt-main-accent:#8a5200; --pt-main-accent-soft:#fff0c9;
-    --pt-auth-bg:radial-gradient(ellipse at 15% 3%,rgba(82,101,215,.16),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(55,160,133,.12),transparent 38%),#f1f4fa;
-    --pt-card-gradient:linear-gradient(160deg,#fff,#edf2fb); --pt-notice-gradient:linear-gradient(160deg,#e9effa,#fff);
-  }
-  :root[data-pantheon-theme="eye-comfort"] {
-    --pt-page:#e9e6d8; --pt-surface:#f9f6e9; --pt-surface-raised:#fffced; --pt-surface-soft:#e4dfc9;
-    --pt-input:#f4f0df; --pt-text:#292f25; --pt-muted:#4e5546; --pt-border:#c1baa0;
-    --pt-accent:#4f6739; --pt-accent-soft:#dbe5cd; --pt-hover:#e6e1cd; --pt-positive:#2d6b42;
-    --pt-main-accent:#795800; --pt-main-accent-soft:#f5e8b8;
-    --pt-auth-bg:radial-gradient(ellipse at 15% 3%,rgba(130,143,91,.19),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(191,154,92,.14),transparent 38%),#e9e6d8;
-    --pt-card-gradient:linear-gradient(160deg,#fffced,#eee9d7); --pt-notice-gradient:linear-gradient(160deg,#e5e0cc,#faf7eb);
-  }
-  :root[data-pantheon-theme="pastel"] {
-    --pt-page:#f4e7f7; --pt-surface:#fff7fc; --pt-surface-raised:#fdf0fa; --pt-surface-soft:#ead7f0;
-    --pt-input:#fff4fb; --pt-text:#382341; --pt-muted:#594368; --pt-border:#cdb2d9;
-    --pt-accent:#8948a2; --pt-accent-soft:#eddaf6; --pt-hover:#f0def5; --pt-positive:#246b57;
-    --pt-main-accent:#8c4b18; --pt-main-accent-soft:#ffe6ca;
-    --pt-auth-bg:radial-gradient(ellipse at 15% 3%,rgba(186,132,205,.23),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(132,201,190,.20),transparent 38%),#f4e7f7;
-    --pt-card-gradient:linear-gradient(160deg,#fff7fc,#eedcf4); --pt-notice-gradient:linear-gradient(160deg,#ead8f1,#fff6fb);
-  }
-  :root[data-pantheon-theme="light"] body,
-  :root[data-pantheon-theme="eye-comfort"] body,
-  :root[data-pantheon-theme="pastel"] body { font-weight:500; }
-  :root[data-pantheon-theme="light"] .activity-insight-stat small,
-  :root[data-pantheon-theme="eye-comfort"] .activity-insight-stat small,
-  :root[data-pantheon-theme="pastel"] .activity-insight-stat small,
-  :root[data-pantheon-theme="light"] .activity-insight-section-note,
-  :root[data-pantheon-theme="eye-comfort"] .activity-insight-section-note,
-  :root[data-pantheon-theme="pastel"] .activity-insight-section-note,
-  :root[data-pantheon-theme="light"] .activity-insight-meta,
-  :root[data-pantheon-theme="eye-comfort"] .activity-insight-meta,
-  :root[data-pantheon-theme="pastel"] .activity-insight-meta { color:var(--pt-muted)!important; opacity:1!important; }
-  :root[data-pantheon-theme="light"] body,
-  :root[data-pantheon-theme="eye-comfort"] body,
-  :root[data-pantheon-theme="pastel"] body { font-size:16px; font-weight:550; }
-  :root[data-pantheon-theme="light"] body :is(small,.text-muted,.text-secondary,.muted,.subtext,.help-text,.field-hint,.section-note,.description,.meta),
-  :root[data-pantheon-theme="eye-comfort"] body :is(small,.text-muted,.text-secondary,.muted,.subtext,.help-text,.field-hint,.section-note,.description,.meta),
-  :root[data-pantheon-theme="pastel"] body :is(small,.text-muted,.text-secondary,.muted,.subtext,.help-text,.field-hint,.section-note,.description,.meta) { color:var(--pt-muted)!important; opacity:1!important; font-size:max(.8125rem,13px)!important; font-weight:600!important; line-height:1.45; }
-  :root[data-pantheon-theme="light"] body :is(button,input,select,textarea,label),
-  :root[data-pantheon-theme="eye-comfort"] body :is(button,input,select,textarea,label),
-  :root[data-pantheon-theme="pastel"] body :is(button,input,select,textarea,label) { font-weight:600; }
-  :root[data-pantheon-theme="light"] body :is(p,li,td),
-  :root[data-pantheon-theme="eye-comfort"] body :is(p,li,td),
-  :root[data-pantheon-theme="pastel"] body :is(p,li,td) { line-height:1.5; }
-  :root[data-pantheon-theme="light"] body :is(small,[class*="muted"],[class*="meta"],[class*="hint"],[class*="caption"],[class*="description"],[class*="count"],[class*="chars-title"],[class*="section-note"],[class*="section-label"],[class*="subtext"]),
-  :root[data-pantheon-theme="eye-comfort"] body :is(small,[class*="muted"],[class*="meta"],[class*="hint"],[class*="caption"],[class*="description"],[class*="count"],[class*="chars-title"],[class*="section-note"],[class*="section-label"],[class*="subtext"]),
-  :root[data-pantheon-theme="pastel"] body :is(small,[class*="muted"],[class*="meta"],[class*="hint"],[class*="caption"],[class*="description"],[class*="count"],[class*="chars-title"],[class*="section-note"],[class*="section-label"],[class*="subtext"]) { font-size:max(.8125rem,13px)!important; font-weight:600!important; opacity:1!important; }
-  :root[data-pantheon-theme="light"] body :is(.member-directory-char,.member-directory-badge,.member-directory-count,.overview-mini-widget strong,.overview-mini-widget small,.overview-mini-widget>span),
-  :root[data-pantheon-theme="eye-comfort"] body :is(.member-directory-char,.member-directory-badge,.member-directory-count,.overview-mini-widget strong,.overview-mini-widget small,.overview-mini-widget>span),
-  :root[data-pantheon-theme="pastel"] body :is(.member-directory-char,.member-directory-badge,.member-directory-count,.overview-mini-widget strong,.overview-mini-widget small,.overview-mini-widget>span) { font-size:max(.8125rem,13px)!important; font-weight:650!important; opacity:1!important; }
-  :root[data-pantheon-theme="pastel"] {
-    --pt-page:#f4e5f8; --pt-surface:#fff8fc; --pt-surface-raised:#fff0fa; --pt-surface-soft:#ead3f2;
-    --pt-input:#fff4fb; --pt-text:#302039; --pt-muted:#554063; --pt-border:#c6a7d4;
-    --pt-accent:#8540a0; --pt-accent-soft:#ecd4f6; --pt-hover:#f1dcf7; --pt-positive:#1d6953;
-    --pt-auth-bg:radial-gradient(ellipse at 15% 3%,rgba(190,126,208,.28),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(111,196,183,.22),transparent 38%),#f4e5f8;
-  }
-  :root[data-pantheon-theme] .member-directory-card.is-main-owner { border:2px solid var(--pt-main-accent)!important; border-top:5px solid var(--pt-main-accent)!important; box-shadow:0 0 0 3px var(--pt-main-accent-soft),0 7px 20px rgba(31,36,53,.09)!important; }
-  :root[data-pantheon-theme] .member-directory-char.is-main-character { border:1px solid var(--pt-main-accent)!important; background:var(--pt-main-accent-soft)!important; color:var(--pt-text)!important; font-weight:700!important; }
-  :root[data-pantheon-theme] .member-directory-char.is-main-character .profile-confirm-main { color:var(--pt-text)!important; border-color:var(--pt-main-accent)!important; background:var(--pt-main-accent-soft)!important; opacity:1!important; }
-  :root[data-pantheon-theme] .member-directory-char-status { color:var(--pt-muted)!important; font-size:max(.75rem,12px)!important; font-weight:850!important; opacity:1!important; }
-  :root[data-pantheon-theme] .member-directory-preview-readonly { display:inline-flex; align-items:center; padding:7px 10px; border:1px solid var(--pt-border); border-radius:8px; color:var(--pt-muted); font-size:.75rem; font-weight:800; }
-  body.admin-view-as-active #member-directory-form,
-  body.admin-view-as-active .member-directory-toolbar,
-  body.admin-view-as-active #menu-toggle,
-  body.admin-view-as-active #tool-drawer,
-  body.admin-view-as-active #drawer-scrim { display:none!important; }
-  body.admin-view-as-active #team-builder-page .team-character-select,
-  body.admin-view-as-active #team-builder-page .team-format-select,
-  body.admin-view-as-active #team-builder-page .team-class-filter,
-  body.admin-view-as-active #team-builder-page .remove-slot-btn,
-  body.admin-view-as-active #team-builder-page .clear-team-btn,
-  body.admin-view-as-active #team-builder-page .team-builder-edit-control { pointer-events:none!important; opacity:.65!important; }
-  :root[data-pantheon-theme] .activity-insights-summary .activity-insight-stat small { font-size:.68rem!important; letter-spacing:.03em!important; }
-  :root[data-pantheon-theme] .activity-insights-summary .activity-insight-stat strong { font-size:1.22rem!important; }
-  :root[data-pantheon-theme] .activity-insight-copy strong { font-size:.84rem!important; font-weight:800!important; }
-  :root[data-pantheon-theme] .activity-insight-copy p { font-size:.78rem!important; color:var(--pt-text)!important; line-height:1.6!important; }
-  :root[data-pantheon-theme] .activity-insight-meta { font-size:.72rem!important; line-height:1.5!important; }
-  :root[data-pantheon-theme] .activity-insight-badge { font-size:.66rem!important; letter-spacing:.015em!important; }
-  :root[data-pantheon-theme] .activity-insight-item { gap:12px; }
-  :root[data-pantheon-theme] .activity-insight-empty { color:var(--pt-text)!important; font-size:.82rem!important; line-height:1.65!important; }
-  :root[data-pantheon-theme] .activity-insight-section-title { font-size:.82rem!important; }
-  :root[data-pantheon-theme] .analytics-disabled { color:var(--pt-text)!important; background:var(--pt-surface-raised)!important; border:1px solid var(--pt-border)!important; border-radius:12px; padding:16px!important; font-size:.86rem!important; line-height:1.65!important; grid-column:1/-1; }
-  :root[data-pantheon-theme] #analytics-grid .char-card { background:var(--pt-surface-raised)!important; color:var(--pt-text)!important; border:1px solid var(--pt-border)!important; border-top:5px solid var(--pt-accent)!important; border-radius:14px!important; padding:18px!important; box-shadow:0 6px 18px rgba(31,36,53,.08)!important; }
-  :root[data-pantheon-theme] #analytics-grid .char-card.is-main-character { border:2px solid var(--pt-main-accent)!important; border-top:5px solid var(--pt-main-accent)!important; box-shadow:0 0 0 3px var(--pt-main-accent-soft),0 7px 20px rgba(31,36,53,.10)!important; }
-  :root[data-pantheon-theme] #analytics-grid .card-header { display:flex; align-items:center; flex-wrap:wrap; gap:7px; color:var(--pt-text)!important; border-bottom:1px solid var(--pt-border)!important; font-size:1.08rem!important; font-weight:900!important; line-height:1.35; }
-  :root[data-pantheon-theme] #analytics-grid .analytics-section-label { color:var(--pt-muted)!important; font-size:.77rem!important; font-weight:850!important; letter-spacing:.025em; text-transform:uppercase; margin:0 0 8px; }
-  :root[data-pantheon-theme] #analytics-grid .analytics-muted { color:var(--pt-muted)!important; font-size:.77rem!important; line-height:1.55; }
-  :root[data-pantheon-theme] #analytics-grid .history-rate-chip { display:inline-flex; align-items:center; justify-content:center; min-width:36px; margin:2px; padding:5px 7px; border-radius:7px; border:1px solid var(--pt-border); background:var(--pt-accent-soft); color:var(--pt-text)!important; font-size:.84rem!important; font-weight:850!important; }
-  :root[data-pantheon-theme] #analytics-grid .history-trend-arrow { color:var(--pt-muted)!important; font-weight:800; }
-  :root[data-pantheon-theme] #analytics-grid .missed-item { align-items:center; gap:10px; background:var(--pt-surface-soft)!important; border:1px solid var(--pt-border); border-radius:9px; padding:9px 10px!important; color:var(--pt-text)!important; font-size:.83rem!important; }
-  :root[data-pantheon-theme] #analytics-grid .missed-item strong { color:var(--pt-text)!important; font-size:.86rem!important; }
-  :root[data-pantheon-theme] #analytics-grid .analytics-priority-score { flex:0 0 auto; background:var(--pt-accent-soft)!important; border:1px solid var(--pt-border); border-radius:7px; padding:6px 8px; color:var(--pt-text)!important; font-size:.78rem!important; font-weight:900; }
-  :root[data-pantheon-theme] #analytics-grid .analytics-no-priorities { color:var(--pt-muted)!important; }
-  :root[data-pantheon-theme] #analytics-grid .analytics-pattern-row { color:var(--pt-muted)!important; font-size:.78rem!important; line-height:1.55; margin:10px 0 0; }
-  :root[data-pantheon-theme] .analytics-reset-readiness { grid-column:1/-1; min-width:0; border:1px solid var(--pt-border); border-radius:16px; padding:18px; background:var(--pt-surface-raised); color:var(--pt-text); box-shadow:0 8px 24px rgba(31,36,53,.07); }
-  :root[data-pantheon-theme] .analytics-reset-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
-  :root[data-pantheon-theme] .analytics-reset-heading h3 { margin:4px 0 6px; font-size:1.35rem; font-weight:950; color:var(--pt-text); }
-  :root[data-pantheon-theme] .analytics-reset-heading p { margin:0; color:var(--pt-text); font-size:.88rem; line-height:1.6; max-width:760px; }
-  :root[data-pantheon-theme] .analytics-eyebrow { color:var(--pt-muted); font-weight:900; font-size:.72rem; letter-spacing:.08em; }
-  :root[data-pantheon-theme] .analytics-reset-countdown { display:grid; gap:4px; min-width:180px; padding:12px 14px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface-soft); }
-  :root[data-pantheon-theme] .analytics-reset-countdown small { color:var(--pt-muted); font-size:.7rem; font-weight:850; text-transform:uppercase; }
-  :root[data-pantheon-theme] .analytics-reset-countdown strong { color:var(--pt-text); font-size:1.55rem; line-height:1.1; font-weight:950; }
-  :root[data-pantheon-theme] .analytics-reset-countdown span { color:var(--pt-text); font-size:.75rem; font-weight:850; }
-  :root[data-pantheon-theme] .analytics-reset-countdown.risk { border-color:#bf5b50; background:#fff0ed; }
-  :root[data-pantheon-theme] .analytics-reset-countdown.risk strong { color:#8d281f; }
-  :root[data-pantheon-theme] .analytics-reset-countdown.watch { border-color:#bd8b36; background:#fff5d9; }
-  :root[data-pantheon-theme] .analytics-reset-countdown.watch strong { color:#774d00; }
-  :root[data-pantheon-theme] .analytics-reset-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:15px 0; }
-  :root[data-pantheon-theme] .analytics-reset-stat { min-width:0; display:grid; gap:5px; padding:12px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); }
-  :root[data-pantheon-theme] .analytics-reset-stat small { color:var(--pt-muted); font-size:.7rem; font-weight:900; text-transform:uppercase; letter-spacing:.03em; }
-  :root[data-pantheon-theme] .analytics-reset-stat strong { color:var(--pt-text); font-size:1.45rem; font-weight:950; line-height:1.15; }
-  :root[data-pantheon-theme] .analytics-reset-stat span { color:var(--pt-muted); font-size:.75rem; line-height:1.45; }
-  :root[data-pantheon-theme] .analytics-reset-stat.positive { border-color:color-mix(in srgb,var(--pt-positive) 45%,var(--pt-border)); background:color-mix(in srgb,var(--pt-positive) 8%,var(--pt-surface)); }
-  :root[data-pantheon-theme] .analytics-reset-stat.watch { border-color:#bd8b36; background:#fff7e5; }
-  :root[data-pantheon-theme] .analytics-reset-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-  :root[data-pantheon-theme] .analytics-reset-columns > section { min-width:0; border:1px solid var(--pt-border); border-radius:12px; padding:13px 14px; background:var(--pt-surface); }
-  :root[data-pantheon-theme] .analytics-reset-columns h4 { color:var(--pt-text); font-size:.95rem; font-weight:900; margin:0 0 7px; }
-  :root[data-pantheon-theme] .analytics-reset-columns p, :root[data-pantheon-theme] .analytics-reset-columns li { color:var(--pt-text); font-size:.81rem; line-height:1.6; }
-  :root[data-pantheon-theme] .analytics-reset-columns p { margin:0 0 8px; }
-  :root[data-pantheon-theme] .analytics-reset-columns ul { padding-left:19px; margin:8px 0 0; display:grid; gap:7px; }
-  :root[data-pantheon-theme] .analytics-reset-subtext { color:var(--pt-muted)!important; font-size:.74rem!important; }
-  :root[data-pantheon-theme] .analytics-character-readiness-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:10px; margin-top:13px; }
-  :root[data-pantheon-theme] .analytics-character-readiness { min-width:0; padding:12px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); }
-  :root[data-pantheon-theme] .analytics-character-readiness.is-main-character { border:2px solid var(--pt-main-accent); box-shadow:0 0 0 2px var(--pt-main-accent-soft); }
-  :root[data-pantheon-theme] .analytics-character-heading { display:flex; align-items:center; justify-content:space-between; gap:7px; flex-wrap:wrap; }
-  :root[data-pantheon-theme] .analytics-character-heading strong { color:var(--pt-text); font-size:.95rem; font-weight:950; }
-  :root[data-pantheon-theme] .analytics-main-badge { display:inline-flex; align-items:center; border:1px solid var(--pt-main-accent); background:var(--pt-main-accent-soft); color:var(--pt-text)!important; border-radius:999px; padding:4px 7px; font-size:.67rem; font-weight:950; letter-spacing:.03em; }
-  :root[data-pantheon-theme] .analytics-character-metrics { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; }
-  :root[data-pantheon-theme] .analytics-character-metrics span { color:var(--pt-muted); font-size:.7rem; border-radius:8px; background:var(--pt-surface-soft); padding:7px 8px; }
-  :root[data-pantheon-theme] .analytics-character-metrics b { color:var(--pt-text); font-size:1rem; }
-  :root[data-pantheon-theme] .analytics-character-readiness p { margin:5px 0; color:var(--pt-text); font-size:.75rem; line-height:1.5; }
-  :root[data-pantheon-theme] .analytics-character-readiness small { display:block; margin-top:8px; color:var(--pt-muted); font-size:.71rem; line-height:1.55; }
-  :root[data-pantheon-theme] .analytics-pattern-note { margin:12px 0 0; color:var(--pt-muted); font-size:.75rem; line-height:1.6; }
-  :root[data-pantheon-theme="light"] .activity-insights-summary .activity-insight-stat small,
-  :root[data-pantheon-theme="eye-comfort"] .activity-insights-summary .activity-insight-stat small,
-  :root[data-pantheon-theme="pastel"] .activity-insights-summary .activity-insight-stat small,
-  :root[data-pantheon-theme="light"] .activity-insight-meta,
-  :root[data-pantheon-theme="eye-comfort"] .activity-insight-meta,
-  :root[data-pantheon-theme="pastel"] .activity-insight-meta,
-  :root[data-pantheon-theme="light"] .activity-insight-badge,
-  :root[data-pantheon-theme="eye-comfort"] .activity-insight-badge,
-  :root[data-pantheon-theme="pastel"] .activity-insight-badge,
-  :root[data-pantheon-theme="light"] .analytics-reset-subtext,
-  :root[data-pantheon-theme="eye-comfort"] .analytics-reset-subtext,
-  :root[data-pantheon-theme="pastel"] .analytics-reset-subtext,
-  :root[data-pantheon-theme="light"] .analytics-character-metrics span,
-  :root[data-pantheon-theme="eye-comfort"] .analytics-character-metrics span,
-  :root[data-pantheon-theme="pastel"] .analytics-character-metrics span,
-  :root[data-pantheon-theme="light"] .analytics-character-readiness small,
-  :root[data-pantheon-theme="eye-comfort"] .analytics-character-readiness small,
-  :root[data-pantheon-theme="pastel"] .analytics-character-readiness small,
-  :root[data-pantheon-theme="light"] .analytics-pattern-note,
-  :root[data-pantheon-theme="eye-comfort"] .analytics-pattern-note,
-  :root[data-pantheon-theme="pastel"] .analytics-pattern-note { font-size:12.5px!important; line-height:1.5!important; font-weight:600!important; opacity:1!important; }
-  :root[data-pantheon-theme] .main-owner-badge { border-color:var(--pt-main-accent)!important; background:var(--pt-main-accent-soft)!important; color:var(--pt-text)!important; font-weight:800!important; }
-  :root[data-pantheon-theme] .admin-view-as-control { display:inline-flex; align-items:center; gap:7px; padding:5px 8px; border:1px solid var(--pt-main-accent); border-radius:10px; background:var(--pt-main-accent-soft); color:var(--pt-text); font-size:.72rem; font-weight:900; }
-  :root[data-pantheon-theme] .admin-view-as-control select { max-width:190px; min-height:34px; padding:6px 9px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font-size:.78rem; font-weight:750; }
-  .admin-view-as-control[hidden], .admin-view-as-banner[hidden] { display:none!important; }
-  .admin-view-as-banner { width:min(1600px,100%); box-sizing:border-box; margin:0 auto 15px; display:grid; grid-template-columns:minmax(0,1fr); gap:4px; padding:12px 15px; border:1px solid var(--pt-main-accent); border-left:5px solid var(--pt-main-accent); border-radius:12px; background:var(--pt-main-accent-soft); color:var(--pt-text); }
-  .admin-view-as-banner strong { font-size:.9rem; font-weight:950; }
-  .admin-view-as-banner span, .admin-view-as-banner small { font-size:.76rem; line-height:1.5; color:var(--pt-text); }
-  .admin-view-as-control select:focus { outline:2px solid var(--pt-main-accent); outline-offset:1px; }
-  :root[data-pantheon-theme] #dn-tracker th.is-main-character { position:relative; outline:3px solid var(--pt-main-accent); outline-offset:-4px; font-weight:950!important; }
-  :root[data-pantheon-theme] #dn-tracker td.is-main-character-cell { box-shadow:inset 2px 0 var(--pt-main-accent), inset -2px 0 var(--pt-main-accent); }
-  :root[data-pantheon-theme] #dn-tracker tfoot th.is-main-character { background:var(--pt-main-accent-soft)!important; color:var(--pt-text)!important; font-weight:950!important; }
-  :root[data-pantheon-theme] .activity-insight-item.main-character-item { margin:4px 0; padding:13px 10px!important; border:1px solid var(--pt-main-accent)!important; border-left:4px solid var(--pt-main-accent)!important; border-radius:10px; background:var(--pt-main-accent-soft)!important; }
-  :root[data-pantheon-theme] .activity-insight-item.main-character-item .activity-insight-marker { background:var(--pt-main-accent-soft)!important; border-color:var(--pt-main-accent)!important; }
-  :root[data-pantheon-theme] .team-row-main td { background:var(--pt-main-accent-soft)!important; border-top:1px solid var(--pt-main-accent)!important; border-bottom:1px solid var(--pt-main-accent)!important; }
-  :root[data-pantheon-theme] .team-row-main td:first-child { border-left:3px solid var(--pt-main-accent)!important; }
-  :root[data-pantheon-theme] .team-row-main td:last-child { border-right:1px solid var(--pt-main-accent)!important; }
-  :root[data-pantheon-theme] #admin-view-as-select:disabled,
-  :root[data-pantheon-theme] #user-identity:disabled,
-  :root[data-pantheon-theme] #mode-toggle-btn:disabled,
-  :root[data-pantheon-theme] #roster-filter:disabled { opacity:1!important; cursor:not-allowed; }
-  @media(max-width:780px) {
-    :root[data-pantheon-theme] .analytics-reset-stats { grid-template-columns:1fr; }
-    :root[data-pantheon-theme] .analytics-reset-columns { grid-template-columns:1fr; }
-    :root[data-pantheon-theme] .analytics-reset-heading h3 { font-size:1.2rem; }
-    :root[data-pantheon-theme] .admin-view-as-control { max-width:100%; flex-wrap:wrap; }
-    :root[data-pantheon-theme] .admin-view-as-control select { max-width:100%; }
-  }
-
-  :root[data-pantheon-theme] .rate-event-modal-card { max-width:760px; }
-  :root[data-pantheon-theme] .rate-event-notice { margin:12px 0 4px; padding:11px 13px; border:1px solid var(--pt-main-accent); border-left:4px solid var(--pt-main-accent); border-radius:10px; background:var(--pt-main-accent-soft); color:var(--pt-text); }
-  :root[data-pantheon-theme] .rate-event-notice-heading { margin:0 0 6px; font-size:.74rem; letter-spacing:.07em; text-transform:uppercase; font-weight:950; color:var(--pt-text); }
-  :root[data-pantheon-theme] .rate-event-notice-line { display:grid; gap:3px; padding:5px 0; }
-  :root[data-pantheon-theme] .rate-event-notice-line + .rate-event-notice-line { border-top:1px solid var(--pt-border); }
-  :root[data-pantheon-theme] .rate-event-notice-line strong { color:var(--pt-text); font-size:.83rem; font-weight:900; }
-  :root[data-pantheon-theme] .rate-event-notice-line span { color:var(--pt-text); opacity:1; font-size:.78rem; font-weight:600; line-height:1.55; }
-  :root[data-pantheon-theme] #overview-rate-events { border-color:var(--pt-main-accent)!important; background:var(--pt-main-accent-soft)!important; color:var(--pt-text)!important; }
-  #overview-rate-events[hidden] { display:none!important; }
-  :root[data-pantheon-theme] .rate-event-admin { margin-top:12px; padding-top:12px; border-top:1px dashed var(--pt-border); }
-  :root[data-pantheon-theme] .rate-event-admin h5 { margin:0 0 10px; color:var(--pt-text); font-size:.85rem; font-weight:900; }
-  :root[data-pantheon-theme] .rate-event-admin-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:10px; }
-  :root[data-pantheon-theme] .rate-event-edit-card { min-width:0; padding:12px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-raised); }
-  :root[data-pantheon-theme] .rate-event-edit-card h6 { margin:0 0 9px; color:var(--pt-text); font-size:.82rem; font-weight:900; }
-  :root[data-pantheon-theme] .rate-event-enabled-label { display:flex; align-items:center; gap:8px; color:var(--pt-text); font-size:.78rem; font-weight:800; margin-bottom:10px; }
-  :root[data-pantheon-theme] .rate-event-edit-card label { display:block; color:var(--pt-muted); font-size:.72rem; font-weight:750; margin:8px 0 4px; }
-  :root[data-pantheon-theme] .rate-event-edit-card select, :root[data-pantheon-theme] .rate-event-edit-card input:not([type="checkbox"]) { width:100%; max-width:100%; min-height:35px; box-sizing:border-box; border:1px solid var(--pt-border); border-radius:8px; padding:7px 9px; color:var(--pt-text); background:var(--pt-input); font-size:.78rem; }
-  :root[data-pantheon-theme] .rate-event-edit-card input[type="checkbox"] { width:17px; min-height:17px; margin:0; accent-color:var(--pt-main-accent); }
-  :root[data-pantheon-theme] .rate-event-custom-range[hidden] { display:none!important; }
-  :root[data-pantheon-theme] .rate-event-admin-actions { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:11px; }
-  :root[data-pantheon-theme] .rate-event-admin-actions .btn { min-height:38px; }
-  :root[data-pantheon-theme] .rate-event-footnote { margin:10px 0 0; color:var(--pt-muted); font-size:.72rem; line-height:1.5; }
-  :root[data-pantheon-theme] .analytics-daily-budget { padding:11px 12px; border:1px solid var(--pt-main-accent); border-left:4px solid var(--pt-main-accent); border-radius:10px; margin:10px 0 0; background:var(--pt-main-accent-soft); color:var(--pt-text); font-size:.8rem; line-height:1.6; }
-  :root[data-pantheon-theme] .analytics-event-advice { padding:10px 12px; border-radius:9px; background:var(--pt-surface-soft); border:1px solid var(--pt-border); margin:7px 0; color:var(--pt-text); font-size:.79rem; line-height:1.6; }
-
-</style>
-
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2076,12 +1859,6 @@
                 <select id="roster-filter" class="btn roster-filter-top" onchange="applyRosterFilter()">
                     <option value="all">👁️ All Rosters</option>
                 </select>
-                <label class="admin-view-as-control" id="admin-view-as-control" hidden>
-                    <span>Admin preview</span>
-                    <select id="admin-view-as-select" aria-label="Preview the app as a member" onchange="setAdminViewAsMember(this.value)">
-                        <option value="">My admin view</option>
-                    </select>
-                </label>
                 <button class="mini-help" type="button" title="Personal & Universal View Guide" onclick="openHelpModal('view')">?</button>
             </div>
             <label class="pantheon-theme-control app-theme-control" for="pantheon-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label>
@@ -2091,7 +1868,6 @@
             </button>
         </div>
     </div>
-    <div id="admin-view-as-banner" class="admin-view-as-banner" hidden aria-live="polite"></div>
 
     <aside class="tool-drawer" id="tool-drawer" hidden aria-hidden="true">
         <div class="tool-drawer-head">
@@ -2155,7 +1931,6 @@
                     <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
                     <div class="overview-profile-actions">
                         <a href="/admin.html" id="overview-admin-link" hidden>Admin</a>
-                        <button type="button" id="overview-rate-events" onclick="openRateEventModal()" hidden>Rate-Up Events</button>
                         <button type="button" id="overview-signout" class="overview-signout">Log out</button>
                     </div>
                 </div>
@@ -2455,15 +2230,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay hidden" id="rate-event-modal" role="dialog" aria-modal="true" aria-labelledby="rate-event-modal-title">
-        <div class="modal-card wide-modal rate-event-modal-card">
-            <div class="modal-heading-row"><div><h3 id="rate-event-modal-title">Rate-Up Events</h3><p class="modal-note">Admin-only shared schedule. Members receive compact event alerts and adjusted progression advice in Analytics. All dates and times use Manila time (GMT+8).</p></div><button class="btn btn-secondary" type="button" onclick="closeModal('rate-event-modal')">Close</button></div>
-            <div id="rate-event-modal-content"></div>
-            <div id="rate-event-modal-status" class="modal-note" role="status" aria-live="polite"></div>
-            <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="closeModal('rate-event-modal')">Done</button></div>
-        </div>
-    </div>
-
     <div class="modal-overlay hidden" id="profile-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="profile-confirm-title">
         <div class="modal-card wide-modal profile-confirm-modal">
             <div class="profile-confirm-kicker">MEMBER SETUP</div>
@@ -2483,9 +2249,9 @@
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.7.1</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>New in v1.7.1:</strong> Rate-Up schedules moved into one administrator-only profile button. Analytics shows compact event alerts and tailored Lucky Zone / enhancement advice without embedding an event planner in the page.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>New in v1.6.8:</strong> Tracker opt-in controls Tracker participation only. All registered characters remain available in Team Builder and Class Setup.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -2736,7 +2502,6 @@
                     <section class="help-topic" data-help-topic="analytics">
                         <h4>Roster Analytics</h4>
                         <p>Weekly analytics is <b>opt-in</b>. When <b>Track weekly analytics</b> is unchecked, normal daily and weekly task resets still run, but new historical snapshots are not saved. This switch is shared across connected clients.</p>
-                        <p><b>Reset Readiness</b> is live and does not depend on weekly history being enabled. It separates tracked Daily progress from the assumed Lucky Zone obligation: reserve about 24 minutes per visible character for 3 solo runs, even though Lucky Zones are not a Tracker checkbox. The advice also accounts for tracked Dailies still open, the Saturday reset, and administrator-configured +50% Item Drop / +30% Enhancement event windows in Manila time. Item Drop weekends run from Saturday 00:00 to Monday 00:00 Manila time when enabled in weekend mode. Priority patterns are estimates from saved history, not confirmed statements of player preference.</p>
                         <p>When enabled, the tracker retains up to five weekly snapshots to support the visible trend and priority calculations. Use <b>Clear Stored History</b> to remove old snapshots and reduce the shared cloud record size.</p>
                         <h5>5-Week Trend</h5>
                         <p>Shows the most recent weekly completion percentages available for that character.</p>
@@ -3122,105 +2887,6 @@
         let pantheonDiscordUser = null;
         let discordIdentityMatchStatus = 'pending';
 
-        function createDefaultRateUpEvents() {
-            return {
-                itemDrop: { enabled:false, schedule:'weekend', startAt:0, endAt:0 },
-                enhancement: { enabled:false, schedule:'weekend', startAt:0, endAt:0 },
-                updatedAt:0, updatedBy:''
-            };
-        }
-        function normalizeRateUpEvent(event) {
-            const item = safeObject(event);
-            return {
-                enabled:item.enabled === true,
-                schedule:item.schedule === 'custom' ? 'custom' : 'weekend',
-                startAt:Math.max(0, Number(item.startAt)||0),
-                endAt:Math.max(0, Number(item.endAt)||0)
-            };
-        }
-        function normalizeRateUpEvents(value) {
-            const raw = safeObject(value);
-            return {
-                itemDrop:normalizeRateUpEvent(raw.itemDrop),
-                enhancement:normalizeRateUpEvent(raw.enhancement),
-                updatedAt:Math.max(0, Number(raw.updatedAt)||0),
-                updatedBy:String(raw.updatedBy||'')
-            };
-        }
-        function getManilaDateKey(timestamp = Date.now()) {
-            const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(timestamp));
-            const values = Object.fromEntries(parts.map(part=>[part.type,part.value]));
-            return `${values.year}-${values.month}-${values.day}`;
-        }
-        function shiftManilaDateKey(dateKey, days) {
-            const date = new Date(`${dateKey}T12:00:00Z`);
-            date.setUTCDate(date.getUTCDate()+days);
-            return `${date.getUTCFullYear()}-${String(date.getUTCMonth()+1).padStart(2,'0')}-${String(date.getUTCDate()).padStart(2,'0')}`;
-        }
-        function manilaDateTimeToEpoch(dateKey, hour, minute=0) {
-            return Date.parse(`${dateKey}T${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}:00+08:00`);
-        }
-        function getCurrentDailyCycleWindowManila(now = Date.now()) {
-            let dateKey = getManilaDateKey(now);
-            let startAt = manilaDateTimeToEpoch(dateKey,9,0);
-            if (now < startAt) { dateKey = shiftManilaDateKey(dateKey,-1); startAt = manilaDateTimeToEpoch(dateKey,9,0); }
-            return { dateKey, startAt, endAt:startAt+24*60*60*1000 };
-        }
-        function getWeekendRateEventWindow(dateKey) {
-            const day = new Date(`${dateKey}T12:00:00Z`).getUTCDay();
-            const daysSinceSaturday = (day+1)%7;
-            const saturdayKey = shiftManilaDateKey(dateKey,-daysSinceSaturday);
-            return { startAt:manilaDateTimeToEpoch(saturdayKey,0,0), endAt:manilaDateTimeToEpoch(shiftManilaDateKey(saturdayKey,2),0,0) };
-        }
-        function getRelevantRateEventWindow(event, cycle, now = Date.now()) {
-            if (!event?.enabled) return null;
-            if (event.schedule === 'custom') {
-                if (!(event.startAt>0 && event.endAt>event.startAt)) return null;
-                if (event.startAt < cycle.endAt && event.endAt > cycle.startAt) return { startAt:event.startAt, endAt:event.endAt };
-                return null;
-            }
-            const base = getWeekendRateEventWindow(cycle.dateKey);
-            const candidates = [-7,0,7].map(days=>{
-                const startAt=base.startAt+days*24*60*60*1000;
-                const endAt=base.endAt+days*24*60*60*1000;
-                return {startAt,endAt};
-            });
-            return candidates.find(window=>window.startAt<cycle.endAt && window.endAt>cycle.startAt) || null;
-        }
-        function getRateEventStatus(event, now = Date.now()) {
-            if (!event?.enabled) return { state:'off', label:'Disabled', window:null };
-            let window = null;
-            if (event.schedule === 'custom') {
-                if (!(event.startAt>0 && event.endAt>event.startAt)) return { state:'needs-schedule', label:'Add a valid start and end time', window:null };
-                window = {startAt:event.startAt,endAt:event.endAt};
-            } else {
-                const dateKey = getManilaDateKey(now);
-                const base = getWeekendRateEventWindow(dateKey);
-                const nextStart = now < base.startAt ? base.startAt : (now < base.endAt ? base.startAt : base.startAt+7*24*60*60*1000);
-                if (now >= base.startAt && now < base.endAt) window = base;
-                else window = {startAt:nextStart,endAt:nextStart+2*24*60*60*1000};
-            }
-            if (now < window.startAt) return {state:'scheduled', label:`Starts ${formatManilaDateTime(window.startAt)}`, window};
-            if (now < window.endAt) return {state:'active', label:`Active · ends ${formatManilaDateTime(window.endAt)}`, window};
-            return {state:'ended', label:`Ended ${formatManilaDateTime(window.endAt)}`, window};
-        }
-        function formatManilaDateTime(timestamp) {
-            if (!timestamp) return 'not set';
-            return `${new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(timestamp))} Manila`;
-        }
-        function formatManilaDateTimeInput(timestamp) {
-            if (!timestamp) return '';
-            const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(timestamp));
-            const v=Object.fromEntries(parts.map(part=>[part.type,part.value]));
-            return `${v.year}-${v.month}-${v.day}T${v.hour}:${v.minute}`;
-        }
-        function parseManilaDateTimeInput(value) {
-            const text = String(value||'').trim();
-            if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(text)) return 0;
-            const parsed = Date.parse(`${text}:00+08:00`);
-            return Number.isFinite(parsed) ? parsed : 0;
-        }
-
         function createEmptyData() {
             return {
                 schemaVersion: APP_SCHEMA_VERSION,
@@ -3228,7 +2894,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -3286,9 +2952,7 @@
                     color: normalizeColor(member?.color),
                     note: String(member?.note || '').trim().slice(0, 160),
                     profileConfirmedDiscordId: String(member?.profileConfirmedDiscordId || ''),
-                    profileConfirmedAt: Number(member?.profileConfirmedAt) || 0,
-                    appearanceTheme: ['dark', 'light', 'eye-comfort', 'pastel'].includes(String(member?.appearanceTheme || '')) ? String(member.appearanceTheme) : '',
-                    appearanceThemeUpdatedAt: Number(member?.appearanceThemeUpdatedAt) || 0
+                    profileConfirmedAt: Number(member?.profileConfirmedAt) || 0
                 };
             }).filter(Boolean);
         }
@@ -3435,142 +3099,12 @@
             ];
             return new Set(names.map(identityMatchKey).filter(Boolean));
         }
-        let adminViewAsMemberId = '';
-        let adminViewAsOriginalTheme = '';
-        function getAdminViewAsMember() {
-            if (!isPantheonAdmin() || !adminViewAsMemberId) return null;
-            return normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(member => member.id === adminViewAsMemberId) || null;
-        }
-        function getActivityViewMember() {
-            return getAdminViewAsMember() || getAuthenticatedMemberDirectoryEntry();
-        }
-        function getMemberTrackerRoster(member) {
-            if (!member) return null;
-            const rosters = normalizeRosters(cloudData.settings?.rosters);
-            return rosters.find(item => item.id === member.trackerRosterId)
-                || rosters.find(item => identityMatchKey(item.name) === identityMatchKey(member.name))
-                || null;
-        }
-        function getCharacterProfile(charName) {
-            const key = identityMatchKey(charName);
-            if (!key) return null;
-            for (const member of normalizeMemberDirectory(cloudData.settings?.memberDirectory)) {
-                const profile = (member.characterProfiles || []).find(item => identityMatchKey(item.name) === key);
-                if (profile) return { ...profile, ownerName: member.name, ownerId: member.id, appearanceTheme: member.appearanceTheme || '' };
-            }
-            return null;
-        }
-        function isMainCharacter(charName) { return getCharacterProfile(charName)?.isMain === true; }
-        function syncCurrentMemberAppearanceTheme(theme) {
-            if (!pantheonDiscordUser?.id || (isPantheonAdmin() && adminViewAsMemberId)) return false;
-            const allowed = ['dark', 'light', 'eye-comfort', 'pastel'];
-            const nextTheme = String(theme || '');
-            if (!allowed.includes(nextTheme)) return false;
-            const own = getAuthenticatedMemberDirectoryEntry();
-            if (!own) return false;
-            const entries = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
-            const target = entries.find(member => member.id === own.id);
-            if (!target || target.appearanceTheme === nextTheme) return false;
-            target.appearanceTheme = nextTheme;
-            target.appearanceThemeUpdatedAt = Date.now();
-            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-            touchMemberDirectorySettings();
-            triggerAutoSync();
-            return true;
-        }
-        window.pantheonIsAdminViewAsActive = () => isPantheonAdmin() && !!getAdminViewAsMember();
-        window.pantheonSyncThemePreference = theme => syncCurrentMemberAppearanceTheme(theme);
-        window.pantheonThemeOnLogin = () => {
-            const own = getAuthenticatedMemberDirectoryEntry();
-            const saved = own?.appearanceTheme || '';
-            if (saved && typeof window.pantheonApplyTheme === 'function') window.pantheonApplyTheme(saved, false);
-            else syncCurrentMemberAppearanceTheme(document.documentElement.getAttribute('data-pantheon-theme') || 'dark');
-        };
-        function updateAdminViewAsControl() {
-            const control = document.getElementById('admin-view-as-control');
-            const select = document.getElementById('admin-view-as-select');
-            const banner = document.getElementById('admin-view-as-banner');
-            const rateEventsButton = document.getElementById('overview-rate-events');
-            if (!control || !select || !banner) return;
-            const admin = isPantheonAdmin();
-            control.hidden = !admin;
-            const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory).slice().sort((a, b) => a.name.localeCompare(b.name));
-            if (adminViewAsMemberId && !members.some(member => member.id === adminViewAsMemberId)) {
-                // The selected member was removed or access to the record changed while previewing.
-                // Exit safely rather than leaving the admin locked in a stale, read-only state.
-                adminViewAsMemberId = '';
-                const restoreTheme = adminViewAsOriginalTheme || 'dark';
-                adminViewAsOriginalTheme = '';
-                if (typeof window.pantheonApplyTheme === 'function') window.pantheonApplyTheme(restoreTheme, false);
-                isPersonalView = true;
-            }
-            const options = '<option value="">My admin view</option>' + members.map(member => {
-                const tracked = (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length;
-                return `<option value="${escapeHTML(member.id)}">${escapeHTML(member.name)} · ${tracked} tracked</option>`;
-            }).join('');
-            if (select.innerHTML !== options) select.innerHTML = options;
-            select.value = adminViewAsMemberId && members.some(member => member.id === adminViewAsMemberId) ? adminViewAsMemberId : '';
-            const preview = getAdminViewAsMember();
-            if (rateEventsButton) rateEventsButton.hidden = !admin || !!preview;
-            banner.hidden = !preview;
-            document.body.classList.toggle('admin-view-as-active', !!preview);
-            if (preview) {
-                const themeText = preview.appearanceTheme ? `Saved theme: ${preview.appearanceTheme === 'eye-comfort' ? 'Eye comfort' : preview.appearanceTheme.charAt(0).toUpperCase() + preview.appearanceTheme.slice(1)}.` : 'Theme not saved yet; this preview uses your prior admin theme.';
-                banner.innerHTML = `<strong>Read-only member preview: ${escapeHTML(preview.name)}</strong><span>Overview, Tracker, and Analytics use this member’s tracked characters; Member Roster shows only their entry. Tracker progress, roster edits, team plans, and shared analytics settings are locked. This previews member-scoped screens; it does not sign you in as them. Exit preview before using guild-management tools.</span><small>${escapeHTML(themeText)}</small>`;
-            }
-            const identitySelect = document.getElementById('user-identity');
-            const modeButton = document.getElementById('mode-toggle-btn');
-            const rosterFilter = document.getElementById('roster-filter');
-            if (identitySelect) identitySelect.disabled = !!preview;
-            if (modeButton) modeButton.disabled = !!preview;
-            if (rosterFilter) rosterFilter.disabled = !!preview;
-            document.querySelectorAll('[data-pantheon-theme-select]').forEach(select => { select.disabled = !!preview; });
-        }
-        function setAdminViewAsMember(memberId) {
-            if (!isPantheonAdmin()) return;
-            const requested = String(memberId || '');
-            const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
-            const target = requested ? members.find(member => member.id === requested) : null;
-            if (requested && !target) {
-                adminViewAsMemberId = '';
-                const restoreTheme = adminViewAsOriginalTheme || 'dark';
-                adminViewAsOriginalTheme = '';
-                if (typeof window.pantheonApplyTheme === 'function') window.pantheonApplyTheme(restoreTheme, false);
-                isPersonalView = true;
-                alert('That member is no longer in the Member Roster. Preview has been closed.');
-                applyDiscordIdentityDefaults();
-            } else if (!adminViewAsMemberId && target) {
-                adminViewAsOriginalTheme = document.documentElement.getAttribute('data-pantheon-theme') || 'dark';
-                adminViewAsMemberId = target.id;
-            } else if (target) {
-                adminViewAsMemberId = target.id;
-            } else {
-                const restoreTheme = adminViewAsOriginalTheme || 'dark';
-                adminViewAsMemberId = '';
-                adminViewAsOriginalTheme = '';
-                if (typeof window.pantheonApplyTheme === 'function') window.pantheonApplyTheme(restoreTheme, false);
-                applyDiscordIdentityDefaults();
-            }
-            const activePreview = getAdminViewAsMember();
-            if (activePreview) {
-                if (typeof toggleSideMenu === 'function') toggleSideMenu(false);
-                const roster = getMemberTrackerRoster(activePreview);
-                activeRosterFilter = roster?.id || '__unregistered__';
-                isPersonalView = true;
-                const theme = activePreview.appearanceTheme || adminViewAsOriginalTheme || 'dark';
-                if (typeof window.pantheonApplyTheme === 'function') window.pantheonApplyTheme(theme, false);
-            }
-            updateAdminViewAsControl();
-            refreshTrackerUI();
-            if (!document.getElementById('overview-page')?.classList.contains('hidden-page')) renderOverviewActivity();
-            if (!document.getElementById('tracker-page')?.classList.contains('hidden-page')) {
-                syncDataStructures(); buildTrackerTable(); applyBoardState(); if (isAnalyticsVisible) renderAnalytics();
-            }
-            if (!document.getElementById('member-roster-page')?.classList.contains('hidden-page')) renderMemberDirectory();
-            if (!document.getElementById('team-builder-page')?.classList.contains('hidden-page')) { populateTeamBuilderRosterFilter(); renderTeamBuilder(); }
+        function getCharacterOwnerMember(charName) {
+            const nameKey = identityMatchKey(charName);
+            if (!nameKey) return null;
+            return normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(member => memberRegisteredCharacterNames(member).has(nameKey)) || null;
         }
         function canEditCharacterProgress(charName) {
-            if (isPantheonAdmin() && adminViewAsMemberId) return false;
             if (isPantheonAdmin()) return true;
             const own = getAuthenticatedMemberDirectoryEntry();
             return !!own && memberRegisteredCharacterNames(own).has(identityMatchKey(charName));
@@ -3694,7 +3228,6 @@
 
         // --- Personal View Logic ---
         function togglePersonalView() {
-            if (isPantheonAdmin() && adminViewAsMemberId) return;
             const identity = localStorage.getItem(IDENTITY_KEY);
             if (!identity) {
                 alert('No personal roster is linked yet. Check that your Discord profile name matches your Member Roster owner name, or select your roster once.');
@@ -3721,7 +3254,6 @@
         }
 
         function saveIdentity() {
-            if (isPantheonAdmin() && adminViewAsMemberId) return;
             const val = document.getElementById('user-identity').value;
             const wasUnmatched = discordIdentityMatchStatus === 'unmatched';
             localStorage.setItem(IDENTITY_KEY, val);
@@ -3861,29 +3393,20 @@
             });
 
             filter.innerHTML = options;
-            const previewMember = getAdminViewAsMember();
-            if (previewMember) {
-                const previewRoster = getMemberTrackerRoster(previewMember);
-                filter.value = previewRoster?.id || '__unregistered__';
-                filter.disabled = true;
-            } else {
-                const preferredFilter = isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || currentVal) : currentVal;
-                filter.value = preferredFilter === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
-                filter.disabled = !!isPersonalView;
-            }
+            const preferredFilter = isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || currentVal) : currentVal;
+            filter.value = preferredFilter === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
+            filter.disabled = !!isPersonalView;
             activeRosterFilter = filter.value;
 
             identitySel.innerHTML = idOptions;
             identitySel.value = savedIdentity === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === savedIdentity) ? savedIdentity : '';
 
             refreshLedgerVisibility();
-            updateAdminViewAsControl();
         }
 
-        function applyRosterFilter() {
-            if (isPantheonAdmin() && adminViewAsMemberId) { updateFilterDropdown(); return; }
-            activeRosterFilter = document.getElementById('roster-filter').value;
-            refreshTrackerUI();
+        function applyRosterFilter() { 
+            activeRosterFilter = document.getElementById('roster-filter').value; 
+            refreshTrackerUI(); 
         }
 
         function syncDataStructures() {
@@ -4022,7 +3545,6 @@
             norm.settings.analyticsTrackingUpdatedBy = String(sets.analyticsTrackingUpdatedBy || '');
             norm.settings.analyticsHistoryClearedAt = Number(sets.analyticsHistoryClearedAt) || 0;
             norm.settings.analyticsHistoryClearedBy = String(sets.analyticsHistoryClearedBy || '');
-            norm.settings.rateUpEvents = normalizeRateUpEvents(sets.rateUpEvents);
             norm.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sets.lootWeights) };
             norm.settings.lootWeightUpdatedAt = safeObject(sets.lootWeightUpdatedAt);
             norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : [];
@@ -4189,9 +3711,6 @@
             const clearSource = localClearAt >= remoteClearAt ? local.settings : remote.settings;
             merged.settings.analyticsHistoryClearedAt = Math.max(localClearAt, remoteClearAt);
             merged.settings.analyticsHistoryClearedBy = String(clearSource.analyticsHistoryClearedBy || '');
-            const lEventAt = Number(local.settings.rateUpEvents?.updatedAt)||0, rEventAt = Number(remote.settings.rateUpEvents?.updatedAt)||0;
-            const eventSource = (lEventAt > rEventAt || (lEventAt === rEventAt && String(local.settings.rateUpEvents?.updatedBy||'') >= String(remote.settings.rateUpEvents?.updatedBy||''))) ? local.settings.rateUpEvents : remote.settings.rateUpEvents;
-            merged.settings.rateUpEvents = normalizeRateUpEvents(eventSource);
             merged.lastDailyReset = Math.max(local.lastDailyReset, remote.lastDailyReset);
             merged.lastWeeklyReset = Math.max(local.lastWeeklyReset, remote.lastWeeklyReset);
             merged.updatedAt = Math.max(local.updatedAt, remote.updatedAt);
@@ -4504,7 +4023,7 @@
         function getLastSeenGlobalSignature(){return String(localStorage.getItem('pantheon-last-global-impact-signature')||'');}
         function setLastSeenGlobalSignature(sig){if(sig)localStorage.setItem('pantheon-last-global-impact-signature',sig);}
         function setPendingGlobalChange(label){const text=String(label||'Global change').slice(0,140);if(!pendingGlobalBeforeSnapshot)pendingGlobalBeforeSnapshot=cloneDataObject(getGlobalImpactSnapshot(cloudData));pendingGlobalChangeLabel=pendingGlobalChangeLabel?`${pendingGlobalChangeLabel} + ${text}`.slice(0,140):text;}
-        function prepareGlobalChange(label){if(isPantheonAdmin() && getAdminViewAsMember()){alert('Exit the read-only member preview before changing shared guild data.');return Promise.resolve(false);}if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return Promise.resolve(false);}setPendingGlobalChange(label);return Promise.resolve(true);}
+        function prepareGlobalChange(label){if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return Promise.resolve(false);}setPendingGlobalChange(label);return Promise.resolve(true);}
         function clearPendingGlobalChange(){pendingGlobalChangeLabel='';pendingGlobalBeforeSnapshot=null;}
 
         function versionRowHtml(row,index){const entry=row.entry;if(!entry)return '';const kind=entry.kind==='marker'?'<span class="version-badge">SAVEPOINT</span>':(entry.kind==='before-external-change'?'<span class="version-badge">EXTERNAL CHANGE</span>':'<span class="version-badge">GLOBAL CHANGE</span>');const action=entry.patch?`<button class="btn btn-secondary" type="button" onclick="openRevisionDetails('${escapeHTML(entry.id)}')">Details</button><button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo All</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Logged</span>';return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')} ${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}${entry.patch?` · ${escapeHTML(describePatch(entry.patch))}`:''}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button>${action}</div></div>`;}
@@ -4675,7 +4194,7 @@
             document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged(); });
         }
 
-        function openVersionHistoryModal(){if(getAdminViewAsMember()){alert('Exit the read-only member preview before opening admin controls.');return;}if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
+        function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
         function triggerAutoSync() { unsavedCloudChanges = true; persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
@@ -4733,7 +4252,6 @@
             window.addEventListener('hashchange', handlePageRoute);
             loadLiveTracker().then(() => {
                 applyDiscordIdentityDefaults();
-                if (typeof window.pantheonThemeOnLogin === 'function') window.pantheonThemeOnLogin();
                 const routeHash = location.hash;
                 if (['#registration', '#dungeons', '#loot-weights', '#version-history', '#sync-now', '#landing-settings', '#salary-calculator', '#ledger', '#help', '#overview', '#tracker', '#team-builder', '#card-wiki', '#member-roster'].includes(routeHash)) handlePageRoute();
                 else applySavedLandingPage();
@@ -4750,7 +4268,6 @@
         }
 
         function setAnalyticsTrackingEnabled(enabled) {
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before changing analytics settings.'); renderAnalytics(); return; }
             const next = enabled === true;
             cloudData.settings.analyticsTrackingEnabled = next;
             cloudData.settings.analyticsTrackingUpdatedAt = Date.now();
@@ -4761,7 +4278,6 @@
         }
 
         function clearAnalyticsHistory() {
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before clearing analytics history.'); return; }
             const weeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
             const legacy = Object.keys(safeObject(cloudData.history)).length;
             if (!weeks && !legacy) { alert('There is no stored analytics history to clear.'); return; }
@@ -4827,7 +4343,7 @@
                 if (analyticsGrid) analyticsGrid.hidden = true;
                 if (resetNote) resetNote.hidden = true;
                 if (emptyState) { emptyState.hidden = false; emptyState.classList.remove('hidden'); }
-                const own = getAdminViewAsMember() || getCurrentMemberDirectoryEntry();
+                const own = getCurrentMemberDirectoryEntry();
                 const profiles = own?.characterProfiles || [];
                 const tracked = profiles.filter(profile => profile.trackerEnabled);
                 const title = document.getElementById('tracker-empty-title');
@@ -4841,8 +4357,6 @@
                 if (startButton) startButton.hidden = profiles.length === 0 || tracked.length > 0;
                 if (startButton && profiles.length > 0 && tracked.length === 0) startButton.textContent = 'Start Tracking Registered Characters';
                 if (addButton) addButton.textContent = profiles.length ? '＋ Add More Characters' : 'Register My Characters';
-                if (addButton) addButton.hidden = !!getAdminViewAsMember();
-                if (startButton) startButton.hidden = !!getAdminViewAsMember() || profiles.length === 0 || tracked.length > 0;
                 if (addCharactersButton) addCharactersButton.hidden = true;
                 return;
             }
@@ -4852,7 +4366,7 @@
             if (analyticsGrid) { analyticsGrid.hidden = false; analyticsGrid.style.display = isAnalyticsVisible ? 'grid' : 'none'; }
             if (resetNote) resetNote.hidden = false;
             if (emptyState) { emptyState.hidden = true; emptyState.classList.add('hidden'); }
-            if (addCharactersButton) addCharactersButton.hidden = !!getAdminViewAsMember();
+            if (addCharactersButton) addCharactersButton.hidden = false;
 
             const isUniversal = activeRosterFilter === 'all';
 
@@ -4880,14 +4394,11 @@
             });
 
             characters.forEach(char => {
-                const main = isMainCharacter(char.name);
-                const th = document.createElement('th');
-                th.textContent = main ? `★ ${char.name} · MAIN` : char.name;
-                th.title = main ? `${char.name} · Main character` : char.name;
-                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = `bold char-col${main ? ' is-main-character' : ''}`;
+                const th = document.createElement('th'); th.textContent = char.name; th.title = char.name;
+                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = 'bold char-col';
                 headerRow.appendChild(th);
                 const rateTh = document.createElement('th'); rateTh.id = rateElementId(char.name);
-                rateTh.style.background = '#ffe599'; rateTh.style.color = '#000'; rateTh.textContent = '0%'; rateTh.className = `char-col${main ? ' is-main-character' : ''}`;
+                rateTh.style.background = '#ffe599'; rateTh.style.color = '#000'; rateTh.textContent = '0%'; rateTh.className = 'char-col';
                 footerRow.appendChild(rateTh);
             });
             
@@ -4921,7 +4432,7 @@
                         
                         characters.forEach(char => {
                             const td = document.createElement('td'); td.className = 'interactive-cell char-col';
-                            td.dataset.char = char.name; td.dataset.task = taskName; td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false'; if (isMainCharacter(char.name)) td.classList.add('is-main-character-cell');
+                            td.dataset.char = char.name; td.dataset.task = taskName; td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false';
                             const access = characterAccess.get(char.name) || { canEdit: false, owner: null };
                             const canEdit = access.canEdit;
                             const owner = access.owner;
@@ -5241,13 +4752,11 @@
             document.body.classList.toggle('pantheon-admin-session', isAdmin);
             document.body.classList.toggle('pantheon-member-session', !isAdmin);
             const adminLink = document.getElementById('overview-admin-link');
-            const rateEventsButton = document.getElementById('overview-rate-events');
             const drawerAdminLink = document.getElementById('drawer-admin-console');
             const menuToggle = document.getElementById('menu-toggle');
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
             if (adminLink) adminLink.hidden = !isAdmin;
-            if (rateEventsButton) rateEventsButton.hidden = !isAdmin;
             if (drawerAdminLink) drawerAdminLink.hidden = !isAdmin;
             if (menuToggle) menuToggle.hidden = !isAdmin;
             if (drawer) drawer.hidden = !isAdmin;
@@ -5276,8 +4785,7 @@
             const summary = document.getElementById('overview-insights-summary');
             if (!cont && !completionCont) return;
             const esc = value => escapeHTML(String(value ?? ''));
-            const owner = getActivityViewMember();
-            const isPreview = !!getAdminViewAsMember();
+            const owner = getAuthenticatedMemberDirectoryEntry();
             const enabledNames = owner
                 ? (owner.characterProfiles || []).filter(profile => profile.trackerEnabled && profile.name).map(profile => profile.name)
                 : [];
@@ -5317,14 +4825,14 @@
             metrics.forEach(item => {
                 const nextTask = item.pendingTasks[0]?.task || '';
                 if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity) {
-                    priorities.push({ isMain:item.isMain, rank: 0, tone:'risk', icon:'◷', label:'No progress recorded', title:`${item.name}${item.isMain ? ' · Main' : ''} has no recorded weekly progress`, body:`Nothing is marked complete for this week yet. If you meant to keep this character active, start with ${nextTask ? `“${nextTask}”` : 'one eligible weekly task'}. If the character is intentionally parked, turn off its Tracker opt-in so it stops looking overdue.`, meta:`0/${item.eligible} eligible tasks complete · this is a prompt, not a judgment` });
+                    priorities.push({ rank: 0, tone:'risk', icon:'◷', label:'No progress recorded', title:`${item.name}${item.isMain ? ' · Main' : ''} has no recorded weekly progress`, body:`Nothing is marked complete for this week yet. If you meant to keep this character active, start with ${nextTask ? `“${nextTask}”` : 'one eligible weekly task'}. If the character is intentionally parked, turn off its Tracker opt-in so it stops looking overdue.`, meta:`0/${item.eligible} eligible tasks complete · this is a prompt, not a judgment` });
                 } else if (item.eligible > 0 && item.rate < 40) {
-                    priorities.push({ isMain:item.isMain, rank: 1, tone:'risk', icon:'!', label:'Low completion', title:`${item.name}${item.isMain ? ' · Main' : ''} is falling behind`, body:`${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). ${nextTask ? `Highest-weight open task to tackle next: “${nextTask}”.` : 'Review remaining eligible tasks before reset.'} If priorities changed, consider pausing tracking instead of carrying this character as an ongoing reminder.`, meta:`${item.pending} outstanding · Bounty tasks excluded` });
+                    priorities.push({ rank: 1, tone:'risk', icon:'!', label:'Low completion', title:`${item.name}${item.isMain ? ' · Main' : ''} is falling behind`, body:`${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). ${nextTask ? `Highest-weight open task to tackle next: “${nextTask}”.` : 'Review remaining eligible tasks before reset.'} If priorities changed, consider pausing tracking instead of carrying this character as an ongoing reminder.`, meta:`${item.pending} outstanding · Bounty tasks excluded` });
                 } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0) {
-                    priorities.push({ isMain:item.isMain, rank: 2, tone:'watch', icon:'↗', label:'Needs a nudge', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A manageable next step is “${nextTask}”, currently among the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} If the character is not a current focus, consider turning off its tracking opt-in.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
+                    priorities.push({ rank: 2, tone:'watch', icon:'↗', label:'Needs a nudge', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A manageable next step is “${nextTask}”, currently among the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} If the character is not a current focus, consider turning off its tracking opt-in.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
                 }
                 if (item.trend !== null && item.trend <= -20) {
-                    priorities.push({ isMain:item.isMain, rank: 1, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, a changed priority, or simply a missed update. Review the next reset cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
+                    priorities.push({ rank: 1, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, a changed priority, or simply a missed update. Review the next reset cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
                 }
             });
             priorities.sort((a,b) => a.rank-b.rank || a.title.localeCompare(b.title));
@@ -5338,18 +4846,14 @@
                 summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
             }
             if (!owner || metrics.length === 0) {
-                const noDataAction = isPreview ? '' : `<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button>`;
-                const noData = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} ${isPreview ? 'This member has no tracked characters to preview.' : 'Add or opt in your characters from Member Roster to get completion insights, outlier reminders, and task-specific advice here.'}${noDataAction}</div>`;
+                const noData = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters from Member Roster to get completion insights, outlier reminders, and task-specific advice here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
                 if (cont) cont.innerHTML = noData;
-                const completionEmpty = isPreview
-                    ? 'Character-level completion appears once at least one registered character is opted into Tracker. This read-only preview does not allow changes.'
-                    : `Character-level completion appears once at least one registered character is opted into Tracker.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button>`;
-                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">${completionEmpty}</div>`;
+                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Character-level completion will appear here once at least one registered character is opted into Tracker. No roster or progress data is shown for other members.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
             let insightHtml = `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted</span></div>`;
             if (shownPriorities.length) {
-                insightHtml += shownPriorities.map(item => `<div class="activity-insight-item${item.isMain ? ' main-character-item' : ''}"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
+                insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
                 insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>Nothing needs urgent attention</strong><p>Your currently tracked characters are either on pace or have no open eligible tasks. Keep the same cadence and check back before the Saturday reset.</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
             }
@@ -5363,330 +4867,46 @@
                     const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
                     const pendingName = item.pendingTasks[0]?.task;
                     const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
-                    return `<div class="activity-insight-item${item.isMain ? ' main-character-item' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
+                    return `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
                 }).join('');
             } else {
                 completionHtml = `<div class="activity-insight-empty">No eligible weekly tasks are currently configured for the characters you track.</div>`;
             }
             if (completionCont) completionCont.innerHTML = completionHtml;
         }
-        function formatResetCountdown(milliseconds) {
-            const totalMinutes = Math.max(0, Math.floor(milliseconds / 60000));
-            const days = Math.floor(totalMinutes / 1440);
-            const hours = Math.floor((totalMinutes % 1440) / 60);
-            const minutes = totalMinutes % 60;
-            if (days) return `${days}d ${hours}h`;
-            if (hours) return `${hours}h ${minutes}m`;
-            return `${minutes}m`;
-        }
-        function getNextWeeklyResetTime() {
-            return getTargetResetTimeUTC(true) + 7 * 24 * 60 * 60 * 1000;
-        }
-        function getCharacterHistoryPattern(characterName, archiveEntries = null) {
-            if (cloudData.settings.analyticsTrackingEnabled !== true) return null;
-            const entries = archiveEntries || Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-5);
-            const taskStats = new Map();
-            entries.forEach(([, archive]) => {
-                const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
-                const states = String(archive?.states?.[characterName] || '');
-                order.forEach((task, index) => {
-                    const code = states[index];
-                    if (!['d','m','x'].includes(code) || isBountyTask(task)) return;
-                    if (!taskStats.has(task)) taskStats.set(task, { done:0, observed:0 });
-                    const item = taskStats.get(task);
-                    if (code === 'x') return;
-                    item.observed++;
-                    if (code === 'd') item.done++;
-                });
-            });
-            const best = [...taskStats.entries()].filter(([,s])=>s.observed >= 2).map(([task,s])=>({task,...s,rate:s.done/s.observed}))
-                .sort((a,b)=>b.rate-a.rate || b.observed-a.observed || a.task.localeCompare(b.task))[0];
-            return best || null;
-        }
-        function getLuckyZoneBudgetCharacterNames() {
-            const registeredNames = member => [...new Set([
-                ...(Array.isArray(member?.characters) ? member.characters : []),
-                ...(Array.isArray(member?.characterProfiles) ? member.characterProfiles.map(profile=>profile?.name||profile?.ign||'') : [])
-            ].map(name=>String(name||'').trim()).filter(Boolean))];
-            const previewMember=getAdminViewAsMember();
-            if (previewMember) return registeredNames(previewMember);
-            if (isPantheonAdmin()) {
-                if (activeRosterFilter !== 'all') {
-                    const roster=normalizeRosters(cloudData.settings?.rosters).find(item=>item.id===activeRosterFilter);
-                    const member=normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(item=>item.trackerRosterId===activeRosterFilter || (roster && identityMatchKey(item.name)===identityMatchKey(roster.name)));
-                    if(member) return registeredNames(member);
-                }
-                return [...new Set(characters.map(char=>char.name).filter(Boolean))];
-            }
-            const ownMember=getAuthenticatedMemberDirectoryEntry();
-            if(ownMember) return registeredNames(ownMember);
-            if(activeRosterFilter!=='all') {
-                const roster=normalizeRosters(cloudData.settings?.rosters).find(item=>item.id===activeRosterFilter);
-                const member=normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(item=>item.trackerRosterId===activeRosterFilter || (roster && identityMatchKey(item.name)===identityMatchKey(roster.name)));
-                if(member) return registeredNames(member);
-            }
-            return [...new Set(characters.map(char=>char.name).filter(Boolean))];
-        }
-
-        function formatRateEventCountdown(milliseconds) {
-            const totalMinutes = Math.max(0, Math.ceil(milliseconds/60000));
-            if (totalMinutes < 60) return `${totalMinutes}m`;
-            const hours = Math.floor(totalMinutes/60), minutes = totalMinutes%60;
-            return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
-        }
-        function buildRateEventNotice(now = Date.now()) {
-            const events = normalizeRateUpEvents(cloudData.settings?.rateUpEvents);
-            const definitions = [
-                {key:'itemDrop',title:'+50% Item Drop Rate UP'},
-                {key:'enhancement',title:'+30% Enhancement Rate UP'}
-            ];
-            const messages = [];
-            for (const def of definitions) {
-                const config = events[def.key];
-                if (!config.enabled) continue;
-                const status = getRateEventStatus(config, now);
-                if (status.state === 'active' && status.window) {
-                    const remaining = status.window.endAt-now;
-                    const aboutToEnd = remaining <= 24*60*60*1000;
-                    const stateLabel = aboutToEnd ? 'About to end' : 'Active';
-                    const timeLabel = aboutToEnd
-                        ? `Ends in ${formatRateEventCountdown(remaining)} · ${formatManilaDateTime(status.window.endAt)}`
-                        : `Ends ${formatManilaDateTime(status.window.endAt)}`;
-                    messages.push(`<div class="rate-event-notice-line"><strong>${escapeHTML(def.title)} · ${stateLabel}</strong><span>${escapeHTML(timeLabel)}</span></div>`);
-                } else if (status.state === 'scheduled' && status.window && status.window.startAt-now <= 24*60*60*1000) {
-                    const remaining = status.window.startAt-now;
-                    messages.push(`<div class="rate-event-notice-line"><strong>${escapeHTML(def.title)} · Coming soon</strong><span>Starts in ${formatRateEventCountdown(remaining)} · ${escapeHTML(formatManilaDateTime(status.window.startAt))}</span></div>`);
-                }
-            }
-            if (!messages.length) return '';
-            return `<section class="rate-event-notice" aria-label="Current Rate-Up event notices" aria-live="polite"><div class="rate-event-notice-heading">Rate-Up Event Alert</div>${messages.join('')}</section>`;
-        }
-        function buildRateEventAdminCard(key, title, event) {
-            const config=normalizeRateUpEvent(event);
-            const schedule=config.schedule;
-            const customHidden=schedule!=='custom';
-            return `<div class="rate-event-edit-card"><h6>${escapeHTML(title)}</h6><label class="rate-event-enabled-label"><input type="checkbox" id="rate-event-${key}-enabled" ${config.enabled?'checked':''}> Enable this event for planning</label><label for="rate-event-${key}-schedule">Schedule</label><select id="rate-event-${key}-schedule" onchange="toggleRateEventCustomRange('${key}')"><option value="weekend" ${schedule==='weekend'?'selected':''}>Every weekend: Sat 00:00 to Mon 00:00 Manila</option><option value="custom" ${schedule==='custom'?'selected':''}>Custom date and time window</option></select><div id="rate-event-${key}-custom-range" class="rate-event-custom-range" ${customHidden?'hidden':''}><label for="rate-event-${key}-start">Starts (Manila, GMT+8)</label><input id="rate-event-${key}-start" type="datetime-local" step="60" value="${escapeHTML(formatManilaDateTimeInput(config.startAt))}"><label for="rate-event-${key}-end">Ends (Manila, GMT+8)</label><input id="rate-event-${key}-end" type="datetime-local" step="60" value="${escapeHTML(formatManilaDateTimeInput(config.endAt))}"></div></div>`;
-        }
-        function buildRateEventAdminControls() {
-            if (!isPantheonAdmin() || getAdminViewAsMember()) return '';
-            const events=normalizeRateUpEvents(cloudData.settings?.rateUpEvents);
-            return `<div class="rate-event-admin"><div class="rate-event-admin-grid">${buildRateEventAdminCard('itemDrop','+50% Item Drop Rate UP',events.itemDrop)}${buildRateEventAdminCard('enhancement','+30% Enhancement Rate UP',events.enhancement)}</div><div class="rate-event-admin-actions"><button class="btn btn-primary" type="button" onclick="saveRateUpEventSettings()">Save event settings</button><span class="rate-event-footnote">Weekend mode means Saturday 00:00 through Monday 00:00, Asia/Manila (GMT+8). Custom time fields are also interpreted in Manila time, regardless of the administrator’s device timezone.</span></div></div>`;
-        }
-        function openRateEventModal() {
-            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can manage Rate-Up Events.'); return; }
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before changing event schedules.'); return; }
-            const content = document.getElementById('rate-event-modal-content');
-            const status = document.getElementById('rate-event-modal-status');
-            if (content) content.innerHTML = buildRateEventAdminControls();
-            if (status) status.textContent = 'Changes are shared with the guild after cloud sync completes.';
-            openModal('rate-event-modal');
-        }
-        function toggleRateEventCustomRange(key) {
-            const mode=document.getElementById(`rate-event-${key}-schedule`)?.value;
-            const range=document.getElementById(`rate-event-${key}-custom-range`);
-            if(range) range.hidden=mode!=='custom';
-        }
-        async function saveRateUpEventSettings() {
-            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can edit shared event schedules.'); return; }
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before changing event settings.'); return; }
-            const readEvent=(key,label)=>{
-                const enabled=!!document.getElementById(`rate-event-${key}-enabled`)?.checked;
-                const schedule=document.getElementById(`rate-event-${key}-schedule`)?.value==='custom'?'custom':'weekend';
-                const startText=document.getElementById(`rate-event-${key}-start`)?.value||'';
-                const endText=document.getElementById(`rate-event-${key}-end`)?.value||'';
-                const startAt=parseManilaDateTimeInput(startText), endAt=parseManilaDateTimeInput(endText);
-                if(enabled && schedule==='custom') {
-                    if(!startAt || !endAt) throw new Error(`${label}: enter both a start and end time in Manila time.`);
-                    if(endAt<=startAt) throw new Error(`${label}: the end must be later than the start.`);
-                }
-                return {enabled,schedule,startAt,endAt};
-            };
-            let next;
-            try { next={itemDrop:readEvent('itemDrop','Item Drop Rate UP'),enhancement:readEvent('enhancement','Enhancement Rate UP'),updatedAt:Date.now(),updatedBy:deviceId}; }
-            catch(error) { alert(error.message); return; }
-            cloudData.settings.rateUpEvents=normalizeRateUpEvents(next);
-            persistLocalData();
-            renderAnalytics();
-            const modalStatus = document.getElementById('rate-event-modal-status');
-            if (modalStatus) modalStatus.textContent = 'Event settings saved locally. Cloud sync is queued; check Sync Status for confirmation.';
-            triggerAutoSync();
-            setStatus('🟡 Shared event schedule saved locally · syncing…');
-        }
-
-        function buildResetReadinessPanel() {
-            const now = Date.now();
-            const dailyResetAt = getTargetResetTimeUTC(false);
-            const nextDailyResetAt = dailyResetAt + 24 * 60 * 60 * 1000;
-            const nextWeeklyResetAt = getNextWeeklyResetTime();
-            const weeklyHours = Math.max(0, (nextWeeklyResetAt - now) / 3600000);
-            const weeklyCountdown = formatResetCountdown(nextWeeklyResetAt - now);
-            let urgency = { tone:'good', label:'Steady pace', advice:'Build progress steadily. Reserve the per-character daily workload first, then use the remaining playtime for the highest-value weeklies.' };
-            if (weeklyHours <= 2) urgency = { tone:'risk', label:'Reset imminent', advice:'Use a realistic final pass: account for the daily commitments still due, then do only the highest-value weekly clears that fit. Do not assume there is time to sweep every character.' };
-            else if (weeklyHours <= 8) urgency = { tone:'risk', label:'Final push', advice:'Protect the daily baseline, then focus on the Main and the highest-weight weeklies you can finish before reset. Avoid planning a full-roster raid sweep unless time actually remains.' };
-            else if (weeklyHours <= 24) urgency = { tone:'watch', label:'Last day', advice:'Reserve Lucky Zone and other daily time first. Spend the remaining window on high-weight raids, starting with the Main and the most important characters rather than overcommitting to every alt.' };
-            else if (weeklyHours <= 48) urgency = { tone:'watch', label:'Reset approaching', advice:'Spread raid clears across the remaining days. Keep enough room each day for the repeated per-character Dailies instead of leaving both Dailies and raids for Saturday.' };
-            else if (weeklyHours <= 96) urgency = { tone:'watch', label:'Midweek pace', advice:'Make a measured dent in the weeklies each day after reserving the per-character Dailies. A full-roster raid sweep is not assumed to fit every session.' };
-
-            const dailyTasks = cloudData.settings.categories.filter(category => category.group === 'Dailies')
-                .flatMap(category => (category.tasks || []).filter(task => trackBountyBoards || !isBountyBoardSlot(category, task)));
-            const weeklyTasks = getCompletionTaskNames();
-            const currentCharacters = characters.map(char => ({ ...char, main:isMainCharacter(char.name) }));
-            let dailyDone = 0, dailyEligible = 0, weeklyDone = 0, weeklyEligible = 0, dailiesDoneToday = 0, weekliesDoneToday = 0, otherDailyPending = 0;
-            const perCharacter = currentCharacters.map(char => {
-                let dDone = 0, dEligible = 0, dPending = 0, wDone = 0, wEligible = 0, wPending = 0;
-                dailyTasks.forEach(task => {
-                    const state = getCellState(char.name, task);
-                    if (state !== 'excluded') {
-                        dEligible++; dailyEligible++;
-                        if (state === 'done') { dDone++; dailyDone++; if ((Number(getCellRecord(char.name, task).updatedAt)||0) >= dailyResetAt) dailiesDoneToday++; }
-                        else { dPending++; otherDailyPending++; }
-                    }
-                });
-                const openWeekly = [];
-                weeklyTasks.forEach(task => {
-                    const state = getCellState(char.name, task);
-                    if (state !== 'excluded') { wEligible++; weeklyEligible++; if (state === 'done') { wDone++; weeklyDone++; if ((Number(getCellRecord(char.name, task).updatedAt)||0) >= dailyResetAt) weekliesDoneToday++; } else { wPending++; openWeekly.push(task); } }
-                });
-                const learnedPattern = getCharacterHistoryPattern(char.name);
-                const nextWeekly = openWeekly.slice().sort((a,b)=>(getLootWeight(b)-getLootWeight(a)) || (Number(b === learnedPattern?.task)-Number(a === learnedPattern?.task)) || a.localeCompare(b))[0] || '';
-                return { ...char, dDone, dEligible, dPending, wDone, wEligible, wPending, nextWeekly };
-            });
-            const luckyMinutesPerCharacter = 24;
-            const luckyBudgetCharacterNames = getLuckyZoneBudgetCharacterNames();
-            const luckyMinutesTotal = luckyBudgetCharacterNames.length * luckyMinutesPerCharacter;
-            const trackedCharacterNameSet = new Set(currentCharacters.map(char=>identityMatchKey(char.name)));
-            const untrackedBudgetNames = luckyBudgetCharacterNames.filter(name=>!trackedCharacterNameSet.has(identityMatchKey(name)));
-            const weeklyOpenTasks = [];
-            perCharacter.forEach(char => weeklyTasks.forEach(task => {
-                const state = getCellState(char.name, task);
-                if (state !== 'done' && state !== 'excluded') weeklyOpenTasks.push({ character:char.name, isMain:char.main, task, weight:getLootWeight(task), pattern:getCharacterHistoryPattern(char.name)?.task === task });
-            }));
-            weeklyOpenTasks.sort((a,b)=>(b.weight-a.weight) || (Number(b.isMain)-Number(a.isMain)) || (Number(b.pattern)-Number(a.pattern)) || a.character.localeCompare(b.character) || a.task.localeCompare(b.task));
-            const completedToday = dailiesDoneToday + weekliesDoneToday;
-            const achievement = completedToday > 0
-                ? `Good work today: ${dailiesDoneToday} tracked daily task${dailiesDoneToday===1?'':'s'} and ${weekliesDoneToday} weekly task${weekliesDoneToday===1?'':'s'} marked complete since the latest reset. Lucky Zones are not tracked here, so those runs are not counted in this total.`
-                : `Fresh start: no tracked daily or weekly completions have been recorded since today’s reset yet. Lucky Zones are a separate assumed daily commitment, not a Tracker checkbox.`;
-
-            const dailyCycle = getCurrentDailyCycleWindowManila(now);
-            const rateEvents = normalizeRateUpEvents(cloudData.settings?.rateUpEvents);
-            const itemEventStatus = getRateEventStatus(rateEvents.itemDrop, now);
-            const enhancementStatus = getRateEventStatus(rateEvents.enhancement, now);
-            const itemContext = getRelevantRateEventWindow(rateEvents.itemDrop, dailyCycle, now);
-            const enhancementContext = getRelevantRateEventWindow(rateEvents.enhancement, dailyCycle, now);
-            const minutesText = value => value >= 60 ? `${Math.floor(value/60)}h ${value%60}m` : `${value} min`;
-            const eventAdvice = [];
-            if (rateEvents.itemDrop.enabled && itemContext) {
-                if (now < itemContext.startAt) {
-                    const availableAfterStart = Math.max(0,Math.floor((dailyCycle.endAt-itemContext.startAt)/60000));
-                    const canFitAfterStart = luckyMinutesTotal <= availableAfterStart;
-                    eventAdvice.push(`<strong>Lucky Zone timing:</strong> delay this cycle’s 3 solo runs until the +50% Item Drop Rate UP starts at ${escapeHTML(formatManilaDateTime(itemContext.startAt))}. The current in-game daily cycle resets at ${escapeHTML(formatManilaDateTime(dailyCycle.endAt))}; after the event begins there are about ${minutesText(availableAfterStart)} before reset. The ${minutesText(luckyMinutesTotal)} full-roster baseline ${canFitAfterStart?'fits under the estimate':'does not fit in that window'}, so do not assume every registered character can finish after midnight if your roster/time budget exceeds the window.`);
-                } else if (now < itemContext.endAt && itemContext.endAt < dailyCycle.endAt) {
-                    const availableBeforeEnd = Math.max(0,Math.floor((itemContext.endAt-now)/60000));
-                    const canFitBeforeEnd = luckyMinutesTotal <= availableBeforeEnd;
-                    eventAdvice.push(`<strong>Lucky Zone deadline:</strong> the +50% Item Drop Rate UP ends at ${escapeHTML(formatManilaDateTime(itemContext.endAt))}, before this daily cycle resets at ${escapeHTML(formatManilaDateTime(dailyCycle.endAt))}. Complete the 3 solo runs on each character before the event ends; do not leave Sunday’s LZs until after midnight Monday Manila time. There are about ${minutesText(availableBeforeEnd)} left in the event against a ${minutesText(luckyMinutesTotal)} full-roster baseline, ${canFitBeforeEnd?'which fits under the estimate':'so a full sweep may no longer fit; prioritize Main/high-value characters instead of assuming all runs are possible'}.`);
-                } else if (now >= itemContext.endAt) {
-                    eventAdvice.push(`<strong>Lucky Zone timing:</strong> the relevant +50% Item Drop window ended at ${escapeHTML(formatManilaDateTime(itemContext.endAt))}. If this daily cycle’s LZs are still due, do them at the normal rate rather than postponing them for an event that has ended.`);
-                } else {
-                    const availableBeforeReset = Math.max(0,Math.floor((dailyCycle.endAt-now)/60000));
-                    const canFitBeforeReset = luckyMinutesTotal <= availableBeforeReset;
-                    eventAdvice.push(`<strong>Lucky Zone timing:</strong> +50% Item Drop Rate UP is active through ${escapeHTML(formatManilaDateTime(itemContext.endAt))}. Fit the 3 solo runs into the event window for each character. After reserving LZ time and other Dailies, use remaining event time for high-value drop-focused raids; ${minutesText(availableBeforeReset)} remain before this cycle’s reset versus a ${minutesText(luckyMinutesTotal)} full-roster baseline, so ${canFitBeforeReset?'the LZ estimate fits before reset':'prioritize the Main/high-value characters and do not plan raids as though every run will fit'}.`);
-                }
-            } else if (rateEvents.itemDrop.enabled && itemEventStatus.state === 'scheduled' && itemEventStatus.window && itemEventStatus.window.startAt - now <= 72*60*60*1000) {
-                eventAdvice.push(`<strong>Next Item Drop window:</strong> scheduled for ${escapeHTML(formatManilaDateTime(itemEventStatus.window.startAt))}. Today's Lucky Zones do not fall inside that window, so complete the current cycle normally; save the delay strategy for a cycle that actually overlaps the event.`);
-            }
-            if (rateEvents.enhancement.enabled) {
-                if (enhancementContext && now < enhancementContext.startAt) {
-                    eventAdvice.push(`<strong>Enhancement preparation:</strong> the +30% Enhancement Rate UP starts at ${escapeHTML(formatManilaDateTime(enhancementContext.startAt))}. Prepare materials, gold, and target gear now; hold non-urgent enhancement attempts until the window begins.`);
-                } else if (enhancementContext && now < enhancementContext.endAt) {
-                    const closeBeforeReset = enhancementContext.endAt < dailyCycle.endAt;
-                    eventAdvice.push(`<strong>Enhancement window:</strong> +30% Enhancement Rate UP is active until ${escapeHTML(formatManilaDateTime(enhancementContext.endAt))}. Use the active window for planned enhancement attempts and prioritize materials for upgrades that matter to your build${closeBeforeReset?'; this event closes before the next daily reset, so do not postpone planned attempts until after the window':''}.`);
-                } else if (enhancementContext && now >= enhancementContext.endAt) {
-                    eventAdvice.push(`<strong>Enhancement window:</strong> the relevant +30% Enhancement Rate UP ended at ${escapeHTML(formatManilaDateTime(enhancementContext.endAt))}. Do not assume the bonus still applies; use the normal rate or prepare for the next scheduled window.`);
-                } else if (enhancementStatus.state === 'scheduled' && enhancementStatus.window && enhancementStatus.window.startAt - now <= 72*60*60*1000) {
-                    const untilStart=(enhancementStatus.window.startAt-now)/3600000;
-                    eventAdvice.push(`<strong>Enhancement preparation:</strong> +30% Enhancement Rate UP is scheduled for ${escapeHTML(formatManilaDateTime(enhancementStatus.window.startAt))}${untilStart<=72?' soon':''}. Prepare materials and gold beforehand; avoid spending enhancement resources early unless the upgrade is needed immediately.`);
-                }
-            }
-
-            const dailyBudgetText = luckyBudgetCharacterNames.length
-                ? `Reserve at least ${minutesText(luckyMinutesTotal)} for Lucky Zones alone: ${luckyBudgetCharacterNames.length} registered character${luckyBudgetCharacterNames.length===1?'':'s'} in this member view × 24 minutes each (3 solo runs × about 8 minutes). This is not tracked as a task and is not included in the daily completion percentage. The estimate includes registered characters not opted into Tracker${untrackedBudgetNames.length ? ` (${untrackedBudgetNames.slice(0,5).map(escapeHTML).join(', ')}${untrackedBudgetNames.length>5?`, and ${untrackedBudgetNames.length-5} more`:''})` : ''}. It excludes ${otherDailyPending} still-open tracked Daily task entries, raid time, loading, and travel.`
-                : 'No registered or visible tracked characters are available in this view, so a per-character Lucky Zone budget cannot be calculated.';
-            const tomorrowActions = [];
-            if (eventAdvice.length) eventAdvice.forEach(advice=>tomorrowActions.push(`<div class="analytics-event-advice">${advice}</div>`));
-            if (weeklyOpenTasks.length) {
-                const first = weeklyOpenTasks[0];
-                const opener = weeklyHours <= 24 ? 'After the daily workload above, prioritize before Saturday reset' : 'After reserving daily time, start with';
-                tomorrowActions.push(`${opener}: ${first.isMain ? 'Main · ' : ''}${escapeHTML(first.character)} — ${escapeHTML(first.task)} (priority weight ${first.weight}/5).`);
-                if (weeklyOpenTasks[1]) tomorrowActions.push(`Next best weekly if time remains: ${escapeHTML(weeklyOpenTasks[1].character)} — ${escapeHTML(weeklyOpenTasks[1].task)} (weight ${weeklyOpenTasks[1].weight}/5). Do not interpret these two suggestions as a recommendation to clear every character this session.`);
-            } else {
-                tomorrowActions.push('Your eligible weekly list is clear. Keep the daily workload separate and check whether any characters should stay opted into Tracker.');
-            }
-            if (otherDailyPending > 0) tomorrowActions.push(`${otherDailyPending} tracked Daily task entr${otherDailyPending===1?'y is':'ies are'} still open across the visible characters. These are additional to Lucky Zones; their duration is not estimated, so reserve time for them before committing to a long raid list.`);
-
-            const dateLabel = new Intl.DateTimeFormat('en-US', { weekday:'short', month:'short', day:'numeric', timeZone:'Asia/Qatar' }).format(new Date());
-            const resetClock = new Intl.DateTimeFormat('en-US', { weekday:'long', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Asia/Qatar' }).format(new Date(nextWeeklyResetAt));
-            const readinessRate = weeklyEligible ? Math.round(weeklyDone / weeklyEligible * 100) : 0;
-            const pendingCount = Math.max(0, weeklyEligible - weeklyDone);
-            const characterCards = perCharacter.length ? perCharacter.map(char => {
-                const badge = char.main ? '<span class="analytics-main-badge">★ MAIN</span>' : '';
-                const pattern = getCharacterHistoryPattern(char.name);
-                const taskTip = char.nextWeekly ? `Next weekly: ${escapeHTML(char.nextWeekly)} · weight ${getLootWeight(char.nextWeekly)}/5${pattern?.task === char.nextWeekly ? ' · matches a task often completed in your saved weeks' : ''}` : 'No eligible open weekly tasks';
-                const patternText = pattern ? `Pattern so far: ${escapeHTML(pattern.task)} completed in ${pattern.done}/${pattern.observed} saved weeks.` : (cloudData.settings.analyticsTrackingEnabled ? 'Priority pattern still learning; more weekly snapshots will improve the estimate.' : 'Priority pattern needs weekly analytics history; live recommendations still work.');
-                return `<article class="analytics-character-readiness${char.main?' is-main-character':''}"><div class="analytics-character-heading"><strong>${char.main?'★ ':''}${escapeHTML(char.name)}</strong>${badge}</div><div class="analytics-character-metrics"><span><b>${char.dEligible ? Math.round(char.dDone/char.dEligible*100) : 0}%</b> tracked dailies</span><span><b>${char.wEligible ? Math.round(char.wDone/char.wEligible*100) : 0}%</b> weeklies</span></div><p>${char.dDone}/${char.dEligible} tracked Daily tasks complete · ${char.dPending} tracked Dailies open · ${char.wPending} eligible weeklies open.</p><p>Lucky Zones: reserve ~24 min today (3 solo runs). Not tracked in the app.</p><p>${taskTip}</p><small>${patternText}</small></article>`;
-            }).join('') : '<div class="activity-insight-empty">No characters are visible in this Tracker view. Choose a member or opt characters into Tracker to populate live readiness.</div>';
-            const eventNotice = buildRateEventNotice(now);
-            return `<section class="analytics-reset-readiness"><div class="analytics-reset-heading"><div><span class="analytics-eyebrow">DAILY PROGRESS · ${escapeHTML(dateLabel)}</span><h3>Reset Readiness</h3><p>${escapeHTML(achievement)}</p></div><div class="analytics-reset-countdown ${urgency.tone}"><small>Saturday reset · Qatar time</small><strong>${escapeHTML(weeklyCountdown)}</strong><span>${escapeHTML(urgency.label)} · ${escapeHTML(resetClock)}</span></div></div><div class="analytics-reset-stats"><div class="analytics-reset-stat positive"><small>Today's tracked Dailies</small><strong>${dailyDone}/${dailyEligible}</strong><span>${dailiesDoneToday} tracked daily tasks completed since reset · Lucky Zones excluded</span></div><div class="analytics-reset-stat"><small>Weekly completion</small><strong>${readinessRate}%</strong><span>${weeklyDone}/${weeklyEligible} eligible tasks · ${pendingCount} open</span></div><div class="analytics-reset-stat ${luckyMinutesTotal ? 'watch' : 'positive'}"><small>Lucky Zone time floor</small><strong>${luckyBudgetCharacterNames.length} character${luckyBudgetCharacterNames.length===1?'':'s'}</strong><span>${minutesText(luckyMinutesTotal)} reserved · untracked</span></div></div><div class="analytics-daily-budget">${escapeHTML(dailyBudgetText)}</div>${eventNotice}<div class="analytics-reset-columns"><section><h4>What you accomplished today</h4><p>${dailiesDoneToday > 0 ? `Great progress: ${dailiesDoneToday} tracked Daily task${dailiesDoneToday===1?'':'s'} were completed since the latest daily reset across the visible characters.` : 'A fresh daily cycle is open. Start with one achievable tracked task, then keep going.'} ${weekliesDoneToday ? `${weekliesDoneToday} weekly task${weekliesDoneToday===1?'':'s'} also moved forward today.` : ''}</p><p class="analytics-reset-subtext">Tracked daily progress refreshes at 04:00 Qatar / 09:00 Manila. The next daily reset is ${escapeHTML(new Intl.DateTimeFormat('en-US',{weekday:'long',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Qatar'}).format(new Date(nextDailyResetAt)))} Qatar time.</p></section><section><h4>What to do next</h4><p>${escapeHTML(urgency.advice)}</p><ul>${tomorrowActions.map(item=>`<li>${item}</li>`).join('')}</ul></section></div><div class="analytics-character-readiness-grid">${characterCards}</div><p class="analytics-pattern-note">Priority learning is a lightweight estimate based on saved weekly completions, the Main designation, and task weights. It does not assume a task is a personal preference; the pattern becomes more useful as weekly history accumulates. Lucky Zone time is budgeted separately because it is a known daily obligation, not a tracked task.</p></section>`;
-        }
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
-            if (!cont) return;
-            cont.innerHTML = buildResetReadinessPanel();
+            if (!cont) return; cont.innerHTML = '';
             const trackingToggle = document.getElementById('analytics-tracking-enabled');
-            const clearButton = document.getElementById('clear-analytics-history-btn');
             const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true;
-            if (trackingToggle) { trackingToggle.checked = analyticsEnabled; trackingToggle.disabled = !!getAdminViewAsMember(); }
-            if (clearButton) clearButton.disabled = !!getAdminViewAsMember();
+            if (trackingToggle) trackingToggle.checked = analyticsEnabled;
             if (!analyticsEnabled) {
                 const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
-                const disabled = document.createElement('div');
-                disabled.className = 'analytics-disabled';
-                disabled.innerHTML = `<strong>Weekly history tracking is off.</strong><br>Live daily progress, Lucky Zone time estimates, open weeklies, and Saturday countdown above still work. No new weekly preference history is saved. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} remain stored; use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable weekly analytics to start collecting up to five weeks of history.'}`;
-                cont.appendChild(disabled);
+                cont.innerHTML = `<div class="analytics-disabled"><strong>Weekly analytics tracking is off.</strong><br>Daily and weekly task resets will continue normally, but no new weekly history will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting five weeks of history.'}</div>`;
                 return;
             }
             const sortedArchiveEntries = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0]));
             characters.forEach(char => {
-                const main = isMainCharacter(char.name);
-                const card = document.createElement('div');
-                card.className = `char-card${main ? ' is-main-character' : ''}`;
-                card.style.borderTopColor = main ? 'var(--pt-main-accent)' : char.color;
+                const card = document.createElement('div'); card.className = 'char-card'; card.style.borderTopColor = char.color;
+                
                 const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...sortedArchiveEntries.map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
-                const trendHTML = rts.length ? rts.map(r => `<span class="history-rate-chip" data-rate="${Math.max(0,Math.min(100,r))}">${r}%</span>`).join(' <span class="history-trend-arrow">→</span> ') : '<div class="analytics-muted">No history yet.</div>';
-                const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m:0, c:0, x:0, o:0 });
-                sortedArchiveEntries.slice(-5).forEach(([,a]) => {
+                const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
+
+                const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m: 0, c: 0, x: 0, o: 0 });
+                sortedArchiveEntries.forEach(([,a]) => {
                     const order = Array.isArray(a.taskOrder) ? a.taskOrder : weeklyTaskNames;
-                    const stateString = String(a.states?.[char.name] || '');
-                    order.forEach((task, i) => {
-                        if (!stats[task]) stats[task] = {m:0,c:0,x:0,o:0};
-                        if (stateString[i]) {
-                            stats[task].o++;
-                            if (stateString[i] === 'x') stats[task].x++;
-                            else if (stateString[i] === 'd') stats[task].c++;
-                            else stats[task].m++;
-                        }
-                    });
+                    const sStr = String(a.states?.[char.name] || '');
+                    order.forEach((t, i) => { if(!stats[t])stats[t]={m:0,c:0,x:0,o:0}; if(sStr[i]) { stats[t].o++; if(sStr[i]==='x')stats[t].x++; else if(sStr[i]==='d')stats[t].c++; else stats[t].m++; } });
                 });
-                const priorities = Object.entries(stats).map(([task,s]) => {
-                    const eligible = s.m+s.c, weight = getLootWeight(task);
-                    const historicalRate = eligible ? s.c/eligible : 0;
-                    const score = Math.max(0, Math.round(weight * (0.55*(eligible?s.m/eligible:0) + 0.3*Math.min(1,s.m/3) + 0.15*Math.min(1,Math.max(eligible,s.o)/4)) * (1-(0.65*(s.o?s.x/s.o:0))) * 20));
-                    return { task, missed:s.m, eligible, excluded:s.x, weight, score, historicalRate };
-                }).filter(item => item.missed > 0 && !isBountyTask(item.task)).sort((a,b)=>b.score-a.score || b.weight-a.weight || b.missed-a.missed).slice(0,3);
-                const priorityHTML = priorities.length ? priorities.map(item => `<div class="missed-item"><div><strong>${escapeHTML(item.task)}</strong><div class="analytics-muted">${item.missed}/${item.eligible||item.missed} missed · ${item.excluded} N/A · weight ${item.weight}/5</div></div><div class="analytics-priority-score">P${item.score}</div></div>`).join('') : '<div class="missed-item analytics-no-priorities">No missed priorities in the saved history.</div>';
-                const mainBadge = main ? '<span class="analytics-main-badge">★ MAIN</span>' : '';
-                const pattern = getCharacterHistoryPattern(char.name, sortedArchiveEntries.slice(-5));
-                const patternHTML = pattern ? `<p class="analytics-pattern-row"><strong>Pattern so far:</strong> ${escapeHTML(pattern.task)} completed in ${pattern.done}/${pattern.observed} saved weeks.</p>` : '<p class="analytics-pattern-row">Priority pattern is still learning; more saved weekly snapshots are needed.</p>';
-                card.innerHTML = `<div class="card-header">${main ? '★ ' : ''}${escapeHTML(char.name)} ${mainBadge}</div><div class="history-trend"><div class="analytics-section-label">5-week trend</div>${trendHTML}</div><div class="missed-dungeons"><div class="analytics-section-label">Loot-weighted weekly priorities</div>${priorityHTML}</div>${patternHTML}`;
+                
+                const p = Object.entries(stats).map(([t, s]) => {
+                    const e = s.m + s.c, w = getLootWeight(t);
+                    return { t, m: s.m, e, x: s.x, w, sc: Math.max(0, Math.round(w * (0.55 * (e?s.m/e:0) + 0.3 * Math.min(1,s.m/3) + 0.15 * Math.min(1,Math.max(e,s.o)/4)) * (1-(0.65*(s.o?s.x/s.o:0))) * 20)) };
+                }).filter(x => x.m > 0).sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m).slice(0, 3);
+                
+                const prioHTML = p.length ? p.map(i => `<div class="missed-item"><div><strong>${escapeHTML(i.t)}</strong><div style="color:#aaa;font-size:0.75rem;">${i.m}/${i.e||i.m} missed • ${i.x} N/A • L${i.w}</div></div><div style="background:#262630;padding:5px;border-radius:5px;color:#ffd27d;font-weight:bold;">P${i.sc}</div></div>`).join('') : '<div class="missed-item" style="color:#b5e5c5;">No priorities yet.</div>';
+
+                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}</div><div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${prioHTML}</div>`;
                 cont.appendChild(card);
             });
         }
@@ -5729,12 +4949,11 @@
         // ==========================================
         // 💰 ESTATE LEDGER
         // ==========================================
-        function openScholarModal() { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before opening admin tools.'); return; }
+        function openScholarModal() {
             if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; }
             renderScholarLedger(); openModal('scholar-modal');
         }
         function submitScholarLog(player) {
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before changing Ledger entries.'); return; }
             if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; }
             const g = parseFloat(document.getElementById(`scholar-gold-${player}`)?.value) || 0, d = parseFloat(document.getElementById(`scholar-dia-${player}`)?.value) || 0, e = parseFloat(document.getElementById(`scholar-eol-${player}`)?.value) || 0, n = document.getElementById(`scholar-note-${player}`)?.value.trim() || '';
             if (!g && !d && !e) return;
@@ -5743,7 +4962,7 @@
             ['gold', 'dia', 'eol', 'note'].forEach(f => { const el = document.getElementById(`scholar-${f}-${player}`); if(el) el.value = ''; });
             renderScholarLedger(); persistLocalData(); forceSync(false);
         }
-        function deleteScholarLog(player, id) { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before changing Ledger entries.'); return; } if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; } if (!confirm('Remove log?')) return; if (cloudData.scholarship[player].logs[id]) { cloudData.scholarship[player].logs[id].deleted = true; cloudData.updatedAt = Date.now(); renderScholarLedger(); persistLocalData(); forceSync(false); } }
+        function deleteScholarLog(player, id) { if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; } if (!confirm('Remove log?')) return; if (cloudData.scholarship[player].logs[id]) { cloudData.scholarship[player].logs[id].deleted = true; cloudData.updatedAt = Date.now(); renderScholarLedger(); persistLocalData(); forceSync(false); } }
         function renderScholarLedger() {
             ['cheean', 'bio', 'idontheal'].forEach(p => {
                 let bg=0, bd=0, be=0; const logs = Object.entries(cloudData.scholarship[p]?.logs||{}).filter(([,d])=>!d.deleted).map(([id,d])=>({id,...d})).sort((a,b)=>b.timestamp-a.timestamp);
@@ -5779,7 +4998,7 @@
             const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(DEFAULT_LOOT_WEIGHTS[t]||3); cloudData.settings.lootWeightUpdatedAt[t] = ts; });
             buildLootWeightEditor(); renderAnalytics(); triggerAutoSync();
         }
-        function openWeightsModal() { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before opening admin controls.'); return; } if (!isPantheonAdmin()) { alert('Loot Weights is available only to Pantheon administrators.'); return; } buildLootWeightEditor(); openModal('weights-modal'); }
+        function openWeightsModal() { if (!isPantheonAdmin()) { alert('Loot Weights is available only to Pantheon administrators.'); return; } buildLootWeightEditor(); openModal('weights-modal'); }
 
         // --- Drag & Drop Variables ---
         let dragSrcData = null; 
@@ -6125,8 +5344,7 @@
                     color: member.color || roster?.color || '#7aa2f7',
                     rosterId: roster?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, ''),
                     rosterName: member.name,
-                    trackerEnabled: profile.trackerEnabled === true,
-                    isMain: profile.isMain === true
+                    trackerEnabled: profile.trackerEnabled === true
                 }));
             });
         }
@@ -6220,7 +5438,7 @@
             return SECONDARY_ROLE_OPTIONS.map(role => `<label class="role-check"><input type="checkbox" data-role-job="${escapeHTML(job)}" data-role-name="${escapeHTML(role)}" ${selected.has(role) ? 'checked' : ''}><span>${escapeHTML(role)}</span></label>`).join('');
         }
 
-        function openRoleConfigModal() { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before opening Job / Role settings.'); return; } renderRoleConfig(); openModal('role-config-modal'); }
+        function openRoleConfigModal() { renderRoleConfig(); openModal('role-config-modal'); }
 
         function renderRoleConfig() {
             const list = document.getElementById('role-config-list');
@@ -6294,7 +5512,6 @@
         }
 
         function openClassSetupModal() {
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before changing Class Setup.'); return; }
             populateClassSetupRosterFilter();
             renderClassSetup();
             openModal('class-setup-modal');
@@ -6315,7 +5532,6 @@
 
         function getTeamBuilderPrefs() { return { allowSameOwner: localStorage.getItem('pantheon-team-allow-same-owner') === '1' }; }
         function saveTeamBuilderPrefs() {
-            if (getAdminViewAsMember()) return;
             const checked = document.getElementById('allow-same-owner')?.checked;
             localStorage.setItem('pantheon-team-allow-same-owner', checked ? '1' : '0');
             renderTeamBuilder();
@@ -6326,7 +5542,6 @@
         }
 
         function saveSplitPartyMechanic() {
-            if (getAdminViewAsMember()) return;
             const checked = document.getElementById('split-party-mechanic')?.checked !== false;
             const tb = getLocalTeamBuilderState();
             if (checked === (tb.splitPartyMechanic !== false)) return;
@@ -6406,7 +5621,6 @@
         }
 
         function setTeamClassFilter(teamKey, index, className) {
-            if (getAdminViewAsMember()) return;
             if (!teamClassFilters[teamKey]) teamClassFilters[teamKey] = Array(8).fill('');
             teamClassFilters[teamKey][index] = CLASS_ORDER.includes(className) ? className : '';
             const current = getTeamState(teamKey).slots[index]?.character || '';
@@ -6460,11 +5674,10 @@
                 return true;
             });
 
-            return '<option value="">Empty Slot</option>' + opts.map(c => `<option value="${escapeHTML(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${c.isMain ? '★ MAIN · ' : ''}${escapeHTML(c.name)}</option>`).join('');
+            return '<option value="">Empty Slot</option>' + opts.map(c => `<option value="${escapeHTML(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
         }
 
         function setTeamFormat(value) {
-            if (getAdminViewAsMember()) return;
             const next = normalizeTeamFormat(value);
             const tb = getLocalTeamBuilderState();
             if (tb.format === next) return;
@@ -6475,7 +5688,6 @@
         }
 
         function setTeamSlot(teamKey, index, character) {
-            if (getAdminViewAsMember()) return;
             const activeSize = getActiveTeamSize();
             if (index >= activeSize) return;
             const team = getTeamState(teamKey);
@@ -6503,7 +5715,6 @@
         }
 
         function clearTeam(teamKey) {
-            if (getAdminViewAsMember()) return;
             if (!confirm(`Clear ${teamKey === 'team1' ? 'Team 1' : 'Team 2'}?`)) return;
             const team = getTeamState(teamKey), now = Date.now();
             team.slots = team.slots.map(() => ({ character: '', updatedAt: now, deviceId }));
@@ -6665,8 +5876,7 @@
                     const jobHTML = meta ? `<span class="team-job">${escapeHTML(job)}</span>` : (char ? '<span class="team-job team-unknown">Job not set</span>' : '<span class="team-unknown">—</span>');
                     const classHTML = `<select class="team-class-select" onchange="setTeamClassFilter('${teamKey}', ${i}, this.value)">${buildTeamClassOptions(teamKey, i, char)}</select>`;
                     const dmgHTML = meta && jobHasRole(meta, 'DPS') && meta.damageType ? `<span class="team-badge damage-${String(meta.damageType||'').toLowerCase()}">${escapeHTML(meta.damageType)}</span>` : '<span class="team-unknown">—</span>';
-                    const mainRowClass = isMainCharacter(char) ? ' team-row-main' : '';
-                    return `<tr class="${mainRowClass.trim()}"><td class="team-slot">${i+1}</td><td><select class="team-character-select ${char && !job ? 'needs-job' : ''}" onchange="setTeamSlot('${teamKey}', ${i}, this.value)" title="${isMainCharacter(char) ? 'Main character' : 'Choose character'}">${teamCharacterOptions(teamKey,i,char)}</select></td><td class="team-meta">${classHTML}</td><td class="team-meta">${jobHTML}</td><td class="team-meta">${posHTML}</td><td>${dmgHTML}</td><td>${owner ? `<span class="owner-chip">${escapeHTML(owner)}</span>` : '<span class="team-unknown">—</span>'}</td><td><button class="remove-slot-btn" type="button" title="Empty slot" onclick="setTeamSlot('${teamKey}', ${i}, '')">×</button></td></tr>`;
+                    return `<tr><td class="team-slot">${i+1}</td><td><select class="team-character-select ${char && !job ? 'needs-job' : ''}" onchange="setTeamSlot('${teamKey}', ${i}, this.value)">${teamCharacterOptions(teamKey,i,char)}</select></td><td class="team-meta">${classHTML}</td><td class="team-meta">${jobHTML}</td><td class="team-meta">${posHTML}</td><td>${dmgHTML}</td><td>${owner ? `<span class="owner-chip">${escapeHTML(owner)}</span>` : '<span class="team-unknown">—</span>'}</td><td><button class="remove-slot-btn" type="button" title="Empty slot" onclick="setTeamSlot('${teamKey}', ${i}, '')">×</button></td></tr>`;
                 }).join('');
                 renderTeamSummary(teamKey);
             });
@@ -6863,7 +6073,6 @@
         }
 
         async function resetTeamsForNewWeek() {
-            if (getAdminViewAsMember()) return;
             if (!confirm('Clear both teams for a new week?')) return;
             const now = Date.now();
             ['team1','team2'].forEach(k => {
@@ -6952,10 +6161,9 @@
             if (!list) return;
             list.innerHTML = cardWikiBatches.length ? cardWikiBatches.map(batch => `<div class="card-wiki-batch-row"><div><strong>${escapeHTML(batch.name)}</strong><small>${batch.cards.length} cards · saved in this browser only</small></div><button class="btn btn-secondary" type="button" data-remove-card-batch="${escapeHTML(batch.id)}">Remove</button></div>`).join('') : '<div class="member-directory-empty">No custom batches yet. Imported card updates will appear here.</div>';
         }
-        function openCardWikiBatches() { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before editing Card Database batches.'); return; } renderCardWikiBatchList(); openModal('card-wiki-batches-modal'); }
+        function openCardWikiBatches() { renderCardWikiBatchList(); openModal('card-wiki-batches-modal'); }
         function importCardWikiBatch(event) {
             event.preventDefault();
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before editing Card Database batches.'); return; }
             const name = document.getElementById('card-wiki-batch-name').value.trim();
             let parsed;
             try { parsed = JSON.parse(document.getElementById('card-wiki-batch-json').value); }
@@ -6972,7 +6180,6 @@
             document.getElementById('card-wiki-batch-form').reset();
         }
         function removeCardWikiBatch(id) {
-            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before editing Card Database batches.'); return; }
             const batch = cardWikiBatches.find(item => item.id === String(id));
             if (!batch || !confirm(`Remove local batch "${batch.name}"?`)) return;
             const previousBatches = cardWikiBatches;
@@ -7234,7 +6441,6 @@
             </div>`).join('');
         }
         function addMemberCharacterRow(profile = null) {
-            if (getAdminViewAsMember()) return;
             const container = document.getElementById('member-character-editor');
             if (!container) return;
             const rows = [...container.querySelectorAll('[data-member-character-row]')].map(row => ({
@@ -7261,23 +6467,16 @@
             const list = document.getElementById('member-directory-list'); if (!list) return;
             const query = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
             const all = getMemberDirectoryView();
-            const viewAs = getAdminViewAsMember();
-            const scoped = viewAs ? all.filter(member => member.id === viewAs.id) : (isPantheonAdmin() ? all : all.filter(member => canManageMemberRecord(member)));
+            const scoped = isPantheonAdmin() ? all : all.filter(member => canManageMemberRecord(member));
             const members = scoped.filter(member => [member.name, member.note || '', ...(member.characters || []), ...(member.characterProfiles || []).map(profile => `${profile.job} ${profile.trackerEnabled ? 'tracking' : 'directory'}`)].join(' ').toLowerCase().includes(query));
-            const memberForm = document.getElementById('member-directory-form');
-            if (memberForm) memberForm.hidden = !!viewAs;
-            const memberToolbar = document.querySelector('.member-directory-toolbar');
-            if (memberToolbar) memberToolbar.hidden = !!viewAs;
             const memberNameInput = document.getElementById('member-directory-name');
             if (memberNameInput && !isPantheonAdmin()) { memberNameInput.readOnly = true; if (!editingMemberDirectoryId) memberNameInput.value = getCurrentOwnerName(); }
             else if (memberNameInput) memberNameInput.readOnly = false;
             const memberHeading = document.getElementById('member-directory-form-title');
             const memberDescription = document.getElementById('member-roster-description');
-            if (memberDescription) memberDescription.textContent = viewAs
-                ? `Read-only preview of ${viewAs.name}'s Member Roster. The entry is scoped to this member and all editing is disabled until you exit preview.`
-                : isPantheonAdmin()
-                    ? 'Shared guild directory. Manage member records and choose which characters appear in Tracker. All registered characters remain available in Team Builder.'
-                    : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
+            if (memberDescription) memberDescription.textContent = isPantheonAdmin()
+                ? 'Shared guild directory. Manage member records and choose which characters appear in Tracker. All registered characters remain available in Team Builder.'
+                : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
             if (memberHeading && !isPantheonAdmin() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
             const trackingCount = members.reduce((sum, member) => sum + (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length, 0);
@@ -7290,13 +6489,10 @@
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
                     const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Not tracked; still available in Team Builder'}`;
-                    return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${profile.isMain ? '★ ' : ''}${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span>${viewAs ? '' : `<button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button>`}</span>`;
+                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
-                const removeMemberButton = isPantheonAdmin() && !viewAs ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
-                const mainProfile = (member.characterProfiles || []).find(profile => profile.isMain);
-                const hasMain = !!mainProfile;
-                const actions = viewAs ? '<span class="member-directory-preview-readonly">Read-only preview</span>' : `<button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}`;
-                return `<article class="member-directory-card${hasMain ? ' is-main-owner' : ''}" style="border-top:3px solid ${hasMain ? 'var(--pt-main-accent)' : normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${mainProfile ? `<span class="member-directory-badge main-owner-badge">★ Main: ${escapeHTML(mainProfile.name)}</span>` : ''}${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions">${actions}</div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
+                const removeMemberButton = isPantheonAdmin() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
+                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
             }).join('') : `<div class="member-directory-empty">${isPantheonAdmin() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
         }
         function resetMemberDirectoryForm() {
@@ -7315,7 +6511,6 @@
             renderMemberCharacterRows([]);
         }
         function startMemberDirectoryEdit(name, recordId = '') {
-            if (getAdminViewAsMember()) return alert('Exit the read-only member preview before editing a roster.');
             const view = getMemberDirectoryView().find(member => member.name.toLowerCase() === String(name).toLowerCase());
             const record = recordId ? normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.id === recordId) : view;
             if (!view || !canManageMemberRecord(record || view)) { alert('You can only edit the characters linked to your own Discord account.'); return; }
@@ -7330,14 +6525,12 @@
             document.getElementById('member-directory-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         async function addMemberDirectoryCharacter(ownerName) {
-            if (getAdminViewAsMember()) return alert('Exit the read-only member preview before editing a roster.');
             const view = getMemberDirectoryView().find(member => member.name.trim().toLowerCase() === String(ownerName || '').trim().toLowerCase());
             if (!view) return alert('That member is no longer in the roster. Refresh and try again.');
             startMemberDirectoryEdit(view.name, view.recordId || view.id);
             addMemberCharacterRow();
         }
         async function removeMemberDirectoryCharacter(ownerName, characterName) {
-            if (getAdminViewAsMember()) return alert('Exit the read-only member preview before editing a roster.');
             const ownerKey = String(ownerName || '').trim().toLowerCase();
             const charKey = String(characterName || '').trim().toLowerCase();
             const initialEntries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
@@ -7365,7 +6558,6 @@
         }
         async function saveMemberDirectoryForm(event) {
             event.preventDefault();
-            if (getAdminViewAsMember()) return alert('Exit the read-only member preview before editing a roster.');
             let name = document.getElementById('member-directory-name').value.trim().slice(0, 60);
             const profiles = collectMemberCharacterRows();
             const note = document.getElementById('member-directory-note').value.trim().slice(0, 160);
@@ -7452,7 +6644,6 @@
             if (isCurrentUserEntry && profiles.length && profiles.filter(profile => profile.isMain).length === 1) closeModal('profile-confirm-modal');
         }
         async function removeMemberDirectoryEntry(id) {
-            if (getAdminViewAsMember()) return alert('Exit the read-only member preview before editing a roster.');
             if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.id === id);
@@ -7488,7 +6679,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.7.1';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -7914,7 +7105,7 @@
             // On every entry to Tracker, force the signed-in Discord account's own roster.
             // This overrides stale local Universal View state; the toolbar toggle still lets
             // a member switch to Universal View manually while remaining on the Tracker page.
-            if (page === 'tracker' && pantheonDiscordUser?.id && !(isPantheonAdmin() && adminViewAsMemberId)) applyDiscordIdentityDefaults();
+            if (page === 'tracker' && pantheonDiscordUser?.id) applyDiscordIdentityDefaults();
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
             if (page === 'overview') { renderOverviewActivity(); updateOverviewStatusCards(); }
             if (page === 'tracker') { syncDataStructures(); buildTrackerTable(); applyBoardState(); if (isAnalyticsVisible) renderAnalytics(); updateClassSetupSummary(); }
@@ -7926,26 +7117,14 @@
 
 
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
-        function openRegistrationPage() { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before opening registration.'); return; } renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
+        function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
-        function openDungeonPage() { if (getAdminViewAsMember()) { alert('Exit the read-only member preview before opening admin controls.'); return; } if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function openDungeonPage() { if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
             closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('weights-modal'); closeModal('version-history-modal');
             const route = location.hash || '#overview';
             const adminOnlyRoutes = new Set(['#dungeons', '#loot-weights', '#version-history', '#sync-now']);
-            if (route === '#registration' && getAdminViewAsMember()) {
-                history.replaceState(null, '', location.pathname + location.search);
-                showAppPage('overview');
-                alert('Exit the read-only member preview before opening registration.');
-                return;
-            }
-            if (adminOnlyRoutes.has(route) && getAdminViewAsMember()) {
-                history.replaceState(null, '', location.pathname + location.search);
-                showAppPage('overview');
-                alert('Exit the read-only member preview before opening admin controls.');
-                return;
-            }
             if (adminOnlyRoutes.has(route) && !isPantheonAdmin()) {
                 history.replaceState(null, '', location.pathname + location.search);
                 showAppPage('overview');
@@ -8044,15 +7223,9 @@
         document.documentElement.setAttribute('data-pantheon-theme', theme);
         document.querySelectorAll('[data-pantheon-theme-select]').forEach(function (select) { select.value = theme; });
         if (persist) {
-            const viewAs = typeof window.pantheonIsAdminViewAsActive === 'function' && window.pantheonIsAdminViewAsActive();
-            if (!viewAs) {
-                try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
-                if (typeof window.pantheonSyncThemePreference === 'function') window.pantheonSyncThemePreference(theme);
-            }
+            try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
         }
     }
-    window.pantheonApplyTheme = applyPantheonTheme;
-    window.pantheonGetTheme = function () { return document.documentElement.getAttribute('data-pantheon-theme') || 'dark'; };
     document.querySelectorAll('[data-pantheon-theme-select]').forEach(function (select) {
         select.addEventListener('change', function () { applyPantheonTheme(select.value, true); });
     });
