@@ -46,3 +46,15 @@ CREATE TABLE IF NOT EXISTS audit_events (
   details_json TEXT NOT NULL DEFAULT '{}'
 );
 CREATE INDEX IF NOT EXISTS idx_audit_created_at ON audit_events(created_at DESC);
+
+
+-- Berlin's Workshop: one private virtual inventory per authenticated Discord account.
+CREATE TABLE IF NOT EXISTS berlin_game_profiles (
+  discord_id TEXT PRIMARY KEY,
+  username TEXT NOT NULL DEFAULT '',
+  profile_json TEXT NOT NULL,
+  version INTEGER NOT NULL DEFAULT 1,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_berlin_profiles_updated ON berlin_game_profiles(updated_at DESC);
