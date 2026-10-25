@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r7</title>
+    <title>Pantheon Tools v1.6.8-r9</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2468,37 +2468,134 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-v168-r7-main-fill-and-pulse-clarity">
-/* Distinct Main fills adapt with the selected theme; no heavy outline is used to communicate role. */
-:root[data-pantheon-theme="dark"] { --pt-main-fill:#2d3850; --pt-main-star:#eed184; --pt-main-overlay:rgba(183,199,255,.07); }
-:root[data-pantheon-theme="light"] { --pt-main-fill:#e8edff; --pt-main-star:#7c5a0b; --pt-main-overlay:rgba(75,101,195,.08); }
-:root[data-pantheon-theme="eye-comfort"] { --pt-main-fill:#e9e9d4; --pt-main-star:#6d5a16; --pt-main-overlay:rgba(90,108,66,.09); }
-:root[data-pantheon-theme="pastel"] { --pt-main-fill:#f1e0fa; --pt-main-star:#80519b; --pt-main-overlay:rgba(130,79,161,.08); }
-:root[data-pantheon-theme] .main-character-badge,:root[data-pantheon-theme] .profile-confirm-main { display:inline-flex !important; align-items:center; justify-content:center; margin-left:4px !important; padding:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; color:var(--pt-main-star) !important; -webkit-text-fill-color:var(--pt-main-star) !important; box-shadow:none !important; font-size:.78rem !important; font-weight:900 !important; line-height:1 !important; opacity:1 !important; vertical-align:middle; }
+<style id="pantheon-v168-r8-main-gold-outline">
+/* Main characters use the original pale-gold outline; keep each surface's normal theme fill. */
+:root[data-pantheon-theme] { --pt-main-outline:#d4ac42; }
+:root[data-pantheon-theme="dark"] { --pt-main-star:#eed184; }
+:root[data-pantheon-theme="light"],
+:root[data-pantheon-theme="eye-comfort"],
+:root[data-pantheon-theme="pastel"] { --pt-main-star:#96721b; }
+:root[data-pantheon-theme] .main-character-badge,
+:root[data-pantheon-theme] .profile-confirm-main { display:inline-flex !important; align-items:center; justify-content:center; margin-left:4px !important; padding:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; color:var(--pt-main-star) !important; -webkit-text-fill-color:var(--pt-main-star) !important; box-shadow:none !important; font-size:.78rem !important; font-weight:900 !important; line-height:1 !important; opacity:1 !important; vertical-align:middle; }
 .focus-main-star { color:var(--pt-main-star); font-size:.8rem; margin-left:2px; }
-:root[data-pantheon-theme] .char-card.is-main-character { border:1px solid var(--pt-border) !important; border-top:1px solid var(--pt-border) !important; background:var(--pt-main-fill) !important; box-shadow:0 3px 12px rgba(0,0,0,.08) !important; }
-:root[data-pantheon-theme] .char-card.is-main-character .card-header { background:var(--pt-main-fill) !important; border-bottom-color:var(--pt-border) !important; color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
-.member-directory-char.is-main-character,:root[data-pantheon-theme] :root[data-pantheon-theme] .member-directory-char.is-main-character { border:1px solid var(--pt-border) !important; background:var(--pt-main-fill) !important; color:var(--pt-text) !important; box-shadow:none !important; }
-.member-directory-char.is-main-character .member-directory-char-label,:root[data-pantheon-theme] .member-directory-char.is-main-character .member-directory-char-label { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
-.member-directory-char.is-main-character .member-directory-char-status { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; -webkit-text-fill-color:var(--pt-text) !important; }
-:root[data-pantheon-theme] .profile-confirm-character:has(.profile-confirm-main) { background:var(--pt-main-fill) !important; border-color:var(--pt-border) !important; box-shadow:none !important; }
-:root[data-pantheon-theme] .class-setup-table tr.is-main-character td,:root[data-pantheon-theme] .team-table tr.is-main-character td { background:var(--pt-main-fill) !important; border-top:1px solid var(--pt-border) !important; border-bottom:1px solid var(--pt-border) !important; color:var(--pt-text) !important; }
-:root[data-pantheon-theme] .class-setup-table tr.is-main-character td:first-child,:root[data-pantheon-theme] .team-table tr.is-main-character td:first-child { border-left:1px solid var(--pt-border) !important; }
-:root[data-pantheon-theme] .class-setup-table tr.is-main-character td:last-child,:root[data-pantheon-theme] .team-table tr.is-main-character td:last-child { border-right:1px solid var(--pt-border) !important; }
-:root[data-pantheon-theme] .activity-insight-item.is-main-character { border:1px solid var(--pt-border) !important; background:var(--pt-main-fill) !important; box-shadow:none !important; }
-:root[data-pantheon-theme] .focus-character-chip.is-main { border-color:var(--pt-border) !important; background:var(--pt-main-fill) !important; box-shadow:none !important; }
-:root[data-pantheon-theme] #dn-tracker .char-col.is-main-character { background:var(--pt-main-fill) !important; color:var(--pt-text) !important; box-shadow:none !important; outline:none !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme] .char-card.is-main-character { border:2px solid var(--pt-main-outline) !important; border-top:5px solid var(--pt-main-outline) !important; background:var(--pt-surface-raised) !important; box-shadow:0 0 0 1px rgba(212,172,66,.12),0 4px 12px rgba(0,0,0,.10) !important; }
+:root[data-pantheon-theme] .char-card.is-main-character .card-header { background:var(--pt-surface-raised) !important; border-bottom-color:var(--pt-main-outline) !important; color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme] .member-directory-char.is-main-character { border:1px solid var(--pt-main-outline) !important; background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; box-shadow:inset 0 0 0 1px rgba(212,172,66,.14) !important; }
+:root[data-pantheon-theme] .member-directory-char.is-main-character .member-directory-char-label { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme] .member-directory-char.is-main-character .member-directory-char-status { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme] .profile-confirm-character:has(.profile-confirm-main) { background:var(--pt-surface-raised) !important; border-color:var(--pt-main-outline) !important; box-shadow:inset 0 0 0 1px rgba(212,172,66,.12) !important; }
+:root[data-pantheon-theme] .class-setup-table tr.is-main-character td,
+:root[data-pantheon-theme] .team-table tr.is-main-character td { background:transparent !important; border-top:1px solid var(--pt-main-outline) !important; border-bottom:1px solid var(--pt-main-outline) !important; color:var(--pt-text) !important; }
+:root[data-pantheon-theme] .class-setup-table tr.is-main-character td:first-child,
+:root[data-pantheon-theme] .team-table tr.is-main-character td:first-child { border-left:2px solid var(--pt-main-outline) !important; }
+:root[data-pantheon-theme] .class-setup-table tr.is-main-character td:last-child,
+:root[data-pantheon-theme] .team-table tr.is-main-character td:last-child { border-right:2px solid var(--pt-main-outline) !important; }
+:root[data-pantheon-theme] .activity-insight-item.is-main-character { border:1px solid var(--pt-main-outline) !important; border-radius:10px; padding:10px; margin:6px 0; background:var(--pt-surface-raised) !important; box-shadow:inset 3px 0 var(--pt-main-outline) !important; }
+:root[data-pantheon-theme] .focus-character-chip.is-main { border-color:var(--pt-main-outline) !important; background:var(--pt-surface-raised) !important; box-shadow:inset 0 0 0 1px rgba(212,172,66,.15) !important; }
+:root[data-pantheon-theme] #dn-tracker .char-col.is-main-character { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; box-shadow:inset 2px 0 var(--pt-main-outline),inset -2px 0 var(--pt-main-outline) !important; outline:none !important; border-color:var(--pt-main-outline) !important; }
 :root[data-pantheon-theme] #dn-tracker th.is-main-character::after { color:var(--pt-main-star) !important; }
-:root[data-pantheon-theme] #dn-tracker td.is-main-character { box-shadow:none !important; }
-:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character:not(.done):not(.marked):not(.excluded):not(.reset) { background:var(--pt-main-fill) !important; border-color:var(--pt-border) !important; }
-:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.done { background:color-mix(in srgb,var(--pt-positive) 24%,var(--pt-main-fill)) !important; border-color:var(--pt-positive) !important; }
-:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.marked { background:color-mix(in srgb,var(--pt-accent) 19%,var(--pt-main-fill)) !important; border-color:var(--pt-accent) !important; box-shadow:inset 0 0 0 1px var(--pt-accent) !important; }
-:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.reset { background:color-mix(in srgb,var(--pt-accent-soft) 62%,var(--pt-main-fill)) !important; border-color:var(--pt-accent) !important; box-shadow:inset 0 0 0 1px var(--pt-accent) !important; }
-:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.excluded { background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--pt-surface-soft) 75%,var(--pt-main-fill)),color-mix(in srgb,var(--pt-surface-soft) 75%,var(--pt-main-fill)) 10px,var(--pt-hover) 10px,var(--pt-hover) 20px) !important; color:var(--pt-muted) !important; }
-/* Pulse labels explain the status; Lucky Zones are explicitly described as a planning estimate only. */
+:root[data-pantheon-theme] #dn-tracker td.is-main-character { box-shadow:inset 2px 0 rgba(212,172,66,.75),inset -2px 0 rgba(212,172,66,.75) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character:not(.done):not(.marked):not(.excluded):not(.reset) { background:transparent !important; border-color:var(--pt-main-outline) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.done { border-color:var(--pt-positive) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.marked,
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.reset { border-color:var(--pt-accent) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.excluded { color:var(--pt-muted) !important; }
+/* Pulse labels explain the status; Lucky Zones are a planning estimate, not tracked completions. */
 .focus-model-explainer { color:var(--pt-muted) !important; }
 .focus-model-summary { display:flex; flex-wrap:wrap; gap:3px 8px; }
 .focus-review-note { overflow-wrap:anywhere; }
+</style>
+
+
+<style id="pantheon-v168-r9-responsive-shell">
+/* Fix width-plus-padding overflow without globally changing existing component sizing. */
+.controls {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:min(1600px,100%) !important;
+  min-width:0 !important;
+}
+.controls > *, .controls .control-actions, .controls .toolbar-row, .controls .toolbar-group,
+.controls .brand-area, .controls .topbar-player { min-width:0 !important; }
+.app-page, .analytics-container { box-sizing:border-box !important; width:100% !important; max-width:1600px !important; min-width:0 !important; margin-left:auto !important; margin-right:auto !important; }
+#online-presence-pane { box-sizing:border-box !important; min-width:0 !important; }
+
+/* Use the floating side rail only when the viewport actually has room beside the centered 1600px app.
+   At regular desktop/laptop widths, keep it in normal flow instead of covering the app's left side. */
+@media (min-width:2200px) {
+  body { padding-left:0 !important; padding-right:0 !important; }
+  #online-presence-pane {
+    position:fixed !important; left:max(12px,calc((100vw - 1600px)/2 - 282px)) !important; top:145px !important;
+    width:270px !important; max-width:270px !important; max-height:calc(100vh - 165px) !important;
+    margin:0 !important; z-index:850;
+  }
+  #online-presence-pane .online-presence-list { max-height:min(58vh,560px) !important; }
+}
+@media (min-width:761px) and (max-width:2199px) {
+  body { align-items:center !important; }
+  #online-presence-pane {
+    position:relative !important; inset:auto !important; transform:none !important;
+    width:min(100%,920px) !important; max-width:920px !important; max-height:min(42vh,380px) !important;
+    margin:12px auto 16px !important; z-index:30;
+  }
+  #online-presence-pane .online-presence-list { max-height:min(30vh,260px) !important; }
+}
+
+/* A browser maximized at 125–150% display scaling may report only ~1000–1280 CSS pixels.
+   Switch dense layouts earlier rather than shrinking every card into narrow columns. */
+@media (min-width:761px) and (max-width:1280px) {
+  body { padding:18px clamp(12px,1.8vw,22px) 36px !important; align-items:stretch !important; }
+  .controls {
+    width:100% !important; max-width:1600px !important; flex-wrap:wrap !important;
+    align-items:flex-start !important; gap:10px !important; padding:12px !important;
+  }
+  .controls .brand-area { flex:0 1 auto !important; max-width:100%; }
+  .controls .control-actions {
+    display:flex !important; flex:1 1 100% !important; width:100% !important; max-width:100% !important;
+    min-width:0 !important; flex-wrap:wrap !important; justify-content:flex-start !important; gap:7px !important;
+  }
+  .controls .toolbar-row { width:100% !important; justify-content:flex-start !important; flex-wrap:wrap !important; gap:6px !important; }
+  .controls .toolbar-group { max-width:100% !important; flex-wrap:wrap !important; gap:5px !important; }
+  .controls .topbar-player { max-width:100% !important; flex-wrap:wrap !important; }
+  .controls .identity-select, .controls .roster-filter-top { min-width:0 !important; max-width:100% !important; }
+
+  .overview-dashboard-head-r2 { grid-template-columns:minmax(0,1fr) !important; gap:10px !important; }
+  .overview-dashboard-head-r2 > * { min-width:0 !important; width:100% !important; max-width:100% !important; }
+  .overview-dashboard-head-r2 > .overview-profile-chip-r2 { min-width:0 !important; width:100% !important; }
+  .overview-bottom-grid { grid-template-columns:minmax(0,1fr) !important; gap:12px !important; }
+  .overview-tools-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  #team-builder-page .team-builder-grid { grid-template-columns:minmax(0,1fr) !important; }
+  #card-database-page .card-wiki-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  #card-database-page .card-wiki-controls { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .weekly-plan-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .overview-panel, .weekly-plan-card, .focus-character-chip, .team-builder-panel, .card-wiki-panel { min-width:0 !important; }
+  .table-responsive, .team-table-wrap, .class-setup-table-wrap, .card-wiki-table-wrap { max-width:100% !important; overflow-x:auto !important; }
+}
+@media (max-width:760px) {
+  .controls { box-sizing:border-box !important; width:100% !important; max-width:100% !important; }
+  #online-presence-pane { box-sizing:border-box !important; width:100% !important; max-width:920px !important; }
+}
+</style>
+
+
+<style id="pantheon-v168-r9-responsive-breathing-room">
+/* Give scaled laptop viewports more breathing room without enlarging text or changing the centered shell. */
+@media (min-width:761px) and (max-width:1280px) {
+  .overview-tools-grid { gap:14px !important; }
+  .overview-bottom-grid { gap:16px !important; }
+  .overview-dashboard-head-r2 { gap:14px !important; }
+  .overview-panel, .weekly-plan-card, .team-builder-panel, .card-wiki-panel, .member-directory-panel { margin-bottom:4px; }
+  .card-wiki-grid { gap:14px !important; }
+  .card-wiki-controls { gap:12px !important; }
+  .weekly-plan-grid { gap:12px !important; }
+  .member-directory-list { gap:12px !important; }
+  .app-page { padding-bottom:24px !important; }
+}
+@media (max-width:760px) {
+  .overview-tools-grid { gap:10px !important; }
+  .overview-bottom-grid { gap:12px !important; }
+  .overview-panel { padding:13px !important; }
+}
 </style>
 
 </head>
@@ -2659,7 +2756,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 </div>
             </section>
             <section class="overview-panel overview-completion-panel">
-                <div class="overview-panel-heading"><div><h2>Character Completion</h2><p>See which opted-in characters are on pace and which may need attention.</p></div><span class="overview-panel-kicker">LOWEST FIRST</span></div>
+                <div class="overview-panel-heading"><div><h2>Character Completion</h2><p>See which opted-in characters are on pace and which may need attention.</p></div><span class="overview-panel-kicker" id="overview-completion-sort-label">WEEK START</span></div>
                 <div id="overview-character-completion" class="overview-character-completion" aria-live="polite">
                     <div class="activity-insight-empty">Your character completion details will appear here after your registered characters are loaded.</div>
                 </div>
@@ -2941,9 +3038,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r7</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r9</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r7 update:</strong> theme-aware Main character fills, a clearer Character Activity Summary, and Lucky Zone time estimates separated from tracked task completions.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r9 update:</strong> improved layouts for laptop and scaled displays, with weekly reminders that become more urgent as reset approaches.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5760,6 +5857,32 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             set('overview-permissions-value', isAdmin ? 'Administrator' : 'Member');
             set('overview-permissions-detail', isAdmin ? 'Guild management access' : 'Authenticated guild account');
         }
+        function getWeeklyPaceContext(now = Date.now()) {
+            const weekMs = 7 * 24 * 60 * 60 * 1000;
+            const cycleStart = getTargetResetTimeUTC(true);
+            const nextReset = cycleStart + weekMs;
+            const elapsedHours = Math.max(0, Math.min(168, (now - cycleStart) / 3600000));
+            const hoursLeft = Math.max(0, (nextReset - now) / 3600000);
+            const label = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? 'Final 2 days' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : hoursLeft <= 120 ? 'Early week' : 'Week just started';
+            return { cycleStart, nextReset, elapsedHours, hoursLeft, label };
+        }
+
+        function getPacedCompletionBadge(item, pace) {
+            if (item.eligible <= 0) return ['No eligible tasks', 'good'];
+            if (item.pending <= 0) return ['Complete', 'good'];
+            if (pace.elapsedHours < 48) return [item.done === 0 && !item.thisWeekActivity ? 'Week just started' : 'In progress', 'good'];
+            if (pace.elapsedHours < 96) {
+                if (item.done === 0 && !item.thisWeekActivity) return ['Not started', 'watch'];
+                return item.rate < 25 ? ['Getting started', 'watch'] : item.rate < 65 ? ['In progress', 'good'] : ['On pace', 'good'];
+            }
+            if (pace.elapsedHours < 144) {
+                if (item.done === 0 && !item.thisWeekActivity) return ['No completions', 'watch'];
+                return item.rate < 25 ? ['Behind pace', 'watch'] : item.rate < 55 ? ['Needs attention', 'watch'] : item.rate < 75 ? ['In progress', 'good'] : ['On pace', 'good'];
+            }
+            if (pace.hoursLeft <= 8 && item.rate < 70) return [item.rate < 40 ? 'Low completion' : 'Final push', 'watch'];
+            return item.rate < 40 ? ['Low completion', 'watch'] : item.rate < 70 ? ['Final push', 'watch'] : ['On pace', 'good'];
+        }
+
         function renderOverviewActivity() {
             const cont = document.getElementById('overview-activity');
             const completionCont = document.getElementById('overview-character-completion');
@@ -5772,6 +5895,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 : [];
             const uniqueNames = [...new Map(enabledNames.map(name => [String(name).trim().toLocaleLowerCase(), String(name).trim()])).values()].filter(Boolean);
             const tasks = typeof getCompletionTaskNames === 'function' ? getCompletionTaskNames() : [];
+            const pace = getWeeklyPaceContext();
             const analyticsOn = cloudData?.settings?.analyticsTrackingEnabled === true;
             const archives = Object.entries(safeObject(cloudData?.weeklyArchive))
                 .sort((a, b) => Number(a[0]) - Number(b[0]))
@@ -5805,15 +5929,39 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const priorities = [];
             metrics.forEach(item => {
                 const nextTask = item.pendingTasks[0]?.task || '';
-                if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity) {
-                    priorities.push({ rank: 0, tone:'watch', icon:'◷', label:'No completions yet', title:`${item.name}${item.isMain ? ' · Main' : ''} has no weekly completions recorded yet`, body:`Nothing is marked complete for this week yet. If you meant to keep this character active, start with ${nextTask ? `“${nextTask}”` : 'one eligible weekly task'}. If the character is intentionally parked, turn off its Tracker opt-in so the completion view matches your current rotation.`, meta:`0/${item.eligible} eligible tasks complete · this is a prompt, not a judgment` });
-                } else if (item.eligible > 0 && item.rate < 40) {
-                    priorities.push({ rank: 1, tone:'watch', icon:'!', label:'Several tasks open', title:`${item.name}${item.isMain ? ' · Main' : ''} has ${item.pending} tasks still open`, body:`${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). ${nextTask ? `Highest-weight open task to tackle next: “${nextTask}”.` : 'Review remaining eligible tasks before reset.'} If priorities changed, consider pausing tracking instead of carrying this character as an ongoing reminder.`, meta:`${item.pending} outstanding · Bounty tasks excluded` });
-                } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0) {
-                    priorities.push({ rank: 2, tone:'watch', icon:'↗', label:'Needs a nudge', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A useful next step is “${nextTask}”, currently among the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} If the character is not a current focus, consider turning off its tracking opt-in.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
+                // Ease into the week. No low-completion alarms in the first 48 hours;
+                // increase urgency gradually as the Saturday reset approaches.
+                if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 48) {
+                    const late = pace.elapsedHours >= 144;
+                    const midweek = pace.elapsedHours >= 96;
+                    priorities.push({
+                        rank: late ? 0 : midweek ? 2 : 4, tone:'watch', icon: late ? '!' : '◷',
+                        label: late ? 'No completions' : 'Not started',
+                        title:`${item.name}${item.isMain ? ' · Main' : ''} has no weekly completions recorded`,
+                        body: late
+                            ? `No eligible weekly tasks are marked complete and reset is about ${Math.ceil(pace.hoursLeft)} hours away. Check whether you played this character but missed ticks, or whether it is not part of this week's rotation${nextTask ? `; a suggested task is “${nextTask}”` : ''}.`
+                            : `No eligible weekly tasks are marked complete yet. Check whether you missed ticks or whether this character is not part of this week's plan${nextTask ? `; a suggested task is “${nextTask}”` : ''}.`,
+                        meta:`0/${item.eligible} eligible weekly tasks recorded · confirm activity before changing tracking`
+                    });
+                } else if (item.eligible > 0 && item.rate < 40 && pace.elapsedHours >= 48) {
+                    const late = pace.elapsedHours >= 144;
+                    const midweek = pace.elapsedHours >= 96;
+                    priorities.push({
+                        rank: late ? 1 : midweek ? 2 : 4, tone:'watch', icon: late ? '!' : '↗',
+                        label: late ? 'Low completion' : midweek ? 'Behind pace' : 'In progress',
+                        title:`${item.name}${item.isMain ? ' · Main' : ''}: ${item.pending} weekly tasks remain open`,
+                        body: late
+                            ? `${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%) with reset approaching. If time is limited, start with ${nextTask ? `“${nextTask}”` : 'the tasks that matter most this week'}.`
+                            : midweek
+                                ? `${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). The week is past its midpoint; consider ${nextTask ? `“${nextTask}”` : 'the highest-priority open task'} if this character is still in your rotation.`
+                                : `${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). The week is still in progress; use the remaining time according to your priorities${nextTask ? `, starting with “${nextTask}” if it fits` : ''}.`,
+                        meta:`${item.pending} open · Bounty tasks excluded`
+                    });
+                } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0 && pace.elapsedHours >= 96) {
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A useful next step is “${nextTask}”, one of the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} Keep this character in the rotation only if it remains a current priority.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
                 }
-                if (item.trend !== null && item.trend <= -20) {
-                    priorities.push({ rank: 1, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, a changed priority, or simply a missed update. Review the next reset cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
+                if (pace.elapsedHours >= 48 && item.trend !== null && item.trend <= -20) {
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, changed priorities, or missed ticks. Review another cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
                 }
             });
             priorities.sort((a,b) => a.rank-b.rank || a.title.localeCompare(b.title));
@@ -5821,7 +5969,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (summary) {
                 const stats = [
                     { label:'Tracked characters', value:String(metrics.length), detail: main ? `Main: ${main.name}` : 'Characters opted into Tracker' },
-                    { label:'Weekly completion', value:average === null ? '—' : `${average}%`, detail: totalEligible ? `${totalDone} of ${totalEligible} eligible tasks` : 'No eligible weekly tasks' },
+                    { label:'Weekly completion', value:average === null ? '—' : `${average}%`, detail: totalEligible ? `${totalDone} of ${totalEligible} eligible tasks · ${pace.label}` : `No eligible weekly tasks · ${pace.label}` },
                     { label:'Still open', value:String(totalPending), detail: 'Bounty Boards are excluded' }
                 ];
                 summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
@@ -5832,19 +5980,24 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Character-level completion will appear here once at least one registered character is opted into Tracker. No roster or progress data is shown for other members.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
-            let insightHtml = `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted</span></div>`;
+            let insightHtml = `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(pace.label)}</span></div>`;
             if (shownPriorities.length) {
                 insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
-                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>Nothing needs urgent attention</strong><p>Your currently tracked characters are either on pace or have no open eligible tasks. Keep the same cadence and check back before the Saturday reset.</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
+                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.elapsedHours < 48 ? 'The week has just started' : 'No immediate follow-up'}</strong><p>${pace.elapsedHours < 48 ? 'Completion percentages are still settling after the reset. Reminders become more urgent gradually as Saturday approaches.' : pace.elapsedHours < 96 ? 'Weekly tasks are in progress. Choose what fits your time; reminders get more specific later in the week.' : 'No major follow-up is flagged right now. Check remaining tasks again as the Saturday reset gets closer.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
             }
             if (cont) cont.innerHTML = insightHtml;
 
-            const sortedMetrics = [...metrics].sort((a,b) => a.rate-b.rate || Number(b.isMain)-Number(a.isMain) || a.name.localeCompare(b.name));
+            const sortedMetrics = [...metrics].sort((a,b) => {
+                if (pace.elapsedHours < 96) return Number(b.isMain)-Number(a.isMain) || Number(b.thisWeekActivity)-Number(a.thisWeekActivity) || b.done-a.done || a.name.localeCompare(b.name);
+                return a.rate-b.rate || Number(b.isMain)-Number(a.isMain) || a.name.localeCompare(b.name);
+            });
+            const completionSortLabel = document.getElementById('overview-completion-sort-label');
+            if (completionSortLabel) completionSortLabel.textContent = pace.elapsedHours < 48 ? 'WEEK START' : pace.elapsedHours < 96 ? 'ACTIVITY FIRST' : pace.elapsedHours < 144 ? 'PACE CHECK' : 'LOWEST FIRST';
             let completionHtml = '';
             if (sortedMetrics.length) {
                 completionHtml = sortedMetrics.map(item => {
-                    const badge = item.done === 0 && !item.thisWeekActivity ? ['No completions','watch'] : item.rate < 40 ? ['Low completion','watch'] : item.rate < 70 ? ['In progress','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
+                    const badge = getPacedCompletionBadge(item, pace);
                     const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
                     const pendingName = item.pendingTasks[0]?.task;
                     const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
@@ -5925,7 +6078,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const nextReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
             const minsLeft = Math.max(0, Math.round((nextReset - now) / 60000));
             const hoursLeft = minsLeft / 60;
-            const urgency = hoursLeft <= 2 ? 'Reset soon' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? '2 days left' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : 'New cycle';
+            const urgency = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? 'Final 2 days' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : hoursLeft <= 120 ? 'Early week' : 'Week just started';
             const recent = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-3);
             const cycleStart = getTargetResetTimeUTC(false);
             const cycleHours = Math.max(0, (now - cycleStart) / 3600000);
@@ -8020,7 +8173,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r6';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r9';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

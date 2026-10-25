@@ -1,6 +1,16 @@
-# Pantheon Tools v1.6.8-r5 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r9 — Cloudflare Pages + D1
 
 This release remains based directly on the stable v1.6.8 branch. It refines the existing UI and keeps the original package structure; it does not incorporate the later v1.6.9 or v1.7.x code branches.
+
+## v1.6.8-r9 responsive layout and weekly pacing update
+
+- Prevented the top toolbar from exceeding its container because of width-plus-padding calculations.
+- Kept the main tool centered. The Online/Offline roster floats beside it only when there is enough outer gutter; on regular desktop/laptop widths it moves into normal flow rather than covering the application.
+- Added earlier responsive breakpoints for browser windows reduced by Windows display scaling or browser zoom. Dense overview panels and Team Builder content stack before their columns become cramped; Card Database controls and cards adapt to the available width.
+- Added adaptive spacing at scaled laptop widths without enlarging the original text scale.
+- Made Overview Analytics time-aware: the first 48 hours after the Saturday 09:00 Manila reset are treated as early week, with no low-completion reminders. Reminders grow more direct through the week, and “Low completion” appears only near the final day when the recorded rate remains low.
+- Character Completion prioritizes Main/recorded activity early in the week, then switches to pace checks and lowest completion as reset approaches. Weekly completion summaries show the current week phase.
+- Kept tables within their own horizontal scroll containers. No schema, API, permission, or database changes.
 
 ## v1.6.8-r5 update
 
@@ -257,6 +267,12 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - Updated the release version to v1.6.6.
 - Weekly archive snapshots also enforce ownership: members can add/update their own character's weekly rate/state, but cannot change another character's archived progress, alter the global task order, or delete a shared archive week. Archive pruning is administrator-only.
 
+
+## v1.6.8-r8 notes
+
+- Reverted Main-character presentation from theme-tinted fills to the pale-gold border outline, retaining a small gold star for quick recognition.
+- Normal theme surfaces and Tracker task-state fills remain intact; the gold outline highlights Main characters without recoloring completion/exclusion states.
+- Cosmetic-only change; no schema, API, permission, or event-setting changes.
 
 ## v1.6.8-r7 notes
 
