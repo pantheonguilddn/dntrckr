@@ -74,6 +74,21 @@ main>p{max-width:850px;color:var(--muted);line-height:1.75;margin-bottom:22px}
 .tool-launcher-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.tool-launcher-link{display:flex;flex-direction:column;gap:5px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);text-decoration:none;font-size:12px;font-weight:850;transition:border-color .15s,transform .15s}.tool-launcher-link:hover{border-color:var(--accent);transform:translateY(-1px)}.tool-launcher-link small{font-size:10px;font-weight:500;color:var(--muted);line-height:1.5}.tool-launcher-intro{font-size:11px;color:var(--muted);line-height:1.65}@media(max-width:760px){.tool-launcher-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:470px){.tool-launcher-grid{grid-template-columns:1fr}}
 </style>
 
+<style id="pantheon-v175-admin-readability">
+:root{--main-accent:#f1c45b;--main-accent-soft:rgba(241,196,91,.15)}
+:root[data-pantheon-theme="light"]{--bg:#f1f4fa;--surface:#fff;--surface2:#e5ebf6;--border:#b3c1d6;--text:#182235;--muted:#344258;--accent:#3f54c2;--good:#087555;--danger:#a64252;--main-accent:#8a5200;--main-accent-soft:#fff0c9}
+:root[data-pantheon-theme="eye-comfort"]{--bg:#e9e6d8;--surface:#f9f6e9;--surface2:#e4dfc9;--border:#bcb59b;--text:#292f25;--muted:#3a4333;--accent:#4f6739;--good:#2d6b42;--danger:#994343;--main-accent:#795800;--main-accent-soft:#f5e8b8}
+:root[data-pantheon-theme="pastel"]{--bg:#f0def8;--surface:#fff7ff;--surface2:#e9d0f4;--border:#c09bd2;--text:#30203b;--muted:#4a3157;--accent:#7c349c;--good:#17674e;--danger:#a64272;--main-accent:#824515;--main-accent-soft:#ffe4c4}
+:root[data-pantheon-theme="light"] body :is(p,.hint,.field,.field label,.person small,.brand small,.kicker,.badge,.toplink,.checkbox-line,.pantheon-theme-control),
+:root[data-pantheon-theme="eye-comfort"] body :is(p,.hint,.field,.field label,.person small,.brand small,.kicker,.badge,.toplink,.checkbox-line,.pantheon-theme-control),
+:root[data-pantheon-theme="pastel"] body :is(p,.hint,.field,.field label,.person small,.brand small,.kicker,.badge,.toplink,.checkbox-line,.pantheon-theme-control){font-size:clamp(12px,.84em,16px)!important;line-height:1.5;opacity:1!important}
+:root[data-pantheon-theme="light"] body :is(p,.hint,.field,.field label,.person small,.brand small,.checkbox-line,.pantheon-theme-control),
+:root[data-pantheon-theme="eye-comfort"] body :is(p,.hint,.field,.field label,.person small,.brand small,.checkbox-line,.pantheon-theme-control),
+:root[data-pantheon-theme="pastel"] body :is(p,.hint,.field,.field label,.person small,.brand small,.checkbox-line,.pantheon-theme-control){color:var(--muted)!important;font-weight:600}
+:root[data-pantheon-theme] .admin-character-row:has(input[data-admin-main]:checked){border:2px solid var(--main-accent)!important;box-shadow:0 0 0 2px var(--main-accent-soft);background:var(--surface)}
+:root[data-pantheon-theme] .admin-main-choice:has(input[data-admin-main]:checked){color:var(--main-accent)!important;background:var(--main-accent-soft);border-radius:7px;padding:4px 7px}
+:root[data-pantheon-theme] .character-owner-card:has(input[data-admin-main]:checked){border-top:4px solid var(--main-accent)!important}
+</style>
 </head>
 <body>
 <main>
