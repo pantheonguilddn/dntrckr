@@ -1,11 +1,20 @@
-# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r1 — Cloudflare Pages + D1
+
+## Feedback update built directly from the stable v1.6.8 baseline
+
+- Preserves the original v1.6.8 package structure and backend endpoints; no later-version code was carried forward.
+- Improves Light, Eye Comfort, and Pastel readability through stronger text contrast and font weight only. Existing font sizes and layout dimensions are preserved.
+- Adds clearer Main-character borders/badges across Tracker, analytics, Member Roster, Class Setup, and Team Builder, while preserving the Main flag during the baseline roster migration.
+- Adds administrator-only, read-only **View As Member** for the member’s Tracker, analytics, and Member Roster data (registered characters, Main designation, and class details). The admin role remains enforced by the existing server-side session; this release does not grant admin privileges. In v1.6.8, theme choice and Team Builder slots/format/preferences are browser-local, so View As simulates the theme and replaces Team Builder with a limitation notice rather than claiming to read another member’s local layout.
+- Adds an administrator-only shared scheduler for +50% Item Drop Rate UP and +30% Enhancement Rate UP, with weekend windows (Saturday 00:00 to Monday 00:00 Manila time) or custom Manila-time windows. Non-admin cloud writes preserve the existing shared event settings and update metadata; dedicated timestamps prevent stale cache merges from rolling the schedule back.
+- Adds reset-aware analytics with today’s recorded wins, Saturday-reset urgency, and tomorrow planning. Lucky Zones remain intentionally outside the Tracker and completion percentage; the plan reserves about 24 minutes per registered character (three solo runs at approximately eight minutes each) before tracked daily chores and then remaining-time raid recommendations.
 
 ## v1.6.8 Team Builder roster separation
 
 - Team Builder now lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
 - The **Include in Tracker** checkbox controls Tracker participation only; it does not control Team Builder eligibility.
 - Class Setup uses the canonical Member Roster directory, so classes can be configured for characters not opted into Tracker.
-- Updated current-facing roster and help text to explain the distinction. The What's New popup is kept compact: a short tool description plus this release's main change. This package is based on v1.6.6 and does not carry forward later package changes.
+- Updated current-facing roster and help text to explain the distinction. The What's New popup is kept compact: a short tool description plus this release's main change. This package is based directly on v1.6.8 and does not carry forward later package changes.
 
 
 This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
@@ -19,7 +28,7 @@ This release refines the Overview into a compact account-and-status header and a
 
 This release is based on v1.6.1 and extends the inline character-registration editor so members can add characters directly from the confirmation prompt or Tracker. Saving updates the canonical shared Member Roster and reprojects the Tracker roster. Character registration uses the authenticated shared-storage endpoint and queues a cloud sync after Save; check the app sync status and retry if the remote write fails.
 
-This bundle carries forward the supplied v1.5.6 Cloudflare Pages + D1 base and the later UI updates. Discord display names map to Member Roster owner names; when they differ, set the roster-match name in the admin allowlist. A Wrangler configuration file is not required. Bind D1 through the Cloudflare Pages dashboard.
+Deployment details retained from the v1.6.8 baseline: this package uses Cloudflare Pages + D1. Discord display names map to Member Roster owner names; when they differ, set the roster-match name in the admin allowlist. A Wrangler configuration file is not required. Bind D1 through the Cloudflare Pages dashboard.
 
 ## v1.6.2 add characters in the shared editor
 

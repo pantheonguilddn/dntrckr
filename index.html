@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8</title>
+    <title>Pantheon Tools v1.6.8-r1</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1815,6 +1815,77 @@
   }
 </style>
 
+
+<style id="pantheon-v168-feedback-polish">
+/* v1.6.8-r1: readability uses contrast and weight only; existing font sizes/layout are deliberately retained. */
+:root[data-pantheon-theme="light"] { --pt-muted:#4d5a70; --pt-border:#cfd7e5; --pt-surface-soft:#e9eef7; --pt-accent:#465acb; --pt-accent-soft:#e3ebfc; --pt-banner-border:#c6d1e4; }
+:root[data-pantheon-theme="eye-comfort"] { --pt-muted:#505544; --pt-border:#c9c1a8; --pt-surface-soft:#e6e0cc; --pt-accent:#596f43; --pt-accent-soft:#e0e5d1; --pt-banner-border:#c8bea3; }
+:root[data-pantheon-theme="pastel"] { --pt-page:#f2e5fa; --pt-surface:#fff9ff; --pt-surface-raised:#fdf5ff; --pt-surface-soft:#ead6f4; --pt-input:#fbf0ff; --pt-text:#45304f; --pt-muted:#5e4b69; --pt-border:#d6bfe3; --pt-accent:#78509c; --pt-accent-soft:#e3d1f0; --pt-hover:#f0e2fa; --pt-banner-border:#c9a9dc; --pt-auth-bg:radial-gradient(ellipse at 15% 3%,rgba(186,132,205,.23),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(132,201,190,.18),transparent 38%),#f2e5fa; --pt-card-gradient:linear-gradient(160deg,#fff9ff,#f1e2f8); --pt-notice-gradient:linear-gradient(160deg,#eddbf6,#fff9ff); --pt-positive:#276d5d; color-scheme:light; }
+:root[data-pantheon-theme="light"] .muted,:root[data-pantheon-theme="light"] small,:root[data-pantheon-theme="light"] .member-directory-note,:root[data-pantheon-theme="light"] .member-directory-meta,:root[data-pantheon-theme="light"] .member-directory-chars-title,:root[data-pantheon-theme="light"] .activity-insight-meta,:root[data-pantheon-theme="light"] .activity-insight-section-note,
+:root[data-pantheon-theme="eye-comfort"] .muted,:root[data-pantheon-theme="eye-comfort"] small,:root[data-pantheon-theme="eye-comfort"] .member-directory-note,:root[data-pantheon-theme="eye-comfort"] .member-directory-meta,:root[data-pantheon-theme="eye-comfort"] .member-directory-chars-title,:root[data-pantheon-theme="eye-comfort"] .activity-insight-meta,:root[data-pantheon-theme="eye-comfort"] .activity-insight-section-note,
+:root[data-pantheon-theme="pastel"] .muted,:root[data-pantheon-theme="pastel"] small,:root[data-pantheon-theme="pastel"] .member-directory-note,:root[data-pantheon-theme="pastel"] .member-directory-meta,:root[data-pantheon-theme="pastel"] .member-directory-chars-title,:root[data-pantheon-theme="pastel"] .activity-insight-meta,:root[data-pantheon-theme="pastel"] .activity-insight-section-note { color:var(--pt-muted) !important; opacity:1 !important; font-weight:600; }
+
+:root[data-pantheon-theme="light"] [style*="color:#aaa"],:root[data-pantheon-theme="light"] [style*="color: #aaa"],
+:root[data-pantheon-theme="eye-comfort"] [style*="color:#aaa"],:root[data-pantheon-theme="eye-comfort"] [style*="color: #aaa"],
+:root[data-pantheon-theme="pastel"] [style*="color:#aaa"],:root[data-pantheon-theme="pastel"] [style*="color: #aaa"],
+:root[data-pantheon-theme="light"] [style*="color:#888"],:root[data-pantheon-theme="light"] [style*="color: #888"],
+:root[data-pantheon-theme="eye-comfort"] [style*="color:#888"],:root[data-pantheon-theme="eye-comfort"] [style*="color: #888"],
+:root[data-pantheon-theme="pastel"] [style*="color:#888"],:root[data-pantheon-theme="pastel"] [style*="color: #888"] { color:var(--pt-muted) !important; opacity:1 !important; font-weight:650 !important; }
+:root[data-pantheon-theme="light"] .history-trend span[style*="#b5e5c5"],:root[data-pantheon-theme="eye-comfort"] .history-trend span[style*="#b5e5c5"],:root[data-pantheon-theme="pastel"] .history-trend span[style*="#b5e5c5"] { color:#276d5d !important; }
+:root[data-pantheon-theme="light"] .history-trend span[style*="#fceea7"],:root[data-pantheon-theme="eye-comfort"] .history-trend span[style*="#fceea7"],:root[data-pantheon-theme="pastel"] .history-trend span[style*="#fceea7"] { color:#765900 !important; }
+:root[data-pantheon-theme="light"] .history-trend span[style*="#f7bab4"],:root[data-pantheon-theme="eye-comfort"] .history-trend span[style*="#f7bab4"],:root[data-pantheon-theme="pastel"] .history-trend span[style*="#f7bab4"] { color:#9a3e50 !important; }
+:root[data-pantheon-theme] .class-setup-table th,:root[data-pantheon-theme] .team-table th,:root[data-pantheon-theme] .role-config-table th { color:var(--pt-muted) !important; font-weight:850 !important; }
+:root[data-pantheon-theme] .class-setup-owner,:root[data-pantheon-theme] .member-directory-char-status,:root[data-pantheon-theme] .owner-chip,:root[data-pantheon-theme] .class-setup-status { opacity:1 !important; font-weight:700; }
+:root[data-pantheon-theme="pastel"] .member-directory-char.is-main-character,:root[data-pantheon-theme="pastel"] .profile-confirm-character:has(.profile-confirm-main) { background:#f0dff8 !important; border-color:#ab80c8 !important; }
+.main-character-badge { display:inline-flex; align-items:center; gap:3px; margin-left:5px; padding:2px 5px; border:1px solid #d4b25b; border-radius:999px; background:#fff0bb; color:#62480c; font-size:.62rem; font-weight:900; letter-spacing:.025em; vertical-align:middle; white-space:nowrap; }
+.is-main-character { position:relative; }
+#dn-tracker th.is-main-character { box-shadow:inset 2px 0 #d4ac42,inset -2px 0 #d4ac42,inset 0 0 0 1px rgba(255,222,133,.48); }
+#dn-tracker th.is-main-character::after { content:" ★"; font-weight:900; }
+#dn-tracker td.is-main-character { box-shadow:inset 2px 0 rgba(212,172,66,.6),inset -2px 0 rgba(212,172,66,.6); }
+#dn-tracker tfoot th.is-main-character { outline:1px solid #d4ac42; outline-offset:-2px; }
+.char-card.is-main-character { border:2px solid #d4ac42 !important; border-top-width:5px !important; box-shadow:0 0 0 2px rgba(212,172,66,.12),0 5px 18px rgba(0,0,0,.12); }
+.char-card.is-main-character .card-header { border-bottom-color:#d4ac42; }
+.member-directory-char.is-main-character { border-color:#d4ac42 !important; background:rgba(255,220,132,.12) !important; box-shadow:inset 0 0 0 1px rgba(212,172,66,.22); }
+.class-setup-table tr.is-main-character td,.team-table tr.is-main-character td { border-top:1px solid #d4ac42 !important; border-bottom:1px solid #d4ac42 !important; }
+.class-setup-table tr.is-main-character td:first-child,.team-table tr.is-main-character td:first-child { border-left:2px solid #d4ac42 !important; }
+.class-setup-table tr.is-main-character td:last-child,.team-table tr.is-main-character td:last-child { border-right:2px solid #d4ac42 !important; }
+.activity-insight-item.is-main-character { border:1px solid #d4ac42; border-radius:10px; padding:10px; margin:6px 0; background:var(--pt-surface-raised); box-shadow:inset 3px 0 #d4ac42; }
+.weekly-plan-card { grid-column:1/-1; min-width:0; padding:16px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 4px 14px rgba(0,0,0,.08); }
+.weekly-plan-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; border-bottom:1px solid var(--pt-border); padding-bottom:10px; margin-bottom:12px; }
+.weekly-plan-head h3 { margin:0; color:var(--pt-text); }
+.weekly-plan-kicker { color:var(--pt-muted); font-weight:850; letter-spacing:.07em; text-transform:uppercase; }
+.weekly-plan-status { display:inline-flex; border:1px solid var(--pt-border); border-radius:999px; padding:4px 8px; color:var(--pt-text); background:var(--pt-surface-soft); font-weight:850; }
+.weekly-plan-status.urgent { border-color:#b86f45; background:#ffeddf; color:#74351d; }
+.weekly-plan-status.active-event { border-color:#57967c; background:#e2f5e9; color:#205c46; }
+.weekly-plan-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.weekly-plan-block { min-width:0; padding:12px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-raised); }
+.weekly-plan-block h4 { margin:0 0 6px; color:var(--pt-text); }
+.weekly-plan-block p { margin:5px 0; color:var(--pt-muted); line-height:1.55; }
+.weekly-plan-block strong { color:var(--pt-text); }
+.weekly-plan-list { margin:6px 0 0; padding-left:18px; color:var(--pt-muted); }
+.weekly-plan-list li { margin:4px 0; }
+.weekly-plan-win { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:7px 0; border-top:1px solid var(--pt-border); }
+.weekly-plan-win:first-child { border-top:0; }
+.weekly-plan-win-main { color:var(--pt-accent); font-weight:850; white-space:nowrap; }
+.weekly-plan-muted { color:var(--pt-muted); }
+.weekly-plan-alert { margin-top:9px; padding:9px 10px; border:1px solid #c38a53; border-radius:8px; background:#fff1e2; color:#713d19; }
+.weekly-plan-info { margin-top:9px; padding:9px 10px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface-soft); color:var(--pt-text); }
+.admin-view-as-banner { position:sticky; top:0; z-index:900; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; padding:10px 16px; border-bottom:2px solid #d4ac42; background:var(--pt-notice-gradient); color:var(--pt-text); box-shadow:0 4px 18px rgba(0,0,0,.1); }
+.admin-view-as-banner[hidden] { display:none !important; }
+.admin-view-as-banner-main { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.admin-view-as-banner select { min-height:32px; padding:5px 8px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-input); color:var(--pt-text); font:inherit; }
+.admin-preview-readonly-note { padding:9px 12px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft); color:var(--pt-text); }
+.rate-up-editor-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.rate-up-editor-card { min-width:0; padding:12px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-raised); }
+.rate-up-editor-card h4 { margin:0 0 8px; }
+.rate-up-editor-card label { display:flex; align-items:center; gap:7px; margin:8px 0; color:var(--pt-text); }
+.rate-up-editor-card input[type="datetime-local"],.rate-up-editor-card select,.admin-view-as-field select { box-sizing:border-box; width:100%; min-height:36px; padding:7px 9px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-input); color:var(--pt-text); }
+.admin-view-as-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.admin-view-as-field { display:grid; gap:6px; color:var(--pt-muted); font-weight:800; }
+body.admin-view-as-active .admin-preview-disable { pointer-events:none !important; opacity:.55 !important; }
+@media(max-width:700px) { .weekly-plan-grid,.rate-up-editor-grid,.admin-view-as-fields { grid-template-columns:1fr; } .weekly-plan-card { padding:12px; } }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1897,6 +1968,8 @@
                 <div class="drawer-section-title">System</div>
                 <button class="drawer-item" type="button" onclick="forceSync(true)"><span class="drawer-icon">↻</span><span><strong>Sync Now</strong><small>Update shared database</small></span></button>
                 <button class="drawer-item" id="drawer-admin-console" type="button" onclick="window.open('/admin.html','_blank','noopener')" hidden><span class="drawer-icon">⚙</span><span><strong>Admin Console</strong><small>Accounts &amp; character registrations</small></span></button>
+                <button class="drawer-item" id="drawer-view-as" type="button" onclick="openAdminViewAsModal(); toggleSideMenu(false)" hidden><span class="drawer-icon">👁</span><span><strong>View As Member</strong><small>Read-only account preview</small></span></button>
+                <button class="drawer-item" id="drawer-rateup-events" type="button" onclick="openRateUpEventsModal(); toggleSideMenu(false)" hidden><span class="drawer-icon">✨</span><span><strong>Rate-Up Events</strong><small>Shared drop / enhancement schedule</small></span></button>
                 <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Savepoints & undo global changes</small></span></button>
                 <button class="drawer-item" type="button" onclick="openLandingSettings()"><span class="drawer-icon">⌂</span><span><strong>Set Default Landing Page</strong><small>Change startup destination anytime</small></span></button>
             </div>
@@ -2251,7 +2324,7 @@
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
                 <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>New in v1.6.8:</strong> Tracker opt-in controls Tracker participation only. All registered characters remain available in Team Builder and Class Setup.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r1 feedback update:</strong> clearer light themes without larger text, Main-character highlights, member View As, and a reset-aware plan that reserves time for Lucky Zones and Rate-Up events.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -2886,6 +2959,33 @@
         let localTeamBuilderState = null;
         let pantheonDiscordUser = null;
         let discordIdentityMatchStatus = 'pending';
+        let adminViewAsMemberId = '';
+        let adminViewOriginalTheme = '';
+        let adminViewThemeChoice = '';
+
+        function createDefaultRateUpEvents() {
+            return {
+                itemDrop: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
+                enhancement: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' }
+            };
+        }
+        function normalizeRateUpEvents(value) {
+            const source = safeObject(value);
+            const normalizeOne = event => {
+                const raw = safeObject(event);
+                return {
+                    enabled: raw.enabled === true,
+                    schedule: raw.schedule === 'custom' ? 'custom' : 'weekend',
+                    customStart: String(raw.customStart || '').slice(0, 16),
+                    customEnd: String(raw.customEnd || '').slice(0, 16)
+                };
+            };
+            const defaults = createDefaultRateUpEvents();
+            return {
+                itemDrop: normalizeOne(source.itemDrop || defaults.itemDrop),
+                enhancement: normalizeOne(source.enhancement || defaults.enhancement)
+            };
+        }
 
         function createEmptyData() {
             return {
@@ -2894,7 +2994,7 @@
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -3019,7 +3119,7 @@
                         const previous = member.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterName.trim().toLowerCase()) || {};
                         const isLegacyTracked = !!roster?.characters.some(name => name.trim().toLowerCase() === characterName.trim().toLowerCase());
                         const knownJob = JOB_ORDER.includes(previous.job) ? previous.job : (JOB_ORDER.includes(jobs[characterName]?.job) ? jobs[characterName].job : '');
-                        return { name: characterName, job: knownJob, trackerEnabled: previous.trackerEnabled === true || isLegacyTracked };
+                        return { name: characterName, job: knownJob, trackerEnabled: previous.trackerEnabled === true || isLegacyTracked, isMain: previous.isMain === true };
                     });
                 });
                 settings.memberRosterMasterVersion = 1;
@@ -3048,10 +3148,18 @@
             });
         }
 
-        function flattenRosters(rosters) { return normalizeRosters(rosters).flatMap(r => r.characters.map(name => ({ name, color: r.color, rosterId: r.id, rosterName: r.name }))); }
+        function flattenRosters(rosters) {
+            const profiles = normalizeMemberDirectory(cloudData?.settings?.memberDirectory);
+            const profileByName = new Map(profiles.flatMap(member => (member.characterProfiles || []).map(profile => [identityMatchKey(profile.name), { ...profile, ownerName: member.name }])));
+            return normalizeRosters(rosters).flatMap(r => r.characters.map(name => {
+                const profile = profileByName.get(identityMatchKey(name));
+                return { name, color: r.color, rosterId: r.id, rosterName: profile?.ownerName || r.name, isMain: profile?.isMain === true, trackerEnabled: profile?.trackerEnabled === true };
+            }));
+        }
 
         // --- Discord-aware identity and permission helpers ---
         function isPantheonAdmin() { return pantheonDiscordUser?.role === 'admin'; }
+        function isAdminViewAsActive() { return isPantheonAdmin() && !!adminViewAsMemberId; }
         function ownerCandidateNames() {
             return [pantheonDiscordUser?.label, pantheonDiscordUser?.username]
                 .map(value => String(value || '').trim()).filter(Boolean);
@@ -3075,6 +3183,8 @@
         }
         function getCurrentMemberDirectoryEntry() {
             const entries = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
+            // View As changes only the read-only display context. Authentication and server permissions remain the admin's own.
+            if (isAdminViewAsActive()) return entries.find(member => member.id === adminViewAsMemberId) || null;
             // Resolve the logged-in Discord account first. Only fall back to a locally
             // selected roster if its linked owner also matches this authenticated account.
             const authenticated = getAuthenticatedMemberDirectoryEntry();
@@ -3105,6 +3215,7 @@
             return normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(member => memberRegisteredCharacterNames(member).has(nameKey)) || null;
         }
         function canEditCharacterProgress(charName) {
+            if (isAdminViewAsActive()) return false;
             if (isPantheonAdmin()) return true;
             const own = getAuthenticatedMemberDirectoryEntry();
             return !!own && memberRegisteredCharacterNames(own).has(identityMatchKey(charName));
@@ -3180,6 +3291,7 @@
             return candidate;
         }
         function canManageMemberRecord(member) {
+            if (isAdminViewAsActive()) return false;
             if (isPantheonAdmin()) return true;
             if (!member) return false;
             const own = getCurrentMemberDirectoryEntry();
@@ -3228,6 +3340,7 @@
 
         // --- Personal View Logic ---
         function togglePersonalView() {
+            if (isAdminViewAsActive()) return;
             const identity = localStorage.getItem(IDENTITY_KEY);
             if (!identity) {
                 alert('No personal roster is linked yet. Check that your Discord profile name matches your Member Roster owner name, or select your roster once.');
@@ -3393,9 +3506,16 @@
             });
 
             filter.innerHTML = options;
-            const preferredFilter = isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || currentVal) : currentVal;
-            filter.value = preferredFilter === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
-            filter.disabled = !!isPersonalView;
+            if (isAdminViewAsActive()) {
+                const target = normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(member => member.id === adminViewAsMemberId);
+                const targetRosterId = String(target?.trackerRosterId || '');
+                filter.value = cloudData.settings.rosters.some(r => r.id === targetRosterId) ? targetRosterId : 'all';
+                filter.disabled = true;
+            } else {
+                const preferredFilter = isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || currentVal) : currentVal;
+                filter.value = preferredFilter === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === preferredFilter) ? preferredFilter : 'all';
+                filter.disabled = !!isPersonalView;
+            }
             activeRosterFilter = filter.value;
 
             identitySel.innerHTML = idOptions;
@@ -3540,6 +3660,9 @@
             if (source.syncInfo && typeof source.syncInfo === 'object') norm.syncInfo = { operationId:String(source.syncInfo.operationId || ''), by:String(source.syncInfo.by || ''), at:Number(source.syncInfo.at) || 0 };
 
             const sets = safeObject(source.settings);
+            norm.settings.rateUpEvents = normalizeRateUpEvents(sets.rateUpEvents);
+            norm.settings.rateUpEventsUpdatedAt = Number(sets.rateUpEventsUpdatedAt) || 0;
+            norm.settings.rateUpEventsUpdatedBy = String(sets.rateUpEventsUpdatedBy || '');
             norm.settings.analyticsTrackingEnabled = sets.analyticsTrackingEnabled === true;
             norm.settings.analyticsTrackingUpdatedAt = Number(sets.analyticsTrackingUpdatedAt) || 0;
             norm.settings.analyticsTrackingUpdatedBy = String(sets.analyticsTrackingUpdatedBy || '');
@@ -3700,7 +3823,21 @@
             const local = normalizeData(localRecord);
             const remote = normalizeData(remoteRecord);
             const merged = createEmptyData();
-            
+
+            // Shared Rate-Up settings are admin-owned. Resolve them by their own timestamp,
+            // rather than allowing an older browser cache to reset a newer schedule.
+            const localRateAt = Number(local.settings.rateUpEventsUpdatedAt) || 0;
+            const remoteRateAt = Number(remote.settings.rateUpEventsUpdatedAt) || 0;
+            const defaultRateJson = JSON.stringify(createDefaultRateUpEvents());
+            const localRateConfigured = JSON.stringify(local.settings.rateUpEvents) !== defaultRateJson;
+            const remoteRateConfigured = JSON.stringify(remote.settings.rateUpEvents) !== defaultRateJson;
+            const rateSource = localRateAt > remoteRateAt ||
+                (localRateAt === remoteRateAt && localRateConfigured && !remoteRateConfigured) ||
+                (localRateAt === remoteRateAt && localRateConfigured === remoteRateConfigured && String(local.settings.rateUpEventsUpdatedBy || '') >= String(remote.settings.rateUpEventsUpdatedBy || ''))
+                ? local.settings : remote.settings;
+            merged.settings.rateUpEvents = normalizeRateUpEvents(rateSource.rateUpEvents);
+            merged.settings.rateUpEventsUpdatedAt = Math.max(localRateAt, remoteRateAt);
+            merged.settings.rateUpEventsUpdatedBy = String(rateSource.rateUpEventsUpdatedBy || '');
             merged.history = { ...remote.history, ...local.history };
             const lat = Number(local.settings.analyticsTrackingUpdatedAt) || 0, rat = Number(remote.settings.analyticsTrackingUpdatedAt) || 0;
             const analyticsSource = (lat > rat || (lat === rat && String(local.settings.analyticsTrackingUpdatedBy) >= String(remote.settings.analyticsTrackingUpdatedBy))) ? local.settings : remote.settings;
@@ -4243,6 +4380,7 @@
         }
         document.addEventListener('DOMContentLoaded', async () => {
             initializeBountyBoardsToggle();
+            ['item','enhancement'].forEach(prefix => document.getElementById(`rateup-${prefix}-schedule`)?.addEventListener('change', () => updateRateUpEventFields(prefix)));
             const canEnter = await pantheonCheckSessionAndBoot();
             if (!canEnter) return;
             hydrateCardWikiData();
@@ -4308,6 +4446,7 @@
                 applyBoardState();
                 if (isAnalyticsVisible) renderAnalytics();
             }
+            if (isAdminViewAsActive()) applyAdminPreviewReadOnly();
             updateClassSetupSummary();
             if (visible('team-builder-page')) renderTeamBuilder();
             if (visible('member-roster-page')) renderMemberDirectory();
@@ -4317,6 +4456,7 @@
             if (modalOpen('scholar-modal')) renderScholarLedger();
             if (visible('overview-page')) renderOverviewActivity();
             updateOverviewStatusCards();
+            if (isAdminViewAsActive()) applyAdminPreviewReadOnly();
         }
 
         function buildTrackerTable() {
@@ -4394,17 +4534,18 @@
             });
 
             characters.forEach(char => {
-                const th = document.createElement('th'); th.textContent = char.name; th.title = char.name;
-                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = 'bold char-col';
+                const th = document.createElement('th'); th.textContent = char.name; th.title = char.isMain ? `${char.name} · Main character` : char.name;
+                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = `bold char-col${char.isMain ? ' is-main-character' : ''}`;
                 headerRow.appendChild(th);
                 const rateTh = document.createElement('th'); rateTh.id = rateElementId(char.name);
-                rateTh.style.background = '#ffe599'; rateTh.style.color = '#000'; rateTh.textContent = '0%'; rateTh.className = 'char-col';
+                rateTh.style.background = '#ffe599'; rateTh.style.color = '#000'; rateTh.textContent = '0%'; rateTh.className = `char-col${char.isMain ? ' is-main-character' : ''}`;
                 footerRow.appendChild(rateTh);
             });
             
             const characterAccess = new Map(characters.map(char => [char.name, {
                 canEdit: canEditCharacterProgress(char.name),
-                owner: getCharacterOwnerMember(char.name)
+                owner: getCharacterOwnerMember(char.name),
+                isMain: char.isMain === true
             }]));
             const grouped = {};
             cloudData.settings.categories.forEach(cat => {
@@ -4431,9 +4572,9 @@
                         const tdTask = document.createElement('td'); tdTask.className = 'task-name'; tdTask.textContent = taskName; tdTask.title = taskName; tr.appendChild(tdTask);
                         
                         characters.forEach(char => {
-                            const td = document.createElement('td'); td.className = 'interactive-cell char-col';
+                            const td = document.createElement('td'); td.className = `interactive-cell char-col${char.isMain ? ' is-main-character' : ''}`;
                             td.dataset.char = char.name; td.dataset.task = taskName; td.dataset.isWeekly = groupName === 'Weeklies' ? 'true' : 'false';
-                            const access = characterAccess.get(char.name) || { canEdit: false, owner: null };
+                            const access = characterAccess.get(char.name) || { canEdit: false, owner: null, isMain: false };
                             const canEdit = access.canEdit;
                             const owner = access.owner;
                             if (canEdit) {
@@ -4753,11 +4894,15 @@
             document.body.classList.toggle('pantheon-member-session', !isAdmin);
             const adminLink = document.getElementById('overview-admin-link');
             const drawerAdminLink = document.getElementById('drawer-admin-console');
+            const viewAsLink = document.getElementById('drawer-view-as');
+            const rateUpLink = document.getElementById('drawer-rateup-events');
             const menuToggle = document.getElementById('menu-toggle');
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
             if (adminLink) adminLink.hidden = !isAdmin;
             if (drawerAdminLink) drawerAdminLink.hidden = !isAdmin;
+            if (viewAsLink) viewAsLink.hidden = !isAdmin;
+            if (rateUpLink) rateUpLink.hidden = !isAdmin;
             if (menuToggle) menuToggle.hidden = !isAdmin;
             if (drawer) drawer.hidden = !isAdmin;
             if (scrim) scrim.hidden = !isAdmin;
@@ -4785,7 +4930,7 @@
             const summary = document.getElementById('overview-insights-summary');
             if (!cont && !completionCont) return;
             const esc = value => escapeHTML(String(value ?? ''));
-            const owner = getAuthenticatedMemberDirectoryEntry();
+            const owner = getCurrentMemberDirectoryEntry();
             const enabledNames = owner
                 ? (owner.characterProfiles || []).filter(profile => profile.trackerEnabled && profile.name).map(profile => profile.name)
                 : [];
@@ -4867,27 +5012,294 @@
                     const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
                     const pendingName = item.pendingTasks[0]?.task;
                     const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
-                    return `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
+                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
                 }).join('');
             } else {
                 completionHtml = `<div class="activity-insight-empty">No eligible weekly tasks are currently configured for the characters you track.</div>`;
             }
             if (completionCont) completionCont.innerHTML = completionHtml;
         }
+        const RATEUP_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+        function getManilaDateParts(timestamp = Date.now()) {
+            const parts = new Intl.DateTimeFormat('en-US', { timeZone:'Asia/Manila', year:'numeric', month:'2-digit', day:'2-digit', weekday:'short', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(new Date(timestamp));
+            const read = key => parts.find(part => part.type === key)?.value || '';
+            return { year:Number(read('year')), month:Number(read('month')), day:Number(read('day')), weekday:read('weekday'), hour:Number(read('hour')), minute:Number(read('minute')) };
+        }
+        function manilaLocalDateTimeToUTC(value) {
+            const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+            if (!match) return 0;
+            const [, y, mo, d, h, mi] = match.map(Number);
+            return Date.UTC(y, mo - 1, d, h - 8, mi, 0, 0);
+        }
+        function manilaLocalDateTimeValue(timestamp) {
+            const p = getManilaDateParts(timestamp);
+            return `${String(p.year).padStart(4,'0')}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}T${String(p.hour).padStart(2,'0')}:${String(p.minute).padStart(2,'0')}`;
+        }
+        function formatManilaStamp(timestamp, options = {}) {
+            if (!timestamp) return 'Not set';
+            return new Intl.DateTimeFormat('en-US', { timeZone:'Asia/Manila', weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', ...options }).format(new Date(timestamp));
+        }
+        function getRateUpWindow(event, now = Date.now()) {
+            if (!event?.enabled) return { enabled:false, status:'disabled', start:0, end:0, label:'Disabled' };
+            if (event.schedule === 'custom') {
+                const start = manilaLocalDateTimeToUTC(event.customStart), end = manilaLocalDateTimeToUTC(event.customEnd);
+                if (!start || !end || end <= start) return { enabled:true, status:'invalid', start, end, label:'Custom window needs a valid start and end' };
+                if (now >= start && now < end) return { enabled:true, status:'active', start, end, label:`Active until ${formatManilaStamp(end)}` };
+                if (now < start) return { enabled:true, status:'upcoming', start, end, label:`Starts ${formatManilaStamp(start)}` };
+                return { enabled:true, status:'closed', start, end, label:`Ended ${formatManilaStamp(end)}` };
+            }
+            const p = getManilaDateParts(now);
+            const localMidnightUTC = Date.UTC(p.year, p.month - 1, p.day);
+            const dow = new Date(localMidnightUTC).getUTCDay();
+            const daysSinceSaturday = (dow + 1) % 7;
+            let saturdayLocal = localMidnightUTC - daysSinceSaturday * 24 * 60 * 60 * 1000;
+            let start = saturdayLocal - 8 * 60 * 60 * 1000;
+            let end = start + 48 * 60 * 60 * 1000;
+            if (now >= start && now < end) return { enabled:true, status:'active', start, end, label:`Active until ${formatManilaStamp(end)}` };
+            if (now >= end) { saturdayLocal += 7 * 24 * 60 * 60 * 1000; start = saturdayLocal - 8 * 60 * 60 * 1000; end = start + 48 * 60 * 60 * 1000; }
+            return { enabled:true, status:'upcoming', start, end, label:`Next window ${formatManilaStamp(start)}–${formatManilaStamp(end)}` };
+        }
+        function getPlanCharacters() {
+            const owner = getCurrentMemberDirectoryEntry();
+            if (owner) return (owner.characterProfiles || []).filter(profile => String(profile.name || '').trim()).map(profile => ({ name: profile.name.trim(), isMain: profile.isMain === true, trackerEnabled: profile.trackerEnabled === true }));
+            if (isAdminViewAsActive()) return [];
+            // Universal admins should not receive a misleading full-guild time estimate. Use only the currently visible tracker roster if no owner context exists.
+            return characters.map(char => ({ name:char.name, isMain:char.isMain === true, trackerEnabled:true }));
+        }
+        function getPlanDailyTasks() {
+            return cloudData.settings.categories.filter(category => category.group === 'Dailies')
+                .flatMap(category => (category.tasks || []).filter(task => !isBountyBoardSlot(category, task)).map(task => ({ name:task, category:category.name })));
+        }
+        function buildTodayWins(profiles) {
+            const from = getTargetResetTimeUTC(false), tasks = [];
+            profiles.forEach(profile => {
+                const maps = safeObject(cloudData.cells?.[profile.name]);
+                Object.entries(maps).forEach(([taskName, cell]) => {
+                    if (cell?.state !== 'done' || (Number(cell.updatedAt) || 0) < from) return;
+                    const category = cloudData.settings.categories.find(item => (item.tasks || []).includes(taskName));
+                    if (!category || isBountyBoardSlot(category, taskName)) return;
+                    tasks.push({ name:profile.name, task:taskName, isMain:profile.isMain, at:Number(cell.updatedAt)||0, group:category.group });
+                });
+            });
+            return tasks.sort((a,b)=>b.at-a.at).slice(0,5).map(item=>({ ...item, time:new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',hour:'numeric',minute:'2-digit'}).format(new Date(item.at)) }));
+        }
+        function renderDailyPlanningPanel(container) {
+            const now = Date.now(), p = getManilaDateParts(now);
+            const profiles = getPlanCharacters();
+            const registeredCount = profiles.length;
+            const tracked = profiles.filter(profile => profile.trackerEnabled);
+            const main = profiles.find(profile => profile.isMain);
+            const lzMinutes = registeredCount * 3 * 8;
+            const dailyTasks = getPlanDailyTasks();
+            const pendingDaily = tracked.reduce((count, profile) => count + dailyTasks.filter(item => !['done','excluded'].includes(getCellState(profile.name, item.name))).length, 0);
+            const wins = buildTodayWins(tracked);
+            const nextWeeklyReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
+            const weeklyHoursLeft = Math.max(0, (nextWeeklyReset - now) / 3600000);
+            const weeklyMinsLeft = Math.max(0, Math.round((nextWeeklyReset - now) / 60000));
+            const urgency = weeklyHoursLeft <= 2 ? ['Reset imminent',true] : weeklyHoursLeft <= 8 ? ['Final hours',true] : weeklyHoursLeft <= 24 ? ['Final day',true] : weeklyHoursLeft <= 48 ? ['Two-day push',false] : weeklyHoursLeft <= 72 ? ['Three-day focus',false] : weeklyHoursLeft <= 96 ? ['Midweek pace',false] : weeklyHoursLeft <= 120 ? ['Midweek check-in',false] : weeklyHoursLeft <= 144 ? ['Early-week setup',false] : ['Fresh reset cycle',false];
+            const tomorrow = new Date(now + 24*60*60*1000);
+            const tomorrowLabel = new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',weekday:'long',month:'short',day:'numeric'}).format(tomorrow);
+            const itemEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).itemDrop, now);
+            const enhanceEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).enhancement, now);
+            const todayDOW = p.weekday;
+            const isFriday = todayDOW === 'Fri', isSunday = todayDOW === 'Sun';
+            const dailyReset = getTargetResetTimeUTC(false) + 24*60*60*1000;
+            const itemWindowStart = itemEvent.status === 'upcoming' ? itemEvent.start : 0;
+            let itemTiming = '';
+            if (itemEvent.status === 'active') {
+                itemTiming = `+50% Item Drop Rate UP is active (${itemEvent.label}). Prioritize Lucky Zone runs within the bonus window, then focus on drop-efficient raids only after the LZ reserve and tracked dailies are covered.`;
+                if (isSunday && itemEvent.end) {
+                    const untilClose = Math.max(0, Math.round((itemEvent.end-now)/60000));
+                    itemTiming += ` Sunday reminder: finish this cycle’s LZ runs before Monday 00:00 Manila; about ${Math.floor(untilClose/60)}h ${untilClose%60}m remain in the event window.`;
+                    if (lzMinutes > untilClose) itemTiming += ` The full-roster LZ budget (${lzMinutes}m) exceeds the remaining event window; start now and prioritize Main / highest-value characters rather than assuming every run will fit.`;
+                }
+            } else if (itemEvent.status === 'upcoming' && isFriday && itemWindowStart && itemWindowStart < dailyReset) {
+                const waitMins = Math.max(0, Math.round((itemWindowStart-now)/60000));
+                const eventToResetMins = Math.max(0, Math.round((dailyReset-itemWindowStart)/60000));
+                itemTiming = `The +50% Item Drop Rate window begins ${formatManilaStamp(itemWindowStart)}. Consider holding this cycle’s LZ runs until it starts, but only when your schedule allows. There are about ${eventToResetMins} minutes between event start and the next daily reset, versus a ${lzMinutes}-minute full-roster LZ budget.`;
+                if (lzMinutes > eventToResetMins) itemTiming += ` That window cannot fit the full roster’s estimated runs; prioritize Main / valuable characters or begin some runs before the bonus rather than risking a reset with all LZs unfinished.`;
+                else itemTiming += ' The estimated LZ budget fits inside that window, but leave room for real run-to-run variance.';
+                if (waitMins > 0) itemTiming += ` Waiting means leaving about ${Math.floor(waitMins/60)}h ${waitMins%60}m before the bonus begins.`;
+            } else if (itemEvent.status === 'upcoming') {
+                itemTiming = `+50% Item Drop Rate UP is scheduled (${itemEvent.label}). Prepare your run order and stamina/time window now; avoid postponing the LZ reserve unless the bonus window will actually overlap this daily cycle.`;
+            } else if (itemEvent.status === 'invalid') {
+                itemTiming = 'The custom +50% Item Drop Rate window has invalid dates. Correct its Manila start/end in Admin → Rate-Up Events before relying on it for planning.';
+            }
+            let enhancementTiming = '';
+            if (enhanceEvent.status === 'active') enhancementTiming = `+30% Enhancement Rate UP is active (${enhanceEvent.label}). Use prepared materials and gold on intended upgrades; do not spend time farming extra tasks if that would sacrifice your daily baseline.`;
+            else if (enhanceEvent.status === 'upcoming') enhancementTiming = `+30% Enhancement Rate UP is scheduled (${enhanceEvent.label}). Prepare materials, gold, and target gear beforehand; keep nonurgent enhancement attempts until the bonus begins.`;
+            else if (enhanceEvent.status === 'invalid') enhancementTiming = 'The custom +30% Enhancement Rate window has invalid dates. Correct its Manila start/end before relying on this event.';
+            const winsHtml = wins.length ? wins.map(win => `<div class="weekly-plan-win"><div><strong>${escapeHTML(win.name)}</strong>${win.isMain ? ' <span class="main-character-badge">★ MAIN</span>' : ''}<div class="weekly-plan-muted">${escapeHTML(win.task)} · ${escapeHTML(win.group || 'Task')}</div></div><span class="weekly-plan-win-main">✓ ${escapeHTML(win.time)}</span></div>`).join('') : '<p>No task completions have been recorded since the latest daily reset yet. The next checkboxes can turn into today’s wins.</p>';
+            const trackedLabel = `${tracked.length} tracked · ${registeredCount} registered`;
+            const memberTitle = isAdminViewAsActive() ? `Previewing ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? `Planning for ${getCurrentOwnerName()}` : 'Planning for the visible Tracker roster';
+            const panel = document.createElement('section');
+            panel.className = 'weekly-plan-card';
+            panel.innerHTML = `<div class="weekly-plan-head"><div><div class="weekly-plan-kicker">${escapeHTML(memberTitle)} · ${escapeHTML(trackedLabel)}</div><h3>Reset-aware plan &amp; today’s wins</h3><p class="weekly-plan-muted">Today is ${escapeHTML(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',weekday:'long',month:'short',day:'numeric'}).format(new Date(now)))} in Manila. Next daily reset: ${escapeHTML(formatManilaStamp(dailyReset))}.</p></div><span class="weekly-plan-status${urgency[1]?' urgent':''}">${escapeHTML(urgency[0])} · ${Math.floor(weeklyMinsLeft/60)}h ${weeklyMinsLeft%60}m to Saturday reset</span></div><div class="weekly-plan-grid"><section class="weekly-plan-block"><h4>Today’s wins</h4><p>Recognize the progress logged since the 09:00 Manila daily reset. Lucky Zones are intentionally not counted as Tracker completions.</p>${winsHtml}</section><section class="weekly-plan-block"><h4>Plan for ${escapeHTML(tomorrowLabel)}</h4><p><strong>1.</strong> Protect the Lucky Zone time budget first: ${escapeHTML(String(lzMinutes))} minutes for ${escapeHTML(String(registeredCount))} registered character${registeredCount===1?'':'s'}.</p><p><strong>2.</strong> Finish the normal tracked daily checklist next (${escapeHTML(String(pendingDaily))} unfinished tracked daily item${pendingDaily===1?'':'s'} visible right now). There is no per-task time model, so this is a count—not a promise about minutes.</p><p><strong>3.</strong> Spend only genuinely remaining time on high-weight weekly tasks / raids. ${main ? `Keep ${escapeHTML(main.name)} (Main) first when choosing which character gets the limited extra raid time.` : 'Choose the character you currently value most first; Main designation helps the planner rank that choice.'}</p><div class="weekly-plan-info">Completion guidance becomes more urgent near Saturday’s 09:00 Manila weekly reset. This is a practical order of operations, not an assumption that every character can finish every raid.</div></section></div>${itemTiming ? `<div class="weekly-plan-info"><strong>＋50% Item Drop Rate:</strong> ${escapeHTML(itemTiming)}</div>` : ''}${enhancementTiming ? `<div class="weekly-plan-info"><strong>＋30% Enhancement Rate:</strong> ${escapeHTML(enhancementTiming)}</div>` : ''}${isAdminViewAsActive() ? '<div class="weekly-plan-info"><strong>Read-only preview:</strong> displayed progress and recommendations are for the selected member. All changes remain disabled.</div>' : ''}${!getCurrentMemberDirectoryEntry() && isPantheonAdmin() ? '<div class="weekly-plan-info">For a truly personal estimate, use Admin → View As Member. This view has no single member selected, so the time budget uses only the currently visible Tracker roster.</div>' : ''}`;
+            container.appendChild(panel);
+        }
+
+        function openRateUpEventsModal() {
+            if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
+            const events = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
+            const fill = (prefix, key) => {
+                const event = events[key];
+                document.getElementById(`rateup-${prefix}-enabled`).checked = event.enabled;
+                document.getElementById(`rateup-${prefix}-schedule`).value = event.schedule;
+                document.getElementById(`rateup-${prefix}-start`).value = event.customStart;
+                document.getElementById(`rateup-${prefix}-end`).value = event.customEnd;
+                updateRateUpEventFields(prefix);
+            };
+            fill('item','itemDrop'); fill('enhancement','enhancement');
+            const summary = document.getElementById('rateup-events-summary');
+            if (summary) summary.textContent = `Current Item Drop: ${getRateUpWindow(events.itemDrop).label}. Current Enhancement: ${getRateUpWindow(events.enhancement).label}.`;
+            openModal('rateup-events-modal');
+        }
+        function updateRateUpEventFields(prefix) {
+            const custom = document.getElementById(`rateup-${prefix}-schedule`)?.value === 'custom';
+            ['start','end'].forEach(part => { const input = document.getElementById(`rateup-${prefix}-${part}`); if (input) { input.disabled = !custom; const label = input.closest('label'); if (label) label.style.opacity = custom ? '1' : '.65'; } });
+        }
+        function readRateUpEventForm(prefix) {
+            return { enabled:document.getElementById(`rateup-${prefix}-enabled`).checked, schedule:document.getElementById(`rateup-${prefix}-schedule`).value === 'custom' ? 'custom' : 'weekend', customStart:document.getElementById(`rateup-${prefix}-start`).value, customEnd:document.getElementById(`rateup-${prefix}-end`).value };
+        }
+        function saveRateUpEvents() {
+            if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
+            const next = normalizeRateUpEvents({ itemDrop:readRateUpEventForm('item'), enhancement:readRateUpEventForm('enhancement') });
+            for (const [label, event] of [['Item Drop Rate',next.itemDrop],['Enhancement Rate',next.enhancement]]) {
+                if (!event.enabled || event.schedule !== 'custom') continue;
+                const start = manilaLocalDateTimeToUTC(event.customStart), end = manilaLocalDateTimeToUTC(event.customEnd);
+                if (!start || !end || end <= start) { alert(`${label}: enter a valid custom start and end in Manila time. End must be after start.`); return; }
+            }
+            cloudData.settings.rateUpEvents = next;
+            cloudData.settings.rateUpEventsUpdatedAt = Date.now();
+            cloudData.settings.rateUpEventsUpdatedBy = String(pantheonDiscordUser?.id || deviceId);
+            triggerAutoSync();
+            closeModal('rateup-events-modal');
+            renderAnalytics();
+            setStatus('🟡 Shared Rate-Up schedule saved locally · syncing...');
+        }
+
+        function openAdminViewAsModal() {
+            if (!isPantheonAdmin()) { alert('View As is available only to Pantheon administrators.'); return; }
+            const select = document.getElementById('admin-view-as-member-select');
+            const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory).slice().sort((a,b)=>a.name.localeCompare(b.name));
+            select.innerHTML = '<option value="">Choose a member…</option>' + members.map(member => {
+                const registered = (member.characterProfiles || []).length;
+                const tracked = (member.characterProfiles || []).filter(profile=>profile.trackerEnabled).length;
+                return `<option value="${escapeHTML(member.id)}">${escapeHTML(member.name)} · ${tracked} tracked / ${registered} registered</option>`;
+            }).join('');
+            select.value = adminViewAsMemberId || '';
+            document.getElementById('admin-view-as-theme-select').value = adminViewThemeChoice || 'current';
+            openModal('admin-view-as-modal');
+        }
+        function setPreviewTheme(theme) {
+            const allowed = ['light','dark','eye-comfort','pastel'];
+            const next = allowed.includes(theme) ? theme : (localStorage.getItem('pantheon-theme-choice-v1') || 'dark');
+            document.documentElement.setAttribute('data-pantheon-theme', next);
+            document.querySelectorAll('[data-pantheon-theme-select]').forEach(select => { select.value = next; });
+        }
+        function buildAdminViewAsBanner(member) {
+            let banner = document.getElementById('admin-view-as-banner');
+            if (!banner) {
+                banner = document.createElement('div'); banner.id = 'admin-view-as-banner'; banner.className = 'admin-view-as-banner';
+                const overview = document.getElementById('overview-page');
+                const container = document.body;
+                container.insertBefore(banner, container.firstChild);
+            }
+            const chosenTheme = document.documentElement.getAttribute('data-pantheon-theme') || 'dark';
+            banner.innerHTML = `<div class="admin-view-as-banner-main"><strong>👁 Read-only View As:</strong> ${escapeHTML(member.name)} <span class="weekly-plan-muted">Your admin session stays active; progress edits and roster changes are blocked.</span></div><div class="admin-view-as-banner-main"><label>Simulated theme <select id="admin-view-as-live-theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label><button class="btn btn-secondary" type="button" data-admin-preview-allow onclick="exitAdminViewAs()">Exit preview</button></div>`;
+            banner.hidden = false;
+            const themeSelect = document.getElementById('admin-view-as-live-theme');
+            if (themeSelect) { themeSelect.value = chosenTheme; themeSelect.addEventListener('change', () => { adminViewThemeChoice = themeSelect.value; setPreviewTheme(adminViewThemeChoice); }); }
+        }
+        function applyAdminPreviewReadOnly() {
+            if (!isAdminViewAsActive()) return;
+            document.body.classList.add('admin-view-as-active');
+            const filter = document.getElementById('roster-filter'); if (filter) filter.disabled = true;
+            const banner = document.getElementById('admin-view-as-banner'); if (banner) banner.hidden = false;
+            // Controls that can mutate tracked progress or roster/team settings are disabled in the simulated member pages.
+            document.querySelectorAll('#tracker-page input, #tracker-page select, #tracker-page textarea, #tracker-page button, #team-builder-page input, #team-builder-page select, #team-builder-page textarea, #team-builder-page button, #member-roster-page input, #member-roster-page select, #member-roster-page textarea, #member-roster-page button').forEach(el => {
+                if (el.matches('.mini-help,[data-admin-preview-allow]')) return;
+                if (!el.hasAttribute('data-admin-preview-disabled')) el.dataset.adminPreviewWasDisabled = el.disabled ? '1' : '0';
+                el.setAttribute('data-admin-preview-disabled','1'); el.disabled = true;
+            });
+            document.querySelectorAll('#tracker-page .interactive-cell').forEach(el=>el.classList.add('admin-preview-readonly-note'));
+        }
+        function clearAdminPreviewReadOnly() {
+            document.body.classList.remove('admin-view-as-active');
+            document.querySelectorAll('[data-admin-preview-disabled="1"]').forEach(el => {
+                el.disabled = el.dataset.adminPreviewWasDisabled === '1';
+                delete el.dataset.adminPreviewWasDisabled; el.removeAttribute('data-admin-preview-disabled');
+            });
+            document.querySelectorAll('#tracker-page .interactive-cell').forEach(el=>el.classList.remove('admin-preview-readonly-note'));
+            const banner = document.getElementById('admin-view-as-banner'); if (banner) banner.hidden = true;
+        }
+        function startAdminViewAs() {
+            if (!isPantheonAdmin()) { alert('View As is available only to Pantheon administrators.'); return; }
+            const memberId = document.getElementById('admin-view-as-member-select').value;
+            const member = normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(item => item.id === memberId);
+            if (!member) { alert('Choose a registered member first.'); return; }
+            closeModal('admin-view-as-modal');
+            ['weights-modal','class-setup-modal','role-config-modal','roster-modal','dungeon-modal','rateup-events-modal','version-history-modal'].forEach(closeModal);
+            adminViewOriginalTheme = localStorage.getItem('pantheon-theme-choice-v1') || document.documentElement.getAttribute('data-pantheon-theme') || 'dark';
+            adminViewAsMemberId = member.id;
+            adminViewThemeChoice = document.getElementById('admin-view-as-theme-select').value;
+            setPreviewTheme(adminViewThemeChoice === 'current' ? adminViewOriginalTheme : adminViewThemeChoice);
+            document.body.classList.add('admin-view-as-active');
+            buildAdminViewAsBanner(member);
+            updateFilterDropdown();
+            syncDataStructures();
+            refreshTrackerUI();
+            renderOverviewActivity();
+            renderAnalytics();
+            renderTeamBuilder();
+            applyAdminPreviewReadOnly();
+            setStatus(`👁 Read-only preview: ${member.name}`);
+        }
+        function exitAdminViewAs() {
+            if (!isPantheonAdmin()) return;
+            adminViewAsMemberId = '';
+            adminViewThemeChoice = '';
+            clearAdminPreviewReadOnly();
+            setPreviewTheme(localStorage.getItem('pantheon-theme-choice-v1') || adminViewOriginalTheme || 'dark');
+            updateFilterDropdown();
+            syncDataStructures();
+            refreshTrackerUI();
+            renderOverviewActivity();
+            renderAnalytics();
+            renderTeamBuilder();
+            setStatus('🟢 Returned to administrator view.');
+        }
+        document.addEventListener('click', event => {
+            if (!isAdminViewAsActive()) return;
+            if (event.target.closest('#admin-view-as-banner,[data-admin-preview-allow]')) return;
+            const page = event.target.closest('#tracker-page,#team-builder-page,#member-roster-page');
+            if (!page) return;
+            if (event.target.closest('.mini-help')) return;
+            event.preventDefault(); event.stopPropagation();
+        }, true);
+        document.addEventListener('change', event => {
+            if (!isAdminViewAsActive()) return;
+            if (event.target.closest('#tracker-page,#team-builder-page,#member-roster-page')) { event.preventDefault(); event.stopPropagation(); }
+        }, true);
+
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
+            renderDailyPlanningPanel(cont);
             const trackingToggle = document.getElementById('analytics-tracking-enabled');
             const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true;
             if (trackingToggle) trackingToggle.checked = analyticsEnabled;
             if (!analyticsEnabled) {
                 const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
-                cont.innerHTML = `<div class="analytics-disabled"><strong>Weekly analytics tracking is off.</strong><br>Daily and weekly task resets will continue normally, but no new weekly history will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting five weeks of history.'}</div>`;
+                const disabled = document.createElement('div');
+                disabled.className = 'analytics-disabled';
+                disabled.innerHTML = `<strong>Stored weekly analytics tracking is off.</strong><br>Live planning and today’s completion highlights still work. No new weekly history will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting five weeks of history.'}`;
+                cont.appendChild(disabled);
                 return;
             }
             const sortedArchiveEntries = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0]));
             characters.forEach(char => {
-                const card = document.createElement('div'); card.className = 'char-card'; card.style.borderTopColor = char.color;
+                const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
                 
                 const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...sortedArchiveEntries.map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
                 const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
@@ -4901,12 +5313,14 @@
                 
                 const p = Object.entries(stats).map(([t, s]) => {
                     const e = s.m + s.c, w = getLootWeight(t);
-                    return { t, m: s.m, e, x: s.x, w, sc: Math.max(0, Math.round(w * (0.55 * (e?s.m/e:0) + 0.3 * Math.min(1,s.m/3) + 0.15 * Math.min(1,Math.max(e,s.o)/4)) * (1-(0.65*(s.o?s.x/s.o:0))) * 20)) };
+                    const baseScore = Math.max(0, Math.round(w * (0.55 * (e?s.m/e:0) + 0.3 * Math.min(1,s.m/3) + 0.15 * Math.min(1,Math.max(e,s.o)/4)) * (1-(0.65*(s.o?s.x/s.o:0))) * 20));
+                    const completionPatternBonus = s.o >= 2 && s.c / Math.max(1, s.o) >= 0.7 ? Math.min(5, Math.round(w * 0.35)) : 0;
+                    return { t, m: s.m, c: s.c, e, x: s.x, w, sc: baseScore + completionPatternBonus, completionPatternBonus };
                 }).filter(x => x.m > 0).sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m).slice(0, 3);
                 
-                const prioHTML = p.length ? p.map(i => `<div class="missed-item"><div><strong>${escapeHTML(i.t)}</strong><div style="color:#aaa;font-size:0.75rem;">${i.m}/${i.e||i.m} missed • ${i.x} N/A • L${i.w}</div></div><div style="background:#262630;padding:5px;border-radius:5px;color:#ffd27d;font-weight:bold;">P${i.sc}</div></div>`).join('') : '<div class="missed-item" style="color:#b5e5c5;">No priorities yet.</div>';
+                const prioHTML = p.length ? p.map(i => `<div class="missed-item"><div><strong>${escapeHTML(i.t)}</strong><div style="color:#aaa;font-size:0.75rem;">${i.c}/${i.e||i.c||i.m} completed • ${i.m} still open • ${i.x} N/A • L${i.w}${i.completionPatternBonus ? ' • learned completion pattern' : ''}</div></div><div style="background:#262630;padding:5px;border-radius:5px;color:#ffd27d;font-weight:bold;">P${i.sc}</div></div>`).join('') : '<div class="missed-item" style="color:#b5e5c5;">No priorities yet.</div>';
 
-                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}</div><div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${prioHTML}</div>`;
+                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge">★ MAIN</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${prioHTML}</div>`;
                 cont.appendChild(card);
             });
         }
@@ -5337,14 +5751,17 @@
             ensureMemberRosterMaster(cloudData);
             const rosters = normalizeRosters(cloudData.settings.rosters);
             const rosterById = new Map(rosters.map(roster => [roster.id, roster]));
-            return normalizeMemberDirectory(cloudData.settings.memberDirectory).flatMap(member => {
+            let members = normalizeMemberDirectory(cloudData.settings.memberDirectory);
+            if (isAdminViewAsActive()) members = members.filter(member => member.id === adminViewAsMemberId);
+            return members.flatMap(member => {
                 const roster = rosterById.get(member.trackerRosterId) || rosters.find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
                 return (member.characterProfiles || []).filter(profile => String(profile.name || '').trim()).map(profile => ({
                     name: profile.name.trim(),
                     color: member.color || roster?.color || '#7aa2f7',
                     rosterId: roster?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, ''),
                     rosterName: member.name,
-                    trackerEnabled: profile.trackerEnabled === true
+                    trackerEnabled: profile.trackerEnabled === true,
+                    isMain: profile.isMain === true
                 }));
             });
         }
@@ -5525,7 +5942,7 @@
             const chars = filter === 'all' ? registered : registered.filter(character => character.rosterId === filter);
             list.innerHTML = chars.length ? chars.map(c => {
                 const job = getCharacterJob(c.name), meta = getJobMeta(job);
-                return `<tr><td><strong>${escapeHTML(c.name)}</strong></td><td class="class-setup-owner">${escapeHTML(c.rosterName)}</td><td><select class="class-setup-select" data-class-char="${escapeHTML(c.name)}" onchange="setCharacterJob('${escapeHTML(c.name)}', this.value)">${buildJobOptions(job)}</select></td><td>${meta ? escapeHTML(meta.className) : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? '<span class="class-setup-status ok">Configured</span>' : '<span class="class-setup-status missing">Needs Job</span>'}</td></tr>`;
+                return `<tr class="${c.isMain ? 'is-main-character' : ''}"><td><strong>${escapeHTML(c.name)}${c.isMain ? ' <span class="main-character-badge">★ MAIN</span>' : ''}</strong></td><td class="class-setup-owner">${escapeHTML(c.rosterName)}</td><td><select class="class-setup-select" data-class-char="${escapeHTML(c.name)}" onchange="setCharacterJob('${escapeHTML(c.name)}', this.value)">${buildJobOptions(job)}</select></td><td>${meta ? escapeHTML(meta.className) : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? '<span class="class-setup-status ok">Configured</span>' : '<span class="class-setup-status missing">Needs Job</span>'}</td></tr>`;
             }).join('') : '<tr><td colspan="6" style="color:#8b92a0;padding:16px;text-align:center;">No characters in this roster.</td></tr>';
             updateClassSetupSummary();
         }
@@ -5567,9 +5984,20 @@
         function populateTeamBuilderRosterFilter() {
             const sel = document.getElementById('team-builder-roster-filter');
             if (!sel) return;
+            const rosters = normalizeRosters(cloudData.settings.rosters);
+            if (isAdminViewAsActive()) {
+                const member = getCurrentMemberDirectoryEntry();
+                const roster = rosters.find(item => item.id === member?.trackerRosterId)
+                    || rosters.find(item => identityMatchKey(item.name) === identityMatchKey(member?.name || ''));
+                sel.innerHTML = roster
+                    ? `<option value="${escapeHTML(roster.id)}">Only ${escapeHTML(member?.name || roster.name)}</option>`
+                    : `<option value="all">${escapeHTML(member?.name || 'Selected member')} roster</option>`;
+                sel.value = roster?.id || 'all';
+                return;
+            }
             const cur = sel.value || 'all';
-            sel.innerHTML = '<option value="all">All Rosters</option>' + cloudData.settings.rosters.map(r => `<option value="${escapeHTML(r.id)}">Only ${escapeHTML(r.name)}</option>`).join('');
-            sel.value = cloudData.settings.rosters.some(r => r.id === cur) ? cur : 'all';
+            sel.innerHTML = '<option value="all">All Rosters</option>' + rosters.map(r => `<option value="${escapeHTML(r.id)}">Only ${escapeHTML(r.name)}</option>`).join('');
+            sel.value = rosters.some(r => r.id === cur) ? cur : 'all';
         }
 
         function getTeamState(teamKey) { return getLocalTeamBuilderState()[teamKey]; }
@@ -5674,7 +6102,7 @@
                 return true;
             });
 
-            return '<option value="">Empty Slot</option>' + opts.map(c => `<option value="${escapeHTML(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+            return '<option value="">Empty Slot</option>' + opts.map(c => `<option value="${escapeHTML(c.name)}" ${c.name === currentChar ? 'selected' : ''}>${c.isMain ? '★ ' : ''}${escapeHTML(c.name)}</option>`).join('');
         }
 
         function setTeamFormat(value) {
@@ -5850,6 +6278,29 @@
             const filter = document.getElementById('team-builder-roster-filter');
             if (!filter || !getLocalTeamBuilderState()) return;
             populateTeamBuilderRosterFilter();
+            const previewOnly = isAdminViewAsActive();
+            const member = previewOnly ? getCurrentMemberDirectoryEntry() : null;
+            const headerText = document.querySelector('#team-builder-page .team-builder-header > div > p');
+            const headerActions = document.querySelector('#team-builder-page .builder-header-actions');
+            const classAlert = document.getElementById('class-setup-alert');
+            const toolbar = document.querySelector('#team-builder-page .builder-toolbar');
+            const teamGrid = document.querySelector('#team-builder-page .team-builder-grid');
+            const balancePanel = document.getElementById('team-balance-panel');
+            const bottomHelp = document.querySelector('#team-builder-page .team-builder-bottom');
+            [headerActions, classAlert, toolbar, teamGrid, balancePanel, bottomHelp].forEach(el => { if (el) el.style.display = previewOnly ? 'none' : ''; });
+            if (headerText) headerText.textContent = previewOnly
+                ? `Read-only roster preview for ${member?.name || 'selected member'}. Their registered characters and Main/class details are shared; team placements and builder preferences are stored locally on each member’s own browser and cannot be mirrored here.`
+                : 'Build coordinated parties directly from the characters registered in the tracker.';
+            if (previewOnly) {
+                const tag = document.getElementById('team-format-tag');
+                const desc = document.getElementById('team-format-description');
+                if (tag) tag.textContent = 'Roster preview only';
+                if (desc) desc.textContent = 'Team slots, party format, and builder preferences are local to this browser in v1.6.8; this preview does not show the selected member’s saved layout.';
+                ['team1-slots','team2-slots'].forEach(id => { const tbody = document.getElementById(id); if (tbody) tbody.innerHTML = ''; });
+                const bp = document.getElementById('team-balance-panel'); if (bp) bp.classList.add('hidden');
+                applyAdminPreviewReadOnly();
+                return;
+            }
             populateTeamFormatSelect();
             const ownerDup = document.getElementById('allow-same-owner');
             if (ownerDup) ownerDup.checked = getTeamBuilderPrefs().allowSameOwner;
@@ -5871,12 +6322,12 @@
                 if (!tbody) return;
                 if (card) card.classList.toggle('team-card-compact', fmt.size === 4);
                 tbody.innerHTML = team.slots.slice(0, fmt.size).map((slot, i) => {
-                    const char = slot.character || '', job = getCharacterJob(char), meta = getJobMeta(job), owner = allRegisteredCharacters().find(c => c.name === char)?.rosterName || '';
+                    const char = slot.character || '', job = getCharacterJob(char), meta = getJobMeta(job), selectedProfile = allRegisteredCharacters().find(c => c.name === char), owner = selectedProfile?.rosterName || '';
                     const posHTML = meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">—</span>';
                     const jobHTML = meta ? `<span class="team-job">${escapeHTML(job)}</span>` : (char ? '<span class="team-job team-unknown">Job not set</span>' : '<span class="team-unknown">—</span>');
                     const classHTML = `<select class="team-class-select" onchange="setTeamClassFilter('${teamKey}', ${i}, this.value)">${buildTeamClassOptions(teamKey, i, char)}</select>`;
                     const dmgHTML = meta && jobHasRole(meta, 'DPS') && meta.damageType ? `<span class="team-badge damage-${String(meta.damageType||'').toLowerCase()}">${escapeHTML(meta.damageType)}</span>` : '<span class="team-unknown">—</span>';
-                    return `<tr><td class="team-slot">${i+1}</td><td><select class="team-character-select ${char && !job ? 'needs-job' : ''}" onchange="setTeamSlot('${teamKey}', ${i}, this.value)">${teamCharacterOptions(teamKey,i,char)}</select></td><td class="team-meta">${classHTML}</td><td class="team-meta">${jobHTML}</td><td class="team-meta">${posHTML}</td><td>${dmgHTML}</td><td>${owner ? `<span class="owner-chip">${escapeHTML(owner)}</span>` : '<span class="team-unknown">—</span>'}</td><td><button class="remove-slot-btn" type="button" title="Empty slot" onclick="setTeamSlot('${teamKey}', ${i}, '')">×</button></td></tr>`;
+                    return `<tr class="${selectedProfile?.isMain ? 'is-main-character' : ''}"><td class="team-slot">${i+1}</td><td><select class="team-character-select ${char && !job ? 'needs-job' : ''}" onchange="setTeamSlot('${teamKey}', ${i}, this.value)">${teamCharacterOptions(teamKey,i,char)}</select></td><td class="team-meta">${classHTML}</td><td class="team-meta">${jobHTML}</td><td class="team-meta">${posHTML}</td><td>${dmgHTML}</td><td>${owner ? `<span class="owner-chip">${escapeHTML(owner)}</span>` : '<span class="team-unknown">—</span>'}</td><td><button class="remove-slot-btn" type="button" title="Empty slot" onclick="setTeamSlot('${teamKey}', ${i}, '')">×</button></td></tr>`;
                 }).join('');
                 renderTeamSummary(teamKey);
             });
@@ -6467,14 +6918,18 @@
             const list = document.getElementById('member-directory-list'); if (!list) return;
             const query = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
             const all = getMemberDirectoryView();
-            const scoped = isPantheonAdmin() ? all : all.filter(member => canManageMemberRecord(member));
+            const scoped = isAdminViewAsActive() ? all.filter(member => member.id === adminViewAsMemberId) : isPantheonAdmin() ? all : all.filter(member => canManageMemberRecord(member));
             const members = scoped.filter(member => [member.name, member.note || '', ...(member.characters || []), ...(member.characterProfiles || []).map(profile => `${profile.job} ${profile.trackerEnabled ? 'tracking' : 'directory'}`)].join(' ').toLowerCase().includes(query));
             const memberNameInput = document.getElementById('member-directory-name');
             if (memberNameInput && !isPantheonAdmin()) { memberNameInput.readOnly = true; if (!editingMemberDirectoryId) memberNameInput.value = getCurrentOwnerName(); }
             else if (memberNameInput) memberNameInput.readOnly = false;
             const memberHeading = document.getElementById('member-directory-form-title');
+            const memberForm = document.getElementById('member-directory-form');
+            if (memberForm) memberForm.hidden = isAdminViewAsActive();
             const memberDescription = document.getElementById('member-roster-description');
-            if (memberDescription) memberDescription.textContent = isPantheonAdmin()
+            if (memberDescription) memberDescription.textContent = isAdminViewAsActive()
+                ? 'Read-only preview of this member’s registered characters, Main designation, and Tracker opt-ins.'
+                : isPantheonAdmin()
                 ? 'Shared guild directory. Manage member records and choose which characters appear in Tracker. All registered characters remain available in Team Builder.'
                 : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
             if (memberHeading && !isPantheonAdmin() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
@@ -6489,10 +6944,11 @@
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
                     const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Not tracked; still available in Team Builder'}`;
-                    return `<span class="member-directory-char" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
+                    return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">★ MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
-                const removeMemberButton = isPantheonAdmin() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
-                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div><div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div></div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
+                const removeMemberButton = isPantheonAdmin() && !isAdminViewAsActive() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
+                const directoryActions = isAdminViewAsActive() ? '' : `<div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div>`;
+                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div>${directoryActions}</div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
             }).join('') : `<div class="member-directory-empty">${isPantheonAdmin() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
         }
         function resetMemberDirectoryForm() {
@@ -6679,7 +7135,7 @@
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r1';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -7105,7 +7561,7 @@
             // On every entry to Tracker, force the signed-in Discord account's own roster.
             // This overrides stale local Universal View state; the toolbar toggle still lets
             // a member switch to Universal View manually while remaining on the Tracker page.
-            if (page === 'tracker' && pantheonDiscordUser?.id) applyDiscordIdentityDefaults();
+            if (page === 'tracker' && pantheonDiscordUser?.id && !isAdminViewAsActive()) applyDiscordIdentityDefaults();
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
             if (page === 'overview') { renderOverviewActivity(); updateOverviewStatusCards(); }
             if (page === 'tracker') { syncDataStructures(); buildTrackerTable(); applyBoardState(); if (isAnalyticsVisible) renderAnalytics(); updateClassSetupSummary(); }
@@ -7113,6 +7569,7 @@
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
             else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster') history.replaceState(null, '', location.pathname + location.search);
+            if (isAdminViewAsActive()) applyAdminPreviewReadOnly();
         }
 
 
@@ -7257,6 +7714,44 @@
     }
 })();
 </script>
+
+
+<div class="modal-overlay hidden" id="admin-view-as-modal" role="dialog" aria-modal="true" aria-labelledby="admin-view-as-title">
+  <div class="modal-card">
+    <h3 id="admin-view-as-title">👁 View As Member</h3>
+    <p class="modal-note">Read-only preview of a registered member’s Overview, Tracker, Analytics, and Member Roster data. Team Builder will show a notice instead of a misleading local layout because its saved slots are not shared. Your Discord session and admin permissions are never replaced.</p>
+    <div class="admin-view-as-fields">
+      <label class="admin-view-as-field">Member<select id="admin-view-as-member-select"><option value="">Choose a member…</option></select></label>
+      <label class="admin-view-as-field">Preview theme<select id="admin-view-as-theme-select"><option value="current">This browser’s current theme</option><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
+    </div>
+    <p class="modal-note">v1.6.8 stores both theme choice and Team Builder placements/format/preferences in each browser only. The theme selector simulates appearance; Team Builder preview is roster-only and cannot retrieve another member’s local layout.</p>
+    <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="startAdminViewAs()">Start read-only preview</button><button class="btn btn-secondary" type="button" onclick="closeModal('admin-view-as-modal')">Cancel</button></div>
+  </div>
+</div>
+<div class="modal-overlay hidden" id="rateup-events-modal" role="dialog" aria-modal="true" aria-labelledby="rateup-events-title">
+  <div class="modal-card wide-modal">
+    <h3 id="rateup-events-title">✨ Rate-Up Event Settings</h3>
+    <p class="modal-note">These shared settings affect planning advice for everyone. Weekend uses Manila time (GMT+8): Saturday 00:00 to Monday 00:00. Custom start/end also use Manila local time. Enable events only when the game schedule is confirmed.</p>
+    <div class="rate-up-editor-grid">
+      <section class="rate-up-editor-card">
+        <h4>＋50% Item Drop Rate UP</h4>
+        <label><input id="rateup-item-enabled" type="checkbox"> Event is enabled</label>
+        <label>Schedule<select id="rateup-item-schedule"><option value="weekend">Recurring weekend (Sat–Mon)</option><option value="custom">Custom date/time</option></select></label>
+        <label class="rate-up-custom-field">Start (Manila)<input id="rateup-item-start" type="datetime-local"></label>
+        <label class="rate-up-custom-field">End (Manila)<input id="rateup-item-end" type="datetime-local"></label>
+      </section>
+      <section class="rate-up-editor-card">
+        <h4>＋30% Enhancement Rate UP</h4>
+        <label><input id="rateup-enhancement-enabled" type="checkbox"> Event is enabled</label>
+        <label>Schedule<select id="rateup-enhancement-schedule"><option value="weekend">Recurring weekend (Sat–Mon)</option><option value="custom">Custom date/time</option></select></label>
+        <label class="rate-up-custom-field">Start (Manila)<input id="rateup-enhancement-start" type="datetime-local"></label>
+        <label class="rate-up-custom-field">End (Manila)<input id="rateup-enhancement-end" type="datetime-local"></label>
+      </section>
+    </div>
+    <div id="rateup-events-summary" class="modal-note" aria-live="polite"></div>
+    <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="saveRateUpEvents()">Save shared event schedule</button><button class="btn btn-secondary" type="button" onclick="closeModal('rateup-events-modal')">Cancel</button></div>
+  </div>
+</div>
 
 </body>
 </html>

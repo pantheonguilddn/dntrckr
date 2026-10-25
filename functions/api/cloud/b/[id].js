@@ -1,5 +1,5 @@
 import { getRecord, jsonResponse, resolveRecordId, storeRecord } from '../../../_utils/auth.js';
-import { decodePantheonCompactRecord } from '../../../_utils/compact.js';
+import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../_utils/compact.js';
 import { registrationWriteViolation } from '../../../_utils/registration-guard.js';
 import { denyNonAdminRevisionJournalAccess } from '../../../_utils/admin-tool-access.js';
 
@@ -33,6 +33,16 @@ export async function onRequestPut(context) {
       const next = decodePantheonCompactRecord(record);
       const violation = registrationWriteViolation(previous, next, context.data?.session);
       if (violation) return jsonResponse({ error: violation, message: violation }, 403);
+      // Rate-Up scheduling is a shared admin-owned setting. A member's ordinary tracker sync
+      // must never alter or erase this schedule, even if their cached record predates the field.
+      next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};
+      next.settings.rateUpEvents = previous.settings?.rateUpEvents || {
+        itemDrop: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
+        enhancement: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' }
+      };
+      next.settings.rateUpEventsUpdatedAt = Number(previous.settings?.rateUpEventsUpdatedAt) || 0;
+      next.settings.rateUpEventsUpdatedBy = String(previous.settings?.rateUpEventsUpdatedBy || '');
+      record = encodePantheonCompactRecord(next);
     } catch (error) {
       return jsonResponse({ error: `Could not validate member registration changes: ${String(error?.message || error).slice(0, 250)}` }, 400);
     }
