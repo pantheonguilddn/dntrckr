@@ -1,22 +1,4 @@
-# Pantheon Tools v1.7.5 — Cloudflare Pages + D1
-
-
-## v1.7.5 — accessible themes, Main emphasis, and practical reset planning
-
-**Current release note:** The files at the root of this ZIP are the v1.7.5 deployment package. The sections below include historical setup notes and change history from earlier versions; follow this current-release section for what changed in v1.7.5.
-
-- Raised the minimum size, weight, and opacity of small/helper text specifically in Light, Eye Comfort, and Pastel without changing global body typography or compact layout. Pastel now uses more visibly lavender/pink surfaces with dark, legible text.
-- Preserved Main designation through the legacy roster migration and added a highlighted Main row in Class Setup, while retaining existing Tracker, analytics, roster, and Team Builder accents.
-- Expanded admin View As member labels to show tracked versus registered counts and clarified that the saved-theme preview is read-only. The control remains dependent on the server-recognized admin role; the HTML does not grant privileged access.
-- Analytics now lists completed task names for today, uses a more granular countdown to Saturday reset, reserves 3 solo Lucky Zone runs (~24 minutes) per registered character before tracked Dailies and raids, and makes learned weekly-history patterns a small rather than absolute ranking signal.
-- Existing admin-managed +50% Item Drop Rate UP and +30% Enhancement Rate UP schedules remain shared and Manila-time based. Weekend schedules run Saturday 00:00 through Monday 00:00 Manila time; advice includes the Friday delay opportunity and Sunday deadline, and warns when the full-roster LZ estimate may not fit.
-
-
-## v1.7.3 — verified v1.6.8 checkpoint rebuild
-
-This release reapplies the accessibility, Main-character emphasis, admin member preview, reset-aware Analytics, Rate-Up event reminder and UI-description editing feedback to the v1.6.8 checkpoint whose What's New popup contains a brief tool description and a concise release summary. See `Pantheon_Tools_v1.7.3_README.md` for complete feature and validation notes.
-
-Rate-Up events are shared and admin-managed. Weekend schedules are Saturday 00:00 through Monday 00:00 Manila time; members receive a subtle reminder ribbon and task advice that reserves about 24 minutes for Lucky Zones per registered character. Admins can toggle View as and UI-description editing through the compact profile popover.
+# Pantheon Tools v1.6.8 — Cloudflare Pages + D1
 
 ## v1.6.8 Team Builder roster separation
 
@@ -265,8 +247,3 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - Added the new `memberResetMarkers` field to the compact record encoding and merging logic. Existing global reset markers are preserved for compatibility.
 - Updated the release version to v1.6.6.
 - Weekly archive snapshots also enforce ownership: members can add/update their own character's weekly rate/state, but cannot change another character's archived progress, alter the global task order, or delete a shared archive week. Archive pruning is administrator-only.
-
-
-## v1.7.4 typography and data-safety repair
-
-The shared theme styling no longer inflates compact helper text or overrides global line heights. Higher contrast is achieved with text colors, full opacity and a modest weight change. The app also prefers populated Dungeon Registration categories when timestamps do not show a newer clearing, and the API blocks stale syncs that would erase every category. If categories were already deleted from the shared record, recover the previous category snapshot from Version History if available.
