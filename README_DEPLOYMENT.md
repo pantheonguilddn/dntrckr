@@ -1,15 +1,14 @@
-# Pantheon Tools v1.6.8-r5 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r6 — Cloudflare Pages + D1
 
 This release remains based directly on the stable v1.6.8 branch. It refines the existing UI and keeps the original package structure; it does not incorporate the later v1.6.9 or v1.7.x code branches.
 
-## v1.6.8-r5 update
+## v1.6.8-r6 update
 
-- Expanded the left-side Online/Offline roster to 330px on desktop, stacked the Online and Offline groups for legibility, and allowed long names to wrap rather than clip. Narrow screens keep the roster in normal page flow.
-- The Rate-Up notice is shown only while at least one configured event is active. It displays the remaining time for +50% Item Drop and/or +30% Enhancement, updates every 30 seconds, and disappears when no event is active.
-- Audited all five main pages and the app's dialogs across Dark, Light, Eye Comfort, and Pastel, with representative Card Database results, Member Roster/Main badges, and Team Builder status content. Corrected the Team Builder alert badge, Card Batch modal labels, Salary Calculator result colors, and Ledger surfaces/buttons that still relied on dark-theme text colors.
-- Reverted the recent event-banner text-size increase; font scale is otherwise unchanged. Readability fixes use appropriate foreground/background pairs, not larger typography.
-- Updated the release title and dismissal version so the compact What's New popup identifies v1.6.8-r5.
-- Applied the same theme contrast safeguard to the Admin Console's return link. No data schema change is required.
+- Removed the left-rail body gutter so the app retains its original centered layout. The Online/Offline pane floats beside the app on wide screens and returns to document flow on narrower screens.
+- Added the admin-configurable +100% EXP Boost event alongside +50% Item Drop and +30% Enhancement. Each event supports the existing recurring weekend or custom Manila-time window, displays a live remaining-time countdown only while active, and contributes to planning advice.
+- Fixed the Team Builder “8 Man Hardcore · Two-Team DPS Balance” heading using theme-aware foreground and surface colors. Reduced detailed instruction and helper copy without changing the app’s primary label/data typography.
+- Shortened Tracking Pulse explanations and task-review notes. It continues learning character roles from current task ticks and archived weekly activity, and avoids overclaiming when the data cannot distinguish missed ticks from unplayed characters.
+- App title and release popup now identify v1.6.8-r6. No D1 schema migration is required.
 
 ## Deployment notes
 

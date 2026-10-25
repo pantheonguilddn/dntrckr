@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r5</title>
+    <title>Pantheon Tools v1.6.8-r6</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -498,7 +498,7 @@
             margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid #353844;
         }
         .team-builder-header h2 { margin:0; font-size:1.45rem; }
-        .team-builder-header p { margin:5px 0 0; color:#858c9c; font-size:.82rem; }
+        .team-builder-header p { margin:5px 0 0; color:#858c9c; font-size:.72rem; line-height:1.4; }
         .builder-header-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
         .builder-toolbar {
             display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
@@ -1952,7 +1952,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
 .overview-profile-status-row.overview-status-row-r2 { margin:0 0 8px; }
 .overview-profile-widget-row.overview-widget-row-r2 { margin:0 0 10px; }
 .overview-feature-banner:not(.overview-header-banner) { display:none !important; }
-@media(min-width:1450px) { body { padding-left:236px !important; } }
+
 @media(max-width:1449px) { .online-presence-pane { position:relative; left:auto; top:auto; width:auto; max-width:none; max-height:210px; margin:0 0 12px; } .online-presence-pane.is-collapsed { max-height:none; } }
 @media(max-width:850px) { .overview-dashboard-head-r2 { flex-direction:column; } .overview-dashboard-head-r2 .overview-header-banner { flex:0 0 auto; width:100% !important; height:100px; min-height:100px !important; max-height:100px; } .overview-dashboard-head-r2 .overview-profile-chip-r2 { width:100%; min-width:0; min-height:70px; flex:0 0 auto; } .focus-next-row { grid-template-columns:1fr; } .focus-character-chips { gap:4px; } }
 @media(max-width:640px) { .weekly-plan-card-compact { padding:11px !important; } .focus-character-chips { gap:4px; } .focus-summary-head { align-items:flex-start; } .online-presence-pane { max-height:180px; } }
@@ -2180,11 +2180,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 <style id="pantheon-v168-r4-contrast-and-presence">
 /* r4: the left rail is inset from the viewport edge and the page gets a matching gutter. */
 @media (min-width:1320px) {
-  body { padding-left:clamp(277px, calc((100vw - 1800px)/2 + 277px), 360px) !important; }
+  
   #online-presence-pane { position:fixed !important; left:clamp(44px, calc((100vw - 1800px)/2 + 44px), 100px) !important; top:145px !important; width:215px !important; max-width:215px !important; max-height:calc(100vh - 165px) !important; margin:0 !important; }
 }
 @media (max-width:1319px) {
-  body { padding-left:clamp(12px, 2.5vw, 36px) !important; }
+  
   #online-presence-pane { position:relative !important; left:auto !important; top:auto !important; width:100% !important; max-width:100% !important; max-height:260px !important; margin:12px 0 16px !important; }
 }
 @media (max-width:700px) { #online-presence-pane { max-height:220px !important; } }
@@ -2350,7 +2350,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 <style id="pantheon-v168-r5-presence-theme-audit">
 /* The larger rail should remain near the content gutter while leaving room for names. */
 @media (min-width:1320px) {
-  body { padding-left:clamp(392px,calc((100vw - 1800px)/2 + 390px),470px) !important; }
+  
   #online-presence-pane { left:clamp(44px,calc((100vw - 1800px)/2 + 44px),100px) !important; width:330px !important; max-width:330px !important; }
 }
 #online-presence-pane .online-presence-list { grid-template-columns:minmax(0,1fr) !important; max-height:min(58vh,560px) !important; }
@@ -2404,6 +2404,67 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 :root[data-pantheon-theme="eye-comfort"] .salary-receipt .receipt-positive { color:#245b37 !important; -webkit-text-fill-color:#245b37 !important; }
 
 /* Preserve the original typographic scale; these are foreground/background corrections only. */
+</style>
+
+
+<style id="pantheon-v168-r6-centered-layout-pulse-and-exp">
+/* Keep the app at its original viewport center: the live roster floats beside it and never reserves body width. */
+@media (min-width:1320px) {
+  body { padding-left:0 !important; padding-right:0 !important; }
+  #online-presence-pane { position:fixed !important; left:12px !important; top:145px !important; width:270px !important; max-width:270px !important; margin:0 !important; z-index:850; }
+}
+@media (max-width:1319px) {
+  #online-presence-pane { position:relative !important; left:auto !important; top:auto !important; width:min(100%,920px) !important; max-width:920px !important; margin:12px auto 16px !important; }
+}
+#online-presence-pane .online-presence-list { max-height:min(62vh,620px) !important; }
+#online-presence-pane .online-presence-user-name { font-size:.64rem !important; line-height:1.35 !important; }
+
+/* The balance heading was authored for a dark panel; use paired theme variables on every theme. */
+#team-builder-page .team-balance-head { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; border-radius:8px; padding:7px 9px; }
+#team-builder-page .team-balance-head strong { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; font-size:.70rem !important; }
+#team-builder-page .team-balance-head span { color:var(--pt-accent) !important; -webkit-text-fill-color:var(--pt-accent) !important; font-size:.65rem !important; }
+
+/* Detailed instructions are intentionally secondary to the controls and data. */
+#team-builder-page .team-builder-header p,
+#team-builder-page .team-builder-bottom,
+#team-builder-page .team-balance-panel p,
+#team-builder-page .format-description,
+#team-builder-page .format-quick-help,
+#member-roster-page .member-directory-panel p,
+#card-wiki-page .card-wiki-header p,
+#card-wiki-page .card-wiki-preset-head p,
+#card-wiki-page .card-wiki-stat-panel-head p,
+#help-modal .modal-note,
+.overview-panel-heading p,
+.overview-tool-card > span:last-child,
+.discord-notice,
+.member-directory-note,
+.card-wiki-summary,
+.card-wiki-selected-none,
+#rateup-events-modal .modal-note { font-size:.66rem !important; line-height:1.42 !important; }
+#team-builder-page .team-builder-bottom strong { font-weight:800; }
+
+/* Tracking Pulse: shorter copy and a tighter hierarchy without enlarging the existing text. */
+.weekly-plan-card-compact { gap:6px !important; padding:11px 13px !important; }
+.focus-model-explainer { font-size:.62rem !important; line-height:1.35 !important; margin:2px 0 0 !important; }
+.focus-summary-line { font-size:.65rem !important; line-height:1.35 !important; }
+.focus-model-summary { font-size:.59rem !important; line-height:1.35 !important; }
+.focus-review-note { font-size:.61rem !important; line-height:1.35 !important; padding:6px 8px !important; }
+.focus-character-chip-head strong { font-size:.65rem !important; }
+.focus-character-chip-role { font-size:.51rem !important; }
+.focus-character-chip-progress span { font-size:.54rem !important; }
+.focus-character-chip-progress b { font-size:.61rem !important; }
+.focus-character-chip-trend { font-size:.51rem !important; }
+.focus-event-strip span { font-size:.58rem !important; }
+
+/* Three event controls fit in the wide modal; stack on smaller viewports. */
+.rate-up-editor-grid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; gap:9px !important; }
+.rate-up-editor-card { padding:10px !important; }
+.rate-up-editor-card h4 { font-size:.73rem !important; line-height:1.35 !important; }
+.rate-up-editor-card label { font-size:.65rem !important; line-height:1.35 !important; }
+.rate-up-editor-card input[type="datetime-local"], .rate-up-editor-card select { font-size:.68rem !important; min-height:32px !important; padding:5px 6px !important; }
+@media (max-width:1000px) { .rate-up-editor-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+@media (max-width:700px) { .rate-up-editor-grid { grid-template-columns:1fr !important; } }
 </style>
 
 </head>
@@ -2846,9 +2907,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r5</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r6</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r5 feedback update:</strong> wider left-side member list with full names, live Rate-Up countdown only during active events, and cross-theme contrast corrections while preserving the original text sizes.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r6 update:</strong> centered app layout, shorter instructions, a clearer Team Builder balance heading, and a new +100% EXP Boost event trigger with live countdown.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3490,7 +3551,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function createDefaultRateUpEvents() {
             return {
                 itemDrop: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
-                enhancement: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' }
+                enhancement: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
+                expBoost: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' }
             };
         }
         function normalizeRateUpEvents(value) {
@@ -3507,7 +3569,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const defaults = createDefaultRateUpEvents();
             return {
                 itemDrop: normalizeOne(source.itemDrop || defaults.itemDrop),
-                enhancement: normalizeOne(source.enhancement || defaults.enhancement)
+                enhancement: normalizeOne(source.enhancement || defaults.enhancement),
+                expBoost: normalizeOne(source.expBoost || defaults.expBoost)
             };
         }
 
@@ -5025,7 +5088,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         document.addEventListener('DOMContentLoaded', async () => {
             initializeBountyBoardsToggle();
-            ['item','enhancement'].forEach(prefix => document.getElementById(`rateup-${prefix}-schedule`)?.addEventListener('change', () => updateRateUpEventFields(prefix)));
+            ['item','enhancement','exp'].forEach(prefix => document.getElementById(`rateup-${prefix}-schedule`)?.addEventListener('change', () => updateRateUpEventFields(prefix)));
             const canEnter = await pantheonCheckSessionAndBoot();
             if (!canEnter) return;
             hydrateCardWikiData();
@@ -5600,9 +5663,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const events = normalizeRateUpEvents(cloudData?.settings?.rateUpEvents);
             const item = getRateUpWindow(events.itemDrop, now);
             const enhance = getRateUpWindow(events.enhancement, now);
+            const exp = getRateUpWindow(events.expBoost, now);
             const parts = [];
             if (item.status === 'active' && item.end > now) parts.push(`＋50% Item Drop · ${formatEventTimeRemaining(item.end - now)}`);
             if (enhance.status === 'active' && enhance.end > now) parts.push(`＋30% Enhancement · ${formatEventTimeRemaining(enhance.end - now)}`);
+            if (exp.status === 'active' && exp.end > now) parts.push(`＋100% EXP Boost · ${formatEventTimeRemaining(exp.end - now)}`);
             const active = parts.length > 0;
             el.textContent = parts.join('   |   ');
             el.hidden = !active;
@@ -5876,7 +5941,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const focus = signals.filter(item => item.isMain || item.regular || item.emerging).slice(0,3);
             const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'Learning your rotation';
             const chips = signals.slice(0, Math.min(8, signals.length)).map(item => {
-                const status = item.reviewNA ? 'Review rotation' : item.checkTicks ? 'Check weekly ticks' : item.checkWeeklyLog ? 'No weekly activity' : item.isMain ? 'Main focus' : item.regular ? 'Regular' : item.emerging ? 'Emerging' : item.trackerEnabled ? 'History building' : 'Tracking off';
+                const status = item.reviewNA ? 'Review N/A' : item.checkTicks ? 'Check ticks' : item.checkWeeklyLog ? 'No activity' : item.isMain ? 'Main' : item.regular ? 'Regular' : item.emerging ? 'Emerging' : item.trackerEnabled ? 'Learning' : 'Tracking off';
                 const rate = item.currentRate === null ? '—' : `${item.currentRate}%`;
                 const trendText = item.trend === null ? 'History building' : item.trend > 0 ? `Up ${item.trend} pts` : item.trend < 0 ? `Down ${Math.abs(item.trend)} pts` : 'Steady';
                 const weeklyText = item.currentEligible ? `${item.currentDone}/${item.currentEligible} weekly tasks` : 'No eligible weekly tasks';
@@ -5886,13 +5951,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const checkTicks = signals.filter(item => item.checkTicks && !item.isMain);
             const checkWeeklyLog = signals.filter(item => item.checkWeeklyLog && !item.isMain);
             const reviewTextParts = [];
-            if (checkTicks.length) reviewTextParts.push(`${checkTicks.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkTicks.length>3?' + more':''}: other tasks were recorded this cycle, but no weekly completions are marked. Check the weekly ticks before changing priorities.`);
-            if (checkWeeklyLog.length) reviewTextParts.push(`${checkWeeklyLog.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkWeeklyLog.length>3?' + more':''}: no completions are recorded this cycle, despite regular activity in past weeks. This cannot distinguish a character not being played from missed ticks; check the tracker before deciding.`);
-            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: recorded weekly activity has been low across the saved weeks. If they are no longer in rotation, consider marking irrelevant tasks N/A or turning off Tracker for that character.`);
+            if (checkTicks.length) reviewTextParts.push(`${checkTicks.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkTicks.length>3?' + more':''}: other tasks are recorded, but weekly ticks are empty. Check those ticks first.`);
+            if (checkWeeklyLog.length) reviewTextParts.push(`${checkWeeklyLog.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkWeeklyLog.length>3?' + more':''}: no activity is recorded this cycle despite past participation. Could be missed ticks or not played; confirm first.`);
+            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: low weekly activity across saved cycles. If out of rotation, consider N/A or turning Tracker off.`);
             const reviewText = reviewTextParts.join(' ');
-            const activitySummary = `Recorded pattern: ${signals.filter(item=>item.isMain).length} Main · ${signals.filter(item=>item.regular).length} regular · ${signals.filter(item=>item.emerging).length} emerging · ${signals.filter(item=>item.reviewNA).length} low-activity to review`;
-            const itemEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).itemDrop, now);
-            const enhanceEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).enhancement, now);
+            const activitySummary = `${signals.filter(item=>item.isMain).length} Main · ${signals.filter(item=>item.regular).length} regular · ${signals.filter(item=>item.emerging).length} emerging · ${signals.filter(item=>item.reviewNA).length} to review`;
+            const configuredEvents = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
+            const itemEvent = getRateUpWindow(configuredEvents.itemDrop, now);
+            const enhanceEvent = getRateUpWindow(configuredEvents.enhancement, now);
+            const expEvent = getRateUpWindow(configuredEvents.expBoost, now);
             const manilaDOW = getManilaDateParts(now).weekday;
             const eventNotes = [];
             if (itemEvent.status === 'active') {
@@ -5907,17 +5974,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             } else if (itemEvent.status === 'upcoming' && itemEvent.start && itemEvent.start-now <= 72*60*60*1000) eventNotes.push(`+50% Drop ${formatManilaStamp(itemEvent.start)}`);
             if (enhanceEvent.status === 'active') eventNotes.push('+30% Enhancement live · use prepared materials on planned upgrades');
             else if (enhanceEvent.status === 'upcoming' && enhanceEvent.start && enhanceEvent.start-now <= 72*60*60*1000) eventNotes.push(`+30% Enhancement ${formatManilaStamp(enhanceEvent.start)} · prepare materials/gold`);
+            if (expEvent.status === 'active') eventNotes.push('+100% EXP live · prioritize planned EXP runs during the bonus');
+            else if (expEvent.status === 'upcoming' && expEvent.start && expEvent.start-now <= 72*60*60*1000) eventNotes.push(`+100% EXP Boost starts ${formatManilaStamp(expEvent.start)} · prepare EXP runs`);
             const panel = document.createElement('section');
             panel.className = 'weekly-plan-card weekly-plan-card-compact';
             panel.innerHTML = `
                 <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity &amp; Completion</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
-                <p class="focus-model-explainer">Combines completion rates, current task ticks, and archived weekly activity to estimate each character’s role. It separates possible missed weekly ticks from repeated low participation where history allows. It cannot tell whether unrecorded play happened.</p>
-                <div class="focus-summary-line"><strong>Current focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Building history</span>' : ''}</div>
+                <p class="focus-model-explainer">Learns from task ticks and saved weekly history. It flags possible missed ticks separately from repeated low activity when the data supports it.</p>
+                <div class="focus-summary-line"><strong>Focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Learning priorities</span>' : ''}</div>
                 ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to start building a personal focus.</div>'}
                 ${signals.length ? `<div class="focus-model-summary">${escapeHTML(activitySummary)} <span>· ${recent.length} weekly archive${recent.length===1?'':'s'} available</span></div>` : ''}
                 ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
-                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} tracked completions · <strong>Tomorrow’s time estimate:</strong> Lucky Zones take about ${lzMinutes} minutes across ${registeredCount} registered character${registeredCount===1?'':'s'} (3 solo runs × ~8 minutes each). There are ${pendingDaily} open tracked daily task${pendingDaily===1?'':'s'} before raid time can be estimated.</div>
-                ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,2).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
+                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} completions · <strong>Estimated Lucky Zone time:</strong> ${lzMinutes} min for ${registeredCount} character${registeredCount===1?'':'s'} · <strong>Open tracked dailies:</strong> ${pendingDaily}</div>
+                ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,3).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
                 ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
         }
@@ -5933,9 +6002,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 document.getElementById(`rateup-${prefix}-end`).value = event.customEnd;
                 updateRateUpEventFields(prefix);
             };
-            fill('item','itemDrop'); fill('enhancement','enhancement');
+            fill('item','itemDrop'); fill('enhancement','enhancement'); fill('exp','expBoost');
             const summary = document.getElementById('rateup-events-summary');
-            if (summary) summary.textContent = `Current Item Drop: ${getRateUpWindow(events.itemDrop).label}. Current Enhancement: ${getRateUpWindow(events.enhancement).label}.`;
+            if (summary) summary.textContent = `Item Drop: ${getRateUpWindow(events.itemDrop).label}. Enhancement: ${getRateUpWindow(events.enhancement).label}. EXP Boost: ${getRateUpWindow(events.expBoost).label}.`;
             openModal('rateup-events-modal');
         }
         function updateRateUpEventFields(prefix) {
@@ -5947,8 +6016,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function saveRateUpEvents() {
             if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
-            const next = normalizeRateUpEvents({ itemDrop:readRateUpEventForm('item'), enhancement:readRateUpEventForm('enhancement') });
-            for (const [label, event] of [['Item Drop Rate',next.itemDrop],['Enhancement Rate',next.enhancement]]) {
+            const next = normalizeRateUpEvents({ itemDrop:readRateUpEventForm('item'), enhancement:readRateUpEventForm('enhancement'), expBoost:readRateUpEventForm('exp') });
+            for (const [label, event] of [['Item Drop Rate',next.itemDrop],['Enhancement Rate',next.enhancement],['EXP Boost',next.expBoost]]) {
                 if (!event.enabled || event.schedule !== 'custom') continue;
                 const start = manilaLocalDateTimeToUTC(event.customStart), end = manilaLocalDateTimeToUTC(event.customEnd);
                 if (!start || !end || end <= start) { alert(`${label}: enter a valid custom start and end in Manila time. End must be after start.`); return; }
@@ -7921,7 +7990,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r5';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r6';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -8533,6 +8602,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         <label>Schedule<select id="rateup-enhancement-schedule"><option value="weekend">Recurring weekend (Sat–Mon)</option><option value="custom">Custom date/time</option></select></label>
         <label class="rate-up-custom-field">Start (Manila)<input id="rateup-enhancement-start" type="datetime-local"></label>
         <label class="rate-up-custom-field">End (Manila)<input id="rateup-enhancement-end" type="datetime-local"></label>
+      </section>
+      <section class="rate-up-editor-card">
+        <h4>＋100% EXP Boost</h4>
+        <label><input id="rateup-exp-enabled" type="checkbox"> Event is enabled</label>
+        <label>Schedule<select id="rateup-exp-schedule"><option value="weekend">Recurring weekend (Sat–Mon)</option><option value="custom">Custom date/time</option></select></label>
+        <label class="rate-up-custom-field">Start (Manila)<input id="rateup-exp-start" type="datetime-local"></label>
+        <label class="rate-up-custom-field">End (Manila)<input id="rateup-exp-end" type="datetime-local"></label>
       </section>
     </div>
     <div id="rateup-events-summary" class="modal-note" aria-live="polite"></div>
