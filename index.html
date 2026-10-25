@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r3</title>
+    <title>Pantheon Tools v1.6.8-r4</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2177,6 +2177,175 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:560px) { .focus-character-chips { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); } }
 </style>
 
+<style id="pantheon-v168-r4-contrast-and-presence">
+/* r4: the left rail is inset from the viewport edge and the page gets a matching gutter. */
+@media (min-width:1320px) {
+  body { padding-left:clamp(277px, calc((100vw - 1800px)/2 + 277px), 360px) !important; }
+  #online-presence-pane { position:fixed !important; left:clamp(44px, calc((100vw - 1800px)/2 + 44px), 100px) !important; top:145px !important; width:215px !important; max-width:215px !important; max-height:calc(100vh - 165px) !important; margin:0 !important; }
+}
+@media (max-width:1319px) {
+  body { padding-left:clamp(12px, 2.5vw, 36px) !important; }
+  #online-presence-pane { position:relative !important; left:auto !important; top:auto !important; width:100% !important; max-width:100% !important; max-height:260px !important; margin:12px 0 16px !important; }
+}
+@media (max-width:700px) { #online-presence-pane { max-height:220px !important; } }
+
+/* The event line should read as a notice, not subdued metadata. */
+#online-presence-pane .online-event-notice {
+  display:block !important; box-sizing:border-box; min-height:66px; padding:11px 13px 12px !important;
+  background:linear-gradient(130deg,var(--pt-accent-soft),var(--pt-surface-soft)) !important;
+  color:var(--pt-text) !important; border:0 !important; border-bottom:2px solid var(--pt-accent) !important;
+  text-align:center !important; white-space:normal !important; overflow:visible !important; text-overflow:clip !important;
+  font-size:.76rem !important; font-weight:900 !important; line-height:1.4 !important; overflow-wrap:anywhere;
+  box-shadow:inset 0 3px 0 var(--pt-accent);
+}
+#online-presence-pane .online-event-notice::before { content:'GUILD EVENT NOTICE'; display:block; margin:0 0 5px; color:var(--pt-accent) !important; font-size:.58rem; font-weight:950; letter-spacing:.13em; }
+#online-presence-pane .online-event-notice.is-event-live { background:linear-gradient(130deg,color-mix(in srgb,var(--pt-positive) 18%,var(--pt-surface)),var(--pt-surface-soft)) !important; color:var(--pt-text) !important; border-bottom-color:var(--pt-positive) !important; }
+#online-presence-pane .online-event-notice.is-event-live::before { color:var(--pt-positive) !important; }
+
+/* Explicit foregrounds for nested Quick Build Filter text and controls across every non-Dark theme. */
+:root[data-pantheon-theme="light"] .card-wiki-preset-panel,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset-panel,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset-panel,
+:root[data-pantheon-theme="light"] .card-wiki-preset,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset-head h3,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset-head h3,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset-head h3,
+:root[data-pantheon-theme="light"] .card-wiki-preset-head p,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset-head p,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset-head p,
+:root[data-pantheon-theme="light"] .card-wiki-preset span,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset span,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset span,
+:root[data-pantheon-theme="light"] .card-wiki-preset strong,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset strong,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset strong { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; opacity:1 !important; font-weight:750 !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset small,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset small,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset small { color:var(--pt-muted) !important; -webkit-text-fill-color:var(--pt-muted) !important; opacity:1 !important; font-weight:700 !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="pastel"] .card-wiki-preset:has(input:checked) { background:var(--pt-accent-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-accent) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset:has(input:checked) small,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset:has(input:checked) small,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset:has(input:checked) small { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+
+/* Member Roster: force paired text/surface colors instead of inheriting legacy dark-theme literals. */
+:root[data-pantheon-theme="light"] .member-directory-panel,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-panel,
+:root[data-pantheon-theme="pastel"] .member-directory-panel,
+:root[data-pantheon-theme="light"] .member-directory-card,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-card,
+:root[data-pantheon-theme="pastel"] .member-directory-card { background:var(--pt-surface) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .member-directory-card h3,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-card h3,
+:root[data-pantheon-theme="pastel"] .member-directory-card h3,
+:root[data-pantheon-theme="light"] .member-directory-name,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-name,
+:root[data-pantheon-theme="pastel"] .member-directory-name,
+:root[data-pantheon-theme="light"] .member-directory-char-label,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char-label,
+:root[data-pantheon-theme="pastel"] .member-directory-char-label { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-meta,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-meta,
+:root[data-pantheon-theme="pastel"] .member-directory-meta,
+:root[data-pantheon-theme="light"] .member-directory-note,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-note,
+:root[data-pantheon-theme="pastel"] .member-directory-note,
+:root[data-pantheon-theme="light"] .member-directory-chars-title,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-chars-title,
+:root[data-pantheon-theme="pastel"] .member-directory-chars-title { color:var(--pt-muted) !important; -webkit-text-fill-color:var(--pt-muted) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-char,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char,
+:root[data-pantheon-theme="pastel"] .member-directory-char { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-char-status,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char-status,
+:root[data-pantheon-theme="pastel"] .member-directory-char-status { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; -webkit-text-fill-color:var(--pt-text) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-char-status.is-tracked,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char-status.is-tracked,
+:root[data-pantheon-theme="pastel"] .member-directory-char-status.is-tracked { background:#d8eee0 !important; color:#174d35 !important; border-color:#78b893 !important; -webkit-text-fill-color:#174d35 !important; }
+:root[data-pantheon-theme="light"] .member-directory-char-remove,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char-remove,
+:root[data-pantheon-theme="pastel"] .member-directory-char-remove { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .member-directory-char.is-main-character,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char.is-main-character,
+:root[data-pantheon-theme="pastel"] .member-directory-char.is-main-character { background:#fff0b9 !important; color:#302500 !important; border-color:#a27a14 !important; box-shadow:inset 0 0 0 1px rgba(162,122,20,.35) !important; }
+:root[data-pantheon-theme="light"] .member-directory-char.is-main-character .member-directory-char-label,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char.is-main-character .member-directory-char-label,
+:root[data-pantheon-theme="pastel"] .member-directory-char.is-main-character .member-directory-char-label { color:#302500 !important; -webkit-text-fill-color:#302500 !important; }
+:root[data-pantheon-theme="light"] .member-directory-char.is-main-character .member-directory-char-status,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char.is-main-character .member-directory-char-status,
+:root[data-pantheon-theme="pastel"] .member-directory-char.is-main-character .member-directory-char-status { background:#fff9df !important; color:#302500 !important; border-color:#a27a14 !important; -webkit-text-fill-color:#302500 !important; }
+:root[data-pantheon-theme="light"] .member-directory-char .profile-confirm-main,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-char .profile-confirm-main,
+:root[data-pantheon-theme="pastel"] .member-directory-char .profile-confirm-main,
+:root[data-pantheon-theme="light"] .main-character-badge,
+:root[data-pantheon-theme="eye-comfort"] .main-character-badge,
+:root[data-pantheon-theme="pastel"] .main-character-badge { background:#ffdf80 !important; color:#302300 !important; -webkit-text-fill-color:#302300 !important; border:1px solid #8c6812 !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .profile-confirm-character,
+:root[data-pantheon-theme="eye-comfort"] .profile-confirm-character,
+:root[data-pantheon-theme="pastel"] .profile-confirm-character,
+:root[data-pantheon-theme="light"] .profile-confirm-main-choice,
+:root[data-pantheon-theme="eye-comfort"] .profile-confirm-main-choice,
+:root[data-pantheon-theme="pastel"] .profile-confirm-main-choice { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .profile-confirm-character strong,
+:root[data-pantheon-theme="eye-comfort"] .profile-confirm-character strong,
+:root[data-pantheon-theme="pastel"] .profile-confirm-character strong { color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] .profile-confirm-character small,
+:root[data-pantheon-theme="eye-comfort"] .profile-confirm-character small,
+:root[data-pantheon-theme="pastel"] .profile-confirm-character small { color:var(--pt-muted) !important; opacity:1 !important; }
+
+/* Remaining Member Roster metadata/form labels also used legacy low-contrast gray literals. */
+:root[data-pantheon-theme="light"] .member-directory-badge,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-badge,
+:root[data-pantheon-theme="pastel"] .member-directory-badge { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; -webkit-text-fill-color:var(--pt-text) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-count,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-count,
+:root[data-pantheon-theme="pastel"] .member-directory-count,
+:root[data-pantheon-theme="light"] .member-directory-empty,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-empty,
+:root[data-pantheon-theme="pastel"] .member-directory-empty { color:var(--pt-muted) !important; -webkit-text-fill-color:var(--pt-muted) !important; border-color:var(--pt-border) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-field,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-field,
+:root[data-pantheon-theme="pastel"] .member-directory-field,
+:root[data-pantheon-theme="light"] .member-character-editor-heading,
+:root[data-pantheon-theme="eye-comfort"] .member-character-editor-heading,
+:root[data-pantheon-theme="pastel"] .member-character-editor-heading,
+:root[data-pantheon-theme="light"] .member-directory-panel h3,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-panel h3,
+:root[data-pantheon-theme="pastel"] .member-directory-panel h3,
+:root[data-pantheon-theme="light"] .member-directory-panel p,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-panel p,
+:root[data-pantheon-theme="pastel"] .member-directory-panel p { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-panel .member-directory-note,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-panel .member-directory-note,
+:root[data-pantheon-theme="pastel"] .member-directory-panel .member-directory-note { color:var(--pt-muted) !important; -webkit-text-fill-color:var(--pt-muted) !important; }
+:root[data-pantheon-theme="light"] .member-character-row,
+:root[data-pantheon-theme="eye-comfort"] .member-character-row,
+:root[data-pantheon-theme="pastel"] .member-character-row,
+:root[data-pantheon-theme="light"] .member-character-editor-block,
+:root[data-pantheon-theme="eye-comfort"] .member-character-editor-block,
+:root[data-pantheon-theme="pastel"] .member-character-editor-block { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .member-character-opt-in,
+:root[data-pantheon-theme="eye-comfort"] .member-character-opt-in,
+:root[data-pantheon-theme="pastel"] .member-character-opt-in,
+:root[data-pantheon-theme="light"] .member-character-main,
+:root[data-pantheon-theme="eye-comfort"] .member-character-main,
+:root[data-pantheon-theme="pastel"] .member-character-main { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .member-directory-field input::placeholder,
+:root[data-pantheon-theme="eye-comfort"] .member-directory-field input::placeholder,
+:root[data-pantheon-theme="pastel"] .member-directory-field input::placeholder { color:var(--pt-muted) !important; opacity:1 !important; }
+/* Main marker should remain legible even inside green-completion cells or tinted cards. */
+.main-character-badge,.profile-confirm-main { background:#ffdf80 !important; color:#302300 !important; border:1px solid #8c6812 !important; -webkit-text-fill-color:#302300 !important; opacity:1 !important; }
+#dn-tracker td.is-main-character .main-character-badge { box-shadow:0 0 0 2px var(--pt-surface); }
+
+/* Character activity copy uses explicit readable text; retain the established size scale. */
+.focus-model-explainer,.focus-review-note,.focus-summary-line,.focus-model-summary,.focus-character-chip-role,.focus-character-chip-trend { color:var(--pt-muted) !important; opacity:1 !important; }
+.focus-review-note { padding:8px 10px; border-left:3px solid var(--pt-accent); border-radius:6px; background:var(--pt-surface-soft); color:var(--pt-text) !important; line-height:1.5 !important; }
+.focus-character-chip-role { background:var(--pt-surface-soft); border-radius:5px; padding:2px 4px; color:var(--pt-text) !important; }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2619,7 +2788,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
                 <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r3 feedback update:</strong> adaptive character focus, cleaner Overview banner, online presence, and admin-only text editing.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r4 feedback update:</strong> better left-side presence placement, stronger event notice, theme contrast, and clearer character activity signals.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5365,7 +5534,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             else if (item.status === 'upcoming' && item.start-now <= 72*60*60*1000) parts.push(`＋50% Item Drop ${formatManilaStamp(item.start)}`);
             if (enhance.status === 'active') parts.push('＋30% Enhancement LIVE');
             else if (enhance.status === 'upcoming' && enhance.start-now <= 72*60*60*1000) parts.push(`＋30% Enhancement ${formatManilaStamp(enhance.start)}`);
-            el.textContent = parts.length ? parts.join('  ·  ') : 'PANTHEON GUILD OPERATIONS  ·  Check the Tracker for priorities';
+            el.textContent = parts.length ? parts.join('  ·  ') : 'Guild operations · Check the Tracker for current priorities';
             el.classList.toggle('is-event-live', item.status === 'active' || enhance.status === 'active');
         }
 
@@ -5502,7 +5671,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             let completionHtml = '';
             if (sortedMetrics.length) {
                 completionHtml = sortedMetrics.map(item => {
-                    const badge = item.done === 0 && !item.thisWeekActivity ? ['Quiet so far','watch'] : item.rate < 40 ? ['A few completed','watch'] : item.rate < 70 ? ['In progress','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
+                    const badge = item.done === 0 && !item.thisWeekActivity ? ['No completions','watch'] : item.rate < 40 ? ['Low completion','watch'] : item.rate < 70 ? ['In progress','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
                     const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
                     const pendingName = item.pendingTasks[0]?.task;
                     const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
@@ -5575,7 +5744,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     tasks.push({ name:profile.name, task:taskName, isMain:profile.isMain, at:Number(cell.updatedAt)||0, group:category.group });
                 });
             });
-            return tasks.sort((a,b)=>b.at-a.at).slice(0,5).map(item=>({ ...item, time:new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',hour:'numeric',minute:'2-digit'}).format(new Date(item.at)) }));
+            return tasks.sort((a,b)=>b.at-a.at).map(item=>({ ...item, time:new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',hour:'numeric',minute:'2-digit'}).format(new Date(item.at)) }));
         }
         function renderDailyPlanningPanel(container) {
             const now = Date.now();
@@ -5591,6 +5760,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const hoursLeft = minsLeft / 60;
             const urgency = hoursLeft <= 2 ? 'Reset soon' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? '2 days left' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : 'New cycle';
             const recent = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-3);
+            const cycleStart = getTargetResetTimeUTC(false);
+            const cycleHours = Math.max(0, (now - cycleStart) / 3600000);
             const signals = profiles.map(profile => {
                 let validWeeks = 0, weeksWithProgress = 0, done = 0, missed = 0;
                 recent.forEach(([,archive]) => {
@@ -5613,27 +5784,39 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
                 const currentEligible = currentDone + currentOpen;
                 const currentRate = currentEligible ? Math.round(currentDone / currentEligible * 100) : null;
+                // A recorded completion outside the weekly list helps distinguish a missed weekly tick from no recorded play.
+                const currentCells = safeObject(cloudData.cells?.[profile.name]);
+                const currentCycleRecorded = Object.values(currentCells).some(cell => cell?.state === 'done' && (Number(cell.updatedAt) || 0) >= cycleStart);
                 const archivedRates = recent.map(([,archive]) => safeObject(archive.rates)[profile.name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
                 const trend = archivedRates.length >= 2 ? Math.round(archivedRates[archivedRates.length - 1] - archivedRates[archivedRates.length - 2]) : null;
                 const regular = !profile.isMain && validWeeks >= 2 && (weeksWithProgress >= 2 || (done >= 4 && weeksWithProgress >= 1));
                 const emerging = !profile.isMain && !regular && (currentDone >= 2 || (weeksWithProgress >= 1 && done >= 2));
-                const reviewNA = profile.trackerEnabled && validWeeks >= 3 && !regular && !emerging && missed >= 3;
-                const signalScore = (weeksWithProgress * 5) + (done * 0.45) + (currentDone * 0.8) + (profile.isMain ? 100 : 0) + (regular ? 10 : emerging ? 4 : 0) + (trend === null ? 0 : Math.max(-5, Math.min(5, trend * 0.12)));
-                return { ...profile, validWeeks, weeksWithProgress, done, missed, currentDone, currentEligible, currentRate, trend, regular, emerging, reviewNA, signalScore };
+                const historicalRegular = validWeeks >= 3 && weeksWithProgress >= 2;
+                const checkTicks = profile.trackerEnabled && !profile.isMain && historicalRegular && currentDone === 0 && currentCycleRecorded && cycleHours >= 24;
+                const checkWeeklyLog = profile.trackerEnabled && !profile.isMain && historicalRegular && currentDone === 0 && !currentCycleRecorded && cycleHours >= 48;
+                const reviewNA = profile.trackerEnabled && !profile.isMain && validWeeks >= 3 && weeksWithProgress <= 1 && done <= Math.max(2, validWeeks) && currentDone === 0 && cycleHours >= 48;
+                const signalScore = (weeksWithProgress * 5) + (done * 0.45) + (currentDone * 0.8) + (profile.isMain ? 100 : 0) + (regular ? 10 : emerging ? 4 : 0) + (checkTicks ? 2 : 0) + (trend === null ? 0 : Math.max(-5, Math.min(5, trend * 0.12)));
+                return { ...profile, validWeeks, weeksWithProgress, done, missed, currentDone, currentEligible, currentRate, currentCycleRecorded, trend, regular, emerging, checkTicks, checkWeeklyLog, reviewNA, signalScore };
             }).sort((a,b)=>b.signalScore-a.signalScore);
             const main = signals.find(item => item.isMain);
             const focus = signals.filter(item => item.isMain || item.regular || item.emerging).slice(0,3);
             const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'Learning your rotation';
             const chips = signals.slice(0, Math.min(8, signals.length)).map(item => {
-                const status = item.reviewNA ? 'Review rotation' : item.isMain ? 'Main focus' : item.regular ? 'Regular' : item.emerging ? 'Building' : item.trackerEnabled ? 'Learning' : 'Paused';
+                const status = item.reviewNA ? 'Review rotation' : item.checkTicks ? 'Check weekly ticks' : item.checkWeeklyLog ? 'No weekly activity' : item.isMain ? 'Main focus' : item.regular ? 'Regular' : item.emerging ? 'Emerging' : item.trackerEnabled ? 'History building' : 'Tracking off';
                 const rate = item.currentRate === null ? '—' : `${item.currentRate}%`;
                 const trendText = item.trend === null ? 'History building' : item.trend > 0 ? `Up ${item.trend} pts` : item.trend < 0 ? `Down ${Math.abs(item.trend)} pts` : 'Steady';
                 const weeklyText = item.currentEligible ? `${item.currentDone}/${item.currentEligible} weekly tasks` : 'No eligible weekly tasks';
                 return `<div class="focus-character-chip ${item.isMain?'is-main':''} ${item.reviewNA?'is-review':''}" title="${escapeHTML(status)}"><div class="focus-character-chip-head"><strong>${escapeHTML(item.name)}</strong><span class="focus-character-chip-role">${escapeHTML(status)}</span></div><div class="focus-character-chip-progress"><span>${escapeHTML(weeklyText)}</span><b>${rate}</b></div><div class="focus-character-chip-trend">${escapeHTML(trendText)} · ${item.weeksWithProgress}/${item.validWeeks || 0} recent weeks active</div></div>`;
             }).join('');
             const reviewNA = signals.filter(item => item.reviewNA && !item.isMain);
-            const reviewText = reviewNA.length ? `Consider N/A for ${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''} if they're no longer part of your rotation.` : '';
-            const activitySummary = `Activity pattern: ${signals.filter(item=>item.isMain).length} Main · ${signals.filter(item=>item.regular).length} regular · ${signals.filter(item=>item.emerging).length} building · ${signals.filter(item=>item.trackerEnabled && !item.isMain && !item.regular && !item.emerging).length} learning`;
+            const checkTicks = signals.filter(item => item.checkTicks && !item.isMain);
+            const checkWeeklyLog = signals.filter(item => item.checkWeeklyLog && !item.isMain);
+            const reviewTextParts = [];
+            if (checkTicks.length) reviewTextParts.push(`${checkTicks.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkTicks.length>3?' + more':''}: other tasks were recorded this cycle, but no weekly completions are marked. Check the weekly ticks before changing priorities.`);
+            if (checkWeeklyLog.length) reviewTextParts.push(`${checkWeeklyLog.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkWeeklyLog.length>3?' + more':''}: no completions are recorded this cycle, despite regular activity in past weeks. This cannot distinguish a character not being played from missed ticks; check the tracker before deciding.`);
+            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: recorded weekly activity has been low across the saved weeks. If they are no longer in rotation, consider marking irrelevant tasks N/A or turning off Tracker for that character.`);
+            const reviewText = reviewTextParts.join(' ');
+            const activitySummary = `Recorded pattern: ${signals.filter(item=>item.isMain).length} Main · ${signals.filter(item=>item.regular).length} regular · ${signals.filter(item=>item.emerging).length} emerging · ${signals.filter(item=>item.reviewNA).length} low-activity to review`;
             const itemEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).itemDrop, now);
             const enhanceEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).enhancement, now);
             const manilaDOW = getManilaDateParts(now).weekday;
@@ -5653,13 +5836,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const panel = document.createElement('section');
             panel.className = 'weekly-plan-card weekly-plan-card-compact';
             panel.innerHTML = `
-                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity &amp; Priorities</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
-                <p class="focus-model-explainer">A rolling read of each character’s completion, recent activity, and likely rotation. The focus adjusts as weekly history builds; low-activity characters are suggestions to review, not automatic N/A changes.</p>
+                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity &amp; Completion</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
+                <p class="focus-model-explainer">Combines completion rates, current task ticks, and archived weekly activity to estimate each character’s role. It separates possible missed weekly ticks from repeated low participation where history allows. It cannot tell whether unrecorded play happened.</p>
                 <div class="focus-summary-line"><strong>Current focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Building history</span>' : ''}</div>
                 ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to start building a personal focus.</div>'}
                 ${signals.length ? `<div class="focus-model-summary">${escapeHTML(activitySummary)} <span>· ${recent.length} weekly archive${recent.length===1?'':'s'} available</span></div>` : ''}
                 ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
-                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} tracked completions · <strong>Tomorrow:</strong> reserve ${lzMinutes}m for Lucky Zones (${registeredCount} characters), then ${pendingDaily} open tracked daily task${pendingDaily===1?'':'s'} before planning raids around remaining time.</div>
+                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} tracked completions · <strong>Tomorrow’s time estimate:</strong> Lucky Zones take about ${lzMinutes} minutes across ${registeredCount} registered character${registeredCount===1?'':'s'} (3 solo runs × ~8 minutes each). There are ${pendingDaily} open tracked daily task${pendingDaily===1?'':'s'} before raid time can be estimated.</div>
                 ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,2).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
                 ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
@@ -7664,7 +7847,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r3';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r4';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

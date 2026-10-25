@@ -1,24 +1,24 @@
-# Pantheon Tools v1.6.8-r3 UI refinements
+# Pantheon Tools v1.6.8-r4 UI refinements
 
-This package remains branched from the stable v1.6.8 base. It restores a side-by-side Overview banner and a consolidated account/status/Ledger card, moves the shared event notice above the centered online/offline account roster, improves Light/Eye Saver/Pastel Card Database contrast without changing font sizes, clarifies Character Activity & Priorities, and softens completion wording. The presence API now returns all enabled allowlisted accounts with an online flag; it reuses the existing D1 tables and requires no schema migration. Deploy this ZIP as a unit so the page and presence endpoint stay in sync.
+This package remains branched from the stable v1.6.8 base. It restores a side-by-side Overview banner and a consolidated account/status/Ledger card, docks the online/offline roster on the left at a comfortable inset on desktop, makes the event notice prominent, improves Quick Build Filters and Member Roster contrast in Light/Eye Comfort/Pastel without changing font sizes, and makes Character Activity & Completion more direct about missed ticks versus sustained low activity. The presence API now returns all enabled allowlisted accounts with an online flag; it reuses the existing D1 tables and requires no schema migration. Deploy this ZIP as a unit so the page and presence endpoint stay in sync.
 
 ---
 
-# Pantheon Tools v1.6.8-r3 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r4 — Cloudflare Pages + D1
 
-## v1.6.8-r3 update
+## v1.6.8-r4 update
 
-- Compact adaptive character-focus summary that learns from archived weekly completions and flags possible out-of-rotation characters for manual N/A review.
+- Character Activity & Completion separates possible missed weekly ticks from repeated low recorded activity where weekly history is sufficient, and explicitly states when the tracker cannot know if unrecorded play happened.
 - Shared online-presence pane using authenticated session heartbeats.
 - Admin-only Developer Mode edits text nodes only; typography, styling, and layout remain CSS-controlled. Overrides are shared and protected from member syncs.
-- Overview banner and live event notice now sit beside a matching-height account/logout card. If `Guild Banner.png` is absent from the deployment root, the header uses a branded fallback built from the included `guild-logo.png`.
+- Overview banner remains beside the consolidated account/status/Ledger/Logout card. The event notice is larger and more prominent. The online/offline rail is positioned on the left with a gutter so it does not sit at the far viewport edge. If `Guild Banner.png` is absent, the branded fallback uses `guild-logo.png`.
 - Ledger remains restricted to Bio, Cheean, and Cho; View As remains admin-only.
 
 
 ## Feedback update built directly from the stable v1.6.8 baseline
 
 - Retains the v1.6.8 package layout and does not inherit later-version implementations. Adds a small authenticated `/api/presence` endpoint for live usage indicators; existing cloud sync and admin role checks remain in place.
-- Improves Light, Eye Comfort, and Pastel readability through stronger text contrast and font weight only. Existing font sizes and layout dimensions are preserved.
+- Improves Light, Eye Comfort, and Pastel readability through stronger text contrast and font weight only. Existing font sizes are preserved; layout changes are limited to the requested panel placement and visibility fixes.
 - Adds clearer Main-character borders/badges across Tracker, analytics, Member Roster, Class Setup, and Team Builder, while preserving the Main flag during the baseline roster migration.
 - Adds administrator-only, read-only **View As Member** for the member’s Tracker, analytics, and Member Roster data (registered characters, Main designation, and class details). The admin role remains enforced by the existing server-side session; this release does not grant admin privileges. In v1.6.8, theme choice and Team Builder slots/format/preferences are browser-local, so View As simulates the theme and replaces Team Builder with a limitation notice rather than claiming to read another member’s local layout.
 - Adds an administrator-only shared scheduler for +50% Item Drop Rate UP and +30% Enhancement Rate UP, with weekend windows (Saturday 00:00 to Monday 00:00 Manila time) or custom Manila-time windows. Non-admin cloud writes preserve the existing shared event settings and update metadata; dedicated timestamps prevent stale cache merges from rolling the schedule back.
