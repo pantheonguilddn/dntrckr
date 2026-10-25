@@ -46,3 +46,12 @@ CREATE TABLE IF NOT EXISTS audit_events (
   details_json TEXT NOT NULL DEFAULT '{}'
 );
 CREATE INDEX IF NOT EXISTS idx_audit_created_at ON audit_events(created_at DESC);
+
+
+-- Live tool presence; stale rows are ignored by the API and pruned during heartbeat.
+CREATE TABLE IF NOT EXISTS user_presence (
+  discord_id TEXT PRIMARY KEY,
+  username TEXT NOT NULL DEFAULT '',
+  last_seen_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_user_presence_seen ON user_presence(last_seen_at);

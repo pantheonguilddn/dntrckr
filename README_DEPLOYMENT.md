@@ -1,8 +1,17 @@
-# Pantheon Tools v1.6.8-r1 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r2 — Cloudflare Pages + D1
+
+## v1.6.8-r2 update
+
+- Compact adaptive character-focus summary that learns from archived weekly completions and flags possible out-of-rotation characters for manual N/A review.
+- Shared online-presence pane using authenticated session heartbeats.
+- Admin-only Developer Mode edits text nodes only; typography, styling, and layout remain CSS-controlled. Overrides are shared and protected from member syncs.
+- Overview banner and live event notice now sit beside a matching-height account/logout card. If `Guild Banner.png` is absent from the deployment root, the header uses a branded fallback built from the included `guild-logo.png`.
+- Ledger remains restricted to Bio, Cheean, and Cho; View As remains admin-only.
+
 
 ## Feedback update built directly from the stable v1.6.8 baseline
 
-- Preserves the original v1.6.8 package structure and backend endpoints; no later-version code was carried forward.
+- Retains the v1.6.8 package layout and does not inherit later-version implementations. Adds a small authenticated `/api/presence` endpoint for live usage indicators; existing cloud sync and admin role checks remain in place.
 - Improves Light, Eye Comfort, and Pastel readability through stronger text contrast and font weight only. Existing font sizes and layout dimensions are preserved.
 - Adds clearer Main-character borders/badges across Tracker, analytics, Member Roster, Class Setup, and Team Builder, while preserving the Main flag during the baseline roster migration.
 - Adds administrator-only, read-only **View As Member** for the member’s Tracker, analytics, and Member Roster data (registered characters, Main designation, and class details). The admin role remains enforced by the existing server-side session; this release does not grant admin privileges. In v1.6.8, theme choice and Team Builder slots/format/preferences are browser-local, so View As simulates the theme and replaces Team Builder with a limitation notice rather than claiming to read another member’s local layout.

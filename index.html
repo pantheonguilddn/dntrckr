@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r1</title>
+    <title>Pantheon Tools v1.6.8-r2</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1886,6 +1886,87 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
 @media(max-width:700px) { .weekly-plan-grid,.rate-up-editor-grid,.admin-view-as-fields { grid-template-columns:1fr; } .weekly-plan-card { padding:12px; } }
 </style>
 
+
+<style id="pantheon-v168-r2-styles">
+/* v1.6.8-r2: compact character guidance; no global typography-size changes. */
+.weekly-plan-card-compact { padding:13px 15px !important; display:grid; gap:9px !important; }
+.focus-summary-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.focus-summary-head h3 { margin:2px 0 0 !important; font-size:.9rem !important; }
+.focus-summary-line { color:var(--pt-text); font-size:.72rem; line-height:1.45; overflow-wrap:anywhere; }
+.focus-separator { color:var(--pt-muted); margin:0 4px; }
+.focus-learning-note { display:inline-block; margin-left:8px; color:var(--pt-muted); font-size:.64rem; font-weight:650; }
+.focus-character-chips { display:flex; align-items:center; flex-wrap:wrap; gap:5px; }
+.focus-character-chip,.focus-character-more { display:inline-flex; align-items:center; gap:5px; max-width:100%; padding:4px 7px; border:1px solid var(--pt-border); border-radius:999px; background:var(--pt-surface-raised); color:var(--pt-text); font-size:.63rem; line-height:1.2; overflow-wrap:anywhere; }
+.focus-character-chip b { font-size:.62rem; font-weight:900; }
+.focus-character-chip.is-main { border-color:var(--pt-accent); box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pt-accent) 30%,transparent); }
+.focus-character-chip.is-review { border-style:dashed; color:var(--pt-muted); }
+.focus-character-more { color:var(--pt-muted); }
+.focus-review-note { color:var(--pt-muted); font-size:.64rem; line-height:1.35; }
+.focus-character-tag.is-low { color:var(--pt-warning); border-color:var(--pt-warning); }
+.focus-low-activity { padding:7px 9px; border-left:3px solid var(--pt-warning); border-radius:5px; background:var(--pt-surface-soft); color:var(--pt-text); font-size:.66rem; line-height:1.4; }
+.focus-next-row { display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:8px; }
+.focus-next-row > div { min-width:0; display:grid; gap:3px; padding:8px 10px; border-radius:8px; background:var(--pt-surface-soft); }
+.focus-next-row strong { color:var(--pt-text); font-size:.67rem; }
+.focus-next-row span { color:var(--pt-muted); font-size:.64rem; line-height:1.45; overflow-wrap:anywhere; }
+.focus-event-strip { display:flex; gap:5px; flex-wrap:wrap; }
+.focus-event-strip span { display:inline-flex; max-width:100%; padding:5px 8px; border:1px solid var(--pt-border); border-radius:7px; color:var(--pt-text); background:var(--pt-surface); font-size:.62rem; line-height:1.4; overflow-wrap:anywhere; }
+.focus-character-empty { color:var(--pt-muted); font-size:.68rem; }
+
+/* Left-side live presence. The app remains a normal flow layout below tablet/desktop widths. */
+.online-presence-pane[hidden] { display:none !important; }
+.online-presence-pane { position:fixed; z-index:850; left:12px; top:145px; width:205px; max-height:calc(100vh - 160px); display:flex; flex-direction:column; border:1px solid var(--pt-border); border-radius:12px; overflow:hidden; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 8px 28px rgba(0,0,0,.12); }
+.online-presence-head { display:flex; align-items:center; justify-content:space-between; gap:7px; padding:10px 11px; border-bottom:1px solid var(--pt-border); background:var(--pt-surface-raised); }
+.online-presence-head > div { display:flex; align-items:center; gap:6px; min-width:0; }
+.online-presence-head strong { font-size:.73rem; white-space:nowrap; }
+.online-presence-dot,.online-presence-user-dot { display:inline-block; width:7px; height:7px; flex:0 0 7px; border-radius:50%; background:#47c981; box-shadow:0 0 0 3px rgba(71,201,129,.12); }
+.online-presence-count { color:var(--pt-muted); font-size:.59rem; white-space:nowrap; }
+#online-presence-collapse { width:23px; height:23px; flex:0 0 23px; border:1px solid var(--pt-border); border-radius:6px; background:var(--pt-surface); color:var(--pt-text); cursor:pointer; line-height:1; }
+.online-presence-list { overflow:auto; padding:5px 8px 8px; display:grid; gap:2px; }
+.online-presence-user { display:flex; align-items:center; gap:7px; min-width:0; padding:7px 4px; border-bottom:1px solid var(--pt-border); }
+.online-presence-user:last-child { border-bottom:0; }
+.online-presence-user-dot { width:6px; height:6px; flex-basis:6px; box-shadow:none; }
+.online-presence-user-name { min-width:0; flex:1; color:var(--pt-text); font-size:.66rem; overflow-wrap:anywhere; }
+.online-presence-user-name em { color:var(--pt-muted); font-size:.55rem; font-style:normal; }
+.online-presence-admin { color:var(--pt-accent); font-size:.49rem; font-weight:900; letter-spacing:.04em; }
+.online-presence-empty,.online-presence-foot { padding:8px 10px; color:var(--pt-muted); font-size:.6rem; line-height:1.4; }
+.online-presence-foot { border-top:1px solid var(--pt-border); }
+.online-presence-pane.is-collapsed .online-presence-list,.online-presence-pane.is-collapsed .online-presence-foot { display:none; }
+.online-presence-pane.is-collapsed { max-height:none; }
+
+/* Overview banner and account card share a common height; the event line sits above the image. */
+.overview-dashboard-head-r2 { align-items:stretch !important; gap:12px !important; margin:16px 0 12px !important; }
+.overview-dashboard-head-r2 .overview-header-banner { flex:1 1 540px; width:auto !important; min-width:0; height:104px; min-height:104px !important; max-height:104px; margin:0 !important; padding:7px 10px !important; display:grid !important; grid-template-rows:auto minmax(0,1fr); gap:4px; box-sizing:border-box; }
+.overview-event-notice { min-width:0; color:var(--pt-muted); font-size:.61rem; font-weight:800; line-height:1.25; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.overview-event-notice.is-event-live { color:var(--pt-positive); }
+.overview-dashboard-head-r2 .overview-header-banner .overview-banner { width:100% !important; height:100% !important; min-height:0 !important; max-height:none !important; object-fit:contain !important; margin:0 !important; }
+.overview-banner-fallback[hidden] { display:none !important; }
+.overview-dashboard-head-r2 .overview-header-banner .overview-banner-fallback { width:100%; height:100%; min-height:0; display:flex; align-items:center; justify-content:center; gap:12px; box-sizing:border-box; border:1px solid var(--pt-border); border-radius:8px; background:linear-gradient(120deg,var(--pt-surface-raised),var(--pt-surface-soft)); color:var(--pt-text); }
+.overview-banner-fallback img { width:58px; height:58px; object-fit:contain; flex:0 0 auto; }
+.overview-banner-fallback > div { min-width:0; display:grid; gap:3px; }
+.overview-banner-fallback strong { color:var(--pt-text); font-size:.82rem; font-weight:900; letter-spacing:.03em; }
+.overview-banner-fallback small { color:var(--pt-muted); font-size:.58rem; overflow-wrap:anywhere; }
+.overview-dashboard-head-r2 .overview-profile-chip-r2 { flex:0 1 350px; width:auto; min-width:275px; min-height:104px; box-sizing:border-box; display:flex; align-items:center; padding:12px 14px; }
+.overview-profile-chip-r2 .overview-profile-main { width:100%; }
+.overview-profile-chip-r2 .overview-profile-actions { margin-left:auto; align-self:center; }
+.overview-profile-chip-r2 .overview-profile-copy { flex:1; }
+.overview-profile-status-row.overview-status-row-r2 { margin:0 0 8px; }
+.overview-profile-widget-row.overview-widget-row-r2 { margin:0 0 10px; }
+.overview-feature-banner:not(.overview-header-banner) { display:none !important; }
+@media(min-width:1450px) { body { padding-left:236px !important; } }
+@media(max-width:1449px) { .online-presence-pane { position:relative; left:auto; top:auto; width:auto; max-width:none; max-height:210px; margin:0 0 12px; } .online-presence-pane.is-collapsed { max-height:none; } }
+@media(max-width:850px) { .overview-dashboard-head-r2 { flex-direction:column; } .overview-dashboard-head-r2 .overview-header-banner { flex:0 0 auto; width:100% !important; height:100px; min-height:100px !important; max-height:100px; } .overview-dashboard-head-r2 .overview-profile-chip-r2 { width:100%; min-width:0; min-height:70px; flex:0 0 auto; } .focus-next-row { grid-template-columns:1fr; } .focus-character-chips { gap:4px; } }
+@media(max-width:640px) { .weekly-plan-card-compact { padding:11px !important; } .focus-character-chips { gap:4px; } .focus-summary-head { align-items:flex-start; } .online-presence-pane { max-height:180px; } }
+.developer-mode-banner { position:fixed; right:12px; bottom:12px; z-index:1200; display:flex; align-items:center; gap:10px; max-width:min(560px,calc(100vw - 24px)); padding:9px 11px; border:1px solid var(--pt-accent); border-radius:10px; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 8px 28px rgba(0,0,0,.18); font-size:.68rem; }
+.developer-mode-banner[hidden] { display:none !important; }
+.developer-mode-banner span { color:var(--pt-muted); }
+.developer-mode-banner button { border:1px solid var(--pt-border); border-radius:7px; padding:5px 8px; background:var(--pt-surface-soft); color:var(--pt-text); font:inherit; font-weight:800; cursor:pointer; }
+body.developer-mode-active .app-page :where(h1,h2,h3,h4,p,strong,small,span,div,li,label) { cursor:text; }
+body.developer-mode-active .app-page :where(h1,h2,h3,h4,p,strong,small,span,div,li,label):hover { outline:1px dashed color-mix(in srgb,var(--pt-accent) 55%,transparent); outline-offset:1px; }
+body.developer-mode-active .app-page button:hover { outline-offset:2px; }
+#drawer-developer-mode[aria-pressed="true"] { border-color:var(--pt-accent); background:var(--pt-hover); }
+@media(max-width:640px) { .developer-mode-banner { left:8px; right:8px; bottom:8px; max-width:none; flex-wrap:wrap; } }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -1970,6 +2051,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                 <button class="drawer-item" id="drawer-admin-console" type="button" onclick="window.open('/admin.html','_blank','noopener')" hidden><span class="drawer-icon">⚙</span><span><strong>Admin Console</strong><small>Accounts &amp; character registrations</small></span></button>
                 <button class="drawer-item" id="drawer-view-as" type="button" onclick="openAdminViewAsModal(); toggleSideMenu(false)" hidden><span class="drawer-icon">👁</span><span><strong>View As Member</strong><small>Read-only account preview</small></span></button>
                 <button class="drawer-item" id="drawer-rateup-events" type="button" onclick="openRateUpEventsModal(); toggleSideMenu(false)" hidden><span class="drawer-icon">✨</span><span><strong>Rate-Up Events</strong><small>Shared drop / enhancement schedule</small></span></button>
+                <button class="drawer-item" id="drawer-developer-mode" type="button" onclick="toggleDeveloperMode(); toggleSideMenu(false)" hidden aria-pressed="false"><span class="drawer-icon">✎</span><span><strong>Developer Mode</strong><small id="drawer-developer-mode-status">Edit static UI text</small></span></button>
                 <button class="drawer-item drawer-item-version" type="button" onclick="openVersionHistoryModal()"><span class="drawer-icon">🕘</span><span><strong>Version History</strong><small>Savepoints & undo global changes</small></span></button>
                 <button class="drawer-item" type="button" onclick="openLandingSettings()"><span class="drawer-icon">⌂</span><span><strong>Set Default Landing Page</strong><small>Change startup destination anytime</small></span></button>
             </div>
@@ -1990,15 +2072,21 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
 
     <div class="drawer-scrim" id="drawer-scrim" hidden onclick="toggleSideMenu(false)"></div>
 
+    <div class="developer-mode-banner" id="developer-mode-banner" hidden><strong>Developer Mode</strong><span>Click static text to edit · format and font sizes stay intact</span><button type="button" onclick="toggleDeveloperMode()">Turn off</button></div>
+    <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Members currently using Pantheon Tools">
+        <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Online now</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse online list" onclick="toggleOnlinePresencePane()">−</button></div>
+        <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading active members…</div></div>
+        <div class="online-presence-foot">Active tab · updates live</div>
+    </aside>
 
     <main id="overview-page" class="app-page overview-page">
-        <section class="overview-dashboard-head">
-            <div class="overview-dashboard-copy">
-                <div class="drawer-kicker">GUILD OVERVIEW</div>
-                <h1>Welcome to Pantheon Tools</h1>
-                <p>Your home for Dragon Nest Classic guild coordination. Track weekly progress, register characters, build raid parties, browse card stats, maintain the member directory, and calculate party income.</p>
-            </div>
-            <div class="overview-profile-chip" aria-label="Signed-in Discord account and workspace status">
+        <section class="overview-dashboard-head overview-dashboard-head-r2">
+            <section class="overview-feature-banner overview-header-banner" aria-label="Guild banner and event notice">
+                <div class="overview-event-notice" id="overview-event-notice">Guild events · Check the Tracker for current priorities</div>
+                <img class="overview-banner" src="Guild%20Banner.png" alt="Pantheon guild banner" onerror="this.hidden=true;const fallback=this.parentElement.querySelector('.overview-banner-fallback');if(fallback)fallback.hidden=false;">
+                <div class="overview-banner-fallback" hidden><img src="guild-logo.png" alt=""><div><strong>Pantheon Tools</strong><small>Dragon Nest - Classic SEA [Guild Operations]</small></div></div>
+            </section>
+            <div class="overview-profile-chip overview-profile-chip-r2" aria-label="Signed-in Discord account">
                 <div class="overview-profile-main">
                     <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
                     <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
@@ -2007,20 +2095,17 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                         <button type="button" id="overview-signout" class="overview-signout">Log out</button>
                     </div>
                 </div>
-                <div class="overview-profile-status-row" aria-label="Workspace status">
-                    <div class="overview-status-card" title="Shared guild data connection"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
-                    <div class="overview-status-card" title="Latest synchronization state"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
-                    <div class="overview-status-card" title="Your authenticated access level"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
-                </div>
-                <div class="overview-profile-widget-row" aria-label="Quick help and account tools">
-                    <button class="overview-mini-widget" id="overview-help-widget" type="button" onclick="runWelcomeShortcut('help')"><span aria-hidden="true">?</span><strong>Help &amp; Guide</strong><small>Quick guide</small></button>
-                    <button class="overview-mini-widget overview-ledger-widget" id="overview-ledger-widget" type="button" onclick="openScholarModal()" hidden><span aria-hidden="true">💰</span><strong>Ledger</strong><small>Shared salary records</small></button>
-                </div>
             </div>
         </section>
-        <section class="overview-feature-banner" aria-label="Guild banner">
-            <img class="overview-banner" src="Guild%20Banner.png" alt="Pantheon guild banner" onerror="this.style.display='none'">
-        </section>
+        <div class="overview-profile-status-row overview-status-row-r2" aria-label="Workspace status">
+            <div class="overview-status-card" title="Shared guild data connection"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
+            <div class="overview-status-card" title="Latest synchronization state"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
+            <div class="overview-status-card" title="Your authenticated access level"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
+        </div>
+        <div class="overview-profile-widget-row overview-widget-row-r2" aria-label="Quick help and account tools">
+            <button class="overview-mini-widget" id="overview-help-widget" type="button" onclick="runWelcomeShortcut('help')"><span aria-hidden="true">?</span><strong>Help &amp; Guide</strong><small>Quick guide</small></button>
+            <button class="overview-mini-widget overview-ledger-widget" id="overview-ledger-widget" type="button" onclick="openScholarModal()" hidden><span aria-hidden="true">💰</span><strong>Ledger</strong><small>Shared salary records</small></button>
+        </div>
         <div class="overview-section-title"><span>Your guild workspace</span><span class="overview-tool-count">Available to your account</span></div>
         <section class="overview-tools-grid" aria-label="Pantheon tool overview">
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-personal')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▤</span><strong>Tracker &amp; Bounties</strong><span>Review daily and weekly tasks, bounty targets, completion rates, and guild progress.</span></button>
@@ -2324,7 +2409,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
                 <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r1 feedback update:</strong> clearer light themes without larger text, Main-character highlights, member View As, and a reset-aware plan that reserves time for Lucky Zones and Rate-Up events.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r2 feedback update:</strong> adaptive character focus, cleaner Overview banner, online presence, and admin-only text editing.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -2994,7 +3079,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -3299,17 +3384,122 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             return ownerCandidateNames().some(candidate => identityCompactKey(candidate) && identityCompactKey(member.name) === identityCompactKey(candidate));
         }
         function refreshLedgerVisibility() {
-            // Ledger access is keyed to the authenticated Member Roster profile only.
-            // A stale locally selected roster must never expose another member's ledger widget.
+            // Only the authenticated account's linked roster identity can expose the Ledger.
+            // The server applies the same allowlist to the shared record itself.
             const allowed = new Set(['cho', 'bio', 'cheean']);
-            const linked = getAuthenticatedMemberDirectoryEntry();
-            const canSee = !!linked && allowed.has(identityCompactKey(linked.name || ''));
+            const discordId = String(pantheonDiscordUser?.id || '');
+            const entries = normalizeMemberDirectory(cloudData?.settings?.memberDirectory);
+            const confirmed = entries.filter(member => String(member.profileConfirmedDiscordId || '') === discordId);
+            const linked = confirmed.length === 1 ? confirmed[0] : getAuthenticatedMemberDirectoryEntry();
+            const linkedId = String(linked?.profileConfirmedDiscordId || '');
+            const canSee = !!linked && allowed.has(identityCompactKey(linked.name || '')) && (!linkedId || linkedId === discordId);
             const button = document.getElementById('btn-ledger');
             const overviewWidget = document.getElementById('overview-ledger-widget');
+            const modal = document.getElementById('scholar-modal');
             if (button) button.hidden = !canSee;
             if (overviewWidget) overviewWidget.hidden = !canSee;
+            if (!canSee && modal && !modal.classList.contains('hidden')) modal.classList.add('hidden');
             return canSee;
         }
+        let developerModeEnabled = false;
+        const DEVELOPER_MODE_KEY = 'pantheon-developer-mode-v1';
+        function initializeDeveloperMode() {
+            developerModeEnabled = false;
+            const button = document.getElementById('drawer-developer-mode');
+            const banner = document.getElementById('developer-mode-banner');
+            if (button) { button.setAttribute('aria-pressed','false'); const sub=document.getElementById('drawer-developer-mode-status'); if(sub) sub.textContent='Edit static UI text'; }
+            if (banner) banner.hidden = true;
+            applyDeveloperTextOverrides();
+        }
+        function toggleDeveloperMode() {
+            if (!isPantheonAdmin()) { alert('Developer Mode is available only to Pantheon administrators.'); return; }
+            if (isAdminViewAsActive()) { alert('Exit View As before editing shared interface text.'); return; }
+            developerModeEnabled = !developerModeEnabled;
+            document.body.classList.toggle('developer-mode-active', developerModeEnabled);
+            const button = document.getElementById('drawer-developer-mode');
+            const sub = document.getElementById('drawer-developer-mode-status');
+            const banner = document.getElementById('developer-mode-banner');
+            if (button) button.setAttribute('aria-pressed', String(developerModeEnabled));
+            if (sub) sub.textContent = developerModeEnabled ? 'On · click static text to edit' : 'Edit static UI text';
+            if (banner) banner.hidden = !developerModeEnabled;
+        }
+        function getDeveloperTextNodeKey(node) {
+            const parent = node?.parentElement;
+            if (!parent) return '';
+            const parts = [];
+            let el = parent;
+            while (el && el !== document.body) {
+                if (el.id) { parts.unshift(`#${el.id}`); break; }
+                let part = el.tagName.toLowerCase();
+                const stableClasses = [...el.classList].filter(name => !/^(hidden-page|hidden|active|open|selected|is-|theme-|admin-preview)/.test(name)).slice(0,2);
+                if (stableClasses.length) part += '.' + stableClasses.join('.');
+                const parentEl = el.parentElement;
+                if (parentEl) {
+                    const peers = [...parentEl.children].filter(child => child.tagName === el.tagName && !child.id);
+                    if (peers.length > 1) part += `:nth-of-type(${[...parentEl.children].filter(child=>child.tagName===el.tagName).indexOf(el)+1})`;
+                }
+                parts.unshift(part);
+                el = parentEl;
+            }
+            const textIndex = [...parent.childNodes].filter(child => child.nodeType === Node.TEXT_NODE).indexOf(node);
+            if (textIndex < 0) return '';
+            return `${parts.join(' > ')}::text:${textIndex}`.slice(0,600);
+        }
+        function isDeveloperEditableTextNode(node) {
+            if (!node || node.nodeType !== Node.TEXT_NODE || !node.nodeValue.trim()) return false;
+            const parent = node.parentElement;
+            if (!parent || parent.closest('script,style,noscript,svg,canvas,textarea,input,select,option,template,[contenteditable="true"],.online-presence-pane,.developer-mode-banner')) return false;
+            if (parent.closest('#analytics-grid,#tracker-table-wrap,#overview-activity,#overview-character-completion,#overview-insights-summary,.card-wiki-result-list,.card-wiki-stats,.scholar-history,.scholar-log-list,.weekly-plan-card,.focus-character-list,.activity-insights-summary')) return false;
+            if (parent.closest('.interactive-cell,.bounty-input,.status-pill,.online-presence')) return false;
+            return true;
+        }
+        function applyDeveloperTextOverrides() {
+            if (!cloudData?.settings) return;
+            const overrides = safeObject(cloudData.settings.uiTextOverrides);
+            if (!Object.keys(overrides).length) return;
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+            const nodes=[]; while (walker.nextNode()) if (isDeveloperEditableTextNode(walker.currentNode)) nodes.push(walker.currentNode);
+            nodes.forEach(node => {
+                const key = getDeveloperTextNodeKey(node);
+                if (key && Object.prototype.hasOwnProperty.call(overrides,key) && node.nodeValue !== overrides[key]) node.nodeValue = String(overrides[key]);
+            });
+        }
+        function editDeveloperTextAtPoint(event) {
+            if (!developerModeEnabled || !isPantheonAdmin() || isAdminViewAsActive()) return;
+            let node = null;
+            try {
+                const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(event.clientX,event.clientY) : null;
+                if (range) node = range.startContainer;
+                else if (document.caretPositionFromPoint) node = document.caretPositionFromPoint(event.clientX,event.clientY)?.offsetNode || null;
+            } catch (_) {}
+            if (!isDeveloperEditableTextNode(node)) {
+                let target = event.target;
+                while (target && target !== document.body && !node) {
+                    const textChild = [...target.childNodes].find(child => isDeveloperEditableTextNode(child));
+                    if (textChild) node = textChild;
+                    target = target.parentElement;
+                }
+            }
+            if (!isDeveloperEditableTextNode(node)) return;
+            const key = getDeveloperTextNodeKey(node);
+            if (!key) return;
+            event.preventDefault(); event.stopPropagation();
+            if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+            const current = node.nodeValue;
+            const next = window.prompt('Edit this text. Formatting, font size, and wrapping stay controlled by the page styles.', current);
+            if (next === null || next === current) return;
+            if (String(next).length > 2000) { alert('Please keep UI text under 2,000 characters.'); return; }
+            if (!(isPantheonAdmin() && !isAdminViewAsActive())) return;
+            const overrides = { ...safeObject(cloudData.settings.uiTextOverrides) };
+            overrides[key] = String(next);
+            cloudData.settings.uiTextOverrides = overrides;
+            cloudData.settings.uiTextOverridesUpdatedAt = Date.now();
+            cloudData.settings.uiTextOverridesUpdatedBy = String(pantheonDiscordUser?.id || 'admin');
+            node.nodeValue = String(next);
+            triggerAutoSync();
+        }
+        document.addEventListener('click', editDeveloperTextAtPoint, true);
+
         function initializeBountyBoardsToggle() {
             try { trackBountyBoards = localStorage.getItem(TRACK_BOUNTY_BOARDS_KEY) === 'true'; } catch (_) { trackBountyBoards = false; }
             updateBountyBoardsButton();
@@ -3660,6 +3850,9 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             if (source.syncInfo && typeof source.syncInfo === 'object') norm.syncInfo = { operationId:String(source.syncInfo.operationId || ''), by:String(source.syncInfo.by || ''), at:Number(source.syncInfo.at) || 0 };
 
             const sets = safeObject(source.settings);
+            norm.settings.uiTextOverrides = Object.fromEntries(Object.entries(safeObject(sets.uiTextOverrides)).slice(0,300).map(([key,value]) => [String(key).slice(0,600), String(value ?? '').slice(0,2000)]));
+            norm.settings.uiTextOverridesUpdatedAt = Number(sets.uiTextOverridesUpdatedAt) || 0;
+            norm.settings.uiTextOverridesUpdatedBy = String(sets.uiTextOverridesUpdatedBy || '');
             norm.settings.rateUpEvents = normalizeRateUpEvents(sets.rateUpEvents);
             norm.settings.rateUpEventsUpdatedAt = Number(sets.rateUpEventsUpdatedAt) || 0;
             norm.settings.rateUpEventsUpdatedBy = String(sets.rateUpEventsUpdatedBy || '');
@@ -3838,6 +4031,14 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             merged.settings.rateUpEvents = normalizeRateUpEvents(rateSource.rateUpEvents);
             merged.settings.rateUpEventsUpdatedAt = Math.max(localRateAt, remoteRateAt);
             merged.settings.rateUpEventsUpdatedBy = String(rateSource.rateUpEventsUpdatedBy || '');
+            const localTextAt = Number(local.settings.uiTextOverridesUpdatedAt) || 0;
+            const remoteTextAt = Number(remote.settings.uiTextOverridesUpdatedAt) || 0;
+            const localTexts = safeObject(local.settings.uiTextOverrides), remoteTexts = safeObject(remote.settings.uiTextOverrides);
+            const textSource = localTextAt > remoteTextAt ? local.settings : remoteTextAt > localTextAt ? remote.settings :
+                (Object.keys(localTexts).length > Object.keys(remoteTexts).length ? local.settings : remote.settings);
+            merged.settings.uiTextOverrides = { ...safeObject(textSource.uiTextOverrides) };
+            merged.settings.uiTextOverridesUpdatedAt = Math.max(localTextAt, remoteTextAt);
+            merged.settings.uiTextOverridesUpdatedBy = String(textSource.uiTextOverridesUpdatedBy || '');
             merged.history = { ...remote.history, ...local.history };
             const lat = Number(local.settings.analyticsTrackingUpdatedAt) || 0, rat = Number(remote.settings.analyticsTrackingUpdatedAt) || 0;
             const analyticsSource = (lat > rat || (lat === rat && String(local.settings.analyticsTrackingUpdatedBy) >= String(remote.settings.analyticsTrackingUpdatedBy))) ? local.settings : remote.settings;
@@ -4282,6 +4483,8 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                             const resetChangesAfterRefresh = checkAutoResets();
                             persistLocalData();
                             if(remoteChangedSinceUI || resetChangesAfterRefresh) refreshTrackerUI(); else updateOverviewStatusCards();
+                            applyDeveloperTextOverrides();
+                            updateOverviewEventNotice();
                             if(resetChangesAfterRefresh){unsavedCloudChanges=true;setTimeout(()=>forceSync(false),180);}
                             // Revision logging happens after the core sync and can fail safely.
                             if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
@@ -4316,6 +4519,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                 setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
                 persistLocalData();
                 refreshTrackerUI();
+                updateOverviewEventNotice();
                 setStatus('🟢 Shared data refreshed from cloud');
             }catch(_){
                 // Keep the current local view during transient connection failures.
@@ -4364,6 +4568,8 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                 updateOverviewProfile(state.user);
                 refreshLedgerVisibility();
                 updateOverviewStatusCards();
+                startOnlinePresence();
+                initializeDeveloperMode();
                 const signOutButton = document.getElementById('overview-signout');
                 if (signOutButton) signOutButton.addEventListener('click', async () => {
                     signOutButton.disabled = true;
@@ -4388,6 +4594,8 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             loadCloudForm();
             populateRegistrationJobSelect();
             window.addEventListener('hashchange', handlePageRoute);
+            const devTextObserver = new MutationObserver(() => { if (cloudData?.settings?.uiTextOverrides && Object.keys(safeObject(cloudData.settings.uiTextOverrides)).length) applyDeveloperTextOverrides(); });
+            devTextObserver.observe(document.body, { childList:true, subtree:true });
             loadLiveTracker().then(() => {
                 applyDiscordIdentityDefaults();
                 const routeHash = location.hash;
@@ -4878,6 +5086,72 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
                 image.src = url;
             } else image.hidden = true;
         }
+        let onlinePresenceTimer = null;
+        let onlinePresenceBusy = false;
+        let onlinePresenceCollapsed = false;
+        function toggleOnlinePresencePane() {
+            onlinePresenceCollapsed = !onlinePresenceCollapsed;
+            const pane = document.getElementById('online-presence-pane');
+            const button = document.getElementById('online-presence-collapse');
+            if (pane) pane.classList.toggle('is-collapsed', onlinePresenceCollapsed);
+            if (button) { button.textContent = onlinePresenceCollapsed ? '+' : '−'; button.setAttribute('aria-expanded', String(!onlinePresenceCollapsed)); button.setAttribute('aria-label', onlinePresenceCollapsed ? 'Expand online list' : 'Collapse online list'); }
+        }
+        function renderOnlinePresence(users, status='') {
+            const list = document.getElementById('online-presence-list');
+            const count = document.getElementById('online-presence-count');
+            if (!list || !count) return;
+            const clean = Array.isArray(users) ? users : [];
+            count.textContent = status || `${clean.length} online`;
+            if (!clean.length) { list.innerHTML = `<div class="online-presence-empty">${escapeHTML(status || 'No active members detected')}</div>`; return; }
+            const selfId = String(pantheonDiscordUser?.id || '');
+            list.innerHTML = clean.map(user => {
+                const own = String(user.id || '') === selfId;
+                const label = String(user.label || user.username || 'Member');
+                return `<div class="online-presence-user"><span class="online-presence-user-dot"></span><span class="online-presence-user-name" title="${escapeHTML(label)}">${escapeHTML(label)}${own ? ' <em>You</em>' : ''}</span>${user.role === 'admin' ? '<span class="online-presence-admin">ADMIN</span>' : ''}</div>`;
+            }).join('');
+        }
+        async function refreshOnlinePresence(heartbeat=false) {
+            if (!pantheonDiscordUser?.id || onlinePresenceBusy || (document.visibilityState && document.visibilityState !== 'visible')) return;
+            onlinePresenceBusy = true;
+            try {
+                const response = await fetch('/api/presence', {
+                    method: heartbeat ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+                    headers: heartbeat ? {'Content-Type':'application/json'} : undefined,
+                    body: heartbeat ? '{}' : undefined
+                });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || `Presence unavailable (${response.status})`);
+                renderOnlinePresence(data.users || []);
+            } catch (_) {
+                renderOnlinePresence([], 'Presence unavailable');
+            } finally { onlinePresenceBusy = false; }
+        }
+        function startOnlinePresence() {
+            const pane = document.getElementById('online-presence-pane');
+            if (pane) pane.hidden = false;
+            if (onlinePresenceTimer) clearInterval(onlinePresenceTimer);
+            refreshOnlinePresence(true);
+            onlinePresenceTimer = setInterval(() => refreshOnlinePresence(true), 30000);
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshOnlinePresence(true); });
+            window.addEventListener('focus', () => refreshOnlinePresence(true));
+        }
+
+        function updateOverviewEventNotice() {
+            const el = document.getElementById('overview-event-notice');
+            if (!el) return;
+            const now = Date.now();
+            const events = normalizeRateUpEvents(cloudData?.settings?.rateUpEvents);
+            const item = getRateUpWindow(events.itemDrop, now);
+            const enhance = getRateUpWindow(events.enhancement, now);
+            const parts = [];
+            if (item.status === 'active') parts.push('＋50% Item Drop LIVE');
+            else if (item.status === 'upcoming' && item.start-now <= 72*60*60*1000) parts.push(`＋50% Item Drop ${formatManilaStamp(item.start)}`);
+            if (enhance.status === 'active') parts.push('＋30% Enhancement LIVE');
+            else if (enhance.status === 'upcoming' && enhance.start-now <= 72*60*60*1000) parts.push(`＋30% Enhancement ${formatManilaStamp(enhance.start)}`);
+            el.textContent = parts.length ? parts.join('  ·  ') : 'PANTHEON GUILD OPERATIONS  ·  Check the Tracker for priorities';
+            el.classList.toggle('is-event-live', item.status === 'active' || enhance.status === 'active');
+        }
+
         function updateOverviewProfile(user) {
             const name = String(user?.label || user?.username || user?.global_name || 'Pantheon Member').trim() || 'Pantheon Member';
             const nameEl = document.getElementById('overview-profile-name');
@@ -4896,6 +5170,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             const drawerAdminLink = document.getElementById('drawer-admin-console');
             const viewAsLink = document.getElementById('drawer-view-as');
             const rateUpLink = document.getElementById('drawer-rateup-events');
+            const developerLink = document.getElementById('drawer-developer-mode');
             const menuToggle = document.getElementById('menu-toggle');
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
@@ -4903,11 +5178,13 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             if (drawerAdminLink) drawerAdminLink.hidden = !isAdmin;
             if (viewAsLink) viewAsLink.hidden = !isAdmin;
             if (rateUpLink) rateUpLink.hidden = !isAdmin;
+            if (developerLink) developerLink.hidden = !isAdmin;
             if (menuToggle) menuToggle.hidden = !isAdmin;
             if (drawer) drawer.hidden = !isAdmin;
             if (scrim) scrim.hidden = !isAdmin;
             if (subEl) subEl.textContent = isAdmin ? 'Discord account · Administrator' : 'Discord account · Member';
             refreshLedgerVisibility();
+            updateOverviewEventNotice();
         }
         function updateOverviewStatusCards() {
             const getText = id => document.getElementById(id)?.textContent || '';
@@ -5084,57 +5361,82 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             return tasks.sort((a,b)=>b.at-a.at).slice(0,5).map(item=>({ ...item, time:new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',hour:'numeric',minute:'2-digit'}).format(new Date(item.at)) }));
         }
         function renderDailyPlanningPanel(container) {
-            const now = Date.now(), p = getManilaDateParts(now);
-            const profiles = getPlanCharacters();
-            const registeredCount = profiles.length;
+            const now = Date.now();
+            const profiles = getPlanCharacters().filter(profile => String(profile.name || '').trim());
             const tracked = profiles.filter(profile => profile.trackerEnabled);
-            const main = profiles.find(profile => profile.isMain);
-            const lzMinutes = registeredCount * 3 * 8;
+            const registeredCount = profiles.length;
+            const lzMinutes = registeredCount * 24;
             const dailyTasks = getPlanDailyTasks();
             const pendingDaily = tracked.reduce((count, profile) => count + dailyTasks.filter(item => !['done','excluded'].includes(getCellState(profile.name, item.name))).length, 0);
-            const wins = buildTodayWins(tracked);
-            const nextWeeklyReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
-            const weeklyHoursLeft = Math.max(0, (nextWeeklyReset - now) / 3600000);
-            const weeklyMinsLeft = Math.max(0, Math.round((nextWeeklyReset - now) / 60000));
-            const urgency = weeklyHoursLeft <= 2 ? ['Reset imminent',true] : weeklyHoursLeft <= 8 ? ['Final hours',true] : weeklyHoursLeft <= 24 ? ['Final day',true] : weeklyHoursLeft <= 48 ? ['Two-day push',false] : weeklyHoursLeft <= 72 ? ['Three-day focus',false] : weeklyHoursLeft <= 96 ? ['Midweek pace',false] : weeklyHoursLeft <= 120 ? ['Midweek check-in',false] : weeklyHoursLeft <= 144 ? ['Early-week setup',false] : ['Fresh reset cycle',false];
-            const tomorrow = new Date(now + 24*60*60*1000);
-            const tomorrowLabel = new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',weekday:'long',month:'short',day:'numeric'}).format(tomorrow);
+            const todayWins = buildTodayWins(tracked);
+            const nextReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
+            const minsLeft = Math.max(0, Math.round((nextReset - now) / 60000));
+            const hoursLeft = minsLeft / 60;
+            const urgency = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? '2 days left' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : 'New cycle';
+            const recent = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-3);
+            const signals = profiles.map(profile => {
+                let validWeeks = 0, weeksWithProgress = 0, done = 0, missed = 0;
+                recent.forEach(([,archive]) => {
+                    const states = String(safeObject(archive.states)[profile.name] || '');
+                    const order = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+                    if (!states || !order.length) return;
+                    validWeeks++;
+                    let weekDone = 0;
+                    order.forEach((task, i) => {
+                        if (states[i] === 'd') { done++; weekDone++; }
+                        else if (states[i] === 'm') missed++;
+                    });
+                    if (weekDone) weeksWithProgress++;
+                });
+                let currentDone=0, currentOpen=0;
+                weeklyTaskNames.forEach(task => {
+                    const state = getCellState(profile.name, task);
+                    if (state === 'done') currentDone++;
+                    else if (state !== 'excluded') currentOpen++;
+                });
+                const currentRate = currentDone + currentOpen ? Math.round(currentDone / (currentDone + currentOpen) * 100) : null;
+                const regular = !profile.isMain && validWeeks >= 2 && (weeksWithProgress >= 2 || (done >= 4 && weeksWithProgress >= 1));
+                const emerging = !profile.isMain && !regular && (currentDone >= 2 || (weeksWithProgress >= 1 && done >= 2));
+                const reviewNA = profile.trackerEnabled && validWeeks >= 3 && !regular && !emerging && missed >= 3;
+                const signalScore = (weeksWithProgress * 5) + (done * 0.45) + (currentDone * 0.8) + (profile.isMain ? 100 : 0) + (regular ? 10 : emerging ? 4 : 0);
+                return { ...profile, validWeeks, weeksWithProgress, done, missed, currentRate, regular, emerging, reviewNA, signalScore };
+            }).sort((a,b)=>b.signalScore-a.signalScore);
+            const main = signals.find(item => item.isMain);
+            const focus = signals.filter(item => item.isMain || item.regular || item.emerging).slice(0,3);
+            const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'Learning your rotation';
+            const chips = signals.slice(0, Math.min(6, signals.length)).map(item => {
+                const status = item.reviewNA ? 'Review N/A' : item.isMain ? 'Main' : item.regular ? 'Regular' : item.emerging ? 'Emerging' : item.trackerEnabled ? 'Learning' : 'Off';
+                const rate = item.currentRate === null ? '—' : `${item.currentRate}%`;
+                return `<span class="focus-character-chip ${item.isMain?'is-main':''} ${item.reviewNA?'is-review':''}" title="${escapeHTML(status)}">${escapeHTML(item.name)} <b>${rate}</b></span>`;
+            }).join('');
+            const reviewNA = signals.filter(item => item.reviewNA && !item.isMain);
+            const reviewText = reviewNA.length ? `Review N/A for ${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''} if they're genuinely out of rotation.` : '';
             const itemEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).itemDrop, now);
             const enhanceEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).enhancement, now);
-            const todayDOW = p.weekday;
-            const isFriday = todayDOW === 'Fri', isSunday = todayDOW === 'Sun';
-            const dailyReset = getTargetResetTimeUTC(false) + 24*60*60*1000;
-            const itemWindowStart = itemEvent.status === 'upcoming' ? itemEvent.start : 0;
-            let itemTiming = '';
+            const manilaDOW = getManilaDateParts(now).weekday;
+            const eventNotes = [];
             if (itemEvent.status === 'active') {
-                itemTiming = `+50% Item Drop Rate UP is active (${itemEvent.label}). Prioritize Lucky Zone runs within the bonus window, then focus on drop-efficient raids only after the LZ reserve and tracked dailies are covered.`;
-                if (isSunday && itemEvent.end) {
-                    const untilClose = Math.max(0, Math.round((itemEvent.end-now)/60000));
-                    itemTiming += ` Sunday reminder: finish this cycle’s LZ runs before Monday 00:00 Manila; about ${Math.floor(untilClose/60)}h ${untilClose%60}m remain in the event window.`;
-                    if (lzMinutes > untilClose) itemTiming += ` The full-roster LZ budget (${lzMinutes}m) exceeds the remaining event window; start now and prioritize Main / highest-value characters rather than assuming every run will fit.`;
-                }
-            } else if (itemEvent.status === 'upcoming' && isFriday && itemWindowStart && itemWindowStart < dailyReset) {
-                const waitMins = Math.max(0, Math.round((itemWindowStart-now)/60000));
-                const eventToResetMins = Math.max(0, Math.round((dailyReset-itemWindowStart)/60000));
-                itemTiming = `The +50% Item Drop Rate window begins ${formatManilaStamp(itemWindowStart)}. Consider holding this cycle’s LZ runs until it starts, but only when your schedule allows. There are about ${eventToResetMins} minutes between event start and the next daily reset, versus a ${lzMinutes}-minute full-roster LZ budget.`;
-                if (lzMinutes > eventToResetMins) itemTiming += ` That window cannot fit the full roster’s estimated runs; prioritize Main / valuable characters or begin some runs before the bonus rather than risking a reset with all LZs unfinished.`;
-                else itemTiming += ' The estimated LZ budget fits inside that window, but leave room for real run-to-run variance.';
-                if (waitMins > 0) itemTiming += ` Waiting means leaving about ${Math.floor(waitMins/60)}h ${waitMins%60}m before the bonus begins.`;
-            } else if (itemEvent.status === 'upcoming') {
-                itemTiming = `+50% Item Drop Rate UP is scheduled (${itemEvent.label}). Prepare your run order and stamina/time window now; avoid postponing the LZ reserve unless the bonus window will actually overlap this daily cycle.`;
-            } else if (itemEvent.status === 'invalid') {
-                itemTiming = 'The custom +50% Item Drop Rate window has invalid dates. Correct its Manila start/end in Admin → Rate-Up Events before relying on it for planning.';
-            }
-            let enhancementTiming = '';
-            if (enhanceEvent.status === 'active') enhancementTiming = `+30% Enhancement Rate UP is active (${enhanceEvent.label}). Use prepared materials and gold on intended upgrades; do not spend time farming extra tasks if that would sacrifice your daily baseline.`;
-            else if (enhanceEvent.status === 'upcoming') enhancementTiming = `+30% Enhancement Rate UP is scheduled (${enhanceEvent.label}). Prepare materials, gold, and target gear beforehand; keep nonurgent enhancement attempts until the bonus begins.`;
-            else if (enhanceEvent.status === 'invalid') enhancementTiming = 'The custom +30% Enhancement Rate window has invalid dates. Correct its Manila start/end before relying on this event.';
-            const winsHtml = wins.length ? wins.map(win => `<div class="weekly-plan-win"><div><strong>${escapeHTML(win.name)}</strong>${win.isMain ? ' <span class="main-character-badge">★ MAIN</span>' : ''}<div class="weekly-plan-muted">${escapeHTML(win.task)} · ${escapeHTML(win.group || 'Task')}</div></div><span class="weekly-plan-win-main">✓ ${escapeHTML(win.time)}</span></div>`).join('') : '<p>No task completions have been recorded since the latest daily reset yet. The next checkboxes can turn into today’s wins.</p>';
-            const trackedLabel = `${tracked.length} tracked · ${registeredCount} registered`;
-            const memberTitle = isAdminViewAsActive() ? `Previewing ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? `Planning for ${getCurrentOwnerName()}` : 'Planning for the visible Tracker roster';
+                if (manilaDOW === 'Sun' && itemEvent.end) {
+                    const m = Math.max(0, Math.round((itemEvent.end-now)/60000));
+                    eventNotes.push(`+50% Drop live · finish LZs before Mon 00:00 Manila (${Math.floor(m/60)}h left)`);
+                } else eventNotes.push('+50% Drop live · keep LZs inside the bonus window');
+            } else if (itemEvent.status === 'upcoming' && manilaDOW === 'Fri' && itemEvent.start) {
+                const saturdayReset = getTargetResetTimeUTC(false) + 24*60*60*1000;
+                if (itemEvent.start < saturdayReset) eventNotes.push(`+50% Drop starts ${formatManilaStamp(itemEvent.start)} · delay LZs only if all runs fit before reset`);
+                else if (itemEvent.start-now <= 72*60*60*1000) eventNotes.push('+50% Drop scheduled · prepare LZ run order');
+            } else if (itemEvent.status === 'upcoming' && itemEvent.start && itemEvent.start-now <= 72*60*60*1000) eventNotes.push(`+50% Drop ${formatManilaStamp(itemEvent.start)}`);
+            if (enhanceEvent.status === 'active') eventNotes.push('+30% Enhancement live · use prepared materials on planned upgrades');
+            else if (enhanceEvent.status === 'upcoming' && enhanceEvent.start && enhanceEvent.start-now <= 72*60*60*1000) eventNotes.push(`+30% Enhancement ${formatManilaStamp(enhanceEvent.start)} · prepare materials/gold`);
             const panel = document.createElement('section');
-            panel.className = 'weekly-plan-card';
-            panel.innerHTML = `<div class="weekly-plan-head"><div><div class="weekly-plan-kicker">${escapeHTML(memberTitle)} · ${escapeHTML(trackedLabel)}</div><h3>Reset-aware plan &amp; today’s wins</h3><p class="weekly-plan-muted">Today is ${escapeHTML(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',weekday:'long',month:'short',day:'numeric'}).format(new Date(now)))} in Manila. Next daily reset: ${escapeHTML(formatManilaStamp(dailyReset))}.</p></div><span class="weekly-plan-status${urgency[1]?' urgent':''}">${escapeHTML(urgency[0])} · ${Math.floor(weeklyMinsLeft/60)}h ${weeklyMinsLeft%60}m to Saturday reset</span></div><div class="weekly-plan-grid"><section class="weekly-plan-block"><h4>Today’s wins</h4><p>Recognize the progress logged since the 09:00 Manila daily reset. Lucky Zones are intentionally not counted as Tracker completions.</p>${winsHtml}</section><section class="weekly-plan-block"><h4>Plan for ${escapeHTML(tomorrowLabel)}</h4><p><strong>1.</strong> Protect the Lucky Zone time budget first: ${escapeHTML(String(lzMinutes))} minutes for ${escapeHTML(String(registeredCount))} registered character${registeredCount===1?'':'s'}.</p><p><strong>2.</strong> Finish the normal tracked daily checklist next (${escapeHTML(String(pendingDaily))} unfinished tracked daily item${pendingDaily===1?'':'s'} visible right now). There is no per-task time model, so this is a count—not a promise about minutes.</p><p><strong>3.</strong> Spend only genuinely remaining time on high-weight weekly tasks / raids. ${main ? `Keep ${escapeHTML(main.name)} (Main) first when choosing which character gets the limited extra raid time.` : 'Choose the character you currently value most first; Main designation helps the planner rank that choice.'}</p><div class="weekly-plan-info">Completion guidance becomes more urgent near Saturday’s 09:00 Manila weekly reset. This is a practical order of operations, not an assumption that every character can finish every raid.</div></section></div>${itemTiming ? `<div class="weekly-plan-info"><strong>＋50% Item Drop Rate:</strong> ${escapeHTML(itemTiming)}</div>` : ''}${enhancementTiming ? `<div class="weekly-plan-info"><strong>＋30% Enhancement Rate:</strong> ${escapeHTML(enhancementTiming)}</div>` : ''}${isAdminViewAsActive() ? '<div class="weekly-plan-info"><strong>Read-only preview:</strong> displayed progress and recommendations are for the selected member. All changes remain disabled.</div>' : ''}${!getCurrentMemberDirectoryEntry() && isPantheonAdmin() ? '<div class="weekly-plan-info">For a truly personal estimate, use Admin → View As Member. This view has no single member selected, so the time budget uses only the currently visible Tracker roster.</div>' : ''}`;
+            panel.className = 'weekly-plan-card weekly-plan-card-compact';
+            panel.innerHTML = `
+                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character pulse</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
+                <div class="focus-summary-line"><strong>Focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Learning priorities</span>' : ''}</div>
+                ${chips ? `<div class="focus-character-chips">${chips}${signals.length>6?`<span class="focus-character-more">+${signals.length-6}</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to start building a personal focus.</div>'}
+                ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
+                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} completed · <strong>Tomorrow:</strong> ${lzMinutes}m Lucky Zones (${registeredCount} characters), ${pendingDaily} tracked daily task${pendingDaily===1?'':'s'} left, then raids if time remains.</div>
+                ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,2).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
+                ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
         }
 
@@ -5175,6 +5477,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
             triggerAutoSync();
             closeModal('rateup-events-modal');
             renderAnalytics();
+            updateOverviewEventNotice();
             setStatus('🟡 Shared Rate-Up schedule saved locally · syncing...');
         }
 
@@ -5378,6 +5681,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
         }
         function deleteScholarLog(player, id) { if (!refreshLedgerVisibility()) { alert('The Ledger is available only to Cho, Bio, and Cheean.'); return; } if (!confirm('Remove log?')) return; if (cloudData.scholarship[player].logs[id]) { cloudData.scholarship[player].logs[id].deleted = true; cloudData.updatedAt = Date.now(); renderScholarLedger(); persistLocalData(); forceSync(false); } }
         function renderScholarLedger() {
+            if (!refreshLedgerVisibility()) return;
             ['cheean', 'bio', 'idontheal'].forEach(p => {
                 let bg=0, bd=0, be=0; const logs = Object.entries(cloudData.scholarship[p]?.logs||{}).filter(([,d])=>!d.deleted).map(([id,d])=>({id,...d})).sort((a,b)=>b.timestamp-a.timestamp);
                 logs.forEach(l => { if(l.type==='income'){bg+=l.gold/2;bd+=l.dia/2;be+=l.eol/2;}else{bg-=l.gold;bd-=l.dia;be-=l.eol;} });
@@ -7135,7 +7439,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r1';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r2';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -7643,6 +7947,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
         }
 
         function openModal(id) {
+            if (id === 'scholar-modal' && !refreshLedgerVisibility()) return;
             document.getElementById(id)?.classList.remove('hidden');
             if (id === 'welcome-modal') document.body.classList.add('welcome-modal-open');
         }
