@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r6</title>
+    <title>Pantheon Tools v1.6.8-r7</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2467,6 +2467,40 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media (max-width:700px) { .rate-up-editor-grid { grid-template-columns:1fr !important; } }
 </style>
 
+
+<style id="pantheon-v168-r7-main-fill-and-pulse-clarity">
+/* Distinct Main fills adapt with the selected theme; no heavy outline is used to communicate role. */
+:root[data-pantheon-theme="dark"] { --pt-main-fill:#2d3850; --pt-main-star:#eed184; --pt-main-overlay:rgba(183,199,255,.07); }
+:root[data-pantheon-theme="light"] { --pt-main-fill:#e8edff; --pt-main-star:#7c5a0b; --pt-main-overlay:rgba(75,101,195,.08); }
+:root[data-pantheon-theme="eye-comfort"] { --pt-main-fill:#e9e9d4; --pt-main-star:#6d5a16; --pt-main-overlay:rgba(90,108,66,.09); }
+:root[data-pantheon-theme="pastel"] { --pt-main-fill:#f1e0fa; --pt-main-star:#80519b; --pt-main-overlay:rgba(130,79,161,.08); }
+:root[data-pantheon-theme] .main-character-badge,:root[data-pantheon-theme] .profile-confirm-main { display:inline-flex !important; align-items:center; justify-content:center; margin-left:4px !important; padding:0 !important; border:0 !important; border-radius:0 !important; background:transparent !important; color:var(--pt-main-star) !important; -webkit-text-fill-color:var(--pt-main-star) !important; box-shadow:none !important; font-size:.78rem !important; font-weight:900 !important; line-height:1 !important; opacity:1 !important; vertical-align:middle; }
+.focus-main-star { color:var(--pt-main-star); font-size:.8rem; margin-left:2px; }
+:root[data-pantheon-theme] .char-card.is-main-character { border:1px solid var(--pt-border) !important; border-top:1px solid var(--pt-border) !important; background:var(--pt-main-fill) !important; box-shadow:0 3px 12px rgba(0,0,0,.08) !important; }
+:root[data-pantheon-theme] .char-card.is-main-character .card-header { background:var(--pt-main-fill) !important; border-bottom-color:var(--pt-border) !important; color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+.member-directory-char.is-main-character,:root[data-pantheon-theme] :root[data-pantheon-theme] .member-directory-char.is-main-character { border:1px solid var(--pt-border) !important; background:var(--pt-main-fill) !important; color:var(--pt-text) !important; box-shadow:none !important; }
+.member-directory-char.is-main-character .member-directory-char-label,:root[data-pantheon-theme] .member-directory-char.is-main-character .member-directory-char-label { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+.member-directory-char.is-main-character .member-directory-char-status { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme] .profile-confirm-character:has(.profile-confirm-main) { background:var(--pt-main-fill) !important; border-color:var(--pt-border) !important; box-shadow:none !important; }
+:root[data-pantheon-theme] .class-setup-table tr.is-main-character td,:root[data-pantheon-theme] .team-table tr.is-main-character td { background:var(--pt-main-fill) !important; border-top:1px solid var(--pt-border) !important; border-bottom:1px solid var(--pt-border) !important; color:var(--pt-text) !important; }
+:root[data-pantheon-theme] .class-setup-table tr.is-main-character td:first-child,:root[data-pantheon-theme] .team-table tr.is-main-character td:first-child { border-left:1px solid var(--pt-border) !important; }
+:root[data-pantheon-theme] .class-setup-table tr.is-main-character td:last-child,:root[data-pantheon-theme] .team-table tr.is-main-character td:last-child { border-right:1px solid var(--pt-border) !important; }
+:root[data-pantheon-theme] .activity-insight-item.is-main-character { border:1px solid var(--pt-border) !important; background:var(--pt-main-fill) !important; box-shadow:none !important; }
+:root[data-pantheon-theme] .focus-character-chip.is-main { border-color:var(--pt-border) !important; background:var(--pt-main-fill) !important; box-shadow:none !important; }
+:root[data-pantheon-theme] #dn-tracker .char-col.is-main-character { background:var(--pt-main-fill) !important; color:var(--pt-text) !important; box-shadow:none !important; outline:none !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme] #dn-tracker th.is-main-character::after { color:var(--pt-main-star) !important; }
+:root[data-pantheon-theme] #dn-tracker td.is-main-character { box-shadow:none !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character:not(.done):not(.marked):not(.excluded):not(.reset) { background:var(--pt-main-fill) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.done { background:color-mix(in srgb,var(--pt-positive) 24%,var(--pt-main-fill)) !important; border-color:var(--pt-positive) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.marked { background:color-mix(in srgb,var(--pt-accent) 19%,var(--pt-main-fill)) !important; border-color:var(--pt-accent) !important; box-shadow:inset 0 0 0 1px var(--pt-accent) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.reset { background:color-mix(in srgb,var(--pt-accent-soft) 62%,var(--pt-main-fill)) !important; border-color:var(--pt-accent) !important; box-shadow:inset 0 0 0 1px var(--pt-accent) !important; }
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.is-main-character.excluded { background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--pt-surface-soft) 75%,var(--pt-main-fill)),color-mix(in srgb,var(--pt-surface-soft) 75%,var(--pt-main-fill)) 10px,var(--pt-hover) 10px,var(--pt-hover) 20px) !important; color:var(--pt-muted) !important; }
+/* Pulse labels explain the status; Lucky Zones are explicitly described as a planning estimate only. */
+.focus-model-explainer { color:var(--pt-muted) !important; }
+.focus-model-summary { display:flex; flex-wrap:wrap; gap:3px 8px; }
+.focus-review-note { overflow-wrap:anywhere; }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2907,9 +2941,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r6</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r7</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r6 update:</strong> centered app layout, shorter instructions, a clearer Team Builder balance heading, and a new +100% EXP Boost event trigger with live countdown.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r7 update:</strong> theme-aware Main character fills, a clearer Character Activity Summary, and Lucky Zone time estimates separated from tracked task completions.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5868,10 +5902,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // Universal admins should not receive a misleading full-guild time estimate. Use only the currently visible tracker roster if no owner context exists.
             return characters.map(char => ({ name:char.name, isMain:char.isMain === true, trackerEnabled:true }));
         }
-        function getPlanDailyTasks() {
-            return cloudData.settings.categories.filter(category => category.group === 'Dailies')
-                .flatMap(category => (category.tasks || []).filter(task => !isBountyBoardSlot(category, task)).map(task => ({ name:task, category:category.name })));
-        }
         function buildTodayWins(profiles) {
             const from = getTargetResetTimeUTC(false), tasks = [];
             profiles.forEach(profile => {
@@ -5891,8 +5921,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const tracked = profiles.filter(profile => profile.trackerEnabled);
             const registeredCount = profiles.length;
             const lzMinutes = registeredCount * 24;
-            const dailyTasks = getPlanDailyTasks();
-            const pendingDaily = tracked.reduce((count, profile) => count + dailyTasks.filter(item => !['done','excluded'].includes(getCellState(profile.name, item.name))).length, 0);
             const todayWins = buildTodayWins(tracked);
             const nextReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
             const minsLeft = Math.max(0, Math.round((nextReset - now) / 60000));
@@ -5939,13 +5967,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }).sort((a,b)=>b.signalScore-a.signalScore);
             const main = signals.find(item => item.isMain);
             const focus = signals.filter(item => item.isMain || item.regular || item.emerging).slice(0,3);
-            const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'Learning your rotation';
+            const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'No clear priority yet';
             const chips = signals.slice(0, Math.min(8, signals.length)).map(item => {
-                const status = item.reviewNA ? 'Review N/A' : item.checkTicks ? 'Check ticks' : item.checkWeeklyLog ? 'No activity' : item.isMain ? 'Main' : item.regular ? 'Regular' : item.emerging ? 'Emerging' : item.trackerEnabled ? 'Learning' : 'Tracking off';
+                const status = item.reviewNA ? 'Review activity' : item.checkTicks ? 'Check weekly ticks' : item.checkWeeklyLog ? 'No recorded activity' : item.isMain ? 'Main' : item.regular ? 'Regular secondary' : item.emerging ? 'Recent activity' : item.trackerEnabled ? 'Not enough data' : 'Tracker off';
                 const rate = item.currentRate === null ? '—' : `${item.currentRate}%`;
-                const trendText = item.trend === null ? 'History building' : item.trend > 0 ? `Up ${item.trend} pts` : item.trend < 0 ? `Down ${Math.abs(item.trend)} pts` : 'Steady';
+                const trendText = item.trend === null ? '' : item.trend > 0 ? `Completion +${item.trend} pts` : item.trend < 0 ? `Completion −${Math.abs(item.trend)} pts` : 'Completion steady';
                 const weeklyText = item.currentEligible ? `${item.currentDone}/${item.currentEligible} weekly tasks` : 'No eligible weekly tasks';
-                return `<div class="focus-character-chip ${item.isMain?'is-main':''} ${item.reviewNA?'is-review':''}" title="${escapeHTML(status)}"><div class="focus-character-chip-head"><strong>${escapeHTML(item.name)}</strong><span class="focus-character-chip-role">${escapeHTML(status)}</span></div><div class="focus-character-chip-progress"><span>${escapeHTML(weeklyText)}</span><b>${rate}</b></div><div class="focus-character-chip-trend">${escapeHTML(trendText)} · ${item.weeksWithProgress}/${item.validWeeks || 0} recent weeks active</div></div>`;
+                const historyText = item.validWeeks ? `${item.weeksWithProgress}/${item.validWeeks} saved weeks active` : 'No saved history yet';
+                const detailText = trendText ? `${trendText} · ${historyText}` : historyText;
+                return `<div class="focus-character-chip ${item.isMain?'is-main':''} ${item.reviewNA?'is-review':''}" title="${escapeHTML(status)}"><div class="focus-character-chip-head"><strong>${escapeHTML(item.name)}${item.isMain?' <span class="focus-main-star" aria-label="Main character" title="Main character">★</span>':''}</strong><span class="focus-character-chip-role">${escapeHTML(status)}</span></div><div class="focus-character-chip-progress"><span>${escapeHTML(weeklyText)}</span><b>${rate}</b></div><div class="focus-character-chip-trend">${escapeHTML(detailText)}</div></div>`;
             }).join('');
             const reviewNA = signals.filter(item => item.reviewNA && !item.isMain);
             const checkTicks = signals.filter(item => item.checkTicks && !item.isMain);
@@ -5953,9 +5983,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const reviewTextParts = [];
             if (checkTicks.length) reviewTextParts.push(`${checkTicks.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkTicks.length>3?' + more':''}: other tasks are recorded, but weekly ticks are empty. Check those ticks first.`);
             if (checkWeeklyLog.length) reviewTextParts.push(`${checkWeeklyLog.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkWeeklyLog.length>3?' + more':''}: no activity is recorded this cycle despite past participation. Could be missed ticks or not played; confirm first.`);
-            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: low weekly activity across saved cycles. If out of rotation, consider N/A or turning Tracker off.`);
+            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: consistently low recorded activity across saved weeks. If this character is out of rotation, consider marking weekly tasks N/A or disabling tracking.`);
             const reviewText = reviewTextParts.join(' ');
-            const activitySummary = `${signals.filter(item=>item.isMain).length} Main · ${signals.filter(item=>item.regular).length} regular · ${signals.filter(item=>item.emerging).length} emerging · ${signals.filter(item=>item.reviewNA).length} to review`;
+            const activitySummary = `Marked Main: ${signals.filter(item=>item.isMain).length} · Secondary with recorded activity: ${signals.filter(item=>!item.isMain && (item.regular || item.emerging)).length} · Low activity to review: ${signals.filter(item=>item.reviewNA).length}`;
+            const historySummary = recent.length ? `${recent.length} saved weekly snapshot${recent.length===1?'':'s'}` : 'No saved weekly history yet';
             const configuredEvents = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
             const itemEvent = getRateUpWindow(configuredEvents.itemDrop, now);
             const enhanceEvent = getRateUpWindow(configuredEvents.enhancement, now);
@@ -5963,29 +5994,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const manilaDOW = getManilaDateParts(now).weekday;
             const eventNotes = [];
             if (itemEvent.status === 'active') {
-                if (manilaDOW === 'Sun' && itemEvent.end) {
-                    const m = Math.max(0, Math.round((itemEvent.end-now)/60000));
-                    eventNotes.push(`+50% Drop live · finish LZs before Mon 00:00 Manila (${Math.floor(m/60)}h left)`);
-                } else eventNotes.push('+50% Drop live · keep LZs inside the bonus window');
+                const m = itemEvent.end ? Math.max(0, Math.round((itemEvent.end-now)/60000)) : 0;
+                const remaining = itemEvent.end ? `${Math.floor(m/60)}h ${m%60}m left` : 'active';
+                eventNotes.push(`+50% Item Drop active · ${remaining}; Lucky Zone runs benefit only if finished before the bonus ends`);
             } else if (itemEvent.status === 'upcoming' && manilaDOW === 'Fri' && itemEvent.start) {
                 const saturdayReset = getTargetResetTimeUTC(false) + 24*60*60*1000;
-                if (itemEvent.start < saturdayReset) eventNotes.push(`+50% Drop starts ${formatManilaStamp(itemEvent.start)} · delay LZs only if all runs fit before reset`);
-                else if (itemEvent.start-now <= 72*60*60*1000) eventNotes.push('+50% Drop scheduled · prepare LZ run order');
-            } else if (itemEvent.status === 'upcoming' && itemEvent.start && itemEvent.start-now <= 72*60*60*1000) eventNotes.push(`+50% Drop ${formatManilaStamp(itemEvent.start)}`);
-            if (enhanceEvent.status === 'active') eventNotes.push('+30% Enhancement live · use prepared materials on planned upgrades');
-            else if (enhanceEvent.status === 'upcoming' && enhanceEvent.start && enhanceEvent.start-now <= 72*60*60*1000) eventNotes.push(`+30% Enhancement ${formatManilaStamp(enhanceEvent.start)} · prepare materials/gold`);
-            if (expEvent.status === 'active') eventNotes.push('+100% EXP live · prioritize planned EXP runs during the bonus');
+                if (itemEvent.start < saturdayReset) eventNotes.push(`+50% Item Drop starts ${formatManilaStamp(itemEvent.start)} · delay Lucky Zones only if all runs fit before reset`);
+                else if (itemEvent.start-now <= 72*60*60*1000) eventNotes.push('+50% Item Drop scheduled · plan Lucky Zone timing');
+            } else if (itemEvent.status === 'upcoming' && itemEvent.start && itemEvent.start-now <= 72*60*60*1000) eventNotes.push(`+50% Item Drop starts ${formatManilaStamp(itemEvent.start)}`);
+            if (enhanceEvent.status === 'active') eventNotes.push('+30% Enhancement active · use prepared materials for planned upgrades');
+            else if (enhanceEvent.status === 'upcoming' && enhanceEvent.start && enhanceEvent.start-now <= 72*60*60*1000) eventNotes.push(`+30% Enhancement starts ${formatManilaStamp(enhanceEvent.start)} · prepare materials and gold`);
+            if (expEvent.status === 'active') eventNotes.push('+100% EXP Boost active · use the bonus for planned EXP runs');
             else if (expEvent.status === 'upcoming' && expEvent.start && expEvent.start-now <= 72*60*60*1000) eventNotes.push(`+100% EXP Boost starts ${formatManilaStamp(expEvent.start)} · prepare EXP runs`);
             const panel = document.createElement('section');
             panel.className = 'weekly-plan-card weekly-plan-card-compact';
             panel.innerHTML = `
-                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity &amp; Completion</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
-                <p class="focus-model-explainer">Learns from task ticks and saved weekly history. It flags possible missed ticks separately from repeated low activity when the data supports it.</p>
-                <div class="focus-summary-line"><strong>Focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Learning priorities</span>' : ''}</div>
-                ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to start building a personal focus.</div>'}
-                ${signals.length ? `<div class="focus-model-summary">${escapeHTML(activitySummary)} <span>· ${recent.length} weekly archive${recent.length===1?'':'s'} available</span></div>` : ''}
+                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity Summary</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
+                <p class="focus-model-explainer">Shows recorded weekly-task progress and learns your usual character rotation from saved weeks. An unticked task may be missed data, not proof the character was not played. Lucky Zones are estimated only—not tracked.</p>
+                <div class="focus-summary-line"><strong>Likely priorities:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Early estimate</span>' : ''}</div>
+                ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to see their recorded progress.</div>'}
+                ${signals.length ? `<div class="focus-model-summary">${escapeHTML(activitySummary)} <span>· ${escapeHTML(historySummary)}</span></div>` : ''}
                 ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
-                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} completions · <strong>Estimated Lucky Zone time:</strong> ${lzMinutes} min for ${registeredCount} character${registeredCount===1?'':'s'} · <strong>Open tracked dailies:</strong> ${pendingDaily}</div>
+                <div class="focus-summary-line"><strong>Recorded today:</strong> ${todayWins.length} task completions · <strong>Lucky Zone estimate:</strong> about ${lzMinutes} min across ${registeredCount} registered character${registeredCount===1?'':'s'} (3 solo runs × ~8 min each; not tracked)</div>
                 ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,3).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
                 ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
@@ -6174,7 +6204,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 
                 const prioHTML = p.length ? p.map(i => `<div class="missed-item"><div><strong>${escapeHTML(i.t)}</strong><div style="color:#aaa;font-size:0.75rem;">${i.c}/${i.e||i.c||i.m} completed • ${i.m} still open • ${i.x} N/A • L${i.w}${i.completionPatternBonus ? ' • learned completion pattern' : ''}</div></div><div style="background:#262630;padding:5px;border-radius:5px;color:#ffd27d;font-weight:bold;">P${i.sc}</div></div>`).join('') : '<div class="missed-item" style="color:#b5e5c5;">No priorities yet.</div>';
 
-                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge">★ MAIN</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${prioHTML}</div>`;
+                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:#aaa;margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:#aaa;margin-bottom:4px;">Loot-Weighted Priorities</div>${prioHTML}</div>`;
                 cont.appendChild(card);
             });
         }
@@ -6797,7 +6827,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const chars = filter === 'all' ? registered : registered.filter(character => character.rosterId === filter);
             list.innerHTML = chars.length ? chars.map(c => {
                 const job = getCharacterJob(c.name), meta = getJobMeta(job);
-                return `<tr class="${c.isMain ? 'is-main-character' : ''}"><td><strong>${escapeHTML(c.name)}${c.isMain ? ' <span class="main-character-badge">★ MAIN</span>' : ''}</strong></td><td class="class-setup-owner">${escapeHTML(c.rosterName)}</td><td><select class="class-setup-select" data-class-char="${escapeHTML(c.name)}" onchange="setCharacterJob('${escapeHTML(c.name)}', this.value)">${buildJobOptions(job)}</select></td><td>${meta ? escapeHTML(meta.className) : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? '<span class="class-setup-status ok">Configured</span>' : '<span class="class-setup-status missing">Needs Job</span>'}</td></tr>`;
+                return `<tr class="${c.isMain ? 'is-main-character' : ''}"><td><strong>${escapeHTML(c.name)}${c.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</strong></td><td class="class-setup-owner">${escapeHTML(c.rosterName)}</td><td><select class="class-setup-select" data-class-char="${escapeHTML(c.name)}" onchange="setCharacterJob('${escapeHTML(c.name)}', this.value)">${buildJobOptions(job)}</select></td><td>${meta ? escapeHTML(meta.className) : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? `<span class="team-badge position">${escapeHTML(meta.raidPosition)}</span>` : '<span class="team-unknown">Not set</span>'}</td><td>${meta ? '<span class="class-setup-status ok">Configured</span>' : '<span class="class-setup-status missing">Needs Job</span>'}</td></tr>`;
             }).join('') : '<tr><td colspan="6" style="color:#8b92a0;padding:16px;text-align:center;">No characters in this roster.</td></tr>';
             updateClassSetupSummary();
         }
@@ -7799,7 +7829,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
                     const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Not tracked; still available in Team Builder'}`;
-                    return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main">★ MAIN</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
+                    return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main" title="Main character" aria-label="Main character">★</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
                 const removeMemberButton = isPantheonAdmin() && !isAdminViewAsActive() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
                 const directoryActions = isAdminViewAsActive() ? '' : `<div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div>`;
