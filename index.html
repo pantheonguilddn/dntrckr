@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r2</title>
+    <title>Pantheon Tools v1.6.8-r3</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1888,7 +1888,7 @@ body.admin-view-as-active .admin-preview-disable { pointer-events:none !importan
 
 
 <style id="pantheon-v168-r2-styles">
-/* v1.6.8-r2: compact character guidance; no global typography-size changes. */
+/* v1.6.8-r3: compact character guidance; no global typography-size changes. */
 .weekly-plan-card-compact { padding:13px 15px !important; display:grid; gap:9px !important; }
 .focus-summary-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 .focus-summary-head h3 { margin:2px 0 0 !important; font-size:.9rem !important; }
@@ -1965,6 +1965,216 @@ body.developer-mode-active .app-page :where(h1,h2,h3,h4,p,strong,small,span,div,
 body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 #drawer-developer-mode[aria-pressed="true"] { border-color:var(--pt-accent); background:var(--pt-hover); }
 @media(max-width:640px) { .developer-mode-banner { left:8px; right:8px; bottom:8px; max-width:none; flex-wrap:wrap; } }
+</style>
+
+
+<style id="pantheon-v168-r3-layout-and-contrast">
+/* v1.6.8-r3: preserve font sizes; fix only component layout and foreground/background pairings. */
+.overview-dashboard-head-r2 { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:stretch !important; gap:12px !important; }
+.overview-dashboard-head-r2 > .overview-header-banner,
+.overview-dashboard-head-r2 > .overview-profile-chip-r2 { min-width:0; width:100% !important; max-width:none; height:auto; min-height:168px !important; max-height:none; margin:0 !important; box-sizing:border-box; }
+.overview-dashboard-head-r2 > .overview-header-banner { align-self:stretch; padding:10px !important; display:flex !important; align-items:center; justify-content:center; }
+.overview-dashboard-head-r2 > .overview-header-banner .overview-banner { height:100% !important; min-height:0 !important; max-height:none !important; object-fit:contain !important; }
+.overview-dashboard-head-r2 > .overview-header-banner .overview-banner[hidden] { display:none !important; }
+.overview-dashboard-head-r2 .overview-profile-chip-r2 { display:grid !important; grid-template-rows:auto auto auto; align-content:center; gap:9px !important; padding:11px 12px !important; }
+.overview-profile-chip-r2 .overview-profile-main { min-width:0; width:100%; gap:9px; }
+.overview-profile-chip-r2 .overview-profile-actions { margin-left:auto; flex-shrink:0; }
+.overview-profile-status-row.overview-status-row-r2 { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:0 !important; }
+.overview-profile-status-row.overview-status-row-r2 .overview-status-card { padding:7px 6px !important; gap:5px; align-items:flex-start; }
+.overview-profile-status-row.overview-status-row-r2 .overview-status-symbol { width:21px !important; height:21px !important; flex:0 0 21px !important; font-size:.62rem !important; }
+.overview-profile-status-row.overview-status-row-r2 .overview-status-label { letter-spacing:.035em !important; }
+.overview-profile-status-row.overview-status-row-r2 .overview-status-card strong { overflow-wrap:anywhere; }
+.overview-profile-status-row.overview-status-row-r2 .overview-status-card small { overflow-wrap:anywhere; }
+.overview-profile-widget-row.overview-widget-row-r2 { display:flex; flex-wrap:wrap; gap:6px; margin:0 !important; }
+.overview-profile-widget-row.overview-widget-row-r2 .overview-mini-widget { min-width:0; }
+.overview-dashboard-head-r2 .overview-banner-fallback { min-height:0; }
+@media(max-width:900px) {
+  .overview-dashboard-head-r2 { grid-template-columns:minmax(0,1fr); }
+  .overview-dashboard-head-r2 > .overview-header-banner { min-height:135px !important; }
+  .overview-dashboard-head-r2 > .overview-profile-chip-r2 { min-height:0 !important; }
+}
+@media(max-width:560px) {
+  .overview-profile-status-row.overview-status-row-r2 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .overview-profile-status-row.overview-status-row-r2 .overview-status-card { flex-direction:column; }
+  .overview-profile-status-row.overview-status-row-r2 .overview-status-card small { display:none; }
+  .overview-profile-chip-r2 .overview-profile-main { flex-wrap:wrap; }
+}
+
+/* A centered, useful roster rather than a narrow floating strip on the far left. */
+.online-presence-pane[hidden] { display:none !important; }
+.online-presence-pane { position:relative !important; inset:auto !important; transform:none !important; z-index:30; width:min(920px,calc(100% - 32px)); max-width:920px; max-height:none !important; margin:12px auto 16px !important; display:flex; flex-direction:column; border:1px solid var(--pt-border); border-radius:12px; overflow:hidden; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 5px 18px rgba(0,0,0,.08); }
+.online-event-notice { display:block; padding:8px 12px; border-bottom:1px solid var(--pt-border); background:var(--pt-notice-gradient); text-align:center; white-space:normal; overflow:visible; text-overflow:clip; line-height:1.4; }
+.online-event-notice.is-event-live { color:var(--pt-positive) !important; }
+.online-presence-head { border-bottom:1px solid var(--pt-border); }
+.online-presence-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; padding:9px; overflow:auto; max-height:240px; }
+.online-presence-group { min-width:0; padding:0 8px; }
+.online-presence-group + .online-presence-group { border-left:1px solid var(--pt-border); }
+.online-presence-group-title { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:4px 2px 7px; color:var(--pt-text); font-size:.63rem; font-weight:900; border-bottom:1px solid var(--pt-border); margin-bottom:3px; }
+.online-presence-group-title b { display:inline-flex; align-items:center; justify-content:center; min-width:21px; padding:2px 6px; border-radius:999px; background:var(--pt-surface-soft); color:var(--pt-text); font-size:.58rem; }
+.online-presence-user { min-width:0; }
+.online-presence-user.is-offline { opacity:1; }
+.online-presence-user.is-offline .online-presence-user-dot { background:#87909d; box-shadow:none; }
+.online-presence-state { flex:0 0 auto; color:var(--pt-muted); font-size:.55rem; }
+.online-presence-admin { color:var(--pt-accent) !important; }
+.online-presence-foot { text-align:center; padding:7px 10px; }
+.online-presence-pane.is-collapsed .online-presence-list,.online-presence-pane.is-collapsed .online-presence-foot { display:none; }
+.online-presence-pane.is-collapsed { max-height:none !important; }
+@media(max-width:700px) { .online-presence-list { grid-template-columns:minmax(0,1fr); } .online-presence-group { padding:0 2px; } .online-presence-group + .online-presence-group { border-left:0; border-top:1px solid var(--pt-border); margin-top:8px; padding-top:8px; } }
+
+/* Older inline helper labels were authored for dark surfaces. Use the theme's readable muted tone on light themes. */
+:root[data-pantheon-theme="light"] [style*="color:#c7cad1"],:root[data-pantheon-theme="light"] [style*="color: #c7cad1"],
+:root[data-pantheon-theme="eye-comfort"] [style*="color:#c7cad1"],:root[data-pantheon-theme="eye-comfort"] [style*="color: #c7cad1"],
+:root[data-pantheon-theme="pastel"] [style*="color:#c7cad1"],:root[data-pantheon-theme="pastel"] [style*="color: #c7cad1"],
+:root[data-pantheon-theme="light"] [style*="color:#c1c7d3"],:root[data-pantheon-theme="eye-comfort"] [style*="color:#c1c7d3"],:root[data-pantheon-theme="pastel"] [style*="color:#c1c7d3"],
+:root[data-pantheon-theme="light"] [style*="color:#9ba2b0"],:root[data-pantheon-theme="eye-comfort"] [style*="color:#9ba2b0"],:root[data-pantheon-theme="pastel"] [style*="color:#9ba2b0"],
+:root[data-pantheon-theme="light"] [style*="color:#9aa0aa"],:root[data-pantheon-theme="eye-comfort"] [style*="color:#9aa0aa"],:root[data-pantheon-theme="pastel"] [style*="color:#9aa0aa"],
+:root[data-pantheon-theme="light"] [style*="color:#8b92a0"],:root[data-pantheon-theme="eye-comfort"] [style*="color:#8b92a0"],:root[data-pantheon-theme="pastel"] [style*="color:#8b92a0"],
+:root[data-pantheon-theme="light"] [style*="color:#b8beca"],:root[data-pantheon-theme="eye-comfort"] [style*="color:#b8beca"],:root[data-pantheon-theme="pastel"] [style*="color:#b8beca"],
+:root[data-pantheon-theme="light"] [style*="color:#8f98aa"],:root[data-pantheon-theme="eye-comfort"] [style*="color:#8f98aa"],:root[data-pantheon-theme="pastel"] [style*="color:#8f98aa"] { color:var(--pt-muted) !important; opacity:1 !important; }
+:root[data-pantheon-theme="light"] .class-setup-status.missing,:root[data-pantheon-theme="eye-comfort"] .class-setup-status.missing,:root[data-pantheon-theme="pastel"] .class-setup-status.missing { color:#795900 !important; }
+:root[data-pantheon-theme="light"] .card-wiki-selected-stats > span[style*="color:#8f98aa"],
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-selected-stats > span[style*="color:#8f98aa"],
+:root[data-pantheon-theme="pastel"] .card-wiki-selected-stats > span[style*="color:#8f98aa"] { color:var(--pt-muted) !important; }
+
+/* Card Database cards previously retained dark surfaces while the theme changed text to dark.
+   Keep number/stat badges deliberately dark with white text, and theme all surrounding surfaces. */
+:root[data-pantheon-theme="light"] .card-wiki-tile,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-tile,
+:root[data-pantheon-theme="pastel"] .card-wiki-tile { background:linear-gradient(155deg,var(--pt-surface-raised),var(--pt-surface)) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-tile-head,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-tile-head,
+:root[data-pantheon-theme="pastel"] .card-wiki-tile-head { background:var(--pt-surface-soft) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-card-name,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-card-name,
+:root[data-pantheon-theme="pastel"] .card-wiki-card-name { color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-card-meta,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-card-meta,
+:root[data-pantheon-theme="pastel"] .card-wiki-card-meta,
+:root[data-pantheon-theme="light"] .card-wiki-preview-row span:first-child,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preview-row span:first-child,
+:root[data-pantheon-theme="pastel"] .card-wiki-preview-row span:first-child { color:var(--pt-muted) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preview-row strong,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preview-row strong,
+:root[data-pantheon-theme="pastel"] .card-wiki-preview-row strong { color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-tile-foot,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-tile-foot,
+:root[data-pantheon-theme="pastel"] .card-wiki-tile-foot { background:var(--pt-surface-soft) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-copy-button,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-copy-button,
+:root[data-pantheon-theme="pastel"] .card-wiki-copy-button { background:var(--pt-surface) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-panel,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-panel,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-panel,
+:root[data-pantheon-theme="light"] .card-wiki-preset-panel,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset-panel,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset-panel { background:var(--pt-surface) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-group,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-group,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-group { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-group-head,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-group-head,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-group-head { border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-group-title,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-group-title,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-group-title { color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-group-subtitle,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-group-subtitle,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-group-subtitle { color:var(--pt-muted) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-option,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-option,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-option { background:var(--pt-surface) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-option:has(input:checked),
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-option:has(input:checked),
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-option:has(input:checked),
+:root[data-pantheon-theme="light"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="pastel"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="light"] .card-wiki-selected-tag,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-selected-tag,
+:root[data-pantheon-theme="pastel"] .card-wiki-selected-tag { background:var(--pt-accent-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-accent) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-group-options,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-group-options,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-group-options { color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-selected-none,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-selected-none,
+:root[data-pantheon-theme="pastel"] .card-wiki-selected-none { color:var(--pt-muted) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-number,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-number,
+:root[data-pantheon-theme="pastel"] .card-wiki-number,
+:root[data-pantheon-theme="light"] .card-wiki-result-number,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-result-number,
+:root[data-pantheon-theme="pastel"] .card-wiki-result-number { background:#465778 !important; color:#fff !important; border-color:#7183a2 !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-value,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-value,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-value { background:#465778 !important; color:#fff !important; border-color:#7183a2 !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stat-value strong,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stat-value strong,
+:root[data-pantheon-theme="pastel"] .card-wiki-stat-value strong { color:#fff !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stats-table th,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stats-table th,
+:root[data-pantheon-theme="pastel"] .card-wiki-stats-table th { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-stats-table td,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stats-table td,
+:root[data-pantheon-theme="pastel"] .card-wiki-stats-table td,
+:root[data-pantheon-theme="light"] .card-wiki-stats-table td:first-child,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-stats-table td:first-child,
+:root[data-pantheon-theme="pastel"] .card-wiki-stats-table td:first-child { background:var(--pt-surface) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-rarity-magic,
+:root[data-pantheon-theme="eye-comfort"] .card-rarity-magic,
+:root[data-pantheon-theme="pastel"] .card-rarity-magic { color:#176544 !important; }
+:root[data-pantheon-theme="light"] .card-rarity-rare,
+:root[data-pantheon-theme="eye-comfort"] .card-rarity-rare,
+:root[data-pantheon-theme="pastel"] .card-rarity-rare { color:#245da8 !important; }
+:root[data-pantheon-theme="light"] .card-rarity-epic,
+:root[data-pantheon-theme="eye-comfort"] .card-rarity-epic,
+:root[data-pantheon-theme="pastel"] .card-rarity-epic { color:#8c4b00 !important; }
+:root[data-pantheon-theme="light"] .card-rarity-unique,
+:root[data-pantheon-theme="eye-comfort"] .card-rarity-unique,
+:root[data-pantheon-theme="pastel"] .card-rarity-unique { color:#6f3d91 !important; }
+:root[data-pantheon-theme="light"] .card-rarity-legend,
+:root[data-pantheon-theme="eye-comfort"] .card-rarity-legend,
+:root[data-pantheon-theme="pastel"] .card-rarity-legend { color:#ac2c2c !important; }
+
+/* Card Database search-result rows and presets use matching theme surfaces too. */
+:root[data-pantheon-theme="light"] .card-wiki-result-row,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-result-row,
+:root[data-pantheon-theme="pastel"] .card-wiki-result-row { background:linear-gradient(110deg,var(--pt-surface-raised),var(--pt-surface)) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-result-row:hover,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-result-row:hover,
+:root[data-pantheon-theme="pastel"] .card-wiki-result-row:hover { background:var(--pt-hover) !important; border-color:var(--pt-accent) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-result-name,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-result-name,
+:root[data-pantheon-theme="pastel"] .card-wiki-result-name { color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-cap-tag,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-cap-tag,
+:root[data-pantheon-theme="pastel"] .card-wiki-cap-tag { background:var(--pt-surface-soft) !important; color:var(--pt-muted) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset { background:var(--pt-surface-raised) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset:has(input:checked),
+:root[data-pantheon-theme="pastel"] .card-wiki-preset:has(input:checked) { background:var(--pt-accent-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-accent) !important; box-shadow:inset 3px 0 var(--pt-accent) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-preset small,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-preset small,
+:root[data-pantheon-theme="pastel"] .card-wiki-preset small { color:var(--pt-muted) !important; }
+:root[data-pantheon-theme="light"] .card-wiki-table-wrap,
+:root[data-pantheon-theme="eye-comfort"] .card-wiki-table-wrap,
+:root[data-pantheon-theme="pastel"] .card-wiki-table-wrap { border-color:var(--pt-border) !important; }
+
+/* Character Activity & Priorities: clearer interpretation without making the panel louder. */
+.focus-model-explainer { margin:0 !important; color:var(--pt-muted); font-size:.64rem; line-height:1.45; }
+.focus-character-chips { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); align-items:stretch; gap:6px; }
+.focus-character-chip { display:grid; grid-template-columns:minmax(0,1fr); align-content:start; gap:5px; min-width:0; padding:8px 9px; border-radius:10px; white-space:normal; }
+.focus-character-chip-head,.focus-character-chip-progress { display:flex; align-items:flex-start; justify-content:space-between; gap:6px; min-width:0; }
+.focus-character-chip-head strong { min-width:0; color:var(--pt-text); font-size:.64rem; font-weight:900; overflow-wrap:anywhere; }
+.focus-character-chip-role { flex:0 0 auto; color:var(--pt-muted); font-size:.53rem; font-weight:800; text-align:right; }
+.focus-character-chip-progress span { min-width:0; color:var(--pt-muted); font-size:.57rem; overflow-wrap:anywhere; }
+.focus-character-chip-progress b { flex:0 0 auto; color:var(--pt-text); font-size:.64rem; font-weight:900; }
+.focus-character-chip-trend { color:var(--pt-muted); font-size:.54rem; line-height:1.35; overflow-wrap:anywhere; }
+.focus-character-chip.is-main { background:var(--pt-accent-soft); }
+.focus-model-summary { color:var(--pt-text); font-size:.61rem; font-weight:800; line-height:1.45; }
+.focus-model-summary span { color:var(--pt-muted); font-weight:600; }
+@media(max-width:560px) { .focus-character-chips { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); } }
 </style>
 
 </head>
@@ -2073,20 +2283,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="drawer-scrim" id="drawer-scrim" hidden onclick="toggleSideMenu(false)"></div>
 
     <div class="developer-mode-banner" id="developer-mode-banner" hidden><strong>Developer Mode</strong><span>Click static text to edit · format and font sizes stay intact</span><button type="button" onclick="toggleDeveloperMode()">Turn off</button></div>
-    <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Members currently using Pantheon Tools">
-        <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Online now</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse online list" onclick="toggleOnlinePresencePane()">−</button></div>
-        <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading active members…</div></div>
-        <div class="online-presence-foot">Active tab · updates live</div>
+    <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Guild event notice and member presence">
+        <div class="overview-event-notice online-event-notice" id="overview-event-notice">Guild events · Check the Tracker for current priorities</div>
+        <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Guild activity</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div>
+        <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading member activity…</div></div>
+        <div class="online-presence-foot">Approved Pantheon accounts · status updates live</div>
     </aside>
 
     <main id="overview-page" class="app-page overview-page">
         <section class="overview-dashboard-head overview-dashboard-head-r2">
-            <section class="overview-feature-banner overview-header-banner" aria-label="Guild banner and event notice">
-                <div class="overview-event-notice" id="overview-event-notice">Guild events · Check the Tracker for current priorities</div>
+            <section class="overview-feature-banner overview-header-banner" aria-label="Pantheon guild banner">
                 <img class="overview-banner" src="Guild%20Banner.png" alt="Pantheon guild banner" onerror="this.hidden=true;const fallback=this.parentElement.querySelector('.overview-banner-fallback');if(fallback)fallback.hidden=false;">
                 <div class="overview-banner-fallback" hidden><img src="guild-logo.png" alt=""><div><strong>Pantheon Tools</strong><small>Dragon Nest - Classic SEA [Guild Operations]</small></div></div>
             </section>
-            <div class="overview-profile-chip overview-profile-chip-r2" aria-label="Signed-in Discord account">
+            <div class="overview-profile-chip overview-profile-chip-r2" aria-label="Signed-in account and workspace status">
                 <div class="overview-profile-main">
                     <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
                     <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
@@ -2095,17 +2305,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <button type="button" id="overview-signout" class="overview-signout">Log out</button>
                     </div>
                 </div>
+                <div class="overview-profile-status-row overview-status-row-r2" aria-label="Workspace status">
+                    <div class="overview-status-card" title="Shared guild data connection"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
+                    <div class="overview-status-card" title="Latest synchronization state"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
+                    <div class="overview-status-card" title="Your authenticated access level"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
+                </div>
+                <div class="overview-profile-widget-row overview-widget-row-r2" aria-label="Quick help and account tools">
+                    <button class="overview-mini-widget" id="overview-help-widget" type="button" onclick="runWelcomeShortcut('help')"><span aria-hidden="true">?</span><strong>Help &amp; Guide</strong><small>Quick guide</small></button>
+                    <button class="overview-mini-widget overview-ledger-widget" id="overview-ledger-widget" type="button" onclick="openScholarModal()" hidden><span aria-hidden="true">💰</span><strong>Ledger</strong><small>Shared salary records</small></button>
+                </div>
             </div>
         </section>
-        <div class="overview-profile-status-row overview-status-row-r2" aria-label="Workspace status">
-            <div class="overview-status-card" title="Shared guild data connection"><span class="overview-status-symbol" aria-hidden="true">☁</span><div><span class="overview-status-label">Shared Data</span><strong id="overview-shared-value">Checking...</strong><small id="overview-shared-detail">Checking the shared workspace</small></div></div>
-            <div class="overview-status-card" title="Latest synchronization state"><span class="overview-status-symbol" aria-hidden="true">↻</span><div><span class="overview-status-label">Sync Status</span><strong id="overview-sync-value">Checking...</strong><small id="overview-sync-detail">Reading the latest sync state</small></div></div>
-            <div class="overview-status-card" title="Your authenticated access level"><span class="overview-status-symbol" aria-hidden="true">♙</span><div><span class="overview-status-label">Permissions</span><strong id="overview-permissions-value">Member</strong><small id="overview-permissions-detail">Authenticated guild account</small></div></div>
-        </div>
-        <div class="overview-profile-widget-row overview-widget-row-r2" aria-label="Quick help and account tools">
-            <button class="overview-mini-widget" id="overview-help-widget" type="button" onclick="runWelcomeShortcut('help')"><span aria-hidden="true">?</span><strong>Help &amp; Guide</strong><small>Quick guide</small></button>
-            <button class="overview-mini-widget overview-ledger-widget" id="overview-ledger-widget" type="button" onclick="openScholarModal()" hidden><span aria-hidden="true">💰</span><strong>Ledger</strong><small>Shared salary records</small></button>
-        </div>
         <div class="overview-section-title"><span>Your guild workspace</span><span class="overview-tool-count">Available to your account</span></div>
         <section class="overview-tools-grid" aria-label="Pantheon tool overview">
             <button class="overview-tool-card" type="button" onclick="runWelcomeShortcut('tracker-personal')"><span class="overview-tool-arrow" aria-hidden="true">↗</span><span class="overview-tool-icon" aria-hidden="true">▤</span><strong>Tracker &amp; Bounties</strong><span>Review daily and weekly tasks, bounty targets, completion rates, and guild progress.</span></button>
@@ -2409,7 +2619,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
                 <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r2 feedback update:</strong> adaptive character focus, cleaner Overview banner, online presence, and admin-only text editing.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r3 feedback update:</strong> adaptive character focus, cleaner Overview banner, online presence, and admin-only text editing.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5096,20 +5306,27 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (pane) pane.classList.toggle('is-collapsed', onlinePresenceCollapsed);
             if (button) { button.textContent = onlinePresenceCollapsed ? '+' : '−'; button.setAttribute('aria-expanded', String(!onlinePresenceCollapsed)); button.setAttribute('aria-label', onlinePresenceCollapsed ? 'Expand online list' : 'Collapse online list'); }
         }
-        function renderOnlinePresence(users, status='') {
+        function renderOnlinePresence(users, status = '') {
             const list = document.getElementById('online-presence-list');
             const count = document.getElementById('online-presence-count');
             if (!list || !count) return;
-            const clean = Array.isArray(users) ? users : [];
-            count.textContent = status || `${clean.length} online`;
-            if (!clean.length) { list.innerHTML = `<div class="online-presence-empty">${escapeHTML(status || 'No active members detected')}</div>`; return; }
+            const clean = (Array.isArray(users) ? users : []).filter(user => user && (user.id || user.label || user.username));
+            const hasStatus = clean.some(user => Object.prototype.hasOwnProperty.call(user, 'online'));
+            const isOnline = user => user.online === true || user.online === 1 || user.online === '1';
+            const onlineUsers = hasStatus ? clean.filter(isOnline) : clean;
+            const offlineUsers = hasStatus ? clean.filter(user => !isOnline(user)) : [];
             const selfId = String(pantheonDiscordUser?.id || '');
-            list.innerHTML = clean.map(user => {
+            const row = (user, online) => {
                 const own = String(user.id || '') === selfId;
-                const label = String(user.label || user.username || 'Member');
-                return `<div class="online-presence-user"><span class="online-presence-user-dot"></span><span class="online-presence-user-name" title="${escapeHTML(label)}">${escapeHTML(label)}${own ? ' <em>You</em>' : ''}</span>${user.role === 'admin' ? '<span class="online-presence-admin">ADMIN</span>' : ''}</div>`;
-            }).join('');
+                const label = String(user.label || user.username || 'Discord member');
+                return `<div class="online-presence-user ${online ? '' : 'is-offline'}"><span class="online-presence-user-dot"></span><span class="online-presence-user-name" title="${escapeHTML(label)}">${escapeHTML(label)}${own ? ' <em>You</em>' : ''}</span>${online && user.role === 'admin' ? '<span class="online-presence-admin">ADMIN</span>' : `<span class="online-presence-state">${online ? 'Online' : 'Offline'}</span>`}</div>`;
+            };
+            const onlineHtml = status ? '<div class="online-presence-empty">Presence data is unavailable.</div>' : (onlineUsers.length ? onlineUsers.map(user => row(user, true)).join('') : '<div class="online-presence-empty">No active tabs detected</div>');
+            const offlineHtml = status ? '<div class="online-presence-empty">Account status is currently unknown.</div>' : (hasStatus ? (offlineUsers.length ? offlineUsers.map(user => row(user, false)).join('') : '<div class="online-presence-empty">No offline accounts.</div>') : '<div class="online-presence-empty">Offline status needs the updated presence API.</div>');
+            count.textContent = status ? 'Presence unavailable' : hasStatus ? `${onlineUsers.length} online · ${offlineUsers.length} offline` : `${onlineUsers.length} online · offline list unavailable`;
+            list.innerHTML = `<section class="online-presence-group"><div class="online-presence-group-title"><span>Online</span><b>${status ? '—' : onlineUsers.length}</b></div>${onlineHtml}</section><section class="online-presence-group"><div class="online-presence-group-title"><span>Offline</span><b>${status || !hasStatus ? '—' : offlineUsers.length}</b></div>${offlineHtml}</section>`;
         }
+
         async function refreshOnlinePresence(heartbeat=false) {
             if (!pantheonDiscordUser?.id || onlinePresenceBusy || (document.visibilityState && document.visibilityState !== 'visible')) return;
             onlinePresenceBusy = true;
@@ -5247,11 +5464,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             metrics.forEach(item => {
                 const nextTask = item.pendingTasks[0]?.task || '';
                 if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity) {
-                    priorities.push({ rank: 0, tone:'risk', icon:'◷', label:'No progress recorded', title:`${item.name}${item.isMain ? ' · Main' : ''} has no recorded weekly progress`, body:`Nothing is marked complete for this week yet. If you meant to keep this character active, start with ${nextTask ? `“${nextTask}”` : 'one eligible weekly task'}. If the character is intentionally parked, turn off its Tracker opt-in so it stops looking overdue.`, meta:`0/${item.eligible} eligible tasks complete · this is a prompt, not a judgment` });
+                    priorities.push({ rank: 0, tone:'watch', icon:'◷', label:'No completions yet', title:`${item.name}${item.isMain ? ' · Main' : ''} has no weekly completions recorded yet`, body:`Nothing is marked complete for this week yet. If you meant to keep this character active, start with ${nextTask ? `“${nextTask}”` : 'one eligible weekly task'}. If the character is intentionally parked, turn off its Tracker opt-in so the completion view matches your current rotation.`, meta:`0/${item.eligible} eligible tasks complete · this is a prompt, not a judgment` });
                 } else if (item.eligible > 0 && item.rate < 40) {
-                    priorities.push({ rank: 1, tone:'risk', icon:'!', label:'Low completion', title:`${item.name}${item.isMain ? ' · Main' : ''} is falling behind`, body:`${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). ${nextTask ? `Highest-weight open task to tackle next: “${nextTask}”.` : 'Review remaining eligible tasks before reset.'} If priorities changed, consider pausing tracking instead of carrying this character as an ongoing reminder.`, meta:`${item.pending} outstanding · Bounty tasks excluded` });
+                    priorities.push({ rank: 1, tone:'watch', icon:'!', label:'Several tasks open', title:`${item.name}${item.isMain ? ' · Main' : ''} has ${item.pending} tasks still open`, body:`${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). ${nextTask ? `Highest-weight open task to tackle next: “${nextTask}”.` : 'Review remaining eligible tasks before reset.'} If priorities changed, consider pausing tracking instead of carrying this character as an ongoing reminder.`, meta:`${item.pending} outstanding · Bounty tasks excluded` });
                 } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0) {
-                    priorities.push({ rank: 2, tone:'watch', icon:'↗', label:'Needs a nudge', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A manageable next step is “${nextTask}”, currently among the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} If the character is not a current focus, consider turning off its tracking opt-in.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
+                    priorities.push({ rank: 2, tone:'watch', icon:'↗', label:'Needs a nudge', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A useful next step is “${nextTask}”, currently among the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} If the character is not a current focus, consider turning off its tracking opt-in.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
                 }
                 if (item.trend !== null && item.trend <= -20) {
                     priorities.push({ rank: 1, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, a changed priority, or simply a missed update. Review the next reset cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
@@ -5285,7 +5502,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             let completionHtml = '';
             if (sortedMetrics.length) {
                 completionHtml = sortedMetrics.map(item => {
-                    const badge = item.done === 0 && !item.thisWeekActivity ? ['No activity','risk'] : item.rate < 40 ? ['At risk','risk'] : item.rate < 70 ? ['Watch','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
+                    const badge = item.done === 0 && !item.thisWeekActivity ? ['Quiet so far','watch'] : item.rate < 40 ? ['A few completed','watch'] : item.rate < 70 ? ['In progress','watch'] : item.pending === 0 ? ['Complete','good'] : ['On pace','good'];
                     const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
                     const pendingName = item.pendingTasks[0]?.task;
                     const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
@@ -5372,7 +5589,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const nextReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
             const minsLeft = Math.max(0, Math.round((nextReset - now) / 60000));
             const hoursLeft = minsLeft / 60;
-            const urgency = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? '2 days left' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : 'New cycle';
+            const urgency = hoursLeft <= 2 ? 'Reset soon' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? '2 days left' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : 'New cycle';
             const recent = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-3);
             const signals = profiles.map(profile => {
                 let validWeeks = 0, weeksWithProgress = 0, done = 0, missed = 0;
@@ -5394,23 +5611,29 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     if (state === 'done') currentDone++;
                     else if (state !== 'excluded') currentOpen++;
                 });
-                const currentRate = currentDone + currentOpen ? Math.round(currentDone / (currentDone + currentOpen) * 100) : null;
+                const currentEligible = currentDone + currentOpen;
+                const currentRate = currentEligible ? Math.round(currentDone / currentEligible * 100) : null;
+                const archivedRates = recent.map(([,archive]) => safeObject(archive.rates)[profile.name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
+                const trend = archivedRates.length >= 2 ? Math.round(archivedRates[archivedRates.length - 1] - archivedRates[archivedRates.length - 2]) : null;
                 const regular = !profile.isMain && validWeeks >= 2 && (weeksWithProgress >= 2 || (done >= 4 && weeksWithProgress >= 1));
                 const emerging = !profile.isMain && !regular && (currentDone >= 2 || (weeksWithProgress >= 1 && done >= 2));
                 const reviewNA = profile.trackerEnabled && validWeeks >= 3 && !regular && !emerging && missed >= 3;
-                const signalScore = (weeksWithProgress * 5) + (done * 0.45) + (currentDone * 0.8) + (profile.isMain ? 100 : 0) + (regular ? 10 : emerging ? 4 : 0);
-                return { ...profile, validWeeks, weeksWithProgress, done, missed, currentRate, regular, emerging, reviewNA, signalScore };
+                const signalScore = (weeksWithProgress * 5) + (done * 0.45) + (currentDone * 0.8) + (profile.isMain ? 100 : 0) + (regular ? 10 : emerging ? 4 : 0) + (trend === null ? 0 : Math.max(-5, Math.min(5, trend * 0.12)));
+                return { ...profile, validWeeks, weeksWithProgress, done, missed, currentDone, currentEligible, currentRate, trend, regular, emerging, reviewNA, signalScore };
             }).sort((a,b)=>b.signalScore-a.signalScore);
             const main = signals.find(item => item.isMain);
             const focus = signals.filter(item => item.isMain || item.regular || item.emerging).slice(0,3);
             const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'Learning your rotation';
-            const chips = signals.slice(0, Math.min(6, signals.length)).map(item => {
-                const status = item.reviewNA ? 'Review N/A' : item.isMain ? 'Main' : item.regular ? 'Regular' : item.emerging ? 'Emerging' : item.trackerEnabled ? 'Learning' : 'Off';
+            const chips = signals.slice(0, Math.min(8, signals.length)).map(item => {
+                const status = item.reviewNA ? 'Review rotation' : item.isMain ? 'Main focus' : item.regular ? 'Regular' : item.emerging ? 'Building' : item.trackerEnabled ? 'Learning' : 'Paused';
                 const rate = item.currentRate === null ? '—' : `${item.currentRate}%`;
-                return `<span class="focus-character-chip ${item.isMain?'is-main':''} ${item.reviewNA?'is-review':''}" title="${escapeHTML(status)}">${escapeHTML(item.name)} <b>${rate}</b></span>`;
+                const trendText = item.trend === null ? 'History building' : item.trend > 0 ? `Up ${item.trend} pts` : item.trend < 0 ? `Down ${Math.abs(item.trend)} pts` : 'Steady';
+                const weeklyText = item.currentEligible ? `${item.currentDone}/${item.currentEligible} weekly tasks` : 'No eligible weekly tasks';
+                return `<div class="focus-character-chip ${item.isMain?'is-main':''} ${item.reviewNA?'is-review':''}" title="${escapeHTML(status)}"><div class="focus-character-chip-head"><strong>${escapeHTML(item.name)}</strong><span class="focus-character-chip-role">${escapeHTML(status)}</span></div><div class="focus-character-chip-progress"><span>${escapeHTML(weeklyText)}</span><b>${rate}</b></div><div class="focus-character-chip-trend">${escapeHTML(trendText)} · ${item.weeksWithProgress}/${item.validWeeks || 0} recent weeks active</div></div>`;
             }).join('');
             const reviewNA = signals.filter(item => item.reviewNA && !item.isMain);
-            const reviewText = reviewNA.length ? `Review N/A for ${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''} if they're genuinely out of rotation.` : '';
+            const reviewText = reviewNA.length ? `Consider N/A for ${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''} if they're no longer part of your rotation.` : '';
+            const activitySummary = `Activity pattern: ${signals.filter(item=>item.isMain).length} Main · ${signals.filter(item=>item.regular).length} regular · ${signals.filter(item=>item.emerging).length} building · ${signals.filter(item=>item.trackerEnabled && !item.isMain && !item.regular && !item.emerging).length} learning`;
             const itemEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).itemDrop, now);
             const enhanceEvent = getRateUpWindow(normalizeRateUpEvents(cloudData.settings.rateUpEvents).enhancement, now);
             const manilaDOW = getManilaDateParts(now).weekday;
@@ -5430,11 +5653,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const panel = document.createElement('section');
             panel.className = 'weekly-plan-card weekly-plan-card-compact';
             panel.innerHTML = `
-                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character pulse</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
-                <div class="focus-summary-line"><strong>Focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Learning priorities</span>' : ''}</div>
-                ${chips ? `<div class="focus-character-chips">${chips}${signals.length>6?`<span class="focus-character-more">+${signals.length-6}</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to start building a personal focus.</div>'}
+                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity &amp; Priorities</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
+                <p class="focus-model-explainer">A rolling read of each character’s completion, recent activity, and likely rotation. The focus adjusts as weekly history builds; low-activity characters are suggestions to review, not automatic N/A changes.</p>
+                <div class="focus-summary-line"><strong>Current focus:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Building history</span>' : ''}</div>
+                ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to start building a personal focus.</div>'}
+                ${signals.length ? `<div class="focus-model-summary">${escapeHTML(activitySummary)} <span>· ${recent.length} weekly archive${recent.length===1?'':'s'} available</span></div>` : ''}
                 ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
-                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} completed · <strong>Tomorrow:</strong> ${lzMinutes}m Lucky Zones (${registeredCount} characters), ${pendingDaily} tracked daily task${pendingDaily===1?'':'s'} left, then raids if time remains.</div>
+                <div class="focus-summary-line"><strong>Today:</strong> ${todayWins.length} tracked completions · <strong>Tomorrow:</strong> reserve ${lzMinutes}m for Lucky Zones (${registeredCount} characters), then ${pendingDaily} open tracked daily task${pendingDaily===1?'':'s'} before planning raids around remaining time.</div>
                 ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,2).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
                 ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
@@ -7439,7 +7664,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r2';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r3';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

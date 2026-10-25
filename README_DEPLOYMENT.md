@@ -1,6 +1,12 @@
-# Pantheon Tools v1.6.8-r2 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r3 UI refinements
 
-## v1.6.8-r2 update
+This package remains branched from the stable v1.6.8 base. It restores a side-by-side Overview banner and a consolidated account/status/Ledger card, moves the shared event notice above the centered online/offline account roster, improves Light/Eye Saver/Pastel Card Database contrast without changing font sizes, clarifies Character Activity & Priorities, and softens completion wording. The presence API now returns all enabled allowlisted accounts with an online flag; it reuses the existing D1 tables and requires no schema migration. Deploy this ZIP as a unit so the page and presence endpoint stay in sync.
+
+---
+
+# Pantheon Tools v1.6.8-r3 — Cloudflare Pages + D1
+
+## v1.6.8-r3 update
 
 - Compact adaptive character-focus summary that learns from archived weekly completions and flags possible out-of-rotation characters for manual N/A review.
 - Shared online-presence pane using authenticated session heartbeats.

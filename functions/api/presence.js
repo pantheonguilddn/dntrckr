@@ -8,28 +8,33 @@ async function ensurePresenceTable(env) {
     last_seen_at INTEGER NOT NULL
   )`).run();
 }
-async function listActiveUsers(env, now = Date.now()) {
+
+// Return every currently enabled Pantheon account so the UI can distinguish online and offline.
+// Online requires both a recent heartbeat and a valid, unexpired session.
+async function listAuthorizedUsers(env, now = Date.now()) {
   const cutoff = now - ONLINE_WINDOW_MS;
   const result = await env.PANTHEON_DB.prepare(`
-    SELECT p.discord_id AS id,
+    SELECT a.discord_id AS id,
            COALESCE(NULLIF(a.label, ''), NULLIF(p.username, ''), 'Discord member') AS label,
-           p.username AS username,
+           COALESCE(NULLIF(p.username, ''), '') AS username,
            a.role AS role,
-           p.last_seen_at AS lastSeenAt
-    FROM user_presence p
-    JOIN allowed_users a ON a.discord_id = p.discord_id
+           COALESCE(p.last_seen_at, 0) AS lastSeenAt,
+           CASE WHEN p.last_seen_at >= ?
+                     AND EXISTS (SELECT 1 FROM sessions s WHERE s.discord_id = a.discord_id AND s.expires_at > ?)
+                THEN 1 ELSE 0 END AS online
+    FROM allowed_users a
+    LEFT JOIN user_presence p ON p.discord_id = a.discord_id
     WHERE a.enabled = 1
-      AND p.last_seen_at >= ?
-      AND EXISTS (SELECT 1 FROM sessions s WHERE s.discord_id = p.discord_id AND s.expires_at > ?)
-    ORDER BY p.last_seen_at DESC
-    LIMIT 50
+    ORDER BY online DESC, label COLLATE NOCASE ASC
+    LIMIT 100
   `).bind(cutoff, now).all();
   return (result.results || []).map(row => ({
     id: String(row.id || ''),
     label: String(row.label || row.username || 'Discord member'),
     username: String(row.username || ''),
     role: row.role === 'admin' ? 'admin' : 'member',
-    lastSeenAt: Number(row.lastSeenAt) || 0
+    lastSeenAt: Number(row.lastSeenAt) || 0,
+    online: Number(row.online) === 1
   }));
 }
 
@@ -37,9 +42,9 @@ export async function onRequestGet({ env, data }) {
   if (!data?.session) return jsonResponse({ error: 'Authentication required.' }, 401);
   try {
     await ensurePresenceTable(env);
-    return jsonResponse({ users: await listActiveUsers(env) });
+    return jsonResponse({ users: await listAuthorizedUsers(env) });
   } catch (_) {
-    return jsonResponse({ error: 'Could not read online presence.' }, 503);
+    return jsonResponse({ error: 'Could not read member presence.' }, 503);
   }
 }
 
@@ -53,10 +58,10 @@ export async function onRequestPost({ env, data }) {
       INSERT INTO user_presence (discord_id, username, last_seen_at) VALUES (?, ?, ?)
       ON CONFLICT(discord_id) DO UPDATE SET username = excluded.username, last_seen_at = excluded.last_seen_at
     `).bind(String(session.discordId), String(session.username || session.label || '').slice(0,100), now).run();
-    // Prune long-idle rows; this list contains only actively heartbeating, authorized accounts.
+    // Keep recent history only; enabled accounts without a recent heartbeat remain visible as offline.
     await env.PANTHEON_DB.prepare('DELETE FROM user_presence WHERE last_seen_at < ?').bind(now - 7 * 24 * 60 * 60 * 1000).run();
-    return jsonResponse({ ok: true, users: await listActiveUsers(env, now) });
+    return jsonResponse({ ok: true, users: await listAuthorizedUsers(env, now) });
   } catch (_) {
-    return jsonResponse({ error: 'Could not update online presence.' }, 503);
+    return jsonResponse({ error: 'Could not update member presence.' }, 503);
   }
 }
