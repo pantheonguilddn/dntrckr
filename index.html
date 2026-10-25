@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r4</title>
+    <title>Pantheon Tools v1.6.8-r5</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2195,7 +2195,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   background:linear-gradient(130deg,var(--pt-accent-soft),var(--pt-surface-soft)) !important;
   color:var(--pt-text) !important; border:0 !important; border-bottom:2px solid var(--pt-accent) !important;
   text-align:center !important; white-space:normal !important; overflow:visible !important; text-overflow:clip !important;
-  font-size:.76rem !important; font-weight:900 !important; line-height:1.4 !important; overflow-wrap:anywhere;
+  font-size:.65rem !important; font-weight:850 !important; line-height:1.4 !important; overflow-wrap:anywhere;
   box-shadow:inset 0 3px 0 var(--pt-accent);
 }
 #online-presence-pane .online-event-notice::before { content:'GUILD EVENT NOTICE'; display:block; margin:0 0 5px; color:var(--pt-accent) !important; font-size:.58rem; font-weight:950; letter-spacing:.13em; }
@@ -2346,6 +2346,66 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .focus-character-chip-role { background:var(--pt-surface-soft); border-radius:5px; padding:2px 4px; color:var(--pt-text) !important; }
 </style>
 
+
+<style id="pantheon-v168-r5-presence-theme-audit">
+/* The larger rail should remain near the content gutter while leaving room for names. */
+@media (min-width:1320px) {
+  body { padding-left:clamp(392px,calc((100vw - 1800px)/2 + 390px),470px) !important; }
+  #online-presence-pane { left:clamp(44px,calc((100vw - 1800px)/2 + 44px),100px) !important; width:330px !important; max-width:330px !important; }
+}
+#online-presence-pane .online-presence-list { grid-template-columns:minmax(0,1fr) !important; max-height:min(58vh,560px) !important; }
+#online-presence-pane .online-presence-group { padding:0 8px !important; }
+#online-presence-pane .online-presence-group + .online-presence-group { border-left:0 !important; border-top:1px solid var(--pt-border); margin-top:8px; padding-top:8px !important; }
+#online-presence-pane .online-presence-user { align-items:flex-start; }
+#online-presence-pane .online-presence-user-name { min-width:0; flex:1 1 auto; white-space:normal !important; overflow:visible !important; text-overflow:clip !important; overflow-wrap:anywhere !important; word-break:normal; line-height:1.4; }
+#online-presence-pane .online-presence-admin,
+#online-presence-pane .online-presence-state { flex:0 0 auto; white-space:nowrap; margin-top:1px; }
+#online-presence-pane .online-presence-user-dot { margin-top:.42em; }
+#online-presence-pane .online-event-notice[hidden] { display:none !important; }
+#online-presence-pane .online-event-notice { font-size:.65rem !important; }
+@media (max-width:1319px) {
+  #online-presence-pane { width:100% !important; max-width:100% !important; }
+  #online-presence-pane .online-presence-list { grid-template-columns:minmax(0,1fr) !important; max-height:min(52vh,420px) !important; }
+}
+@media (max-width:700px) {
+  #online-presence-pane .online-presence-list { grid-template-columns:minmax(0,1fr) !important; max-height:min(48vh,320px) !important; }
+}
+
+/* The Team Builder count was a pale amber text over a pale surface in light themes. */
+:root[data-pantheon-theme="light"] #class-setup-count.builder-alert-count,
+:root[data-pantheon-theme="eye-comfort"] #class-setup-count.builder-alert-count,
+:root[data-pantheon-theme="pastel"] #class-setup-count.builder-alert-count {
+  display:inline-flex; align-items:center; padding:2px 6px; border:1px solid #b08b35; border-radius:6px;
+  background:#fff0c9 !important; color:#634500 !important; -webkit-text-fill-color:#634500 !important;
+  font-weight:800 !important;
+}
+
+/* Keep shared dialogs readable when older inline styles were authored for dark backgrounds. */
+:root[data-pantheon-theme="light"] .card-batch-modal .card-batch-form > label,
+:root[data-pantheon-theme="eye-comfort"] .card-batch-modal .card-batch-form > label,
+:root[data-pantheon-theme="pastel"] .card-batch-modal .card-batch-form > label { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] #scholar-modal .scholar-balance-card,
+:root[data-pantheon-theme="eye-comfort"] #scholar-modal .scholar-balance-card,
+:root[data-pantheon-theme="pastel"] #scholar-modal .scholar-balance-card { background:var(--pt-surface-soft) !important; color:var(--pt-text) !important; border-color:var(--pt-border) !important; }
+:root[data-pantheon-theme="light"] #scholar-modal .scholar-balance-card [style*="#d29034"],
+:root[data-pantheon-theme="eye-comfort"] #scholar-modal .scholar-balance-card [style*="#d29034"],
+:root[data-pantheon-theme="pastel"] #scholar-modal .scholar-balance-card [style*="#d29034"] { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] #scholar-modal .scholar-val,
+:root[data-pantheon-theme="eye-comfort"] #scholar-modal .scholar-val,
+:root[data-pantheon-theme="pastel"] #scholar-modal .scholar-val { color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; }
+:root[data-pantheon-theme="light"] #scholar-modal .btn-estate,
+:root[data-pantheon-theme="eye-comfort"] #scholar-modal .btn-estate,
+:root[data-pantheon-theme="pastel"] #scholar-modal .btn-estate { background:var(--pt-accent-soft) !important; color:var(--pt-text) !important; -webkit-text-fill-color:var(--pt-text) !important; border:1px solid var(--pt-accent) !important; }
+:root[data-pantheon-theme="light"] .salary-receipt .receipt-negative,
+:root[data-pantheon-theme="pastel"] .salary-receipt .receipt-negative { color:#81274d !important; -webkit-text-fill-color:#81274d !important; }
+:root[data-pantheon-theme="light"] .salary-receipt .receipt-positive,
+:root[data-pantheon-theme="pastel"] .salary-receipt .receipt-positive { color:#165646 !important; -webkit-text-fill-color:#165646 !important; }
+:root[data-pantheon-theme="eye-comfort"] .salary-receipt .receipt-highlight { color:#3d522c !important; -webkit-text-fill-color:#3d522c !important; }
+:root[data-pantheon-theme="eye-comfort"] .salary-receipt .receipt-positive { color:#245b37 !important; -webkit-text-fill-color:#245b37 !important; }
+
+/* Preserve the original typographic scale; these are foreground/background corrections only. */
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2453,7 +2513,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
     <div class="developer-mode-banner" id="developer-mode-banner" hidden><strong>Developer Mode</strong><span>Click static text to edit · format and font sizes stay intact</span><button type="button" onclick="toggleDeveloperMode()">Turn off</button></div>
     <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Guild event notice and member presence">
-        <div class="overview-event-notice online-event-notice" id="overview-event-notice">Guild events · Check the Tracker for current priorities</div>
+        <div class="overview-event-notice online-event-notice" id="overview-event-notice" hidden>Guild events · Check the Tracker for current priorities</div>
         <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Guild activity</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div>
         <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading member activity…</div></div>
         <div class="online-presence-foot">Approved Pantheon accounts · status updates live</div>
@@ -2786,9 +2846,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r5</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r4 feedback update:</strong> better left-side presence placement, stronger event notice, theme contrast, and clearer character activity signals.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r5 feedback update:</strong> wider left-side member list with full names, live Rate-Up countdown only during active events, and cross-theme contrast corrections while preserving the original text sizes.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5522,6 +5582,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             window.addEventListener('focus', () => refreshOnlinePresence(true));
         }
 
+        let overviewEventCountdownTimer = null;
+        function formatEventTimeRemaining(milliseconds) {
+            const totalMinutes = Math.max(0, Math.ceil(milliseconds / 60000));
+            if (totalMinutes <= 0) return 'ending now';
+            const days = Math.floor(totalMinutes / 1440);
+            const hours = Math.floor((totalMinutes % 1440) / 60);
+            const minutes = totalMinutes % 60;
+            if (days > 0) return `${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m remaining`;
+            if (hours > 0) return `${hours}h ${String(minutes).padStart(2, '0')}m remaining`;
+            return `${minutes}m remaining`;
+        }
         function updateOverviewEventNotice() {
             const el = document.getElementById('overview-event-notice');
             if (!el) return;
@@ -5530,12 +5601,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const item = getRateUpWindow(events.itemDrop, now);
             const enhance = getRateUpWindow(events.enhancement, now);
             const parts = [];
-            if (item.status === 'active') parts.push('＋50% Item Drop LIVE');
-            else if (item.status === 'upcoming' && item.start-now <= 72*60*60*1000) parts.push(`＋50% Item Drop ${formatManilaStamp(item.start)}`);
-            if (enhance.status === 'active') parts.push('＋30% Enhancement LIVE');
-            else if (enhance.status === 'upcoming' && enhance.start-now <= 72*60*60*1000) parts.push(`＋30% Enhancement ${formatManilaStamp(enhance.start)}`);
-            el.textContent = parts.length ? parts.join('  ·  ') : 'Guild operations · Check the Tracker for current priorities';
-            el.classList.toggle('is-event-live', item.status === 'active' || enhance.status === 'active');
+            if (item.status === 'active' && item.end > now) parts.push(`＋50% Item Drop · ${formatEventTimeRemaining(item.end - now)}`);
+            if (enhance.status === 'active' && enhance.end > now) parts.push(`＋30% Enhancement · ${formatEventTimeRemaining(enhance.end - now)}`);
+            const active = parts.length > 0;
+            el.textContent = parts.join('   |   ');
+            el.hidden = !active;
+            el.setAttribute('aria-label', active ? `Active guild events: ${parts.join('; ')}` : 'No active rate-up event');
+            el.classList.toggle('is-event-live', active);
+            // Countdown changes only while an event is active. Keep the label current without relying on a page refresh.
+            if (!overviewEventCountdownTimer) overviewEventCountdownTimer = window.setInterval(updateOverviewEventNotice, 30000);
         }
 
         function updateOverviewProfile(user) {
@@ -7847,7 +7921,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r4';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r5';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

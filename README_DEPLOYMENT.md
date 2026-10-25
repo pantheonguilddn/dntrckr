@@ -1,38 +1,23 @@
-# Pantheon Tools v1.6.8-r4 UI refinements
+# Pantheon Tools v1.6.8-r5 — Cloudflare Pages + D1
 
-This package remains branched from the stable v1.6.8 base. It restores a side-by-side Overview banner and a consolidated account/status/Ledger card, docks the online/offline roster on the left at a comfortable inset on desktop, makes the event notice prominent, improves Quick Build Filters and Member Roster contrast in Light/Eye Comfort/Pastel without changing font sizes, and makes Character Activity & Completion more direct about missed ticks versus sustained low activity. The presence API now returns all enabled allowlisted accounts with an online flag; it reuses the existing D1 tables and requires no schema migration. Deploy this ZIP as a unit so the page and presence endpoint stay in sync.
+This release remains based directly on the stable v1.6.8 branch. It refines the existing UI and keeps the original package structure; it does not incorporate the later v1.6.9 or v1.7.x code branches.
+
+## v1.6.8-r5 update
+
+- Expanded the left-side Online/Offline roster to 330px on desktop, stacked the Online and Offline groups for legibility, and allowed long names to wrap rather than clip. Narrow screens keep the roster in normal page flow.
+- The Rate-Up notice is shown only while at least one configured event is active. It displays the remaining time for +50% Item Drop and/or +30% Enhancement, updates every 30 seconds, and disappears when no event is active.
+- Audited all five main pages and the app's dialogs across Dark, Light, Eye Comfort, and Pastel, with representative Card Database results, Member Roster/Main badges, and Team Builder status content. Corrected the Team Builder alert badge, Card Batch modal labels, Salary Calculator result colors, and Ledger surfaces/buttons that still relied on dark-theme text colors.
+- Reverted the recent event-banner text-size increase; font scale is otherwise unchanged. Readability fixes use appropriate foreground/background pairs, not larger typography.
+- Updated the release title and dismissal version so the compact What's New popup identifies v1.6.8-r5.
+- Applied the same theme contrast safeguard to the Admin Console's return link. No data schema change is required.
+
+## Deployment notes
+
+Deploy the ZIP as a unit so `index.html`, `admin.html`, and the authenticated `/api/presence` endpoint stay in sync. The presence roster uses approved accounts and the existing session/D1 setup. No database migration is needed. Administrator-only tools remain protected by the existing server-side role checks; this release does not grant or alter account permissions.
+
+The standalone HTML is useful for inspection, but presence and cloud-backed features require the Cloudflare Pages deployment and its authenticated API. Live Cloudflare/D1/Discord end-to-end tests were not performed as part of this build.
 
 ---
-
-# Pantheon Tools v1.6.8-r4 — Cloudflare Pages + D1
-
-## v1.6.8-r4 update
-
-- Character Activity & Completion separates possible missed weekly ticks from repeated low recorded activity where weekly history is sufficient, and explicitly states when the tracker cannot know if unrecorded play happened.
-- Shared online-presence pane using authenticated session heartbeats.
-- Admin-only Developer Mode edits text nodes only; typography, styling, and layout remain CSS-controlled. Overrides are shared and protected from member syncs.
-- Overview banner remains beside the consolidated account/status/Ledger/Logout card. The event notice is larger and more prominent. The online/offline rail is positioned on the left with a gutter so it does not sit at the far viewport edge. If `Guild Banner.png` is absent, the branded fallback uses `guild-logo.png`.
-- Ledger remains restricted to Bio, Cheean, and Cho; View As remains admin-only.
-
-
-## Feedback update built directly from the stable v1.6.8 baseline
-
-- Retains the v1.6.8 package layout and does not inherit later-version implementations. Adds a small authenticated `/api/presence` endpoint for live usage indicators; existing cloud sync and admin role checks remain in place.
-- Improves Light, Eye Comfort, and Pastel readability through stronger text contrast and font weight only. Existing font sizes are preserved; layout changes are limited to the requested panel placement and visibility fixes.
-- Adds clearer Main-character borders/badges across Tracker, analytics, Member Roster, Class Setup, and Team Builder, while preserving the Main flag during the baseline roster migration.
-- Adds administrator-only, read-only **View As Member** for the member’s Tracker, analytics, and Member Roster data (registered characters, Main designation, and class details). The admin role remains enforced by the existing server-side session; this release does not grant admin privileges. In v1.6.8, theme choice and Team Builder slots/format/preferences are browser-local, so View As simulates the theme and replaces Team Builder with a limitation notice rather than claiming to read another member’s local layout.
-- Adds an administrator-only shared scheduler for +50% Item Drop Rate UP and +30% Enhancement Rate UP, with weekend windows (Saturday 00:00 to Monday 00:00 Manila time) or custom Manila-time windows. Non-admin cloud writes preserve the existing shared event settings and update metadata; dedicated timestamps prevent stale cache merges from rolling the schedule back.
-- Adds reset-aware analytics with today’s recorded wins, Saturday-reset urgency, and tomorrow planning. Lucky Zones remain intentionally outside the Tracker and completion percentage; the plan reserves about 24 minutes per registered character (three solo runs at approximately eight minutes each) before tracked daily chores and then remaining-time raid recommendations.
-
-## v1.6.8 Team Builder roster separation
-
-- Team Builder now lists every named character profile in the canonical Member Roster, regardless of Tracker opt-in.
-- The **Include in Tracker** checkbox controls Tracker participation only; it does not control Team Builder eligibility.
-- Class Setup uses the canonical Member Roster directory, so classes can be configured for characters not opted into Tracker.
-- Updated current-facing roster and help text to explain the distinction. The What's New popup is kept compact: a short tool description plus this release's main change. This package is based directly on v1.6.8 and does not carry forward later package changes.
-
-
-This release refines the Overview into a compact account-and-status header and a two-column personal dashboard. Activity Insights and Character Completion are separate panels; Help & Guide and the authorized Ledger are compact account-area widgets; and Shared Data, Sync Status, and Permissions sit beside the logged-in Discord profile. The Tools sidebar remains administrator-only with its launcher in the Admin Console.
 
 ## v1.6.3 Version History theme contrast
 

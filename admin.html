@@ -81,6 +81,12 @@ html[data-pantheon-theme="light"] .badge,html[data-pantheon-theme="eye-comfort"]
 .tool-launcher-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.tool-launcher-link{display:flex;flex-direction:column;gap:5px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);text-decoration:none;font-size:12px;font-weight:850;transition:border-color .15s,transform .15s}.tool-launcher-link:hover{border-color:var(--accent);transform:translateY(-1px)}.tool-launcher-link small{font-size:10px;font-weight:500;color:var(--muted);line-height:1.5}.tool-launcher-intro{font-size:11px;color:var(--muted);line-height:1.65}@media(max-width:760px){.tool-launcher-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:470px){.tool-launcher-grid{grid-template-columns:1fr}}
 </style>
 
+<style id="pantheon-admin-r5-theme-contrast">
+/* Explicitly pair the return link's text and surface for every appearance. */
+html[data-pantheon-theme="light"] header .toplink,
+html[data-pantheon-theme="eye-comfort"] header .toplink,
+html[data-pantheon-theme="pastel"] header .toplink { background:var(--surface2) !important; color:var(--text) !important; border-color:var(--border) !important; }
+</style>
 </head>
 <body>
 <main>
