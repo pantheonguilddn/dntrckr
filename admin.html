@@ -98,6 +98,17 @@ html[data-pantheon-theme="pastel"] header .toplink { background:var(--surface2) 
 :root[data-pantheon-theme] .class-setup-table tr.is-main-character td,:root[data-pantheon-theme] .team-table tr.is-main-character td { background:var(--pt-main-fill) !important; border-top:1px solid var(--pt-border) !important; border-bottom:1px solid var(--pt-border) !important; color:var(--pt-text) !important; }
 </style>
 
+
+<style id="pantheon-admin-r10-revoke-contrast">
+/* The Revoke action uses a red fill, so keep its label white in every theme. */
+html[data-pantheon-theme] #allowlist-list .btn.danger {
+  background: #a64052 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: #bd5365 !important;
+}
+html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { background: #913747 !important; }
+</style>
 </head>
 <body>
 <main>

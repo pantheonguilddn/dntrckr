@@ -1,6 +1,13 @@
-# Pantheon Tools v1.6.8-r9 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r10 — Cloudflare Pages + D1
 
 This release remains based directly on the stable v1.6.8 branch. It refines the existing UI and keeps the original package structure; it does not incorporate the later v1.6.9 or v1.7.x code branches.
+
+
+## v1.6.8-r10 theme text contrast fix
+
+- Fixed non-Main character names in the 5-Week Trend cards: every IGN now uses the selected theme's foreground color instead of the legacy hard-coded white. This applies to Dark, Light, Eye Comfort, and Pastel and does not change font sizes or card layout.
+- Fixed the Admin Console's Revoke button so its red fill always has white, readable text in all themes.
+- No data schema, API, permission, or cloud-record changes.
 
 ## v1.6.8-r9 responsive layout and weekly pacing update
 
