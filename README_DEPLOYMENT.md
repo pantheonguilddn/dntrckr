@@ -1,6 +1,27 @@
-# Pantheon Tools v1.6.8-r10 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r12 — Cloudflare Pages + D1
 
-This release remains based directly on the stable v1.6.8 branch. It refines the existing UI and keeps the original package structure; it does not incorporate the later v1.6.9 or v1.7.x code branches.
+This release continues directly from the stable v1.6.8 branch. It preserves the original package structure and does not import code from later v1.6.9 or v1.7.x branches.
+
+## v1.6.8-r12 activity reward/effort profiles
+
+- Keeps global Loot Weights unchanged. The separate personalized `P` recommendation score combines the shared `L` weight with activity-specific reward utility, effort/resource cost, accessibility, weekly-objective value, and per-character history.
+- Adds a flexible progression profile for Abyssal Mire: the stated 2F + 5F route yields 2,000 points with a further 3,000-point Saturday reset payout (5,000 total); known shop uses include Essence of Life (240), Polished Diamond (300), Flawless Diamond (300), Crystal of Power (30), Job Change Scroll (18,000), cosmetics/mounts, and Paculta suffix materials.
+- Adds a weekly-objective profile for Green Dragon Classic, centered on Essence of Life and Polished Diamond, and a cost-sensitive Green Dragon Hardcore profile that weighs the 36g final chest, useful High Grade Legend Codes, and L Accessories against seal-stamp cost.
+- Adds separate value profiles for DDN HC carry/service potential, Black Dragon Level 70 endgame, weekly Dragon Fellowship Heraldry pouch progression, and Theme Park efficiency from the once-weekly x5 Jelly opportunity. The model does not assume Jelly is available for every run.
+- Corrects content tiers so a task labelled Classic is not automatically treated as high difficulty. Successful clears are evaluated for that exact activity; absence of a clear does not automatically mean the character cannot clear it.
+- Reduces unproven-clear penalties for activities known to be carryable, and removes the automatic stronger penalty based only on a configured DPS role. The learning model still uses saved outcomes and N/A history, and becomes more reliable with several archived weeks.
+- Adds compact value notes to Analytics recommendations and a planning hint for the once-weekly x5 Jelly opportunity. Dragon Fellowship is treated as a weekly Heraldry activity. The tool does not read gear, shop balances, Jelly stock, current market prices, or whether a carry is currently available; profiles are starting estimates rather than live inventory valuation.
+- No data schema, API, or permission changes. The existing 31 package entries and paths are preserved. Live Cloudflare Pages, D1, and Discord-session end-to-end tests were not performed.
+
+## Historical: v1.6.8-r11 personalized task recommendation layer
+
+- Keeps global Loot Weights fixed and shared. The existing weight values are unchanged; the character-specific `P` score is calculated after the global loot-weighted task score.
+- Adds a separate character/task fit modifier based on archived per-task outcomes, recent clears, current-week state, N/A history, and evidence that the character has completed other tasks.
+- A recent clear modestly strengthens recommendations for content the character has demonstrated it can complete. Proven recurring activity on accessible tasks (for example, farming tasks such as Abyssal Mire) receives a smaller fit bonus.
+- For a non-Main character, repeated archived misses on high-demand tasks with no recorded clear can lower that task's recommendation when other-task completions demonstrate the character was active. DPS-role characters receive a stronger provisional reduction after at least three archived observations. This is only a heuristic about demonstrated activity; it does not claim the character is undergeared or incapable.
+- Main characters receive a modest nudge toward high-demand content. The tool does not treat missing clear history alone as proof of inability. Tasks currently marked done or N/A are not shown as next actions.
+- Adds a compact explanation of `L` (global Loot Weight) and `P` (personalized priority score), and revises the Analytics help text to explain the distinction.
+- No schema, API, permissions, or cloud-record structure changes. Existing weekly archives are reused; weekly analytics must be enabled and several saved weeks help the model make stronger distinctions.
 
 
 ## v1.6.8-r10 theme text contrast fix
