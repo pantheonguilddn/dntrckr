@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r13</title>
+    <title>Pantheon Tools v1.6.8-r14</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3058,9 +3058,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r13</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r14</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r13 update:</strong> added centered class labels below Tracker character names for faster roster identification.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r14 update:</strong> restricted Reset Bounty status to bounty-list rows and made bounty target assignment and clearing follow each character’s marked dungeon.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3301,10 +3301,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <h4>Tracker & Bounty Checker</h4>
                         <p>Use the checkbox to record a completed task. Uncheck it if it was marked by mistake. The weekly reset archives progress, resets weekly states, and clears bounty target text for a clean new week.</p>
                         <h5>Bounty workflow</h5>
-                        <p>For a dungeon you want to use for a Unique+ bounty, <b>right-click the dungeon cell</b>. It becomes <b>🎯 Marked</b> and the system places that dungeon into the first available bounty target slot.</p>
-                        <p>When you later complete the marked dungeon, checking it can automatically complete the linked bounty slot.</p>
+                        <p>For a dungeon you want to use for a Unique+ bounty, <b>right-click the dungeon cell</b>. It becomes <b>🎯 Marked</b> and the system places that dungeon into the first available, empty bounty target line.</p>
+                        <p>When you later complete the marked dungeon, only its linked bounty line is completed. If you remove the dungeon's bounty mark, the matching target text is cleared.</p>
                         <h5>Right-click states</h5>
-                        <p>Right-click cycles through the special states: <b>Open → 🎯 Marked → 🔄 Reset → N/A → Open</b>.</p>
+                        <p><b>Dungeon rows:</b> Open/Done → 🎯 Marked → N/A → Open. <b>Bounty-list rows:</b> Open/Done → 🎯 Marked → 🔄 Reset Bounty → N/A → Open.</p>
+                        <p>A Marked, Reset Bounty, N/A, or completed bounty line is reserved and will not be overwritten by the next target. Removing a Marked or Reset Bounty state clears that line's target text. Reset Bounty is not available on dungeon rows.</p>
                         <p><b>N/A</b> means the task does not apply to that character. Bounty Claim slots are tracked separately and are <b>not included</b> in weekly completion rate; N/A tasks are also excluded.</p>
                         <div class="help-callout"><b>Easy rule:</b> left-click to record completion. Right-click when you need to mark, reset, or exclude a task.</div>
                     </section>
@@ -5446,7 +5447,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             const canEdit = access.canEdit;
                             const owner = access.owner;
                             if (canEdit) {
-                                td.title = 'Right-click to cycle task status.';
+                                td.title = isBountyListTask(taskName)
+                                    ? 'Right-click to cycle bounty-line status. Reset Bounty reserves this line; removing a mark clears its target text.'
+                                    : 'Right-click to mark a bounty target or set N/A. Reset Bounty is available only on bounty-list lines; removing a target mark clears its linked text.';
                                 td.addEventListener('contextmenu', handleRightClick);
                             } else {
                                 td.classList.add('read-only-cell');
@@ -5480,6 +5483,43 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getCellRecord(c, t) { return cloudData.cells?.[c]?.[t] || { state: 'open', note: '', updatedAt: 0, deviceId: '' }; }
         function getCellState(c, t) { return getCellRecord(c, t).state || 'open'; }
+
+        function getBountyCategory() {
+            return (cloudData.settings?.categories || []).find(cat => String(cat?.name || '').toLowerCase().includes('bounty')) || null;
+        }
+        function isBountyListTask(taskName) {
+            const bountyCategory = getBountyCategory();
+            return !!bountyCategory && (bountyCategory.tasks || []).includes(taskName);
+        }
+        function getTrackerCellState(c, t) {
+            const state = getCellState(c, t);
+            // Older builds could leave 🔄 Reset on dungeon rows. Do not render that state outside the bounty list.
+            return state === 'reset' && !isBountyListTask(t) ? 'open' : state;
+        }
+        function clearBountySlotText(charName, bountyTask) {
+            const note = String(getCellRecord(charName, bountyTask).note || '');
+            if (note) setCellNote(charName, bountyTask, '');
+            const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(String(charName))}"][data-task="${CSS.escape(String(bountyTask))}"]`);
+            if (input) input.value = '';
+        }
+        function clearLinkedBountySlot(charName, dungeonTask) {
+            const bountyCategory = getBountyCategory();
+            if (!bountyCategory) return false;
+            for (const bountyTask of bountyCategory.tasks || []) {
+                if (String(getCellRecord(charName, bountyTask).note || '') !== String(dungeonTask)) continue;
+                clearBountySlotText(charName, bountyTask);
+                return true;
+            }
+            return false;
+        }
+        function findAvailableBountySlot(charName, bountyCategory) {
+            if (!bountyCategory) return null;
+            for (const bountyTask of bountyCategory.tasks || []) {
+                const record = getCellRecord(charName, bountyTask);
+                if (getCellState(charName, bountyTask) === 'open' && !String(record.note || '').trim()) return bountyTask;
+            }
+            return null;
+        }
         
         function setCellState(c, t, state, forcedTime) {
             ensureCellMap(cloudData, c);
@@ -5519,27 +5559,21 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             const prev = getCellState(c, t);
             setCellState(c, t, e.target.checked ? 'done' : 'open');
-            
-            if (e.target.checked && prev === 'marked') {
-                const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
-                if (bCat && !bCat.tasks.includes(t)) {
-                    let targetBounty = null;
-                    
-                    for (const bTask of bCat.tasks) {
-                        const bCell = getCellRecord(c, bTask);
-                        if (bCell.state !== 'done' && bCell.note === t) {
-                            targetBounty = bTask;
-                            break;
-                        }
+
+            // Complete only the bounty line explicitly linked to this marked dungeon.
+            // Never fall back to the first unfinished line: Reset Bounty slots are reserved.
+            if (e.target.checked && prev === 'marked' && !isBountyListTask(t)) {
+                const bountyCategory = getBountyCategory();
+                if (bountyCategory) {
+                    const linkedBounty = (bountyCategory.tasks || []).find(bTask => {
+                        const record = getCellRecord(c, bTask);
+                        const state = getCellState(c, bTask);
+                        return String(record.note || '') === String(t) && ['open', 'marked'].includes(state);
+                    });
+                    if (linkedBounty) {
+                        setCellState(c, linkedBounty, 'done');
+                        updateCellPresentation(c, linkedBounty);
                     }
-                    
-                    if (!targetBounty) {
-                        for (const bTask of bCat.tasks) {
-                            if (getCellState(c, bTask) !== 'done') { targetBounty = bTask; break; }
-                        }
-                    }
-                    
-                    if (targetBounty) { setCellState(c, targetBounty, 'done'); updateCellPresentation(c, targetBounty); }
                 }
             }
             updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerAutoSync();
@@ -5549,56 +5583,54 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const c = e.currentTarget.dataset.char, t = e.currentTarget.dataset.task;
             if (!canEditCharacterProgress(c)) { e.preventDefault(); return; }
             e.preventDefault();
-            const s = getCellState(c, t);
-            const newState = s === 'open' || s === 'done' ? 'marked' : s === 'marked' ? 'reset' : s === 'reset' ? 'excluded' : 'open';
-            setCellState(c, t, newState);
-            
-            const bCat = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
-            
-            // If cycling from marked 🎯 to reset 🔄 (or clearing back to open), auto-clear matching bounty text box
-            if (s === 'marked' && bCat && !bCat.tasks.includes(t)) {
-                for (const bTask of bCat.tasks) {
-                    const bCell = getCellRecord(c, bTask);
-                    if (bCell.note === t) {
-                        setCellNote(c, bTask, '');
-                        const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(bTask)}"]`);
-                        if (input) input.value = '';
-                        break;
-                    }
-                }
-            }
 
-            // Auto-fill the first available bounty text box when pinning (marking 🎯) a dungeon
-            if (newState === 'marked' && bCat && !bCat.tasks.includes(t)) { 
-                for (const bTask of bCat.tasks) {
-                    const bCell = getCellRecord(c, bTask);
-                    if (bCell.state !== 'done' && !bCell.note) {
-                        setCellNote(c, bTask, t);
-                        const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(c)}"][data-task="${CSS.escape(bTask)}"]`);
-                        if (input) input.value = t;
-                        break;
-                    }
+            const rawState = getCellState(c, t);
+            const isBountyRow = isBountyListTask(t);
+            // Legacy Reset state on dungeon cells is treated like Open. Reset now belongs only to bounty rows.
+            const state = (!isBountyRow && rawState === 'reset') ? 'open' : rawState;
+            let newState;
+            if (state === 'open' || state === 'done') newState = 'marked';
+            else if (isBountyRow && state === 'marked') newState = 'reset';
+            else if (state === 'marked' || state === 'reset') newState = 'excluded';
+            else newState = 'open';
+
+            setCellState(c, t, newState);
+            const bountyCategory = getBountyCategory();
+
+            // Removing a dungeon target mark clears exactly the bounty line linked to that dungeon.
+            if (!isBountyRow && state === 'marked') clearLinkedBountySlot(c, t);
+
+            // Removing either special mark from a bounty line clears its own target text.
+            // The Reset state itself remains reserved until the user cycles it through N/A and Open.
+            if (isBountyRow && (state === 'marked' || state === 'reset')) clearBountySlotText(c, t);
+
+            // Assign a newly marked dungeon to the first genuinely available bounty line.
+            // Marked, Reset, N/A, completed, or manually populated lines are never overwritten.
+            if (newState === 'marked' && !isBountyRow && bountyCategory) {
+                const targetBounty = findAvailableBountySlot(c, bountyCategory);
+                if (targetBounty) {
+                    setCellNote(c, targetBounty, t);
+                    const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(String(c))}"][data-task="${CSS.escape(String(targetBounty))}"]`);
+                    if (input) input.value = t;
+                } else {
+                    setStatus('Bounty target marked, but no bounty line is available. Clear or reopen a bounty line before adding another target.');
                 }
             }
 
             updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerAutoSync();
         }
 
-        function renderOverviewIfVisible() {
-            const page = document.getElementById('overview-page');
-            if (page && !page.classList.contains('hidden-page')) renderOverviewActivity();
-        }
         function updateCellPresentation(c, t) {
             const td = document.querySelector(`td.interactive-cell[data-char="${CSS.escape(String(c))}"][data-task="${CSS.escape(String(t))}"]`);
             if (!td) return;
-            const state = getCellState(c, t);
+            const state = getTrackerCellState(c, t);
             ['excluded','marked','reset','done'].forEach(name => td.classList.toggle(name, state === name));
             const cb = td.querySelector('input[type="checkbox"]');
             if (cb) cb.checked = state === 'done';
         }
         function applyBoardState() {
             document.querySelectorAll('td.interactive-cell').forEach(td => {
-                const s = getCellState(td.dataset.char, td.dataset.task);
+                const s = getTrackerCellState(td.dataset.char, td.dataset.task);
                 const cb = td.querySelector('input[type="checkbox"]');
                 td.classList.remove('excluded', 'marked', 'reset', 'done');
                 if (s === 'excluded' || s === 'marked' || s === 'reset' || s === 'done') td.classList.add(s);
@@ -8386,7 +8418,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r13';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r14';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

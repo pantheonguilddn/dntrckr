@@ -1,8 +1,16 @@
-# Pantheon Tools v1.6.8-r13 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r14 — Cloudflare Pages + D1
 
 This release continues directly from the stable v1.6.8 branch. It preserves the original package structure and does not import code from later v1.6.9 or v1.7.x branches.
 
-## v1.6.8-r13 Tracker class labels
+## v1.6.8-r14 bounty mark behavior
+
+- Reset Bounty (🔄) is now available only on rows in the Bounty category. Dungeon rows cycle Open/Done → Marked → N/A → Open and no longer display the Reset state; legacy Reset states on dungeon rows are visually treated as Open.
+- Marking a dungeon fills the first truly available bounty line only: the line must be Open and have no target text. Marked, Reset, N/A, completed, or manually populated lines are skipped, so a Reset Bounty line reserves its slot and new targets move to the next available line.
+- Removing a dungeon's bounty mark clears the matching bounty target textbox. Removing the Marked or Reset status from a bounty-list row clears that row's textbox. Reset rows stay reserved until cycled through N/A and Open.
+- Completing a marked dungeon completes only the matching linked bounty line; the old fallback that could complete an unrelated unfinished bounty slot has been removed.
+- Updates the Tracker & Bounty help text and context tooltips. No schema or API changes. This release is built directly from the v1.6.8-r13 package, with the existing 31 package entries preserved. Live Cloudflare Pages, D1, and Discord-session end-to-end tests were not performed.
+
+## Historical: v1.6.8-r13 Tracker class labels
 
 - Each Tracker character column now shows the IGN on the first line and the configured Job in parentheses on a smaller, centered second line (for example, `Diabolina` / `(Saleana)`).
 - Main-character star remains beside the IGN rather than after the full two-line header.
