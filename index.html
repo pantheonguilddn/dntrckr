@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r21</title>
+    <title>Pantheon Tools v1.6.8-r23</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3105,9 +3105,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r21</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r23</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r21 update:</strong> DDN HC guidance now balances its progression value and accessory upside with a practical group recommendation, without overexplaining the risk.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r23 update:</strong> Tracker saves are more reliable: recent checkbox changes survive refresh, and concurrent syncs no longer let a stale whole-record write undo a newer task update.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3558,6 +3558,50 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         const LEGACY_LOCAL_DATA_KEY = 'pantheon-dn-tracker-data-v4';
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
+        const PENDING_CELL_WRITES_KEY = 'pantheon-pending-cell-writes-v1';
+        function loadPendingCellWrites() {
+            try {
+                const source = JSON.parse(localStorage.getItem(PENDING_CELL_WRITES_KEY) || '{}');
+                const cleaned = {};
+                Object.values(source && typeof source === 'object' ? source : {}).forEach(item => {
+                    if (!item || typeof item !== 'object') return;
+                    const charName = String(item.charName || '').trim(), taskName = String(item.taskName || '').trim();
+                    if (!charName || !taskName) return;
+                    const state = ['open','done','excluded','marked','reset'].includes(item.state) ? item.state : 'open';
+                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || '') };
+                });
+                return cleaned;
+            } catch (_) { return {}; }
+        }
+        let pendingCellWrites = loadPendingCellWrites();
+        function persistPendingCellWrites() {
+            try { localStorage.setItem(PENDING_CELL_WRITES_KEY, JSON.stringify(pendingCellWrites)); } catch (_) {}
+        }
+        function clonePendingCellWrites(source = pendingCellWrites) {
+            try { return JSON.parse(JSON.stringify(source || {})); } catch (_) { return {}; }
+        }
+        function rememberPendingCellWrite(charName, taskName) {
+            const cell = cloudData?.cells?.[charName]?.[taskName];
+            if (!cell) return;
+            const key = JSON.stringify([String(charName), String(taskName)]);
+            pendingCellWrites[key] = { charName: String(charName), taskName: String(taskName), state: String(cell.state || 'open'), note: String(cell.note || '').slice(0,40), updatedAt: Number(cell.updatedAt) || 0, deviceId: String(cell.deviceId || deviceId || '') };
+            persistPendingCellWrites();
+        }
+        function applyPendingCellWrites(candidate, remote, pendingSnapshot) {
+            Object.values(pendingSnapshot || {}).forEach(patch => {
+                if (!patch?.charName || !patch?.taskName || !['open','done','excluded','marked','reset'].includes(patch.state)) return;
+                ensureCellMap(candidate, patch.charName);
+                const current = normalizeCellRecord(candidate.cells[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
+                const remoteCell = normalizeCellRecord(remote?.cells?.[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
+                candidate.cells[patch.charName][patch.taskName] = {
+                    state: patch.state,
+                    note: String(patch.note || '').slice(0,40),
+                    updatedAt: Math.max(Date.now(), (Number(current.updatedAt)||0)+1, (Number(remoteCell.updatedAt)||0)+1, (Number(patch.updatedAt)||0)+1),
+                    deviceId: String(patch.deviceId || deviceId || '')
+                };
+            });
+            return candidate;
+        }
         const JSONBIN_ROOT = '/api/cloud';
         const IDENTITY_KEY = 'pantheon-identity';
         const DISCORD_IDENTITY_ACCOUNT_KEY = 'pantheon-discord-account-id-v1';
@@ -5195,7 +5239,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         // explicit global-impact edit (prepared by prepareGlobalChange)
                         // is versioned.
                         const ext={externalPatch:null};
+                        const pendingWritesSent = clonePendingCellWrites(pendingCellWrites);
                         let candidate=hasMeaningfulLocalData?mergeData(cloudData,remote):remote;
+                        // A local edit is an explicit user action. Reapply it above the latest remote
+                        // cell revision so refreshes and stale tabs cannot silently discard the click.
+                        candidate = applyPendingCellWrites(candidate, remote, pendingWritesSent);
                         candidate = enforceMemberSafeSyncWrite(candidate, remote);
                         let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
@@ -5211,17 +5259,33 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
                             lastSeenRemoteMarker=remoteSyncMarker(latest);unsavedCloudChanges=false;
+                            let cellWriteConflicts = 0;
+                            Object.entries(pendingWritesSent).forEach(([key, patch]) => {
+                                const latestCell = normalizeCellRecord(latest.cells?.[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
+                                const savedAsRequested = latestCell.state === patch.state && latestCell.note === patch.note;
+                                const stillCurrent = pendingCellWrites[key] && Number(pendingCellWrites[key].updatedAt) === Number(patch.updatedAt) && pendingCellWrites[key].state === patch.state && pendingCellWrites[key].note === patch.note;
+                                if (stillCurrent) {
+                                    delete pendingCellWrites[key];
+                                    if (!savedAsRequested) cellWriteConflicts++;
+                                }
+                            });
+                            persistPendingCellWrites();
                             cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();
                             const resetChangesAfterRefresh = checkAutoResets();
                             persistLocalData();
-                            if(remoteChangedSinceUI || resetChangesAfterRefresh) refreshTrackerUI(); else updateOverviewStatusCards();
+                            if(remoteChangedSinceUI || resetChangesAfterRefresh || cellWriteConflicts) refreshTrackerUI(); else updateOverviewStatusCards();
                             applyDeveloperTextOverrides();
                             updateOverviewEventNotice();
                             if(resetChangesAfterRefresh){unsavedCloudChanges=true;setTimeout(()=>forceSync(false),180);}
                             // Revision logging happens after the core sync and can fail safely.
                             if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
                             const flushed=await flushRevisionQueue();
-                            setStatus(showSuccess?'🟢 Cloud Sync Complete':(flushed||!queuedEntries.length?'🟢 Database Synced':'🟢 Database Synced · Revision log pending'));return;
+                            if (cellWriteConflicts) {
+                                setStatus(`🟠 ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} conflicted with a newer save. The latest shared state is shown; please try the task again if needed.`);
+                            } else {
+                                setStatus(showSuccess?'🟢 Cloud Sync Complete':(flushed||!queuedEntries.length?'🟢 Tracker Changes Saved':'🟢 Tracker Changes Saved · Revision log pending'));
+                            }
+                            return;
                         }
                         cloudData=mergeData(cloudData,latest);delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
                     }
@@ -5602,6 +5666,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const cur = cloudData.cells[c][t] || { note: '', updatedAt: 0 };
             cloudData.cells[c][t] = { state, note: cur.note, updatedAt: Math.max(forcedTime || Date.now(), cur.updatedAt + 1), deviceId };
             cloudData.updatedAt = Date.now();
+            rememberPendingCellWrite(c, t);
         }
 
         function setCellNote(c, t, note) {
@@ -5609,6 +5674,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const cur = cloudData.cells[c][t] || { state: 'open', updatedAt: 0 };
             cloudData.cells[c][t] = { state: cur.state, note: String(note).slice(0,40), updatedAt: Math.max(Date.now(), cur.updatedAt + 1), deviceId };
             cloudData.updatedAt = Date.now();
+            rememberPendingCellWrite(c, t);
         }
 
         function handleNoteChange(e) {
@@ -6107,8 +6173,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     ...taskRow,
                     recommendation: buildOverviewTaskRecommendation(character, taskRow.task, archives, recentArchiveEntries)
                 })).sort((a, b) => (b.recommendation.sc - a.recommendation.sc) || (b.recommendation.w - a.recommendation.w) || (b.recommendation.c - a.recommendation.c) || a.task.localeCompare(b.task));
-                item.pendingTasks = rankedTasks;
-                item.nextRecommendation = rankedTasks[0]?.recommendation || null;
+                // Overview must honor the same suppression gate as Tracker Analytics. Otherwise a high-value
+                // but unproven BDN alt could still be named as the next task even when its fit marks it conditional.
+                item.pendingTasks = rankedTasks.filter(taskRow => !taskRow.recommendation.suppress);
+                item.nextRecommendation = item.pendingTasks[0]?.recommendation || null;
                 item.nextTask = item.nextRecommendation?.t || '';
                 item.nextReason = item.nextRecommendation ? getRecommendationPlainReason(item.nextRecommendation) : '';
             });
@@ -6561,8 +6629,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             {
                 key:'black-dragon', match:/(?:black\s+dragon|\bbdn\b)/i, label:'Level 70 endgame · group-sensitive', cadence:'weekly',
                 rewardUtility:1.20, effortMultiplier:1.00, accessibilityMultiplier:1.00, objectiveMultiplier:1.00, resourceMultiplier:1.00,
-                shortNote:'Plan a geared party or guild run. Main is the default focus; an active utility alt may fit if the group needs its role.',
-                detail:'Black Dragon is Level 70 endgame and may take 50 minutes or longer. Prioritize a suitable geared party or guild run for the Main. A secondary can also be worthwhile when its recent activity is strong and its configured utility role is needed by the party. Lower-tier clears do not prove BDN readiness, and no clear history alone is not proof of inability.',
+                shortNote:'Main first. Consider a secondary when its configured raid role is needed and its weekly activity and completions are strong.',
+                detail:'Black Dragon is Level 70 endgame and may take 50 minutes or longer. Prioritize a geared party or guild run for the Main. For an undergeared secondary, evaluate its raid contribution separately from raw DPS: Tank/Provoke and survival first; Debuff/Mobility next; Heal is valuable but MATK-sensitive; then Highlander/Beyond Time and other Utility/Support when the party needs those roles. A secondary is promoted as a recommendation when its role fit is backed by sustained weekly activity and strong completions, or it has a prior BDN clear. A geared group may still bring a DPS alt for a planned late-patch carry, but the tracker cannot infer whether the party has enough damage to do that.',
                 carryPotential:false, endgame:true, roleSensitive:true
             },
             {
@@ -6631,9 +6699,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getActivityReferenceRecommendation(ref) {
             const tip = String(ref?.recommendation || '').trim();
-            // Replace known legacy DDN wording in saved D1 data, while preserving future admin-authored advice.
+            // Normalize known legacy system-generated notes without overwriting new custom Admin guidance.
             if (isDDNHardcoreTask(ref?.name) && /do not plan the rest of the week around|guaranteed clear|prioritize ddn hc as a weekly salary run|failure risk affects scheduling|keep a backup task|weekly salary run:\s*target the evolution hammer and lv 60 legend codes/i.test(tip)) {
                 return 'DDN HC is still worth prioritizing at Level 70. The Evolution Hammer and Lv 60 Legend Codes help keep gear progression moving, with a chance at a Legendary DDN accessory, so line up an 8-player group for your weekly run.';
+            }
+            if (isBlackDragonEndgameTask(ref?.name) && /secondary utility character can also be a good pick|a secondary can also be worthwhile when its recent activity is strong and its configured utility role|this alt has a utility role, but the saved history does not yet show consistently strong activity/i.test(tip)) {
+                return 'BDN is Level 70 endgame and can take 50+ minutes. Main is the default focus. Recommend a secondary when its configured raid role is backed by sustained weekly activity and strong completions, or it has a prior BDN clear. A geared group may still invite a DPS alt for a planned late-patch carry; the tracker cannot assume the party has enough damage.';
             }
             return tip;
         }
@@ -6715,12 +6786,56 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return 'farm';
         }
 
+        // Initial BDN role-fit heuristic based on the guild's current recruitment observations.
+        // It estimates whether an alt can contribute without competing purely on raw DPS; it is not a claim
+        // about exact gear requirements. Class role metadata remains editable in Admin/Role Settings.
+        function getRaidContributionProfile(meta) {
+            const primary = String(meta?.raidPosition || '').trim();
+            const secondary = Array.isArray(meta?.secondaryRoles) ? meta.secondaryRoles.map(String) : [];
+            const roles = [...new Set([primary, ...secondary].filter(Boolean))];
+            const has = (...wanted) => wanted.some(role => roles.includes(role));
+            // Order: survival/provoke first; debuff and mobility next; heal is valuable but MATK-sensitive;
+            // Highlander/Beyond Time and other utility/support are situational party fits; pure DPS is gear-sensitive.
+            if (has('Tank', 'Provoke')) return {
+                key:'survival', label:'Tank / survival', roleText:'Tank / Provoke', rank:1, priorityBonus:7, multiplier:1.18,
+                reason:`${meta?.raidPosition === 'Tank' ? 'This job has a tank role' : 'This job can help cover tank/provoke'}; a geared group may value survival and control even when it is not the highest-DPS character.`
+            };
+            if (has('Debuff', 'Mobility')) return {
+                key:'debuff-mobility', label:'Debuff / Mobility', roleText:roles.filter(role => ['Debuff','Mobility'].includes(role)).join(' / '), rank:2, priorityBonus:6, multiplier:1.17,
+                reason:'This job can contribute debuff or mobility utility that a geared group may value beyond raw damage.'
+            };
+            if (has('Heal')) return {
+                key:'heal', label:'Heal', roleText:'Heal', rank:3, priorityBonus:5, multiplier:1.14,
+                reason:'This job can fill a Heal slot, but its healing output remains MATK-sensitive, so the party should confirm it can sustain the group.'
+            };
+            if (has('Highlander')) return {
+                key:'highlander', label:'Highlander utility', roleText:'Highlander', rank:4, priorityBonus:5, multiplier:1.14,
+                reason:`${jobRoleName(meta)} brings Highlander utility alongside damage; this can make the alt useful to the right raid composition even without top-end DPS gear.`
+            };
+            if (has('Beyond Time')) return {
+                key:'beyond-time', label:'Beyond Time utility', roleText:'Beyond Time', rank:4, priorityBonus:5, multiplier:1.14,
+                reason:'This job offers Beyond Time utility that may be valuable to a raid composition, depending on the party setup.'
+            };
+            if (has('Utility', 'Support')) return {
+                key:'utility-support', label:'Utility / Support', roleText:roles.filter(role => ['Utility','Support'].includes(role)).join(' / '), rank:5, priorityBonus:4, multiplier:1.12,
+                reason:'This job adds utility or support beyond personal damage; it can be a good fit when the geared party specifically needs that contribution.'
+            };
+            return {
+                key:'dps', label:'DPS', roleText:'DPS', rank:6, priorityBonus:0, multiplier:1,
+                reason:'This job is primarily a damage slot, so BDN fit relies more on demonstrated raid readiness or a geared group able to carry the slot.'
+            };
+        }
+
+        function jobRoleName(meta) {
+            return String(meta?.job || meta?.name || '').trim() || 'This job';
+        }
+
         function getCharacterRaidUtilityContext(character, taskName, archiveEntries, recentArchiveEntries) {
             const job = String(getCharacterJob(character?.name) || '').trim();
-            const meta = job ? getJobMeta(job) : null;
+            const meta = job ? { ...getJobMeta(job), job } : null;
             const roles = [meta?.raidPosition, ...(Array.isArray(meta?.secondaryRoles) ? meta.secondaryRoles : [])].filter(Boolean);
-            const utilityRoles = new Set(['Utility', 'Support', 'Heal', 'Tank', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Provoke']);
-            const utilityRole = roles.some(role => utilityRoles.has(role));
+            const contribution = getRaidContributionProfile(meta);
+            const utilityRole = contribution.key !== 'dps';
             const weeks = (Array.isArray(recentArchiveEntries) && recentArchiveEntries.length ? recentArchiveEntries : (archiveEntries || []).slice(-3)).slice(-3);
             let usableWeeks = 0, activeWeeks = 0, totalDone = 0, totalEligible = 0;
             const weeklyRates = [];
@@ -6754,16 +6869,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const highActivity = activeWeeks >= 2 || currentDone >= 4;
             const highPerformance = (weeklyRates.length >= 2 && archivedAverage >= 0.55) || (currentDone >= 4 && currentRate >= 0.55);
             const qualifies = !!(utilityRole && highActivity && highPerformance);
+            const roleDescription = contribution.reason.replace(/^This job/, job || 'This character').replace(/^This character/, job || 'This character');
             return {
                 job, roleLabel: meta?.raidPosition || (roles[0] || ''), utilityRole,
+                contributionKey:contribution.key, contributionLabel:contribution.label, contributionRoleText:contribution.roleText,
+                contributionRank:contribution.rank, contributionPriorityBonus:contribution.priorityBonus,
+                contributionMultiplier:contribution.multiplier, contributionReason:roleDescription,
                 highActivity, highPerformance, qualifies, usableWeeks, activeWeeks,
                 averageRate: archivedAverage === null ? null : Math.round(archivedAverage * 100),
                 currentRate: Math.round(currentRate * 100), currentDone, currentEligible,
                 reason: qualifies
-                    ? `${job} is configured with raid utility and recent Tracker history shows consistent activity and good completion performance.`
+                    ? `${roleDescription} Recent Tracker history also shows consistent activity and good completion performance, so this alt can be worth a geared BDN slot when the party needs this role.`
                     : utilityRole
-                        ? `${job} has a configured utility role, but the available Tracker history does not yet show both sustained activity and strong completion performance.`
-                        : 'This character does not currently have a configured utility/support role that gives it a specific BDN composition advantage.'
+                        ? `${roleDescription} This is a possible role fit, not proof of BDN readiness; the current activity history is not strong enough to recommend spending 50+ minutes on the run yet.`
+                        : 'This character has no configured role fit beyond DPS. Without a prior BDN clear or a specific invitation from a geared group, this should not be a default next-step recommendation.'
             };
         }
 
@@ -6778,13 +6897,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 raidRole: raidUtility.roleLabel,
                 raidJob: raidUtility.job,
                 utilityRole: raidUtility.utilityRole,
+                raidContributionKey: raidUtility.contributionKey,
+                raidContributionLabel: raidUtility.contributionLabel,
+                raidContributionRoleText: raidUtility.contributionRoleText,
+                raidContributionRank: raidUtility.contributionRank,
+                raidContributionReason: raidUtility.contributionReason,
                 highRaidActivity: raidUtility.highActivity,
                 highRaidPerformance: raidUtility.highPerformance,
                 raidUtilityEligible: raidUtility.qualifies,
                 raidActivityRate: raidUtility.averageRate,
                 raidCurrentRate: raidUtility.currentRate,
-                // Group-sensitive baseline: Main gets the primary BDN attempt; a proven utility alt gets a smaller route in.
-                priorityBonus: character?.isMain ? 6 : raidUtility.qualifies ? 5 : 0
+                // Main remains the default BDN target. A secondary gains a role-weighted bonus only
+                // when the configured raid contribution is paired with strong, sustained Tracker activity.
+                priorityBonus: character?.isMain ? 6 : raidUtility.qualifies ? raidUtility.contributionPriorityBonus : 0
             } : {};
             if (currentState === 'done') return { multiplier:1, label:'Done this week', reason:'This task is already recorded as complete for the current week.', suppress:true, demand, ...raidFlags };
             if (currentState === 'excluded') return { multiplier:1, label:'Marked N/A', reason:'This task is marked N/A for the current week, so it is not suggested as a next action.', suppress:true, demand, ...raidFlags };
@@ -6825,14 +6950,26 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return withRaidFlags({ multiplier, label:character.isMain && (demand === 'high' || demand === 'endgame') ? 'Main focus · prior clear' : 'Previously cleared', reason:'The character has cleared this specific activity in older saved history. This supports a modest ranking nudge, but does not prove current gear readiness.', suppress:false, demand });
             }
 
-            // BDN is group-gated endgame. A consistently active, high-performing utility alt can be a good slot
-            // even without top-tier personal gear when a geared group specifically needs that role.
+            // BDN is group-gated endgame. A secondary can be recommended when its raid-role contribution
+            // and sustained Tracker activity support the case, not merely because the activity has a high reward score.
             if (raidUtility && !character.isMain && raidUtility.qualifies) {
                 return {
-                    multiplier:1.16, label:'Active utility alt · strong raid contribution',
-                    reason:`${raidUtility.job} has a configured raid utility role and this character’s recent Tracker history shows sustained activity and strong completion performance. A geared BDN party may value that contribution even if this alt is not the guild’s top-geared DPS; confirm the party needs the role before committing to a 50+ minute run.`,
+                    multiplier:raidUtility.contributionMultiplier, label:`Active ${raidUtility.contributionLabel} alt · strong raid contribution`,
+                    reason:raidUtility.reason,
                     suppress:false, demand, ...raidFlags
                 };
+            }
+            // Without a BDN clear, an unproven secondary is not shown as a default next task: the app cannot
+            // see whether a geared party needs the role or has enough damage to carry it. This is a display/ranking
+            // gate, not a claim the character is incapable; a specific guild/party invitation can override it.
+            if (raidUtility && !character.isMain) {
+                return withRaidFlags({
+                    multiplier:0.65,
+                    label:raidUtility.utilityRole ? 'BDN · conditional role fit' : 'BDN · prior clear or group invite needed',
+                    reason:raidUtility.reason,
+                    suppress:true,
+                    demand
+                });
             }
 
             // Only repeated, non-N/A misses paired with activity elsewhere can lower a high-end recommendation.
@@ -6912,21 +7049,30 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
                 const pace = getWeeklyPaceContext();
                 const resetGate = pace.hoursLeft <= 8
-                    ? ' With reset this close, only start if the geared group is already assembled.'
+                    ? ' With reset this close, start only if the geared group is already assembled.'
                     : pace.hoursLeft <= 24
-                        ? ' In the final day, get the group confirmed before committing.'
-                        : ' Arrange the group ahead of time rather than spending the session on an unplanned pickup.';
+                        ? ' In the final day, confirm the group before committing.'
+                        : ' Arrange the group ahead of time.';
                 if (item.characterIsMain) {
-                    return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. Prioritize it for your Main if this is your best-geared entrant; assemble a geared party or guild run, and judge readiness from BDN-specific results rather than lower-tier clears.${resetGate}`;
+                    return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. If this is your best-geared entrant, organize a geared party or guild run and judge readiness from BDN-specific results.${resetGate}`;
                 }
                 if (item.fit?.raidUtilityEligible) {
-                    const job = String(item.fit?.raidJob || 'This utility character');
-                    return `${historyLead}${job} has a raid utility role and this character’s recent Tracker history shows strong activity and completion. It may be worth bringing even without top-end DPS gear if a geared BDN party needs that role. Confirm the slot first; the run can take 50+ minutes.${resetGate}`;
+                    const job = String(item.fit?.raidJob || 'This alt');
+                    const roleLineByKey = {
+                        survival: `${job} can fill a Tank/Provoke slot, where survival and control may matter more than raw DPS.`,
+                        'debuff-mobility': `${job} brings Debuff/Mobility utility that may matter more than another undergeared DPS slot.`,
+                        heal: `${job} can fill a Heal slot, but healing depends on MATK, so the group should confirm the alt's output.`,
+                        highlander: `${job} brings Highlander utility alongside DPS.`,
+                        'beyond-time': `${job} brings Beyond Time utility that may help round out the raid composition.`,
+                        'utility-support': `${job} adds Utility/Support beyond personal damage.`,
+                    };
+                    const roleLine = roleLineByKey[item.fit?.raidContributionKey] || `${job} brings a useful raid contribution beyond its personal damage.`;
+                    return `${historyLead}${roleLine} Its Tracker history shows reliable activity and strong completion, so it may fit a geared BDN group even without top-end DPS gear when that role is needed. Confirm the slot before the 50+ minute run.${resetGate}`;
                 }
                 if (item.fit?.utilityRole) {
-                    return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. This alt has a utility role, but the saved history does not yet show consistently strong activity; join if a geared party specifically needs that role, otherwise prioritize more dependable weekly rewards.${resetGate}`;
+                    return `${historyLead}${item.fit?.raidJob || 'This alt'} has a possible ${String(item.fit?.raidContributionLabel || 'utility')} fit, but the saved Tracker history does not yet support recommending BDN as its next task. Keep it as an option when a geared group specifically requests that role; otherwise prioritize weekly tasks with a clearer payoff.${resetGate}`;
                 }
-                return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. For this alt, prioritize it only when a geared party specifically needs the character; otherwise use the time on more dependable weekly rewards. Lower-tier clears do not confirm BDN readiness.${resetGate}`;
+                return `${historyLead}BDN is a 50+ minute Level 70 endgame run. This alt has no prior BDN clear or demonstrated role fit, so it should not outrank dependable weekly tasks unless a geared group specifically invites it.${resetGate}`;
             }
 
             const activityAdvice = {
@@ -6954,9 +7100,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return 'Level 60 salary run at the Level 70 cap. Rewards include the Evolution Hammer and Lv 60 Legend Codes, plus a chance at a Legendary DDN accessory. 8 players; allow up to 27 minutes. Not serviceable.';
             }
             if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
-                if (item.characterIsMain) return 'Level 70 endgame. Plan a geared party or guild run for the Main, budget 50+ minutes, and use BDN-specific outcomes to judge readiness.';
-                if (item.fit?.raidUtilityEligible) return 'This alt has strong activity history and a configured utility role. It may be valuable to a geared BDN party even without top-end DPS gear, if that role is needed.';
-                return 'Level 70 endgame with a 50+ minute time commitment. Only prioritize this alt when the geared group needs its role; lower-tier clears do not confirm BDN readiness.';
+                if (item.characterIsMain) return 'Level 70 endgame. Organize a geared party or guild run for the Main; allow 50+ minutes and judge readiness from BDN-specific results.';
+                if (item.fit?.raidUtilityEligible) return `Role fit: ${item.fit.raidContributionLabel || 'raid utility'}. Recent Tracker activity supports considering this alt for BDN when a geared party needs its role.`;
+                return 'BDN stays conditional for secondary characters: recommend it only with a prior BDN clear or a strong, relevant role fit plus sustained weekly activity.';
             }
             if (ref) {
                 const facts = [];
@@ -7008,7 +7154,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const recentArchiveEntries = sortedArchiveEntries.slice(-3);
             const modelNote = document.createElement('div');
             modelNote.className = 'analytics-personalization-note';
-            modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Activity Insights works</summary><p>Suggestions combine task importance, admin-managed Activity Reference details, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p></details>';
+            modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Activity Insights works</summary><p>Suggestions combine task importance, admin-managed Activity Reference details, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p><p>For Black Dragon, the Main is the default focus. A secondary is recommended when it has a prior BDN clear, or when a relevant raid role (survival/tank, debuff/mobility, heal, Highlander, or other utility) is backed by sustained activity and good completion history. Role fit can help an undergeared character contribute, but the system does not assume a party needs that role or can carry extra DPS.</p></details>';
             cont.appendChild(modelNote);
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
@@ -8854,7 +9000,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r21';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r23';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

@@ -1,6 +1,33 @@
-# Pantheon Tools v1.6.8-r21 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r23 — Cloudflare Pages + D1
 
-This release continues directly from v1.6.8-r20. It preserves the bounty fixes, adaptive recommendation logic, Activity Reference editor, API, and shared data model.
+This release continues directly from v1.6.8-r22 and addresses Tracker checkmarks that appear to save but revert after a refresh.
+
+## v1.6.8-r23 tracker persistence reliability
+
+- Adds a durable local pending-write queue for task cell state and bounty-note changes. A refresh before the normal autosync finishes no longer drops the explicit edit; the next authenticated sync reapplies it against the latest shared cell record.
+- The save flow now clears a queued edit only after the shared record confirms the requested state/note. If a conflicting newer save wins, the UI refreshes from the shared record and displays a warning instead of claiming that the checkmark was saved.
+- The D1 tracker write endpoint merges individual cell records by their update timestamps and device tie-break before authorization checks, so an old browser snapshot cannot replace a newer task state simply because it writes the full tracker record.
+- Main-record writes now use compare-and-swap updates with bounded retries. Concurrent clients cannot silently overwrite one another between the read and write; repeatedly contended saves return an explicit retry error.
+- No D1 schema migration or new route. Bounty logic, roster ownership/access control, Activity Insights, role-fit logic, and shared Activity Reference are retained.
+- Built directly from r22. The package retains all 32 archive entries/paths; only `index.html`, `functions/api/cloud/b/[id].js`, and this README change. Validation includes inline JavaScript syntax, endpoint syntax, concurrent-write / stale-cell merge tests, pending-write queue tests, CSS parsing, and ZIP integrity. Live Cloudflare Pages, D1 and Discord-session end-to-end tests are not available in this build environment and must still be confirmed after deployment.
+
+---
+
+# Pantheon Tools v1.6.8-r22 — Cloudflare Pages + D1
+
+This release continues directly from v1.6.8-r21. It preserves the bounty fixes, activity reference, adaptive scoring, admin editor, and shared data model.
+
+## v1.6.8-r22 BDN role-fit recommendations
+
+- Fixes the Moonlord/utility-alt failure mode: a class role tag such as Highlander no longer makes BDN a recommended next task by itself, nor is the character framed as unsuitable simply because the current Tracker history is not strong yet.
+- Black Dragon is now recommended for the Main by default, or for a secondary that has a prior BDN clear. An unproven secondary is not presented as a next step because the app cannot see whether a geared party needs its role or has enough damage to carry the run; this is a recommendation gate, not a claim the character cannot participate.
+- A secondary without a prior BDN clear can qualify when it has configured raid contribution plus sustained Tracker activity and strong completion performance. It then receives a role-weighted priority bonus and contribution multiplier.
+- Adds an initial editable-metadata-driven contribution hierarchy: Tank/Provoke and survival roles first; Debuff/Mobility next; Heal is useful but MATK-sensitive; Highlander/Beyond Time and other Utility/Support are situational group-fit roles; pure DPS requires stronger BDN readiness evidence or a specific geared-party invitation. Admin/Role Settings remains the source of each job's role metadata.
+- Moonlord is classified as a Highlander utility/DPS hybrid. A high-activity, high-performing Moonlord alt can be recommended for a geared BDN group when Highlander is needed; without that evidence, BDN is not pushed as its next task. Strong role history improves the case but never guarantees a clear.
+- Keeps Overview and Tracker on the same personalized scorer. Shared Loot Weight, activity value, N/A handling, DDN HC's salary-run priority, bounty behavior, Activity Reference, API routes, and data schema remain unchanged.
+- Built directly from r21; only `index.html` and this README change within the ZIP. All 32 package paths are preserved. JavaScript syntax, CSS parsing, recommendation/role-fit tests, starter JSON parsing, and ZIP integrity are checked. Live Cloudflare Pages, D1, and Discord-session end-to-end tests are not performed.
+
+---
 
 ## v1.6.8-r21 balanced DDN HC recommendation
 
