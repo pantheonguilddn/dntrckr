@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r14</title>
+    <title>Pantheon Tools v1.6.8-r15</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2618,6 +2618,24 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .analytics-fit-note{display:block;margin-top:3px;color:var(--pt-muted,#a7afc2);font-size:.67rem;line-height:1.4;}
 .analytics-activity-value-note{display:block;margin-top:3px;color:var(--pt-muted,#a7afc2);font-size:.63rem;line-height:1.35;max-width:48rem;}
 </style>
+
+<style id="pantheon-r15-explainable-activity-insights">
+.analytics-recommendation-explanation{margin-top:7px;border:1px solid var(--pt-border,#444);border-radius:7px;background:var(--pt-surface-soft,rgba(127,127,127,.08));color:var(--pt-text,#f2f2f2);font-size:.68rem;line-height:1.48;overflow:hidden;}
+.analytics-recommendation-explanation>summary{cursor:pointer;list-style:none;padding:6px 8px;font-weight:750;color:var(--pt-text,#f2f2f2);}
+.analytics-recommendation-explanation>summary::-webkit-details-marker{display:none;}
+.analytics-recommendation-explanation>summary:after{content:'＋';float:right;color:var(--pt-muted,#888);margin-left:8px;}
+.analytics-recommendation-explanation[open]>summary:after{content:'−';}
+.analytics-recommendation-explanation .analytics-explanation-body{padding:0 8px 8px;color:var(--pt-muted,#b7bdcc);}
+.analytics-recommendation-explanation .analytics-explanation-body p{margin:5px 0 0;}
+.analytics-recommendation-explanation .analytics-explanation-body strong{color:var(--pt-text,#fff);font-weight:750;}
+.analytics-evidence-level{display:inline-block;margin-left:4px;padding:1px 5px;border:1px solid var(--pt-border,#555);border-radius:4px;background:var(--pt-surface,#222);color:var(--pt-text,#fff);font-size:.62rem;font-weight:800;white-space:nowrap;}
+.analytics-evidence-level[data-confidence="High"]{border-style:solid;}
+.analytics-evidence-level[data-confidence="Moderate"]{border-style:dashed;}
+.analytics-evidence-level[data-confidence="Low"]{border-style:dotted;}
+.analytics-recommendation-scoring{overflow-wrap:anywhere;}
+@media(max-width:520px){.analytics-recommendation-explanation>summary{padding:7px 8px}.analytics-recommendation-explanation .analytics-explanation-body{padding:0 8px 8px}}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3058,9 +3076,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r14</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r15</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r14 update:</strong> restricted Reset Bounty status to bounty-list rows and made bounty target assignment and clearing follow each character’s marked dungeon.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r15 update:</strong> added explainable Activity Insights with per-recommendation evidence confidence and visible score breakdowns, while retaining the bounty fixes.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6549,6 +6567,39 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return { multiplier:1, label:'Building history', reason:'More saved weekly outcomes are needed before adjusting this activity based on demonstrated character capability.', suppress:false, demand };
         }
 
+        // Explain the amount of usable per-activity history behind a recommendation.
+        // N/A records are deliberately excluded from capability evidence; they are not failures.
+        function getRecommendationEvidenceConfidence(taskStats) {
+            const observations = Math.max(0, Number(taskStats?.o) || 0);
+            const cleared = Math.max(0, Number(taskStats?.c) || 0);
+            const notCompleted = Math.max(0, Number(taskStats?.m) || 0);
+            const excluded = Math.max(0, Number(taskStats?.x) || 0);
+            const usable = Math.max(0, observations - excluded);
+            let level = 'Low';
+            if (usable >= 4) level = 'High';
+            else if (usable >= 2) level = 'Moderate';
+            let description;
+            if (usable <= 1) {
+                description = `Only ${usable} non-N/A weekly observation${usable === 1 ? '' : 's'} are available for this activity. Treat the personal-fit adjustment as an early estimate.`;
+            } else if (usable <= 3) {
+                description = `${usable} non-N/A weekly observations are available. This is a useful early pattern, but more archived weeks can still change the ranking.`;
+            } else {
+                description = `${usable} non-N/A weekly observations are available. This is a stronger history-based signal, but it still does not guarantee that the character can clear the activity today.`;
+            }
+            if (excluded > 0) description += ` ${excluded} N/A record${excluded === 1 ? ' is' : 's are'} excluded from capability evidence.`;
+            return { level, observations, usable, cleared, notCompleted, excluded, description };
+        }
+
+        function buildRecommendationExplanation(item) {
+            const evidence = getRecommendationEvidenceConfidence(item);
+            const baseAndBonus = `${item.baseScore}${item.completionPatternBonus ? ` + ${item.completionPatternBonus} recurring-clear bonus` : ''}`;
+            const profileLabel = item.activityProfile?.label || 'Shared task value';
+            const profileDetail = item.activityProfile?.detail || 'No activity-specific value profile is configured.';
+            const fitReason = item.fit?.reason || 'No character-specific explanation is available.';
+            const scoreLine = `Score factors: base priority ${baseAndBonus}; character fit ×${Number(item.fit?.multiplier || 1).toFixed(2)}; activity value ×${Number(item.activityValueMultiplier || 1).toFixed(2)}; final personalized priority P${item.sc}. L${item.w} remains the shared Loot Weight and is never changed for this character.`;
+            return { evidence, profileLabel, profileDetail, fitReason, scoreLine };
+        }
+
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
@@ -6568,7 +6619,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const recentArchiveEntries = sortedArchiveEntries.slice(-3);
             const modelNote = document.createElement('div');
             modelNote.className = 'analytics-personalization-note';
-            modelNote.innerHTML = '<strong>How recommendations work:</strong> <b>L</b> is the shared Loot Weight and never changes for a player. <b>P</b> combines L with each activity’s reward/effort profile and this character’s own history. Clear history is per activity; no clear is not proof the character cannot do it, especially when a carry or service is possible. Shop balances, gear, Jelly stock, and current market prices are not read.';
+            modelNote.innerHTML = '<strong>How recommendations work:</strong> <b>L</b> is the shared Loot Weight and never changes for a player. <b>P</b> combines recorded outcomes, a fixed shared task weight, the activity’s reward/effort profile, and this character’s history. Open any recommendation’s <b>Why this ranking?</b> section to inspect those factors and its evidence confidence. N/A weeks are excluded from capability evidence. A missing clear is not proof a character cannot clear content, especially when a carry or service may be possible. Shop balances, gear, Jelly stock, and current market prices are not read.';
             cont.appendChild(modelNote);
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
@@ -6594,12 +6645,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     // P combines fixed shared Loot Weight, activity utility/effort priors, and character fit.
                     // L itself is never altered by these contextual multipliers.
                     const personalizedScore = Math.max(0, Math.round(scoreBeforeFit * fit.multiplier * activityValueMultiplier));
-                    return { t, m: s.m, c: s.c, e, x: s.x, w, sc: personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, fit, activityProfile, activityValueMultiplier, suppress:fit.suppress };
+                    return { t, m: s.m, c: s.c, e, x: s.x, o: s.o, w, sc: personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, fit, activityProfile, activityValueMultiplier, suppress:fit.suppress };
                 }).filter(x => x.m > 0 && !x.suppress).sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m).slice(0, 3);
                 
                 const prioHTML = p.length ? p.map(i => {
                     const why = [i.fit.reason, i.activityProfile.detail].filter(Boolean).join(' · ');
-                    return `<div class="missed-item"><div><strong>${escapeHTML(i.t)}</strong><div style="color:var(--pt-muted,#aaa);font-size:0.72rem;">${i.c} archived clears • ${i.m} missed records • ${i.x} N/A • L${i.w} shared weight${i.completionPatternBonus ? ' • recurring clear pattern' : ''}</div><span class="analytics-fit-note" title="${escapeHTML(why)}">${escapeHTML(i.fit.label)}${i.activityProfile.key !== 'standard' ? ` · ${escapeHTML(i.activityProfile.label)}` : ''}</span>${i.activityProfile.shortNote ? `<div class="analytics-activity-value-note" title="${escapeHTML(i.activityProfile.detail)}">${escapeHTML(i.activityProfile.shortNote)}</div>` : ''}</div><div title="Personalized priority: shared Loot Weight combined with activity value and character history" style="background:var(--pt-surface-soft,#262630);padding:5px;border-radius:5px;color:var(--pt-text,#ffd27d);font-weight:bold;align-self:flex-start;">P${i.sc}</div></div>`;
+                    const explanation = buildRecommendationExplanation(i);
+                    const evidence = explanation.evidence;
+                    const evidenceLabel = `${evidence.level} evidence`;
+                    return `<div class="missed-item"><div style="min-width:0;flex:1;"><strong>${escapeHTML(i.t)}</strong><div style="color:var(--pt-muted,#aaa);font-size:0.72rem;">${i.c} archived clears • ${i.m} not-completed weeks • ${i.x} N/A • L${i.w} shared weight${i.completionPatternBonus ? ' • recurring clear pattern' : ''}</div><span class="analytics-fit-note" title="${escapeHTML(why)}">${escapeHTML(i.fit.label)}${i.activityProfile.key !== 'standard' ? ` · ${escapeHTML(i.activityProfile.label)}` : ''}</span>${i.activityProfile.shortNote ? `<div class="analytics-activity-value-note" title="${escapeHTML(i.activityProfile.detail)}">${escapeHTML(i.activityProfile.shortNote)}</div>` : ''}<details class="analytics-recommendation-explanation"><summary>Why this ranking?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>Evidence confidence:</strong> ${escapeHTML(evidence.description)}</p><p><strong>Character fit · ${escapeHTML(i.fit.label)}:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value · ${escapeHTML(explanation.profileLabel)}:</strong> ${escapeHTML(explanation.profileDetail)}</p><p><strong>Archived record:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'}, ${evidence.notCompleted} not-completed week${evidence.notCompleted === 1 ? '' : 's'}, and ${evidence.excluded} N/A out of ${evidence.observations} saved observation${evidence.observations === 1 ? '' : 's'} for this activity. N/A is not treated as a failed attempt.</p><p class="analytics-recommendation-scoring"><strong>Score breakdown:</strong> ${escapeHTML(explanation.scoreLine)}</p></div></details></div><div title="Personalized priority: recorded outcomes, the fixed shared Loot Weight, activity value, and character fit" style="background:var(--pt-surface-soft,#262630);padding:5px;border-radius:5px;color:var(--pt-text,#ffd27d);font-weight:bold;align-self:flex-start;">P${i.sc}</div></div>`;
                 }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No open recommendations from the saved history yet.</div>';
 
                 card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:4px;">Personalized Task Priorities</div>${prioHTML}</div>`;
@@ -8418,7 +8472,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r14';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r15';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

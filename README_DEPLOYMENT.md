@@ -1,8 +1,17 @@
-# Pantheon Tools v1.6.8-r14 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r15 — Cloudflare Pages + D1
 
 This release continues directly from the stable v1.6.8 branch. It preserves the original package structure and does not import code from later v1.6.9 or v1.7.x branches.
 
-## v1.6.8-r14 bounty mark behavior
+## v1.6.8-r15 explainable Activity Insights
+
+- Each personalized task recommendation now has an expandable **Why this ranking?** explanation showing the per-character fit rationale, configured activity reward/effort profile, archived outcomes, and score components that produced its P priority.
+- Adds Low / Moderate / High evidence confidence based on the count of non-N/A archived observations for that activity: under two usable observations is Low, two to three is Moderate, and four or more is High. This measures available history, not a probability of success or a promise that the character can clear the activity.
+- Explicitly separates clear history, not-completed weekly records, and N/A exclusions. N/A records are not treated as failed attempts and are excluded from capability-evidence confidence.
+- Clarifies that shared Loot Weight L remains fixed; P is the personalized priority score. The UI surfaces the score breakdown without changing the underlying recommendation formula, character-fit modifiers, activity profiles, weekly archive structure, or permissions.
+- The explanation explicitly notes what the system cannot read: current gear, shop balances, Jelly inventory, market prices, and availability of carries/services. It does not convert a missing clear into proof of inability.
+- No database migration, schema, API, or permission changes. Built directly from v1.6.8-r14 with the existing 31 ZIP entries and paths preserved. Live Cloudflare Pages, D1, and Discord-session end-to-end tests were not performed.
+
+## Historical: v1.6.8-r14 bounty mark behavior
 
 - Reset Bounty (🔄) is now available only on rows in the Bounty category. Dungeon rows cycle Open/Done → Marked → N/A → Open and no longer display the Reset state; legacy Reset states on dungeon rows are visually treated as Open.
 - Marking a dungeon fills the first truly available bounty line only: the line must be Open and have no target text. Marked, Reset, N/A, completed, or manually populated lines are skipped, so a Reset Bounty line reserves its slot and new targets move to the next available line.
