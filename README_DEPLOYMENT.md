@@ -1,6 +1,15 @@
-# Pantheon Tools v1.6.8-r19 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r21 — Cloudflare Pages + D1
 
-This release continues directly from v1.6.8-r18 and preserves the existing app, admin Activity Reference, bounty behavior, and shared data model. It does not import code from later v1.6.9 or v1.7.x branches.
+This release continues directly from v1.6.8-r20. It preserves the bounty fixes, adaptive recommendation logic, Activity Reference editor, API, and shared data model.
+
+## v1.6.8-r21 balanced DDN HC recommendation
+
+- Replaces the overly terse r20 wording with a short value-first explanation: DDN HC remains worth prioritizing at the Level 70 cap because the Evolution Hammer and Lv 60 Legend Codes support gear progression, with a chance at a Legendary DDN accessory; it ends with a practical 8-player group recommendation.
+- Keeps the 27-minute run estimate in optional supporting detail rather than the lead, so risk informs planning without undercutting the activity's value.
+- Updates the built-in activity profile, Admin Console starter data, and downloadable Activity Reference JSON. Previously saved r19/r20 wording is normalized on read, while future custom administrator-authored guidance is preserved.
+- Built directly from v1.6.8-r20. Only `index.html`, `admin.html`, and this deployment README change within the ZIP; all 32 original archive entries and paths are preserved. No schema or API behavior changes. JavaScript syntax, CSS parsing, duplicate-ID checks, focused recommendation behavior, JSON parsing, and ZIP integrity are checked. Live Cloudflare Pages, D1, and Discord-session end-to-end tests are not performed.
+
+---
 
 ## v1.6.8-r19 activity-value and raid-fit reasoning
 

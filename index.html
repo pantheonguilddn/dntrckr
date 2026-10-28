@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r19</title>
+    <title>Pantheon Tools v1.6.8-r21</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3105,9 +3105,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r19</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r21</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r19 update:</strong> Activity Insights now treats DDN HC as a valuable Level 60 salary run at the Level 70 cap, and gives BDN advice based on the Main, party readiness and proven utility-role activity.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r21 update:</strong> DDN HC guidance now balances its progression value and accessory upside with a practical group recommendation, without overexplaining the risk.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6554,8 +6554,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 key:'ddn-hardcore', match:/(?:desert\s+dragon.*hardcore|\bddn\s*(?:hc|hardcore)\b)/i, label:'Level 60 salary run', cadence:'weekly',
                 rewardUtility:1.18, effortMultiplier:1.00, accessibilityMultiplier:1.00, objectiveMultiplier:1.03, resourceMultiplier:1.00,
                 priorityBonus:10, demandOverride:'medium', strategy:'salary-run', legacyRaid:true,
-                shortNote:'Prioritize DDN HC as a weekly salary run at the Level 70 cap: useful DDN progression drops and a chance at a Legendary DDN accessory.',
-                detail:'DDN HC is Level 60 content for a Level 70 roster, so keep it as a meaningful weekly salary-run target. Coordinate an eight-player group and budget up to 27 minutes. A possible failure belongs in the time plan; it is not, by itself, a reason to dismiss the run. Keep a backup task in case the group or attempt falls through.',
+                shortNote:'DDN HC is still worth prioritizing at Level 70. The Evolution Hammer and Lv 60 Legend Codes help keep gear progression moving, with a chance at a Legendary DDN accessory, so line up an 8-player group for your weekly run.',
+                detail:'At the Level 70 cap, DDN HC remains a worthwhile Level 60 weekly salary run. The Evolution Hammer and Lv 60 Legend Codes support gear progression, and a Legendary DDN accessory is a valuable bonus drop. Gather an 8-player group; budget up to 27 minutes for the attempt.',
                 carryPotential:false, salaryRun:true
             },
             {
@@ -6631,9 +6631,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getActivityReferenceRecommendation(ref) {
             const tip = String(ref?.recommendation || '').trim();
-            // Replace the older, overly cautious DDN note in already-saved D1 data without requiring a reset/import.
-            if (isDDNHardcoreTask(ref?.name) && /do not plan the rest of the week around|guaranteed clear/i.test(tip)) {
-                return 'Prioritize DDN HC as a weekly salary run at the Level 70 cap. It is Level 60 content with useful DDN progression drops and a chance at a Legendary DDN accessory. Coordinate an eight-player group and budget up to 27 minutes; failure risk affects scheduling, not the value of the attempt. Keep a backup task if the run falls through.';
+            // Replace known legacy DDN wording in saved D1 data, while preserving future admin-authored advice.
+            if (isDDNHardcoreTask(ref?.name) && /do not plan the rest of the week around|guaranteed clear|prioritize ddn hc as a weekly salary run|failure risk affects scheduling|keep a backup task|weekly salary run:\s*target the evolution hammer and lv 60 legend codes/i.test(tip)) {
+                return 'DDN HC is still worth prioritizing at Level 70. The Evolution Hammer and Lv 60 Legend Codes help keep gear progression moving, with a chance at a Legendary DDN accessory, so line up an 8-player group for your weekly run.';
             }
             return tip;
         }
@@ -6906,7 +6906,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     : '';
 
             if (profileKey === 'ddn-hardcore' || isDDNHardcoreTask(item.t)) {
-                return `${historyLead}Prioritize DDN HC as a weekly salary run: it is Level 60 content at the Level 70 cap, with useful DDN progression drops and a chance at a Legendary DDN accessory. Coordinate an 8-player group and budget up to 27 minutes; failure risk affects scheduling, not the value of the attempt. Keep a backup task if the run falls through.`;
+                return getActivityReferenceRecommendation(item.activityProfile?.reference)
+                    || 'DDN HC is still worth prioritizing at Level 70. The Evolution Hammer and Lv 60 Legend Codes help keep gear progression moving, with a chance at a Legendary DDN accessory, so line up an 8-player group for your weekly run.';
             }
             if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
                 const pace = getWeeklyPaceContext();
@@ -6950,7 +6951,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const profileKey = String(item.activityProfile?.key || 'standard');
             const ref = item.activityProfile?.reference;
             if (profileKey === 'ddn-hardcore' || isDDNHardcoreTask(item.t)) {
-                return 'Weekly salary target for a Level 70 roster: DDN HC is Level 60 content with DDN progression drops and a chance at a Legendary DDN accessory. Plan an 8-player group and up to 27 minutes; the reference says it is not serviceable, so do not recommend a paid carry as the default fallback.';
+                return 'Level 60 salary run at the Level 70 cap. Rewards include the Evolution Hammer and Lv 60 Legend Codes, plus a chance at a Legendary DDN accessory. 8 players; allow up to 27 minutes. Not serviceable.';
             }
             if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
                 if (item.characterIsMain) return 'Level 70 endgame. Plan a geared party or guild run for the Main, budget 50+ minutes, and use BDN-specific outcomes to judge readiness.';
@@ -8853,7 +8854,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r19';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r21';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
