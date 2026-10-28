@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r18</title>
+    <title>Pantheon Tools v1.6.8-r19</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3105,9 +3105,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r18</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r19</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r18 update:</strong> Activity Insights now uses the shared, admin-managed Activity Reference for run times, party size, serviceability, milestone goals, materials and weekly rewards.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r19 update:</strong> Activity Insights now treats DDN HC as a valuable Level 60 salary run at the Level 70 cap, and gives BDN advice based on the Main, party readiness and proven utility-role activity.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6047,11 +6047,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const fit = getCharacterTaskRecommendationFit(character, taskName, { m, c, x, o }, archiveEntries, recentArchiveEntries);
             const activityProfile = getActivityValueProfile(taskName);
             const activityValueMultiplier = getActivityValueMultiplier(activityProfile);
-            const scoreBeforeFit = baseScore + completionPatternBonus;
+            // Strategic weekly targets may have a small activity-specific floor even before this character has history.
+            // This is separate from shared Loot Weight; DDN HC's salary-run value should not vanish in a new/empty profile.
+            const activityPriorityBonus = Math.max(0, Math.round((Number(activityProfile.priorityBonus) || 0) * Math.min(1.5, Math.max(0.5, w / 5))));
+            const characterFitPriorityBonus = Math.max(0, Math.round(Number(fit.priorityBonus) || 0));
+            const scoreBeforeFit = baseScore + completionPatternBonus + activityPriorityBonus + characterFitPriorityBonus;
             // P combines fixed shared Loot Weight, activity value/effort, and character fit.
             // Both Overview and Tracker call this function so their task ranking stays consistent.
             const personalizedScore = Math.max(0, Math.round(scoreBeforeFit * fit.multiplier * activityValueMultiplier));
-            return { t:taskName, m, c, e, x, o, w, sc:personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, fit, activityProfile, activityValueMultiplier, suppress:fit.suppress };
+            return { t:taskName, m, c, e, x, o, w, sc:personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, activityPriorityBonus, characterFitPriorityBonus, fit, activityProfile, activityValueMultiplier, characterIsMain:character?.isMain === true, suppress:fit.suppress };
         }
 
         function buildOverviewTaskRecommendation(character, taskName, archiveEntries, recentArchiveEntries) {
@@ -6547,18 +6551,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 carryPotential:true, costSensitive:true
             },
             {
-                key:'ddn-hardcore', match:/(?:desert\s+dragon.*hardcore|\bddn\s*(?:hc|hardcore)\b)/i, label:'Carry/service may make it viable', cadence:'weekly',
-                rewardUtility:1.10, effortMultiplier:0.90, accessibilityMultiplier:1.05, objectiveMultiplier:1.00, resourceMultiplier:1.00,
-                shortNote:'A carry or paid service can make a clear viable before personal clears appear in history.',
-                detail:'Treat lack of recorded personal clears as uncertainty, not proof the character cannot clear DDN HC. Guild carries or paid services can change feasibility, and clear history is specific to this raid tier.',
-                carryPotential:true
+                key:'ddn-hardcore', match:/(?:desert\s+dragon.*hardcore|\bddn\s*(?:hc|hardcore)\b)/i, label:'Level 60 salary run', cadence:'weekly',
+                rewardUtility:1.18, effortMultiplier:1.00, accessibilityMultiplier:1.00, objectiveMultiplier:1.03, resourceMultiplier:1.00,
+                priorityBonus:10, demandOverride:'medium', strategy:'salary-run', legacyRaid:true,
+                shortNote:'Prioritize DDN HC as a weekly salary run at the Level 70 cap: useful DDN progression drops and a chance at a Legendary DDN accessory.',
+                detail:'DDN HC is Level 60 content for a Level 70 roster, so keep it as a meaningful weekly salary-run target. Coordinate an eight-player group and budget up to 27 minutes. A possible failure belongs in the time plan; it is not, by itself, a reason to dismiss the run. Keep a backup task in case the group or attempt falls through.',
+                carryPotential:false, salaryRun:true
             },
             {
-                key:'black-dragon', match:/(?:black\s+dragon|\bbdn\b)/i, label:'Current Level 70 endgame', cadence:'weekly',
-                rewardUtility:1.15, effortMultiplier:0.93, accessibilityMultiplier:1.00, objectiveMultiplier:1.00, resourceMultiplier:1.00,
-                shortNote:'Top-end content; assess this raid from its own history, not from lower-tier clears alone.',
-                detail:'Black Dragon is the current Level 70 highest-difficulty content. A clear on another raid does not prove BDN readiness, and a missing BDN clear does not by itself prove inability; carry availability is not known to the tracker.',
-                carryPotential:false, endgame:true
+                key:'black-dragon', match:/(?:black\s+dragon|\bbdn\b)/i, label:'Level 70 endgame · group-sensitive', cadence:'weekly',
+                rewardUtility:1.20, effortMultiplier:1.00, accessibilityMultiplier:1.00, objectiveMultiplier:1.00, resourceMultiplier:1.00,
+                shortNote:'Plan a geared party or guild run. Main is the default focus; an active utility alt may fit if the group needs its role.',
+                detail:'Black Dragon is Level 70 endgame and may take 50 minutes or longer. Prioritize a suitable geared party or guild run for the Main. A secondary can also be worthwhile when its recent activity is strong and its configured utility role is needed by the party. Lower-tier clears do not prove BDN readiness, and no clear history alone is not proof of inability.',
+                carryPotential:false, endgame:true, roleSensitive:true
             },
             {
                 key:'dragon-fellowship', match:/dragon\s+fellowship/i, label:'Weekly Heraldry progression', cadence:'weekly',
@@ -6615,6 +6620,24 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return Math.max(.90, Math.min(1.05, efficiency / fifteenMinuteBaseline));
         }
 
+        function isDDNHardcoreTask(taskName) {
+            return /(?:desert\s+dragon.*hardcore|\bddn\s*(?:hc|hardcore)\b)/i.test(String(taskName || ''));
+        }
+
+        function isBlackDragonEndgameTask(taskName) {
+            const name = String(taskName || '');
+            return /(?:black\s+dragon|\bbdn\b)/i.test(name) && !/\bblack\s+dragon\s+memoria\b/i.test(name);
+        }
+
+        function getActivityReferenceRecommendation(ref) {
+            const tip = String(ref?.recommendation || '').trim();
+            // Replace the older, overly cautious DDN note in already-saved D1 data without requiring a reset/import.
+            if (isDDNHardcoreTask(ref?.name) && /do not plan the rest of the week around|guaranteed clear/i.test(tip)) {
+                return 'Prioritize DDN HC as a weekly salary run at the Level 70 cap. It is Level 60 content with useful DDN progression drops and a chance at a Legendary DDN accessory. Coordinate an eight-player group and budget up to 27 minutes; failure risk affects scheduling, not the value of the attempt. Keep a backup task if the run falls through.';
+            }
+            return tip;
+        }
+
         function activityReferenceDetail(ref, fallbackDetail = '') {
             if (!ref) return fallbackDetail;
             const facts = [];
@@ -6625,7 +6648,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (ref.serviceable !== 'unknown') facts.push(`Serviceable: ${ref.serviceable === 'yes' ? 'Yes' : 'No'}`);
             if (ref.weeklyRewards && ref.weeklyRewards !== '-') facts.push(`Weekly rewards: ${ref.weeklyRewards}`);
             if (ref.materials && ref.materials !== '-') facts.push(`Materials: ${ref.materials}`);
-            const tip = String(ref.recommendation || '').trim();
+            const tip = getActivityReferenceRecommendation(ref);
             return [tip, facts.join('. '), fallbackDetail && !tip ? fallbackDetail : ''].filter(Boolean).join(' ');
         }
 
@@ -6655,7 +6678,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 // Activity times modestly adjust effort efficiency; reward weights and Loot Weight stay separate.
                 profile.timeEfficiencyModifier = getActivityReferenceEffortModifier(reference);
                 profile.effortMultiplier = (Number(profile.effortMultiplier) || 1) * profile.timeEfficiencyModifier;
-                profile.shortNote = String(reference.recommendation || profile.shortNote || '').trim();
+                profile.shortNote = String(getActivityReferenceRecommendation(reference) || profile.shortNote || '').trim();
                 profile.detail = activityReferenceDetail(reference, profile.detail || '');
                 if (reference.milestoneGoal && reference.milestoneGoal !== '-') profile.label = reference.milestoneGoal;
                 else if (reference.weeklyRewards && reference.weeklyRewards !== '-') profile.label = 'Weekly rewards and materials';
@@ -6680,10 +6703,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getTaskDemandTier(taskName) {
             const name = String(taskName || '').toLowerCase();
-            // Explicit activity tiers come first: Memoria mini-runs and 'Classic' are not automatically endgame.
+            // Explicit activity tiers come first: Memoria is not full BDN, and DDN HC is Level 60 content for a Level 70 roster.
             if (/\bblack\s+dragon\s+memoria\b/.test(name)) return 'medium';
             if (/\bblack\s+dragon\b|\bbdn\b/.test(name)) return 'endgame';
-            if (/\bgreen\s+dragon\b.*\bhardcore\b|\bgdn\s*(?:hc|hardcore)\b|\bdesert\s+dragon\b.*\bhardcore\b|\bddn\s*(?:hc|hardcore)\b/.test(name)) return 'high';
+            if (/\bdesert\s+dragon\b.*\bhardcore\b|\bddn\s*(?:hc|hardcore)\b/.test(name)) return 'medium';
+            if (/\bgreen\s+dragon\b.*\bhardcore\b|\bgdn\s*(?:hc|hardcore)\b/.test(name)) return 'high';
             if (/abyssal\s+mire|theme\s*park|bounty\s+claim/.test(name)) return 'farm';
             if (/\bclassic\b|\bmemoria\s*(?:iii|iv|3|4)\b|\bsea\s+dragon\s+core\b|\bfellowship\b|\bdark\s+banquet\b/.test(name)) return 'medium';
             if (/\bhardcore\b|\bchallenge\b|\braid\b/.test(name)) return 'high';
@@ -6691,12 +6715,79 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return 'farm';
         }
 
+        function getCharacterRaidUtilityContext(character, taskName, archiveEntries, recentArchiveEntries) {
+            const job = String(getCharacterJob(character?.name) || '').trim();
+            const meta = job ? getJobMeta(job) : null;
+            const roles = [meta?.raidPosition, ...(Array.isArray(meta?.secondaryRoles) ? meta.secondaryRoles : [])].filter(Boolean);
+            const utilityRoles = new Set(['Utility', 'Support', 'Heal', 'Tank', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Provoke']);
+            const utilityRole = roles.some(role => utilityRoles.has(role));
+            const weeks = (Array.isArray(recentArchiveEntries) && recentArchiveEntries.length ? recentArchiveEntries : (archiveEntries || []).slice(-3)).slice(-3);
+            let usableWeeks = 0, activeWeeks = 0, totalDone = 0, totalEligible = 0;
+            const weeklyRates = [];
+            for (const [, archive] of weeks) {
+                const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+                const codes = String(archive?.states?.[character?.name] || '');
+                let done = 0, eligible = 0;
+                order.forEach((otherTask, index) => {
+                    if (otherTask === taskName || isBountyTask(otherTask) || /\bbounty\b/i.test(otherTask)) return;
+                    const code = codes[index] || '';
+                    if (code === 'd') { done++; eligible++; }
+                    else if (code === 'm') eligible++;
+                });
+                if (!eligible) continue;
+                usableWeeks++;
+                totalDone += done;
+                totalEligible += eligible;
+                if (done >= 2) activeWeeks++;
+                weeklyRates.push(done / eligible);
+            }
+            let currentDone = 0, currentEligible = 0;
+            getCompletionTaskNames().forEach(otherTask => {
+                if (otherTask === taskName || /\bbounty\b/i.test(otherTask)) return;
+                const state = getCellState(character?.name, otherTask);
+                if (state === 'excluded') return;
+                currentEligible++;
+                if (state === 'done') currentDone++;
+            });
+            const archivedAverage = weeklyRates.length ? weeklyRates.reduce((sum, rate) => sum + rate, 0) / weeklyRates.length : null;
+            const currentRate = currentEligible ? currentDone / currentEligible : 0;
+            const highActivity = activeWeeks >= 2 || currentDone >= 4;
+            const highPerformance = (weeklyRates.length >= 2 && archivedAverage >= 0.55) || (currentDone >= 4 && currentRate >= 0.55);
+            const qualifies = !!(utilityRole && highActivity && highPerformance);
+            return {
+                job, roleLabel: meta?.raidPosition || (roles[0] || ''), utilityRole,
+                highActivity, highPerformance, qualifies, usableWeeks, activeWeeks,
+                averageRate: archivedAverage === null ? null : Math.round(archivedAverage * 100),
+                currentRate: Math.round(currentRate * 100), currentDone, currentEligible,
+                reason: qualifies
+                    ? `${job} is configured with raid utility and recent Tracker history shows consistent activity and good completion performance.`
+                    : utilityRole
+                        ? `${job} has a configured utility role, but the available Tracker history does not yet show both sustained activity and strong completion performance.`
+                        : 'This character does not currently have a configured utility/support role that gives it a specific BDN composition advantage.'
+            };
+        }
+
         function getCharacterTaskRecommendationFit(character, taskName, taskStats, archiveEntries, recentArchiveEntries) {
             const currentState = getCellState(character.name, taskName);
-            const demand = getTaskDemandTier(taskName);
             const activityProfile = getActivityValueProfile(taskName);
-            if (currentState === 'done') return { multiplier:1, label:'Done this week', reason:'This task is already recorded as complete for the current week.', suppress:true, demand };
-            if (currentState === 'excluded') return { multiplier:1, label:'Marked N/A', reason:'This task is marked N/A for the current week, so it is not suggested as a next action.', suppress:true, demand };
+            const demand = activityProfile.demandOverride || getTaskDemandTier(taskName);
+            const raidUtility = isBlackDragonEndgameTask(taskName)
+                ? getCharacterRaidUtilityContext(character, taskName, archiveEntries, recentArchiveEntries)
+                : null;
+            const raidFlags = raidUtility ? {
+                raidRole: raidUtility.roleLabel,
+                raidJob: raidUtility.job,
+                utilityRole: raidUtility.utilityRole,
+                highRaidActivity: raidUtility.highActivity,
+                highRaidPerformance: raidUtility.highPerformance,
+                raidUtilityEligible: raidUtility.qualifies,
+                raidActivityRate: raidUtility.averageRate,
+                raidCurrentRate: raidUtility.currentRate,
+                // Group-sensitive baseline: Main gets the primary BDN attempt; a proven utility alt gets a smaller route in.
+                priorityBonus: character?.isMain ? 6 : raidUtility.qualifies ? 5 : 0
+            } : {};
+            if (currentState === 'done') return { multiplier:1, label:'Done this week', reason:'This task is already recorded as complete for the current week.', suppress:true, demand, ...raidFlags };
+            if (currentState === 'excluded') return { multiplier:1, label:'Marked N/A', reason:'This task is marked N/A for the current week, so it is not suggested as a next action.', suppress:true, demand, ...raidFlags };
 
             const readState = archive => {
                 const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
@@ -6709,7 +6800,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const recentClear = recentStates.includes('d');
             const anyClear = Number(taskStats.c) > 0;
 
-            // Other completed tasks mean the character was active, not that this specific raid was impossible.
+            // Other completed tasks show that the character was active; they do not prove this raid is impossible.
             let otherClearCount = 0;
             for (const [, archive] of (recentArchiveEntries || [])) {
                 const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
@@ -6721,20 +6812,32 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             otherClearCount += getCompletionTaskNames().filter(otherTask => otherTask !== taskName && getCellState(character.name, otherTask) === 'done').length;
             const nonNaObservations = Math.max(0, Number(taskStats.o) - Number(taskStats.x));
             const naRate = Number(taskStats.o) ? Number(taskStats.x) / Number(taskStats.o) : 0;
+            const withRaidFlags = result => ({ ...result, ...raidFlags });
 
             if (recentClear) {
                 let multiplier = demand === 'endgame' ? 1.10 : demand === 'high' ? 1.12 : demand === 'medium' ? 1.08 : 1.06;
                 if (character.isMain && (demand === 'high' || demand === 'endgame')) multiplier *= 1.04;
-                return { multiplier, label:character.isMain && (demand === 'high' || demand === 'endgame') ? 'Recent clear · Main focus' : 'Recent clear history', reason:'A clear for this exact activity appears in recent saved weeks. That is evidence for this content tier, not proof of solo ability or readiness for a harder raid.', suppress:false, demand };
+                return withRaidFlags({ multiplier, label:character.isMain && (demand === 'high' || demand === 'endgame') ? 'Recent clear · Main focus' : 'Recent clear history', reason:'A clear for this exact activity appears in recent saved weeks. That is evidence for this content tier, not proof of solo ability or readiness for a harder raid.', suppress:false, demand });
             }
             if (anyClear) {
                 let multiplier = demand === 'endgame' ? 1.04 : demand === 'high' ? 1.05 : 1.04;
                 if (character.isMain && (demand === 'high' || demand === 'endgame')) multiplier *= 1.05;
-                return { multiplier, label:character.isMain && (demand === 'high' || demand === 'endgame') ? 'Main focus · prior clear' : 'Previously cleared', reason:'The character has cleared this specific activity in older saved history. This supports a modest ranking nudge, but does not prove current gear readiness.', suppress:false, demand };
+                return withRaidFlags({ multiplier, label:character.isMain && (demand === 'high' || demand === 'endgame') ? 'Main focus · prior clear' : 'Previously cleared', reason:'The character has cleared this specific activity in older saved history. This supports a modest ranking nudge, but does not prove current gear readiness.', suppress:false, demand });
             }
 
-            // Require several observations AND activity elsewhere before changing a high-tier task's fit.
-            // Known carry/service routes reduce the penalty because a personal clear is not the only path.
+            // BDN is group-gated endgame. A consistently active, high-performing utility alt can be a good slot
+            // even without top-tier personal gear when a geared group specifically needs that role.
+            if (raidUtility && !character.isMain && raidUtility.qualifies) {
+                return {
+                    multiplier:1.16, label:'Active utility alt · strong raid contribution',
+                    reason:`${raidUtility.job} has a configured raid utility role and this character’s recent Tracker history shows sustained activity and strong completion performance. A geared BDN party may value that contribution even if this alt is not the guild’s top-geared DPS; confirm the party needs the role before committing to a 50+ minute run.`,
+                    suppress:false, demand, ...raidFlags
+                };
+            }
+
+            // Only repeated, non-N/A misses paired with activity elsewhere can lower a high-end recommendation.
+            // DDN HC is deliberately medium-tier at the Level 70 cap, so failure-risk or lack of DDN clears
+            // never triggers this high-end penalty. BDN remains a separate, group-sensitive endgame decision.
             const hasRepeatedOtherActivity = otherClearCount >= 2;
             const observations = Number(taskStats.o) || 0;
             const enoughEvidence = observations >= 2 && nonNaObservations >= 2 && Number(taskStats.m) >= 2 && naRate <= 0.35 && hasRepeatedOtherActivity;
@@ -6744,21 +6847,23 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (activityProfile.carryPotential) multiplier = strongerEvidence ? 0.82 : 0.90;
                 else if (demand === 'endgame') multiplier = strongerEvidence ? 0.66 : 0.78;
                 else multiplier = strongerEvidence ? 0.70 : 0.82;
-                return {
-                    multiplier,
-                    label:activityProfile.carryPotential ? 'No recorded clear · carry may fit' : strongerEvidence ? 'Repeated misses · no clear recorded' : 'No clear recorded yet',
-                    reason:`No clear is recorded across ${observations} archived observations while ${otherClearCount} completions of other tasks show that the character was active. ${activityProfile.carryPotential ? 'A carry or service may still make this activity viable, so the adjustment is deliberately modest.' : 'This is a cautious fit estimate, not proof the character cannot clear it.'}`,
-                    suppress:false,
-                    demand
-                };
+                let reason = `${observations} archived weeks show this task left unfinished while ${otherClearCount} other completions show that the character was active. This is a cautious ranking signal, not proof the character cannot clear it.`;
+                let label = activityProfile.carryPotential ? 'No recorded clear · group help may fit' : strongerEvidence ? 'Repeated misses · no clear recorded' : 'No clear recorded yet';
+                if (raidUtility) {
+                    reason = raidUtility.utilityRole
+                        ? `${raidUtility.reason} Do not write the character off: if a geared BDN group asks for this utility role, reconsider; otherwise prioritize more achievable weekly rewards.`
+                        : `BDN is Level 70 endgame and needs a suitable geared group. This character has no clear recorded and no configured utility-role fit is visible, so keep it below dependable weekly tasks unless a group specifically wants the character.`;
+                    label = raidUtility.utilityRole ? 'BDN · utility history not yet strong' : 'BDN · group fit unconfirmed';
+                }
+                return withRaidFlags({ multiplier, label, reason, suppress:false, demand });
             }
             if (character.isMain && (demand === 'high' || demand === 'endgame')) {
-                return { multiplier:1.08, label:'Main high-tier focus', reason:'The Main gets a modest nudge toward higher-tier content while evidence accumulates. Readiness remains unconfirmed until this activity has recorded clears.', suppress:false, demand };
+                return withRaidFlags({ multiplier:1.08, label:'Main high-tier focus', reason:'This is a high-tier target for your Main. Arrange a suitable geared party or guild run for this raid specifically; lower-tier clears do not confirm readiness.', suppress:false, demand });
             }
             if (observations >= 2 && Number(taskStats.m) > 0) {
-                return { multiplier:1, label:'No clear evidence yet', reason:'There is not enough evidence to tell whether this activity is unsuitable, untried, carried, or simply not recorded. Shared Loot Weight and activity value remain the main signals.', suppress:false, demand };
+                return withRaidFlags({ multiplier:1, label:'No clear evidence yet', reason:'There is not enough evidence to tell whether this activity is unsuitable, untried, or simply not recorded. Shared Loot Weight and activity value remain the main signals.', suppress:false, demand });
             }
-            return { multiplier:1, label:'Building history', reason:'More saved weekly outcomes are needed before adjusting this activity based on demonstrated character capability.', suppress:false, demand };
+            return withRaidFlags({ multiplier:1, label:'Building history', reason:'More saved weekly outcomes are needed before adjusting this activity based on demonstrated character capability.', suppress:false, demand });
         }
 
         // Explain the amount of usable per-activity history behind a recommendation.
@@ -6795,26 +6900,48 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const recentClear = fitLabel.includes('recent clear');
             const priorClear = fitLabel.includes('previously cleared') || fitLabel.includes('prior clear');
             const historyLead = recentClear
-                ? 'This character cleared it in recent saved weeks, so it is a proven option. '
+                ? 'This character cleared it in recent saved weeks. '
                 : priorClear
-                    ? 'This character has cleared it before, so it is a known option. '
+                    ? 'This character has cleared it before. '
                     : '';
+
+            if (profileKey === 'ddn-hardcore' || isDDNHardcoreTask(item.t)) {
+                return `${historyLead}Prioritize DDN HC as a weekly salary run: it is Level 60 content at the Level 70 cap, with useful DDN progression drops and a chance at a Legendary DDN accessory. Coordinate an 8-player group and budget up to 27 minutes; failure risk affects scheduling, not the value of the attempt. Keep a backup task if the run falls through.`;
+            }
+            if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
+                const pace = getWeeklyPaceContext();
+                const resetGate = pace.hoursLeft <= 8
+                    ? ' With reset this close, only start if the geared group is already assembled.'
+                    : pace.hoursLeft <= 24
+                        ? ' In the final day, get the group confirmed before committing.'
+                        : ' Arrange the group ahead of time rather than spending the session on an unplanned pickup.';
+                if (item.characterIsMain) {
+                    return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. Prioritize it for your Main if this is your best-geared entrant; assemble a geared party or guild run, and judge readiness from BDN-specific results rather than lower-tier clears.${resetGate}`;
+                }
+                if (item.fit?.raidUtilityEligible) {
+                    const job = String(item.fit?.raidJob || 'This utility character');
+                    return `${historyLead}${job} has a raid utility role and this character’s recent Tracker history shows strong activity and completion. It may be worth bringing even without top-end DPS gear if a geared BDN party needs that role. Confirm the slot first; the run can take 50+ minutes.${resetGate}`;
+                }
+                if (item.fit?.utilityRole) {
+                    return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. This alt has a utility role, but the saved history does not yet show consistently strong activity; join if a geared party specifically needs that role, otherwise prioritize more dependable weekly rewards.${resetGate}`;
+                }
+                return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. For this alt, prioritize it only when a geared party specifically needs the character; otherwise use the time on more dependable weekly rewards. Lower-tier clears do not confirm BDN readiness.${resetGate}`;
+            }
+
             const activityAdvice = {
                 'theme-park':'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.',
                 'abyssal-mire':'Run 2F + 5F and leave 1 key for reset to reach 5,000 weekly points. Consider a service if you cannot clear it yourself.',
                 'dragon-fellowship':'If duoing is not practical, compare the service cost with the weekly Heraldry rewards.',
                 'gdn-classic':'Prioritize its weekly Polished Diamonds and Lv 50 Heraldry Pouch if those rewards help your current goals.',
-                'gdn-hardcore':'Plan around the run time and check whether its Legend Code rewards justify the seal-stamp cost.',
-                'ddn-hardcore':'Allow for up to 27 minutes and a possible failure; do not build the week around a guaranteed clear.',
-                'black-dragon':'Use this character’s Black Dragon results to judge readiness; lower-tier clears do not confirm it.'
+                'gdn-hardcore':'Plan the run as an optional code/accessory opportunity; weigh its chest against the seal-stamp cost.',
             };
-            const referenceAdvice = String(item.activityProfile?.reference?.recommendation || '').trim();
+            const referenceAdvice = getActivityReferenceRecommendation(item.activityProfile?.reference);
             if (referenceAdvice) return `${historyLead}${referenceAdvice}`;
             if (activityAdvice[profileKey]) return `${historyLead}${activityAdvice[profileKey]}`;
             if (recentClear) return 'This character cleared it recently, so repeating it is a reliable next step.';
             if (priorClear) return 'This character has cleared it before, making it a sensible repeat if time allows.';
-            if (fitLabel.includes('carry may fit')) return 'No personal clear is recorded. A guild carry or service can make the rewards accessible without relying on a solo clear.';
-            if (fitLabel.includes('repeated misses')) return 'This has been left unfinished repeatedly. Check whether a carry or lower-effort route can make it achievable this week.';
+            if (fitLabel.includes('carry may fit')) return 'No personal clear is recorded. A service or a better-matched group can make the rewards accessible without relying on a solo clear.';
+            if (fitLabel.includes('repeated misses')) return 'This has been left unfinished repeatedly. Check whether the route or group setup can make it achievable this week.';
             if (fitLabel.includes('main high-tier focus')) return 'This is a high-tier target for your Main. Plan the right group for this specific raid instead of assuming lower-tier clears carry over.';
             return 'This is among the highest-ranked tasks left for this character. Completing it advances weekly progress and gives future recommendations more evidence.';
         }
@@ -6822,30 +6949,38 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function getRecommendationActivityNote(item) {
             const profileKey = String(item.activityProfile?.key || 'standard');
             const ref = item.activityProfile?.reference;
+            if (profileKey === 'ddn-hardcore' || isDDNHardcoreTask(item.t)) {
+                return 'Weekly salary target for a Level 70 roster: DDN HC is Level 60 content with DDN progression drops and a chance at a Legendary DDN accessory. Plan an 8-player group and up to 27 minutes; the reference says it is not serviceable, so do not recommend a paid carry as the default fallback.';
+            }
+            if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
+                if (item.characterIsMain) return 'Level 70 endgame. Plan a geared party or guild run for the Main, budget 50+ minutes, and use BDN-specific outcomes to judge readiness.';
+                if (item.fit?.raidUtilityEligible) return 'This alt has strong activity history and a configured utility role. It may be valuable to a geared BDN party even without top-end DPS gear, if that role is needed.';
+                return 'Level 70 endgame with a 50+ minute time commitment. Only prioritize this alt when the geared group needs its role; lower-tier clears do not confirm BDN readiness.';
+            }
             if (ref) {
                 const facts = [];
                 if (ref.averageRunTime && ref.averageRunTime !== '-') facts.push(`Time: ${ref.averageRunTime}`);
                 if (ref.partySize && ref.partySize !== '-') facts.push(`Party: ${ref.partySize}`);
                 if (ref.serviceable !== 'unknown') facts.push(`Serviceable: ${ref.serviceable === 'yes' ? 'Yes' : 'No'}`);
                 if (ref.milestoneGoal && ref.milestoneGoal !== '-') facts.push(`Goal: ${ref.milestoneGoal}`);
+                const tip = getActivityReferenceRecommendation(ref);
+                if (tip) facts.unshift(tip);
                 return facts.join(' · ') || 'See the activity reference below for rewards and materials.';
             }
             const notes = {
                 'abyssal-mire':'Best plan: 2F + 5F, with 1 key remaining for the reset payout. This reaches 5,000 weekly points; a service can be a practical fallback.',
                 'gdn-classic':'Focus on the weekly Essence of Life and Polished Diamond rewards.',
                 'gdn-hardcore':'Check whether the chest and gear-code rewards are worth the seal stamps.',
-                'ddn-hardcore':'A carry or service can make this raid worthwhile without a personal clear.',
-                'black-dragon':'Use Black Dragon results to judge this raid; other raid clears do not confirm readiness.',
                 'dragon-fellowship':'Weekly Heraldry pouches. If a duo clear is out of reach, a service may still be worthwhile.',
                 'theme-park':'Persian Goblin suits auto-attacking units if you want to idle. Treacherous Path is good for fast clears. Any Theme Park activity counts.'
             };
-            const referenceAdvice = String(item.activityProfile?.reference?.recommendation || '').trim();
-            return referenceAdvice || notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
+            return notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
         }
 
         function buildRecommendationExplanation(item) {
             const evidence = getRecommendationEvidenceConfidence(item);
-            const baseAndBonus = `${item.baseScore}${item.completionPatternBonus ? ` + ${item.completionPatternBonus} recurring-clear bonus` : ''}`;
+            const bonusParts = [item.completionPatternBonus ? `${item.completionPatternBonus} recurring-clear bonus` : '', item.activityPriorityBonus ? `${item.activityPriorityBonus} activity-priority bonus` : '', item.characterFitPriorityBonus ? `${item.characterFitPriorityBonus} Main/utility-fit bonus` : ''].filter(Boolean);
+            const baseAndBonus = `${item.baseScore}${bonusParts.length ? ` + ${bonusParts.join(' + ')}` : ''}`;
             const profileLabel = item.activityProfile?.label || 'Shared task value';
             const profileDetail = item.activityProfile?.detail || 'No activity-specific value profile is configured.';
             const fitReason = item.fit?.reason || 'No character-specific explanation is available.';
@@ -8718,7 +8853,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r18';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r19';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

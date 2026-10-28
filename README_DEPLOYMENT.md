@@ -1,6 +1,19 @@
-# Pantheon Tools v1.6.8-r18 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r19 — Cloudflare Pages + D1
 
-This release continues directly from the v1.6.8-r17 package, itself built from the stable v1.6.8 line. It does not import code from later v1.6.9 or v1.7.x branches.
+This release continues directly from v1.6.8-r18 and preserves the existing app, admin Activity Reference, bounty behavior, and shared data model. It does not import code from later v1.6.9 or v1.7.x branches.
+
+## v1.6.8-r19 activity-value and raid-fit reasoning
+
+- Reframes DDN HC as a high-value weekly salary run for the Level 70 cap: it is Level 60 content with progression drops and a chance at a Legendary DDN accessory. Its possible failure is handled as a scheduling/time-budget issue, not as a reason to demote or skip the run.
+- Explicitly classifies DDN HC as medium-tier/legacy content for character-feasibility scoring, while retaining a separate salary-run priority bonus. This strategic bonus is added to personalized priority without changing the shared Loot Weight. It gives DDN a useful baseline before a character has accumulated archived history.
+- Removes the old DDN guidance that discouraged planning around the clear. Existing saved D1 references using that older sentence are normalized at read time; the Admin Console starter list is also updated so the corrected advice can be saved for future data edits.
+- Makes BDN recommendations group-sensitive. The Main is guided toward a geared party or guild run, with a 50+ minute budget and BDN-specific readiness evidence. A non-Main utility/support character can receive a positive fit adjustment when its recent Tracker history shows sustained activity and solid completion performance; the advice still requires that a geared party actually needs that role.
+- Preserves the serviceability source of truth. DDN HC and BDN are marked not serviceable in the provided Activity Reference, so their guidance does not suggest a paid service as the default fix. A role-fit guild party is distinct from a paid carry.
+- Keeps Overview and Tracker on the same task scoring function. High-value targets, readiness fit, and time-management advice are treated separately: uncertainty or elapsed run time should inform planning, not automatically erase reward value.
+- No schema migration or new API route. The package preserves the exact r18 ZIP entry list; modified package files are `index.html`, `admin.html`, and this README. The starter JSON is also available separately for admin import/backup.
+- Validation: JavaScript syntax and CSS parse checks, focused policy tests for DDN/BDN scoring and language, starter data checks, and ZIP integrity/path-preservation checks. Live Cloudflare Pages, D1, and Discord-session end-to-end testing was not performed.
+
+
 
 ## v1.6.8-r18 admin-managed Activity Reference
 
