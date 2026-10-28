@@ -1,6 +1,17 @@
-# Pantheon Tools v1.6.8-r16 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r17 — Cloudflare Pages + D1
 
-This release continues directly from the v1.6.8-r15 package, itself built from the stable v1.6.8 line. It does not import code from later v1.6.9 or v1.7.x branches.
+This release continues directly from the v1.6.8-r16 package, itself built from the stable v1.6.8 line. It does not import code from later v1.6.9 or v1.7.x branches.
+
+
+## v1.6.8-r17 action-first personalized recommendations
+
+- Removes generic rotation/priority filler such as “Keep this character in the rotation if it is still a priority.” Overview now names a specific unfinished task and gives a short, practical reason for doing it.
+- Overview and the Tracker's Personalized Task Priorities now use the same shared scoring function. Next-task selection incorporates shared Loot Weight, archived task outcomes, the character-specific fit adjustment, activity value/effort profiles, and reset-sensitive value where configured.
+- The Overview's Priority Reminders and Character Completion both surface the recommended task and its concise reason. The reminder's urgency still increases gradually as Saturday reset approaches; it does not invent urgency early in the week.
+- Plain-language task guidance is more action-oriented: Theme Park route choice; Abyssal Mire 2F + 5F with one key remaining for the 5,000-point weekly total; Dragon Fellowship weekly Heraldry with service as an option when duoing is impractical; and the practical reward/cost guidance for configured raids.
+- Meaningful completion trends remain visible, while empty placeholders about unavailable trends are removed. Deeper history/score details remain optional in Tracker Analytics.
+- Shared Loot Weight values, the scoring formula, weekly archives, bounty behavior, access controls, D1 schema, and API remain unchanged. The scoring formula is now defined once and used by both Overview and Tracker to prevent drift.
+- Built directly from the v1.6.8-r16 ZIP package. The archive preserves its exact 31 entries and paths; only `index.html` and this deployment README are changed. JavaScript syntax, CSS parsing, HTML ID uniqueness, scoring/reason behavior checks, and ZIP integrity pass. Live Cloudflare Pages, D1, and Discord-session end-to-end tests were not performed.
 
 ## v1.6.8-r16 plain-language Activity Insights
 

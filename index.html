@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r16</title>
+    <title>Pantheon Tools v1.6.8-r17</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3105,9 +3105,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r16</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r17</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r16 update:</strong> simplified Activity Insights into short, actionable recommendations, with deeper reasoning kept behind optional details.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r17 update:</strong> Activity Insights now recommends a specific next task using character history and activity value, with a plain-language reason instead of generic encouragement.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5989,6 +5989,47 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return item.rate < 40 ? ['Low completion', 'watch'] : item.rate < 70 ? ['Final push', 'watch'] : ['On pace', 'good'];
         }
 
+        // Pick the next unfinished task using the same character-fit and activity-value model
+        // used by Tracker's Personalized Task Priorities, so Overview does not fall back to
+        // global Loot Weight alone.
+        function getArchivedTaskRecommendationStats(characterName, taskName, archiveEntries) {
+            const stats = { m:0, c:0, x:0, o:0 };
+            (archiveEntries || []).forEach(([, archive]) => {
+                const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+                const index = order.indexOf(taskName);
+                if (index < 0) return;
+                const code = String(archive?.states?.[characterName] || '')[index] || '';
+                if (!code) return;
+                stats.o++;
+                if (code === 'd') stats.c++;
+                else if (code === 'x') stats.x++;
+                else stats.m++;
+            });
+            return stats;
+        }
+
+        function buildPersonalizedTaskRecommendation(character, taskName, taskStats, archiveEntries, recentArchiveEntries) {
+            const stats = taskStats || { m:0, c:0, x:0, o:0 };
+            const m = Number(stats.m) || 0, c = Number(stats.c) || 0, x = Number(stats.x) || 0, o = Number(stats.o) || 0;
+            const e = m + c;
+            const w = getLootWeight(taskName);
+            const baseScore = Math.max(0, Math.round(w * (0.55 * (e ? m / e : 0) + 0.3 * Math.min(1, m / 3) + 0.15 * Math.min(1, Math.max(e, o) / 4)) * (1 - (0.65 * (o ? x / o : 0))) * 20));
+            const completionPatternBonus = o >= 2 && c / Math.max(1, o) >= 0.7 ? Math.min(5, Math.round(w * 0.35)) : 0;
+            const fit = getCharacterTaskRecommendationFit(character, taskName, { m, c, x, o }, archiveEntries, recentArchiveEntries);
+            const activityProfile = getActivityValueProfile(taskName);
+            const activityValueMultiplier = getActivityValueMultiplier(activityProfile);
+            const scoreBeforeFit = baseScore + completionPatternBonus;
+            // P combines fixed shared Loot Weight, activity value/effort, and character fit.
+            // Both Overview and Tracker call this function so their task ranking stays consistent.
+            const personalizedScore = Math.max(0, Math.round(scoreBeforeFit * fit.multiplier * activityValueMultiplier));
+            return { t:taskName, m, c, e, x, o, w, sc:personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, fit, activityProfile, activityValueMultiplier, suppress:fit.suppress };
+        }
+
+        function buildOverviewTaskRecommendation(character, taskName, archiveEntries, recentArchiveEntries) {
+            const stats = getArchivedTaskRecommendationStats(character.name, taskName, archiveEntries);
+            return buildPersonalizedTaskRecommendation(character, taskName, stats, archiveEntries, recentArchiveEntries);
+        }
+
         function renderOverviewActivity() {
             const cont = document.getElementById('overview-activity');
             const completionCont = document.getElementById('overview-character-completion');
@@ -6002,7 +6043,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const uniqueNames = [...new Map(enabledNames.map(name => [String(name).trim().toLocaleLowerCase(), String(name).trim()])).values()].filter(Boolean);
             const tasks = typeof getCompletionTaskNames === 'function' ? getCompletionTaskNames() : [];
             const pace = getWeeklyPaceContext();
-            const analyticsOn = cloudData?.settings?.analyticsTrackingEnabled === true;
             const archives = Object.entries(safeObject(cloudData?.weeklyArchive))
                 .sort((a, b) => Number(a[0]) - Number(b[0]))
                 .filter(([, archive]) => archive && typeof archive === 'object');
@@ -6027,6 +6067,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const profile = profiles.find(item => item.name.toLocaleLowerCase() === name.toLocaleLowerCase());
                 return { name, isMain: !!profile?.isMain, eligible, done, pending: Math.max(0, eligible - done), rate, excluded, marked, thisWeekActivity, latestTouch, pendingTasks, trend };
             });
+            const recentArchiveEntries = archives.slice(-3);
+            metrics.forEach(item => {
+                const character = { name:item.name, isMain:item.isMain };
+                const rankedTasks = item.pendingTasks.map(taskRow => ({
+                    ...taskRow,
+                    recommendation: buildOverviewTaskRecommendation(character, taskRow.task, archives, recentArchiveEntries)
+                })).sort((a, b) => (b.recommendation.sc - a.recommendation.sc) || (b.recommendation.w - a.recommendation.w) || (b.recommendation.c - a.recommendation.c) || a.task.localeCompare(b.task));
+                item.pendingTasks = rankedTasks;
+                item.nextRecommendation = rankedTasks[0]?.recommendation || null;
+                item.nextTask = item.nextRecommendation?.t || '';
+                item.nextReason = item.nextRecommendation ? getRecommendationPlainReason(item.nextRecommendation) : '';
+            });
             const totalEligible = metrics.reduce((sum, item) => sum + item.eligible, 0);
             const totalDone = metrics.reduce((sum, item) => sum + item.done, 0);
             const totalPending = metrics.reduce((sum, item) => sum + item.pending, 0);
@@ -6034,9 +6086,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const main = metrics.find(item => item.isMain);
             const priorities = [];
             metrics.forEach(item => {
-                const nextTask = item.pendingTasks[0]?.task || '';
-                // Ease into the week. No low-completion alarms in the first 48 hours;
-                // increase urgency gradually as the Saturday reset approaches.
+                const nextTask = item.nextTask || item.pendingTasks[0]?.task || '';
+                const nextReason = item.nextReason || 'It is one of the highest-priority tasks still open for this character.';
+                const nextAction = nextTask ? `Next: “${nextTask}”. ${nextReason}` : 'Review the remaining tasks and choose one that fits the time available.';
+                // Ease into the week. Use the personalized task ranking for the next action,
+                // and let reset timing change urgency rather than adding generic encouragement.
                 if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 48) {
                     const late = pace.elapsedHours >= 144;
                     const midweek = pace.elapsedHours >= 96;
@@ -6045,9 +6099,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         label: late ? 'No completions' : 'Not started',
                         title:`${item.name}${item.isMain ? ' · Main' : ''}`,
                         body: late
-                            ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away. If this character is still in your rotation, start with ${nextTask ? `“${nextTask}”` : 'one task that matters most'}.`
-                            : `No tasks are checked off yet. If this character is still in your rotation, start with ${nextTask ? `“${nextTask}”` : 'one task that matters most'}.`,
-                        meta:`0/${item.eligible} tasks complete · check for missed checkmarks first`
+                            ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away. ${nextAction}`
+                            : `No tasks are recorded yet. ${nextAction}`,
+                        meta:`0/${item.eligible} complete · ${item.pending} remaining`
                     });
                 } else if (item.eligible > 0 && item.rate < 40 && pace.elapsedHours >= 48) {
                     const late = pace.elapsedHours >= 144;
@@ -6057,17 +6111,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         label: late ? 'Low completion' : midweek ? 'Behind pace' : 'In progress',
                         title:`${item.name}${item.isMain ? ' · Main' : ''}`,
                         body: late
-                            ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away. ${item.pending} tasks remain; start with ${nextTask ? `“${nextTask}”` : 'the task that matters most'} if time is tight.`
+                            ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away, with ${item.pending} tasks left. ${nextAction}`
                             : midweek
-                                ? `${item.done}/${item.eligible} tasks are complete. Try ${nextTask ? `“${nextTask}”` : 'the next important task'} if this character is still a priority.`
-                                : `${item.done}/${item.eligible} tasks are complete. Work through what fits your available time${nextTask ? `, starting with “${nextTask}” if useful` : ''}.`,
-                        meta:`${item.done}/${item.eligible} complete · ${item.pending} left`
+                                ? `${item.done}/${item.eligible} tasks are complete. ${nextAction}`
+                                : `${item.done}/${item.eligible} tasks are complete. Start with the best-value task that fits your time: ${nextAction}`,
+                        meta:`${item.done}/${item.eligible} complete · ${item.pending} remaining`
                     });
                 } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0 && pace.elapsedHours >= 96) {
-                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name}${item.isMain ? ' · Main' : ''}`, body:`${item.pending} tasks remain. ${nextTask ? `Next: “${nextTask}”.` : 'Choose the next task that matters most.'} Keep this character in the rotation if it is still a priority.`, meta:`${item.done}/${item.eligible} complete` });
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name}${item.isMain ? ' · Main' : ''}`, body:`${item.pending} tasks remain. ${nextAction}`, meta:`${item.done}/${item.eligible} complete` });
                 }
                 if (pace.elapsedHours >= 48 && item.trend !== null && item.trend <= -20) {
-                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Check pattern', title:`${item.name}: completion dipped`, body:`Completion fell ${Math.abs(item.trend)} points over two saved weeks. Check missed ticks or changed priorities before adjusting tracking.`, meta:'Saved weekly trend · one dip is not a verdict' });
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Check pattern', title:`${item.name}: completion dipped`, body:`Completion fell ${Math.abs(item.trend)} points across the last two saved weeks. Check whether tasks were missed, not attempted, or no longer a priority before changing the plan.`, meta:'Weekly history · check the cause before changing course' });
                 }
             });
             priorities.sort((a,b) => a.rank-b.rank || a.title.localeCompare(b.title));
@@ -6104,10 +6158,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (sortedMetrics.length) {
                 completionHtml = sortedMetrics.map(item => {
                     const badge = getPacedCompletionBadge(item, pace);
-                    const trendText = item.trend === null ? (analyticsOn ? 'Trend appears after more weeks are saved.' : 'Trend unavailable while weekly history is off.') : item.trend > 0 ? `Up ${item.trend} points over the last two saved weeks.` : item.trend < 0 ? `Down ${Math.abs(item.trend)} points over the last two saved weeks.` : 'Steady over the last two saved weeks.';
-                    const pendingName = item.pendingTasks[0]?.task;
-                    const quickTip = item.pending === 0 ? 'All weekly tasks complete.' : (pendingName ? `Suggested next task: ${pendingName}.` : `${item.pending} tasks remain.`);
-                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} weekly tasks done · ${esc(item.pending)} left.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
+                    const suggestion = item.nextRecommendation;
+                    const quickTip = item.pending === 0
+                        ? 'All weekly tasks complete.'
+                        : suggestion
+                            ? `Next: ${suggestion.t}. ${getRecommendationPlainReason(suggestion)}`
+                            : `${item.pending} tasks remain. Review the highest-priority open task.`;
+                    const trendText = item.trend === null || item.trend === 0 ? '' : item.trend > 0 ? `Completion rose ${item.trend} points over saved weeks.` : `Completion fell ${Math.abs(item.trend)} points over saved weeks.`;
+                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} weekly tasks done · ${esc(item.pending)} left.</p><span class="activity-insight-meta">${esc(quickTip)}</span>${trendText ? `<span class="activity-insight-meta">${esc(trendText)}</span>` : ''}</div></div>`;
                 }).join('');
             } else {
                 completionHtml = `<div class="activity-insight-empty">No eligible weekly tasks are currently configured for the characters you track.</div>`;
@@ -6629,19 +6687,29 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function getRecommendationPlainReason(item) {
             const fitLabel = String(item.fit?.label || '').toLowerCase();
             const profileKey = String(item.activityProfile?.key || 'standard');
-            if (profileKey === 'theme-park') return 'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.';
-            if (profileKey === 'abyssal-mire') return 'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset. A service may be worthwhile if you cannot clear it yourself.';
-            if (profileKey === 'dragon-fellowship') return 'Weekly Heraldry rewards. If duoing is not practical, a service may still be worthwhile.';
-            if (profileKey === 'gdn-classic') return 'A good weekly target for Essence of Life and Polished Diamonds.';
-            if (profileKey === 'gdn-hardcore') return 'Weigh the 36g chest and useful gear codes against the seal-stamp cost.';
-            if (profileKey === 'ddn-hardcore') return 'A carry or service may make this worthwhile, even without a personal clear recorded.';
-            if (profileKey === 'black-dragon') return 'Level 70 endgame content. Judge readiness from this raid’s own history.';
-            if (fitLabel.includes('recent clear')) return 'This character cleared it recently, so repeating it is a sensible option.';
-            if (fitLabel.includes('previously cleared') || fitLabel.includes('prior clear')) return 'This character has cleared it before, though current readiness may have changed.';
-            if (fitLabel.includes('carry may fit')) return 'A carry or service may make this doable, even without a personal clear.';
-            if (fitLabel.includes('repeated misses')) return 'This has been missed before, so it may be less practical, but it is not ruled out.';
-            if (fitLabel.includes('main high-tier focus')) return 'Worth considering for your Main, but current readiness is not confirmed.';
-            return 'There is limited history so far; this is an early suggestion based on weekly value.';
+            const recentClear = fitLabel.includes('recent clear');
+            const priorClear = fitLabel.includes('previously cleared') || fitLabel.includes('prior clear');
+            const historyLead = recentClear
+                ? 'This character cleared it in recent saved weeks, so it is a proven option. '
+                : priorClear
+                    ? 'This character has cleared it before, so it is a known option. '
+                    : '';
+            const activityAdvice = {
+                'theme-park':'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.',
+                'abyssal-mire':'Run 2F + 5F and leave 1 key for reset to reach 5,000 weekly points. Consider a service if you cannot clear it yourself.',
+                'dragon-fellowship':'Aim for the weekly Heraldry pouches. If duoing is not practical, a service may still be worthwhile.',
+                'gdn-classic':'Prioritize it for weekly Essence of Life and Polished Diamonds; codes and gold are extra value.',
+                'gdn-hardcore':'Check whether the 36g chest, Legend Codes, and L Accessories justify the seal-stamp cost.',
+                'ddn-hardcore':'If a personal clear is not practical, check for a carry or service instead of ruling it out.',
+                'black-dragon':'Use this character’s Black Dragon results to judge readiness; lower-tier clears do not confirm it.'
+            };
+            if (activityAdvice[profileKey]) return `${historyLead}${activityAdvice[profileKey]}`;
+            if (recentClear) return 'This character cleared it recently, so repeating it is a reliable next step.';
+            if (priorClear) return 'This character has cleared it before, making it a sensible repeat if time allows.';
+            if (fitLabel.includes('carry may fit')) return 'No personal clear is recorded. A guild carry or service can make the rewards accessible without relying on a solo clear.';
+            if (fitLabel.includes('repeated misses')) return 'This has been left unfinished repeatedly. Check whether a carry or lower-effort route can make it achievable this week.';
+            if (fitLabel.includes('main high-tier focus')) return 'This is a high-tier target for your Main. Plan the right group for this specific raid instead of assuming lower-tier clears carry over.';
+            return 'This is among the highest-ranked tasks left for this character. Completing it advances weekly progress and gives future recommendations more evidence.';
         }
 
         function getRecommendationActivityNote(item) {
@@ -6702,19 +6770,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     order.forEach((t, i) => { if(!stats[t])stats[t]={m:0,c:0,x:0,o:0}; if(sStr[i]) { stats[t].o++; if(sStr[i]==='x')stats[t].x++; else if(sStr[i]==='d')stats[t].c++; else stats[t].m++; } });
                 });
                 
-                const p = Object.entries(stats).map(([t, s]) => {
-                    const e = s.m + s.c, w = getLootWeight(t);
-                    const baseScore = Math.max(0, Math.round(w * (0.55 * (e?s.m/e:0) + 0.3 * Math.min(1,s.m/3) + 0.15 * Math.min(1,Math.max(e,s.o)/4)) * (1-(0.65*(s.o?s.x/s.o:0))) * 20));
-                    const completionPatternBonus = s.o >= 2 && s.c / Math.max(1, s.o) >= 0.7 ? Math.min(5, Math.round(w * 0.35)) : 0;
-                    const fit = getCharacterTaskRecommendationFit(char, t, s, sortedArchiveEntries, recentArchiveEntries);
-                    const activityProfile = getActivityValueProfile(t);
-                    const activityValueMultiplier = getActivityValueMultiplier(activityProfile);
-                    const scoreBeforeFit = baseScore + completionPatternBonus;
-                    // P combines fixed shared Loot Weight, activity utility/effort priors, and character fit.
-                    // L itself is never altered by these contextual multipliers.
-                    const personalizedScore = Math.max(0, Math.round(scoreBeforeFit * fit.multiplier * activityValueMultiplier));
-                    return { t, m: s.m, c: s.c, e, x: s.x, o: s.o, w, sc: personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, fit, activityProfile, activityValueMultiplier, suppress:fit.suppress };
-                }).filter(x => x.m > 0 && !x.suppress).sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m).slice(0, 3);
+                const p = Object.entries(stats).map(([t, taskStats]) => buildPersonalizedTaskRecommendation(char, t, taskStats, sortedArchiveEntries, recentArchiveEntries))
+                    .filter(item => item.m > 0 && !item.suppress)
+                    .sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m)
+                    .slice(0, 3);
                 
                 const prioHTML = p.length ? p.map((i, rank) => {
                     const explanation = buildRecommendationExplanation(i);
@@ -8542,7 +8601,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r16';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r17';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
