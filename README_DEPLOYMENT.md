@@ -1,6 +1,13 @@
-# Pantheon Tools v1.6.8-r12 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r13 — Cloudflare Pages + D1
 
 This release continues directly from the stable v1.6.8 branch. It preserves the original package structure and does not import code from later v1.6.9 or v1.7.x branches.
+
+## v1.6.8-r13 Tracker class labels
+
+- Each Tracker character column now shows the IGN on the first line and the configured Job in parentheses on a smaller, centered second line (for example, `Diabolina` / `(Saleana)`).
+- Main-character star remains beside the IGN rather than after the full two-line header.
+- The class uses the existing character job in Member Roster/Character Jobs. If no job is configured, the header says `(Class not set)` instead of inventing a class.
+- Uses theme-aware inherited text color and the existing header background; main font sizes and task cells are unchanged. No schema or API changes.
 
 ## v1.6.8-r12 activity reward/effort profiles
 
