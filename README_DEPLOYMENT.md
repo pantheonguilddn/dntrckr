@@ -1,8 +1,17 @@
-# Pantheon Tools v1.6.8-r15 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r16 — Cloudflare Pages + D1
 
-This release continues directly from the stable v1.6.8 branch. It preserves the original package structure and does not import code from later v1.6.9 or v1.7.x branches.
+This release continues directly from the v1.6.8-r15 package, itself built from the stable v1.6.8 line. It does not import code from later v1.6.9 or v1.7.x branches.
 
-## v1.6.8-r15 explainable Activity Insights
+## v1.6.8-r16 plain-language Activity Insights
+
+- Simplifies Overview reminders to one clear next action, a short reason, and a compact completion status. The existing gradual urgency increase toward the Saturday reset remains in place.
+- Simplifies personalized task recommendations in the lower Analytics area. Each card leads with one practical sentence. **Why suggested?** opens a brief history note and an activity-specific tip; saved result counts, character-fit detail, and score explanation are nested under **Past results and score (optional)**.
+- Replaces self-explaining caveats with actionable activity advice: Theme Park recommends Persian Goblin for players with auto-attacking units who want to idle, or Treacherous Path for fast clears; any Theme Park activity counts. Abyssal Mire recommends 2F + 5F with 1 key remaining for the 5,000-point weekly total after reset, and notes that a service may be worthwhile. Dragon Fellowship is presented as a weekly Heraldry reward, with a service as an option when duoing is impractical.
+- Shortens the Help Guide’s analytics explanation and replaces technical terms in prominent UI copy where simpler wording is clearer.
+- Keeps the underlying recommendation formula, shared Loot Weight values, character-fit logic, confidence thresholds, weekly archive structure, bounty behavior, permissions, schema, and API unchanged.
+- Preserves all 31 entries and paths from the r15 ZIP. JavaScript syntax, CSS parsing, duplicate HTML IDs, and focused wording checks pass. Live Cloudflare Pages, D1, and Discord-session end-to-end tests were not performed.
+
+## Historical: v1.6.8-r15 explainable Activity Insights
 
 - Each personalized task recommendation now has an expandable **Why this ranking?** explanation showing the per-character fit rationale, configured activity reward/effort profile, archived outcomes, and score components that produced its P priority.
 - Adds Low / Moderate / High evidence confidence based on the count of non-N/A archived observations for that activity: under two usable observations is Low, two to three is Moderate, and four or more is High. This measures available history, not a probability of success or a promise that the character can clear the activity.

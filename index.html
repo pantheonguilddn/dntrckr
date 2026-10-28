@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r15</title>
+    <title>Pantheon Tools v1.6.8-r16</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2616,7 +2616,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .analytics-personalization-note{grid-column:1/-1;box-sizing:border-box;border:1px solid var(--pt-border,#444);border-radius:8px;background:var(--pt-surface-soft,#30303b);color:var(--pt-muted,#b7bdcc);padding:8px 10px;font-size:.69rem;line-height:1.5;}
 .analytics-personalization-note strong{color:var(--pt-text,#fff);font-weight:800;}
 .analytics-fit-note{display:block;margin-top:3px;color:var(--pt-muted,#a7afc2);font-size:.67rem;line-height:1.4;}
-.analytics-activity-value-note{display:block;margin-top:3px;color:var(--pt-muted,#a7afc2);font-size:.63rem;line-height:1.35;max-width:48rem;}
+.analytics-activity-value-note{display:block;margin-top:7px;padding:8px 10px;border:1px solid var(--pt-border,#454956);border-radius:8px;color:var(--pt-muted,#a7afc2);font-size:.68rem;line-height:1.45;max-width:48rem;}
+.analytics-activity-value-note>strong{display:block;color:var(--pt-text,#f2f2f2);font-size:.7rem;margin-bottom:3px;}
+.analytics-activity-value-note ul{margin:4px 0 0;padding-left:18px;display:grid;gap:4px;}
+.analytics-activity-value-note li{padding-left:1px;}
+.analytics-recommendation-explanation .analytics-explanation-body p{overflow-wrap:anywhere;}
+.analytics-score-details{font-size:.67rem;line-height:1.45;}
 </style>
 
 <style id="pantheon-r15-explainable-activity-insights">
@@ -2634,6 +2639,30 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .analytics-evidence-level[data-confidence="Low"]{border-style:dotted;}
 .analytics-recommendation-scoring{overflow-wrap:anywhere;}
 @media(max-width:520px){.analytics-recommendation-explanation>summary{padding:7px 8px}.analytics-recommendation-explanation .analytics-explanation-body{padding:0 8px 8px}}
+</style>
+
+
+<style id="pantheon-v168-r16-plain-language-insights">
+.analytics-personalization-note{padding:6px 9px!important;font-size:.68rem!important;line-height:1.4!important;}
+.analytics-model-details{font-size:.68rem;line-height:1.55;color:var(--pt-muted,#b7bdcc);}
+.analytics-model-details>summary{cursor:pointer;font-weight:800;color:var(--pt-text,#f2f2f2);padding:2px 0;}
+.analytics-model-details p{margin:6px 0 2px;}
+.analytics-recommendation-card{align-items:flex-start!important;gap:10px!important;padding:10px 0!important;}
+.analytics-recommendation-main{flex:1;min-width:0;}
+.analytics-recommendation-plain-reason{margin:4px 0 0;color:var(--pt-muted,#b7bdcc);font-size:.72rem;line-height:1.45;overflow-wrap:anywhere;}
+.analytics-recommendation-rank{flex:0 0 auto;min-width:30px;box-sizing:border-box;text-align:center;padding:5px 6px;border:1px solid var(--pt-border,#555);border-radius:7px;background:var(--pt-surface-soft,#262630);color:var(--pt-text,#f2f2f2);font-size:.75rem;font-weight:850;}
+.analytics-recommendation-explanation{margin-top:6px;font-size:.68rem;line-height:1.45;}
+.analytics-recommendation-explanation>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.67rem;padding:6px 7px;}
+.analytics-recommendation-explanation>summary:after{content:none!important;}
+.analytics-recommendation-explanation .analytics-explanation-body{padding:0 8px 8px;}
+.analytics-recommendation-explanation .analytics-explanation-body p{margin:6px 0 0;}
+.analytics-score-details{margin-top:8px;padding-top:6px;border-top:1px solid var(--pt-border,#444);}
+.analytics-score-details>summary{cursor:pointer;font-weight:750;color:var(--pt-text,#f2f2f2);}
+.analytics-score-details p{overflow-wrap:anywhere;}
+.analytics-evidence-level{margin-left:auto;white-space:normal;text-align:center;font-size:.6rem;}
+.activity-insight-copy p{line-height:1.5!important;}
+.activity-insight-meta{line-height:1.35!important;}
+@media(max-width:520px){.analytics-recommendation-rank{min-width:26px;padding:4px;font-size:.69rem}.analytics-recommendation-plain-reason{font-size:.7rem}.analytics-recommendation-explanation>summary{align-items:flex-start;flex-wrap:wrap}}
 </style>
 
 </head>
@@ -2786,7 +2815,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         </section>
         <section class="overview-bottom-grid" aria-label="Personal tracker dashboard">
             <section class="overview-panel overview-activity-panel">
-                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>Personalized reminders, completion outliers, and practical next steps for the characters you track.</p></div><span class="overview-panel-kicker">YOUR ACTIVITY</span></div>
+                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>A quick view of what to do next and which characters may need a check.</p></div><span class="overview-panel-kicker">YOUR ACTIVITY</span></div>
                 <div class="activity-insights-summary" id="overview-insights-summary" aria-label="Personal tracker summary"></div>
                 <div class="overview-activity-list" id="overview-activity" aria-live="polite">
                     <div class="overview-activity-row"><span class="overview-activity-icon">✓</span><div><strong>Weekly tracker review</strong><p>Check for outstanding weekly tasks before the reset.</p></div></div>
@@ -3076,9 +3105,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r15</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r16</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r15 update:</strong> added explainable Activity Insights with per-recommendation evidence confidence and visible score breakdowns, while retaining the bounty fixes.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r16 update:</strong> simplified Activity Insights into short, actionable recommendations, with deeper reasoning kept behind optional details.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3334,10 +3363,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <h5>5-Week Trend</h5>
                         <p>Shows the most recent weekly completion percentages available for that character.</p>
                         <h5>Personalized Task Recommendations</h5>
-                        <p>The global Loot Weight is a shared value scale and never changes to fit an individual player. The personal recommendation score combines L with an activity profile for reward utility, effort/resource cost, accessibility, weekly objectives, and the character's own recorded history.</p>
-                        <p>Known examples include Abyssal Mire's flexible shop points and Saturday payout, GDN Classic's weekly material objective, GDN HC's reward-versus-seal-stamp tradeoff, weekly Dragon Fellowship Heraldry, and Theme Park's once-weekly x5 Jelly opportunity. The tool cannot see gear, shop balance, Jelly stock, carries in progress, or current market prices, so these profiles are starting estimates—not personal inventory advice.</p>
-                        <p>History is evaluated per activity. A recent clear supports that exact activity; a missing clear can reduce its recommendation only after repeated observations and activity elsewhere, and carry/service availability keeps the adjustment modest. This is not proof a character cannot clear something. Current N/A and completed tasks are not suggested as next actions.</p>
-                        <div class="help-callout"><b>L = shared Loot Weight. P = personalized recommendation score.</b> L never changes; P combines L with activity value and character-specific evidence.</div>
+                        <p>Suggestions use the shared Loot Weight, the activity's rewards and effort, and each character's saved history. The shared weight never changes for an individual player.</p>
+                        <p><b>Abyssal Mire:</b> Aim for 2F + 5F with 1 key remaining to reach 5,000 points after reset. A service may be worthwhile if you cannot clear it yourself.</p><p><b>Theme Park:</b> Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.</p><p><b>Dragon Fellowship:</b> Weekly Heraldry rewards. If duoing is not practical, a service may still be worthwhile.</p>
+                        <p>A recent clear makes that activity a stronger suggestion. Repeated misses can lower its priority, but they do not prove a character cannot do it. Completed and N/A tasks are left out of next-step suggestions.</p>
+                        <div class="help-callout"><b>Shared weight, personal order:</b> the task's shared importance stays the same, while the suggested order can differ for each character.</div>
                     </section>
                     <section class="help-topic" data-help-topic="weights">
                         <h4>Loot Weights</h4>
@@ -6014,11 +6043,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     priorities.push({
                         rank: late ? 0 : midweek ? 2 : 4, tone:'watch', icon: late ? '!' : '◷',
                         label: late ? 'No completions' : 'Not started',
-                        title:`${item.name}${item.isMain ? ' · Main' : ''} has no weekly completions recorded`,
+                        title:`${item.name}${item.isMain ? ' · Main' : ''}`,
                         body: late
-                            ? `No eligible weekly tasks are marked complete and reset is about ${Math.ceil(pace.hoursLeft)} hours away. Check whether you played this character but missed ticks, or whether it is not part of this week's rotation${nextTask ? `; a suggested task is “${nextTask}”` : ''}.`
-                            : `No eligible weekly tasks are marked complete yet. Check whether you missed ticks or whether this character is not part of this week's plan${nextTask ? `; a suggested task is “${nextTask}”` : ''}.`,
-                        meta:`0/${item.eligible} eligible weekly tasks recorded · confirm activity before changing tracking`
+                            ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away. If this character is still in your rotation, start with ${nextTask ? `“${nextTask}”` : 'one task that matters most'}.`
+                            : `No tasks are checked off yet. If this character is still in your rotation, start with ${nextTask ? `“${nextTask}”` : 'one task that matters most'}.`,
+                        meta:`0/${item.eligible} tasks complete · check for missed checkmarks first`
                     });
                 } else if (item.eligible > 0 && item.rate < 40 && pace.elapsedHours >= 48) {
                     const late = pace.elapsedHours >= 144;
@@ -6026,19 +6055,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     priorities.push({
                         rank: late ? 1 : midweek ? 2 : 4, tone:'watch', icon: late ? '!' : '↗',
                         label: late ? 'Low completion' : midweek ? 'Behind pace' : 'In progress',
-                        title:`${item.name}${item.isMain ? ' · Main' : ''}: ${item.pending} weekly tasks remain open`,
+                        title:`${item.name}${item.isMain ? ' · Main' : ''}`,
                         body: late
-                            ? `${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%) with reset approaching. If time is limited, start with ${nextTask ? `“${nextTask}”` : 'the tasks that matter most this week'}.`
+                            ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away. ${item.pending} tasks remain; start with ${nextTask ? `“${nextTask}”` : 'the task that matters most'} if time is tight.`
                             : midweek
-                                ? `${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). The week is past its midpoint; consider ${nextTask ? `“${nextTask}”` : 'the highest-priority open task'} if this character is still in your rotation.`
-                                : `${item.done}/${item.eligible} eligible tasks are complete (${item.rate}%). The week is still in progress; use the remaining time according to your priorities${nextTask ? `, starting with “${nextTask}” if it fits` : ''}.`,
-                        meta:`${item.pending} open · Bounty tasks excluded`
+                                ? `${item.done}/${item.eligible} tasks are complete. Try ${nextTask ? `“${nextTask}”` : 'the next important task'} if this character is still a priority.`
+                                : `${item.done}/${item.eligible} tasks are complete. Work through what fits your available time${nextTask ? `, starting with “${nextTask}” if useful` : ''}.`,
+                        meta:`${item.done}/${item.eligible} complete · ${item.pending} left`
                     });
                 } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0 && pace.elapsedHours >= 96) {
-                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name} has ${item.pending} task${item.pending===1?'':'s'} left`, body:`Completion is ${item.rate}%. ${nextTask ? `A useful next step is “${nextTask}”, one of the higher-weight open tasks.` : 'Check which open tasks still matter this week.'} Keep this character in the rotation only if it remains a current priority.`, meta:`${item.done}/${item.eligible} eligible tasks complete` });
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name}${item.isMain ? ' · Main' : ''}`, body:`${item.pending} tasks remain. ${nextTask ? `Next: “${nextTask}”.` : 'Choose the next task that matters most.'} Keep this character in the rotation if it is still a priority.`, meta:`${item.done}/${item.eligible} complete` });
                 }
                 if (pace.elapsedHours >= 48 && item.trend !== null && item.trend <= -20) {
-                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Completion dipped', title:`${item.name} dropped ${Math.abs(item.trend)} points across saved weeks`, body:`The last two available weekly snapshots show lower completion. This could reflect time constraints, changed priorities, or missed ticks. Review another cycle before drawing conclusions.`, meta:`${item.trend > 0 ? '+' : ''}${item.trend} percentage points vs the previous archived week · analytics history` });
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Check pattern', title:`${item.name}: completion dipped`, body:`Completion fell ${Math.abs(item.trend)} points over two saved weeks. Check missed ticks or changed priorities before adjusting tracking.`, meta:'Saved weekly trend · one dip is not a verdict' });
                 }
             });
             priorities.sort((a,b) => a.rank-b.rank || a.title.localeCompare(b.title));
@@ -6052,16 +6081,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
             }
             if (!owner || metrics.length === 0) {
-                const noData = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters from Member Roster to get completion insights, outlier reminders, and task-specific advice here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
+                const noData = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters in Member Roster to see weekly progress and helpful reminders here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
                 if (cont) cont.innerHTML = noData;
-                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Character-level completion will appear here once at least one registered character is opted into Tracker. No roster or progress data is shown for other members.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
+                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Weekly progress appears here after you opt a character into Tracker. Other members' rosters and progress are not shown.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
             let insightHtml = `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(pace.label)}</span></div>`;
             if (shownPriorities.length) {
                 insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
-                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.elapsedHours < 48 ? 'The week has just started' : 'No immediate follow-up'}</strong><p>${pace.elapsedHours < 48 ? 'Completion percentages are still settling after the reset. Reminders become more urgent gradually as Saturday approaches.' : pace.elapsedHours < 96 ? 'Weekly tasks are in progress. Choose what fits your time; reminders get more specific later in the week.' : 'No major follow-up is flagged right now. Check remaining tasks again as the Saturday reset gets closer.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty tasks excluded</span></div></div>`;
+                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.elapsedHours < 48 ? 'The week has just started' : 'No urgent follow-up'}</strong><p>${pace.elapsedHours < 48 ? 'Plenty of time remains. Check back later as reminders gradually sharpen near Saturday.' : pace.elapsedHours < 96 ? 'Choose tasks that fit your plan and available time.' : 'Nothing urgent is flagged. Recheck open tasks before Saturday’s reset.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
             }
             if (cont) cont.innerHTML = insightHtml;
 
@@ -6075,10 +6104,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (sortedMetrics.length) {
                 completionHtml = sortedMetrics.map(item => {
                     const badge = getPacedCompletionBadge(item, pace);
-                    const trendText = item.trend === null ? (analyticsOn ? 'Not enough saved weekly snapshots for a trend yet.' : 'Trend unavailable because weekly analytics is off.') : `${item.trend > 0 ? '+' : ''}${item.trend} pts across the last two archived weeks.`;
+                    const trendText = item.trend === null ? (analyticsOn ? 'Trend appears after more weeks are saved.' : 'Trend unavailable while weekly history is off.') : item.trend > 0 ? `Up ${item.trend} points over the last two saved weeks.` : item.trend < 0 ? `Down ${Math.abs(item.trend)} points over the last two saved weeks.` : 'Steady over the last two saved weeks.';
                     const pendingName = item.pendingTasks[0]?.task;
-                    const quickTip = item.pending === 0 ? 'All eligible tasks are complete.' : (pendingName ? `Next high-weight open task: ${pendingName}.` : `${item.pending} eligible task${item.pending===1?'':'s'} remain.`);
-                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} eligible weekly tasks complete · ${esc(item.pending)} open.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
+                    const quickTip = item.pending === 0 ? 'All weekly tasks complete.' : (pendingName ? `Suggested next task: ${pendingName}.` : `${item.pending} tasks remain.`);
+                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} weekly tasks done · ${esc(item.pending)} left.</p><span class="activity-insight-meta">${esc(quickTip)} ${esc(trendText)}</span></div></div>`;
                 }).join('');
             } else {
                 completionHtml = `<div class="activity-insight-empty">No eligible weekly tasks are currently configured for the characters you track.</div>`;
@@ -6211,18 +6240,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const checkTicks = signals.filter(item => item.checkTicks && !item.isMain);
             const checkWeeklyLog = signals.filter(item => item.checkWeeklyLog && !item.isMain);
             const reviewTextParts = [];
-            if (checkTicks.length) reviewTextParts.push(`${checkTicks.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkTicks.length>3?' + more':''}: other tasks are recorded, but weekly ticks are empty. Check those ticks first.`);
-            if (checkWeeklyLog.length) reviewTextParts.push(`${checkWeeklyLog.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkWeeklyLog.length>3?' + more':''}: no activity is recorded this cycle despite past participation. Could be missed ticks or not played; confirm first.`);
-            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: consistently low recorded activity across saved weeks. If this character is out of rotation, consider marking weekly tasks N/A or disabling tracking.`);
+            if (checkTicks.length) reviewTextParts.push(`${checkTicks.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkTicks.length>3?' + more':''}: other activity is recorded, but weekly tasks are unchecked. Check for missed marks.`);
+            if (checkWeeklyLog.length) reviewTextParts.push(`${checkWeeklyLog.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${checkWeeklyLog.length>3?' + more':''}: nothing is marked this week despite past activity. Check for missed marks or confirm they were not played.`);
+            if (reviewNA.length) reviewTextParts.push(`${reviewNA.slice(0,3).map(item=>escapeHTML(item.name)).join(', ')}${reviewNA.length>3?' + more':''}: little progress is recorded across saved weeks. If they are out of rotation, mark tasks N/A or turn off Tracker.`);
             const reviewText = reviewTextParts.join(' ');
-            const activitySummary = `Marked Main: ${signals.filter(item=>item.isMain).length} · Secondary with recorded activity: ${signals.filter(item=>!item.isMain && (item.regular || item.emerging)).length} · Low activity to review: ${signals.filter(item=>item.reviewNA).length}`;
-            const historySummary = recent.length ? `${recent.length} saved weekly snapshot${recent.length===1?'':'s'}` : 'No saved weekly history yet';
+            const activitySummary = `Main: ${signals.filter(item=>item.isMain).length} · Active alts: ${signals.filter(item=>!item.isMain && (item.regular || item.emerging)).length} · To review: ${signals.filter(item=>item.reviewNA).length}`;
+            const historySummary = recent.length ? `${recent.length} saved week${recent.length===1?'':'s'}` : 'No saved history yet';
             const hasThemeParkTask = cloudData.settings.categories.some(category => (category.tasks || []).some(task => /theme\s*park/i.test(String(task))));
+            const hasAbyssalMireTask = cloudData.settings.categories.some(category => (category.tasks || []).some(task => /abyssal\s+mire/i.test(String(task))));
             const hasWeeklyDragonFellowship = cloudData.settings.categories.some(category => category.group === 'Weeklies' && (category.tasks || []).some(task => /dragon\s+fellowship/i.test(String(task))));
             const activityPlanningHints = [];
-            if (hasThemeParkTask) activityPlanningHints.push('Theme Park is faster with the once-weekly x5 Jelly opportunity; Jelly availability is not tracked, so do not assume it is available for every run.');
-            if (hasWeeklyDragonFellowship) activityPlanningHints.push('Dragon Fellowship is a weekly Heraldry opportunity; current character Heraldry needs are not tracked.');
-            const activityPlanningHint = activityPlanningHints.join(' ');
+            if (hasAbyssalMireTask) activityPlanningHints.push({ title:'Abyssal Mire', text:'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset. A service may be worthwhile if you cannot clear it yourself.' });
+            if (hasThemeParkTask) activityPlanningHints.push({ title:'Theme Park', text:'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.' });
+            if (hasWeeklyDragonFellowship) activityPlanningHints.push({ title:'Dragon Fellowship', text:'Weekly Heraldry rewards. If duoing is not practical, a service may still be worthwhile.' });
+            const activityPlanningHint = activityPlanningHints.length ? `<div class="analytics-activity-value-note"><strong>Quick activity tips</strong><ul>${activityPlanningHints.map(hint => `<li><strong>${escapeHTML(hint.title)}:</strong> ${escapeHTML(hint.text)}</li>`).join('')}</ul></div>` : '';
             const configuredEvents = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
             const itemEvent = getRateUpWindow(configuredEvents.itemDrop, now);
             const enhanceEvent = getRateUpWindow(configuredEvents.enhancement, now);
@@ -6246,13 +6277,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             panel.className = 'weekly-plan-card weekly-plan-card-compact';
             panel.innerHTML = `
                 <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity Summary</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
-                <p class="focus-model-explainer">Shows recorded weekly-task progress and learns your usual character rotation from saved weeks. An unticked task may be missed data, not proof the character was not played. Lucky Zones are estimated only—not tracked.</p>
+                <p class="focus-model-explainer">Tracks weekly progress and learns which characters you usually play. Unticked tasks may just be missed checkmarks. Lucky Zone time is estimated, not tracked.</p>
                 <div class="focus-summary-line"><strong>Likely priorities:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Early estimate</span>' : ''}</div>
                 ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to see their recorded progress.</div>'}
                 ${signals.length ? `<div class="focus-model-summary">${escapeHTML(activitySummary)} <span>· ${escapeHTML(historySummary)}</span></div>` : ''}
                 ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
                 <div class="focus-summary-line"><strong>Recorded today:</strong> ${todayWins.length} task completions · <strong>Lucky Zone estimate:</strong> about ${lzMinutes} min across ${registeredCount} registered character${registeredCount===1?'':'s'} (3 solo runs × ~8 min each; not tracked)</div>
-                ${activityPlanningHint ? `<div class="analytics-activity-value-note">${escapeHTML(activityPlanningHint)}</div>` : ''}
+                ${activityPlanningHint}
                 ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,3).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
                 ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
@@ -6408,10 +6439,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // These are cautious default priors, not measured live market prices or inventory values.
         const ACTIVITY_VALUE_PROFILES = [
             {
-                key:'abyssal-mire', match:/abyssal\s+mire/i, label:'Flexible Abyssal Shop value', cadence:'weekly',
+                key:'abyssal-mire', match:/abyssal\s+mire/i, label:'Weekly points and shop rewards', cadence:'weekly',
                 rewardUtility:1.12, effortMultiplier:1.00, accessibilityMultiplier:1.04, objectiveMultiplier:1.00, resourceMultiplier:1.00,
                 shortNote:'2F + 5F: 2,000 points; Saturday reset adds 3,000 (5,000 total).',
-                detail:'Abyssal Mire points can serve several goals: Essence of Life (240 points), Polished Diamond (300), Flawless Diamond for the L DDN → L BDN transition (300), Crystal of Power (30), Job Change Scroll (18,000), cosmetics/mounts, and Paculta Epic/Unique suffix materials. Shop balance and personal inventory are not tracked, so the model cannot assume which purchase is currently needed.',
+                detail:'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset. Points can go toward Essence of Life (240), Polished Diamond (300), Flawless Diamond (300), Crystal of Power (30), Job Change Scroll (18,000), cosmetics, mounts, and Paculta suffix materials. A service may be worthwhile if you cannot clear it yourself.',
                 carryPotential:true, resetSensitive:true
             },
             {
@@ -6446,15 +6477,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 key:'dragon-fellowship', match:/dragon\s+fellowship/i, label:'Weekly Heraldry progression', cadence:'weekly',
                 rewardUtility:1.05, effortMultiplier:1.02, accessibilityMultiplier:1.00, objectiveMultiplier:1.00, resourceMultiplier:1.00,
                 shortNote:'Weekly choice: 1 random Fellowship Heraldry pouch or 2 random Level 70 Heraldry pouches.',
-                detail:'Dragon Fellowship is treated as a weekly opportunity. Random Heraldry pouches have progression value, and a crafted Heraldry may gain a third stat. The tool does not know which Heraldry stats a character currently needs.',
+                detail:'Weekly Heraldry pouches can help with progression. If duoing is not practical, a service may still be worthwhile.',
                 carryPotential:true
             },
             {
-                key:'theme-park', match:/theme\s*park/i, label:'Weekly x5 Jelly opportunity', resourceCadence:'weekly',
+                key:'theme-park', match:/theme\s*park/i, label:'Fast weekly clear', resourceCadence:'weekly',
                 rewardUtility:1.00, effortMultiplier:1.05, accessibilityMultiplier:1.00, objectiveMultiplier:1.00, resourceMultiplier:1.00,
-                shortNote:'The once-weekly x5 Jelly opportunity can make Theme Park fast; availability is not tracked.',
-                detail:'Theme Park can be quick when the once-weekly x5 Jelly resource is available. The tool does not track Jelly inventory, whether the weekly use remains, or whether it was spent elsewhere, so the efficiency advantage is a cautious estimate—not a guarantee for every run.',
-                resourceSensitive:true
+                shortNote:'Persian Goblin works well with auto-attacking units; Treacherous Path is good for fast clears. Any Theme Park activity counts.',
+                detail:'Choose Persian Goblin if your units auto-attack and you want to idle, or Treacherous Path for fast clearing. Any Theme Park activity counts.',
+                resourceSensitive:false
             }
         ];
 
@@ -6580,14 +6611,51 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             else if (usable >= 2) level = 'Moderate';
             let description;
             if (usable <= 1) {
-                description = `Only ${usable} non-N/A weekly observation${usable === 1 ? '' : 's'} are available for this activity. Treat the personal-fit adjustment as an early estimate.`;
+                description = 'Early estimate: there is not much saved history for this activity yet.';
             } else if (usable <= 3) {
-                description = `${usable} non-N/A weekly observations are available. This is a useful early pattern, but more archived weeks can still change the ranking.`;
+                description = 'Some history is available, but this suggestion may change as more weeks are saved.';
             } else {
-                description = `${usable} non-N/A weekly observations are available. This is a stronger history-based signal, but it still does not guarantee that the character can clear the activity today.`;
+                description = 'Several saved weeks support this suggestion, but they do not guarantee a clear today.';
             }
-            if (excluded > 0) description += ` ${excluded} N/A record${excluded === 1 ? ' is' : 's are'} excluded from capability evidence.`;
+            // N/A counts are available in the optional Past results section; keep this summary short.
             return { level, observations, usable, cleared, notCompleted, excluded, description };
+        }
+
+        function getRecommendationConfidenceLabel(evidence) {
+            return evidence.level === 'High' ? 'Good history' : evidence.level === 'Moderate' ? 'Some history' : 'Early data';
+        }
+
+        // One short sentence for the default view. The detailed factors remain available only on request.
+        function getRecommendationPlainReason(item) {
+            const fitLabel = String(item.fit?.label || '').toLowerCase();
+            const profileKey = String(item.activityProfile?.key || 'standard');
+            if (profileKey === 'theme-park') return 'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.';
+            if (profileKey === 'abyssal-mire') return 'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset. A service may be worthwhile if you cannot clear it yourself.';
+            if (profileKey === 'dragon-fellowship') return 'Weekly Heraldry rewards. If duoing is not practical, a service may still be worthwhile.';
+            if (profileKey === 'gdn-classic') return 'A good weekly target for Essence of Life and Polished Diamonds.';
+            if (profileKey === 'gdn-hardcore') return 'Weigh the 36g chest and useful gear codes against the seal-stamp cost.';
+            if (profileKey === 'ddn-hardcore') return 'A carry or service may make this worthwhile, even without a personal clear recorded.';
+            if (profileKey === 'black-dragon') return 'Level 70 endgame content. Judge readiness from this raid’s own history.';
+            if (fitLabel.includes('recent clear')) return 'This character cleared it recently, so repeating it is a sensible option.';
+            if (fitLabel.includes('previously cleared') || fitLabel.includes('prior clear')) return 'This character has cleared it before, though current readiness may have changed.';
+            if (fitLabel.includes('carry may fit')) return 'A carry or service may make this doable, even without a personal clear.';
+            if (fitLabel.includes('repeated misses')) return 'This has been missed before, so it may be less practical, but it is not ruled out.';
+            if (fitLabel.includes('main high-tier focus')) return 'Worth considering for your Main, but current readiness is not confirmed.';
+            return 'There is limited history so far; this is an early suggestion based on weekly value.';
+        }
+
+        function getRecommendationActivityNote(item) {
+            const profileKey = String(item.activityProfile?.key || 'standard');
+            const notes = {
+                'abyssal-mire':'Best plan: 2F + 5F, with 1 key remaining for the reset payout. This reaches 5,000 weekly points; a service can be a practical fallback.',
+                'gdn-classic':'Focus on the weekly Essence of Life and Polished Diamond rewards.',
+                'gdn-hardcore':'Check whether the chest and gear-code rewards are worth the seal stamps.',
+                'ddn-hardcore':'A carry or service can make this raid worthwhile without a personal clear.',
+                'black-dragon':'Use Black Dragon results to judge this raid; other raid clears do not confirm readiness.',
+                'dragon-fellowship':'Weekly Heraldry pouches. If a duo clear is out of reach, a service may still be worthwhile.',
+                'theme-park':'Persian Goblin suits auto-attacking units if you want to idle. Treacherous Path is good for fast clears. Any Theme Park activity counts.'
+            };
+            return notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
         }
 
         function buildRecommendationExplanation(item) {
@@ -6619,7 +6687,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const recentArchiveEntries = sortedArchiveEntries.slice(-3);
             const modelNote = document.createElement('div');
             modelNote.className = 'analytics-personalization-note';
-            modelNote.innerHTML = '<strong>How recommendations work:</strong> <b>L</b> is the shared Loot Weight and never changes for a player. <b>P</b> combines recorded outcomes, a fixed shared task weight, the activity’s reward/effort profile, and this character’s history. Open any recommendation’s <b>Why this ranking?</b> section to inspect those factors and its evidence confidence. N/A weeks are excluded from capability evidence. A missing clear is not proof a character cannot clear content, especially when a carry or service may be possible. Shop balances, gear, Jelly stock, and current market prices are not read.';
+            modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Activity Insights works</summary><p>Suggestions combine task importance, activity tips, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p></details>';
             cont.appendChild(modelNote);
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
@@ -6648,13 +6716,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     return { t, m: s.m, c: s.c, e, x: s.x, o: s.o, w, sc: personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, fit, activityProfile, activityValueMultiplier, suppress:fit.suppress };
                 }).filter(x => x.m > 0 && !x.suppress).sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m).slice(0, 3);
                 
-                const prioHTML = p.length ? p.map(i => {
-                    const why = [i.fit.reason, i.activityProfile.detail].filter(Boolean).join(' · ');
+                const prioHTML = p.length ? p.map((i, rank) => {
                     const explanation = buildRecommendationExplanation(i);
                     const evidence = explanation.evidence;
-                    const evidenceLabel = `${evidence.level} evidence`;
-                    return `<div class="missed-item"><div style="min-width:0;flex:1;"><strong>${escapeHTML(i.t)}</strong><div style="color:var(--pt-muted,#aaa);font-size:0.72rem;">${i.c} archived clears • ${i.m} not-completed weeks • ${i.x} N/A • L${i.w} shared weight${i.completionPatternBonus ? ' • recurring clear pattern' : ''}</div><span class="analytics-fit-note" title="${escapeHTML(why)}">${escapeHTML(i.fit.label)}${i.activityProfile.key !== 'standard' ? ` · ${escapeHTML(i.activityProfile.label)}` : ''}</span>${i.activityProfile.shortNote ? `<div class="analytics-activity-value-note" title="${escapeHTML(i.activityProfile.detail)}">${escapeHTML(i.activityProfile.shortNote)}</div>` : ''}<details class="analytics-recommendation-explanation"><summary>Why this ranking?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>Evidence confidence:</strong> ${escapeHTML(evidence.description)}</p><p><strong>Character fit · ${escapeHTML(i.fit.label)}:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value · ${escapeHTML(explanation.profileLabel)}:</strong> ${escapeHTML(explanation.profileDetail)}</p><p><strong>Archived record:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'}, ${evidence.notCompleted} not-completed week${evidence.notCompleted === 1 ? '' : 's'}, and ${evidence.excluded} N/A out of ${evidence.observations} saved observation${evidence.observations === 1 ? '' : 's'} for this activity. N/A is not treated as a failed attempt.</p><p class="analytics-recommendation-scoring"><strong>Score breakdown:</strong> ${escapeHTML(explanation.scoreLine)}</p></div></details></div><div title="Personalized priority: recorded outcomes, the fixed shared Loot Weight, activity value, and character fit" style="background:var(--pt-surface-soft,#262630);padding:5px;border-radius:5px;color:var(--pt-text,#ffd27d);font-weight:bold;align-self:flex-start;">P${i.sc}</div></div>`;
-                }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No open recommendations from the saved history yet.</div>';
+                    const evidenceLabel = getRecommendationConfidenceLabel(evidence);
+                    const plainReason = getRecommendationPlainReason(i);
+                    const activityNote = getRecommendationActivityNote(i);
+                    const scoreLine = explanation.scoreLine;
+                    return `<div class="missed-item analytics-recommendation-card"><div class="analytics-recommendation-main"><strong>${escapeHTML(i.t)}</strong><p class="analytics-recommendation-plain-reason">${escapeHTML(plainReason)}</p><details class="analytics-recommendation-explanation"><summary>Why suggested?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>History:</strong> ${escapeHTML(evidence.description)}</p><p><strong>Activity tip:</strong> ${escapeHTML(activityNote)}</p><details class="analytics-score-details"><summary>Past results and score (optional)</summary><p><strong>Past results:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'} · ${evidence.notCompleted} week${evidence.notCompleted === 1 ? '' : 's'} not completed · ${evidence.excluded} N/A ignored.</p><p><strong>Why it fits:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value:</strong> ${escapeHTML(explanation.profileDetail)}</p><p class="analytics-recommendation-scoring"><strong>Score details:</strong> ${escapeHTML(scoreLine)}</p><p>Shared Loot Weight stays the same for everyone. The personal priority adjusts it using activity value and this character’s history.</p></details></div></details></div><div class="analytics-recommendation-rank" title="Suggested priority ${rank + 1}">#${rank + 1}</div></div>`;
+                }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No next steps suggested from the saved history yet.</div>';
 
                 card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:4px;">Personalized Task Priorities</div>${prioHTML}</div>`;
                 cont.appendChild(card);
@@ -8472,7 +8542,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r15';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r16';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
