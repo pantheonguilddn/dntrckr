@@ -1,7 +1,16 @@
-# Pantheon Tools v1.6.8-r17 — Cloudflare Pages + D1
+# Pantheon Tools v1.6.8-r18 — Cloudflare Pages + D1
 
-This release continues directly from the v1.6.8-r16 package, itself built from the stable v1.6.8 line. It does not import code from later v1.6.9 or v1.7.x branches.
+This release continues directly from the v1.6.8-r17 package, itself built from the stable v1.6.8 line. It does not import code from later v1.6.9 or v1.7.x branches.
 
+## v1.6.8-r18 admin-managed Activity Reference
+
+- Adds an administrator-only **Activity Reference & Recommendation Data** section to `admin.html`. The starter list contains the 13 activities and details supplied by the guild: entries, milestone goal, party size, average run time, serviceability, materials/drops, weekly rewards and concise practical guidance.
+- Activity profiles can be edited, added or removed, reloaded from shared D1, and imported/exported as JSON for future bulk updates. Edits are not published until **Save Activity Reference** is pressed.
+- Adds the admin-only `GET/PUT /api/admin/activity-reference` endpoint. It writes the activity profiles and update metadata to the shared `pantheon-main` record in D1 and records the action in `audit_events`. No SQL schema migration is required.
+- The app now preserves activity profiles in `normalizeData` and during local/remote merges. Activity Insights uses the saved profile to display the configured recommendation, party size, run time, serviceability, milestone goal, weekly rewards and materials. Confirmed serviceability changes the carry/service feasibility signal; expected run time provides a modest efficiency adjustment relative to a 15-minute baseline, capped at -10% to +5%. This does not change shared Loot Weight or infer a numeric gold value for materials/rewards.
+- Fixes demand classification for Black Dragon Memoria I–III so the 4-player Memoria entries are treated as medium-tier activity rather than inheriting the generic Black Dragon endgame classification.
+- Existing bounty-mark behavior and plain-language recommendation changes from r14–r17 are retained.
+- Built from the verified r17 ZIP. This package includes every original package path plus the new admin API route. JavaScript syntax, CSS parsing, endpoint syntax, starter-profile content, profile normalization/merge, and ZIP integrity are checked. Live Cloudflare Pages, D1 and Discord-session testing was not performed; deploy and end-to-end test before treating production behavior as verified.
 
 ## v1.6.8-r17 action-first personalized recommendations
 

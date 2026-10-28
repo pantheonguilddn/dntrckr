@@ -109,13 +109,43 @@ html[data-pantheon-theme] #allowlist-list .btn.danger {
 }
 html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { background: #913747 !important; }
 </style>
+
+<style id="activity-reference-admin-styles">
+.activity-reference-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+.activity-reference-list{display:grid;gap:12px;margin-top:12px}
+.activity-reference-card{border:1px solid var(--border);border-radius:12px;padding:0;background:var(--surface2);min-width:0;overflow:hidden}
+.activity-reference-summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;min-width:0}
+.activity-reference-summary::-webkit-details-marker{display:none}
+.activity-reference-summary:after{content:"＋";margin-left:auto;color:var(--muted);font-weight:900}
+.activity-reference-card[open]>.activity-reference-summary:after{content:"−"}
+.activity-reference-summary-main{flex:1;min-width:0}
+.activity-reference-summary-main strong{display:block;font-size:12px;overflow-wrap:anywhere}
+.activity-reference-summary-main small{display:block;color:var(--muted);font-size:10px;margin-top:3px;font-weight:500;line-height:1.4}
+.activity-reference-card-body{padding:0 14px 14px}
+.activity-reference-card-body .activity-reference-card-head{margin-top:3px}
+.activity-reference-card-head{display:grid;grid-template-columns:minmax(220px,1fr) auto;align-items:end;gap:10px;margin-bottom:10px}
+.activity-reference-card-head .field{min-width:0}
+.activity-reference-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.activity-reference-fields .field{min-width:0}
+.activity-reference-fields .field input,.activity-reference-fields .field select,.activity-reference-fields .field textarea{width:100%;box-sizing:border-box;min-width:0;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 9px;font:inherit;font-size:12px;letter-spacing:normal;text-transform:none}
+.activity-reference-fields .field input,.activity-reference-fields .field select{min-height:37px}
+.activity-reference-fields .field textarea{min-height:64px;resize:vertical;line-height:1.45}
+.activity-reference-fields .wide{grid-column:span 2}
+.activity-reference-fields .full{grid-column:1/-1}
+.activity-reference-fields .field small{display:block;color:var(--muted);font-size:10px;margin-top:4px;line-height:1.35}
+.activity-reference-remove{min-height:37px;padding:8px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--danger);font-weight:800;cursor:pointer}
+.activity-reference-meta{font-size:11px;color:var(--muted);line-height:1.5;margin:4px 0 10px}
+@media(max-width:820px){.activity-reference-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.activity-reference-fields .wide{grid-column:span 2}}
+@media(max-width:480px){.activity-reference-summary{padding:10px}.activity-reference-card-body{padding:0 10px 10px}.activity-reference-card-head{grid-template-columns:minmax(0,1fr) auto}.activity-reference-fields{grid-template-columns:1fr}.activity-reference-fields .wide,.activity-reference-fields .full{grid-column:1/-1}}
+</style>
+
 </head>
 <body>
 <main>
 <header><a class="brand admin-home-link" href="/" aria-label="Return to Pantheon Overview"><span>Pantheon Tools<small>Dragon Nest - Classic SEA [Guild Operations]</small></span></a><div class="admin-header-actions"><label class="pantheon-theme-control" for="pantheon-admin-theme-select"><span>Appearance</span><select id="pantheon-admin-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Light</option><option value="dark">Dark</option><option value="eye-comfort">Eye comfort</option><option value="pastel">Pastel</option></select></label><a class="toplink" href="/">← Back to Pantheon</a></div></header>
 <div id="auth-status" class="status">Checking your Pantheon administrator session…</div>
 <div id="admin-content" class="hidden">
-  <div class="kicker">Guild administration</div><h1>Pantheon Admin Console</h1><p>Manage approved Discord accounts, character registrations and Main designations, and the one-time JSONBin migration. Do not share the old JSONBin master key; it is used only for the one-time import form and is not saved by this page.</p>
+  <div class="kicker">Guild administration</div><h1>Pantheon Admin Console</h1><p>Manage approved Discord accounts, character registrations and Main designations, the shared Activity Reference used by recommendations, and the one-time JSONBin migration. Do not share the old JSONBin master key; it is used only for the one-time import form and is not saved by this page.</p>
   <section class="card">
     <h2>1. Add an approved Discord account</h2><p>Use the account's numeric Discord user ID, not a username. The member does not need to configure cloud sync after being allowlisted.</p>
     <form id="allowlist-form"><div class="grid"><label class="field">Discord user ID<input id="discord-id" inputmode="numeric" pattern="[0-9]{17,20}" placeholder="17–20 digit ID" required></label><label class="field">Roster match name (optional)<input id="discord-label" maxlength="100" placeholder="Exact Member Roster owner name"></label></div><div class="actions"><button class="btn primary" type="submit">Add / enable account</button><button class="btn" type="button" id="refresh-list">Refresh list</button></div></form>
@@ -137,6 +167,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
       <a class="tool-launcher-link" href="/#version-history" target="_blank" rel="noopener">Version History<small>Inspect and restore global savepoints.</small></a>
       <a class="tool-launcher-link" href="/#landing-settings" target="_blank" rel="noopener">Default Landing Page<small>Set where your Pantheon session opens.</small></a>
       <a class="tool-launcher-link" href="/#dungeons" target="_blank" rel="noopener">Dungeon Registration<small>Maintain daily and weekly task categories.</small></a>
+      <a class="tool-launcher-link" href="#activity-reference-panel">Activity Reference<small>Edit raid timing, rewards, serviceability and recommendation tips.</small></a>
       <a class="tool-launcher-link" href="/#loot-weights" target="_blank" rel="noopener">Loot Weights<small>Adjust task prioritization weights.</small></a>
       <a class="tool-launcher-link" href="/#help" target="_blank" rel="noopener">Tracker Guide<small>Read the member-facing instructions.</small></a>
     </div>
@@ -148,13 +179,23 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
     <div id="character-admin-status" class="character-admin-status hidden"></div>
     <div id="character-admin-list" class="list"></div>
   </section>
+  <section class="card" id="activity-reference-panel">
+    <h2>4. Activity Reference &amp; Recommendation Data</h2>
+    <p>Maintain the facts Activity Insights should use: weekly entries, milestone goals, party size, typical run time, service availability, materials, rewards, and practical advice. These profiles are stored in the shared Pantheon record and can be updated as the game changes. Keep the player-facing recommendation short and actionable.</p>
+    <div class="activity-reference-meta">Save changes to publish them to the app. Import/export JSON to back up the reference or prepare a bulk update. A starter list based on the current guild notes is shown if no reference has been saved yet.</div>
+    <div class="activity-reference-toolbar"><button class="btn primary" type="button" id="save-activity-reference">Save Activity Reference</button><button class="btn" type="button" id="refresh-activity-reference">Reload saved data</button><button class="btn" type="button" id="add-activity-reference">＋ Add activity</button><button class="btn" type="button" id="load-activity-reference-starter">Load starter list</button><button class="btn" type="button" id="export-activity-reference">Export JSON</button><button class="btn" type="button" id="import-activity-reference">Import JSON</button><input class="hidden" type="file" id="activity-reference-import-file" accept="application/json,.json"></div>
+    <div id="activity-reference-status" class="status hidden"></div>
+    <div id="activity-reference-count" class="hint">Loading activity reference…</div>
+    <div id="activity-reference-list" class="activity-reference-list"></div>
+    <div class="activity-reference-toolbar"><button class="btn primary" type="button" id="save-activity-reference-bottom">Save Activity Reference</button></div>
+  </section>
   <section class="card">
-    <h2>4. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
+    <h2>5. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
     <form id="migration-form"><div class="grid"><label class="field">Existing main JSONBin ID<input id="old-bin-id" autocomplete="off" placeholder="Existing tracker Bin ID" required></label><label class="field">Existing JSONBin Master Key<input id="old-bin-key" type="password" autocomplete="off" placeholder="Used for this import only" required></label></div><label class="checkbox-line"><input type="checkbox" id="confirm-migration" required><span>I understand this imports the selected main record into Pantheon D1 and overwrites the new Pantheon main record if it already exists.</span></label><div class="actions"><button class="btn primary" type="submit">Import main record and revision journal</button></div></form>
     <div id="migration-status" class="status hidden"></div>
   </section>
   <section class="card">
-    <h2>5. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
+    <h2>6. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
   </section>
 </div>
 </main>
@@ -162,6 +203,89 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
 const $ = id => document.getElementById(id);
 const ADMIN_JOBS = ["Adept", "Physician", "Gear Master", "Shooting Star", "Sniper", "Artillery", "Wind Walker", "Tempest", "Light Fury", "Abyss Walker", "Raven", "Ripper", "Saint", "Inquisitor", "Crusader", "Guardian", "Spirit Dancer", "Blade Dancer", "Dark Summoner", "Soul Eater", "Saleana", "Elestra", "Majesty", "Smasher", "Gladiator", "Moonlord", "Barbarian", "Destroyer", "Dark Avenger"];
 let adminCharacterMembers = [];
+
+const ACTIVITY_REFERENCE_STARTER = [{"id":"green-dragon-classic","name":"Green Dragon (Classic)","aliases":"GDN Classic, GDN CL","entries":"1","milestoneGoal":"-","partySize":"8","averageRunTime":"15 min","serviceable":"no","materials":"U Code / GDN Teardrop (cosmetic currency for Loffy the Beggar)","weeklyRewards":"x3 Polished Diamond / Lv 50 Heraldry Pouch","recommendation":"Plan about 15 minutes for an 8-player clear. Weekly rewards are 3 Polished Diamonds and a Lv 50 Heraldry Pouch."},{"id":"black-dragon-memoria-i","name":"Black Dragon Memoria I","aliases":"BDN Memoria I, Black Dragon Memoria 1","entries":"1","milestoneGoal":"-","partySize":"4","averageRunTime":"13 min","serviceable":"no","materials":"EOL x4 / BDN Research (used to purchase bound Black Dragon armor from Loffy the Beggar) / Lv 70 Unique Paculta I","weeklyRewards":"-","recommendation":"Plan about 13 minutes for a 4-player clear. Focus on EOL x4 and BDN Research if you need bound Black Dragon armor."},{"id":"black-dragon-memoria-ii","name":"Black Dragon Memoria II","aliases":"BDN Memoria II, Black Dragon Memoria 2","entries":"1","milestoneGoal":"-","partySize":"4","averageRunTime":"13 min","serviceable":"no","materials":"EOL x4 / BDN Research (used to purchase bound Black Dragon armor from Loffy the Beggar) / Lv 70 Unique Paculta I","weeklyRewards":"-","recommendation":"Plan about 13 minutes for a 4-player clear. Focus on EOL x4 and BDN Research if you need bound Black Dragon armor."},{"id":"black-dragon-memoria-iii","name":"Black Dragon Memoria III","aliases":"BDN Memoria III, Black Dragon Memoria 3","entries":"1","milestoneGoal":"-","partySize":"4","averageRunTime":"13 min","serviceable":"no","materials":"EOL x4 / BDN Research (used to purchase bound Black Dragon armor from Loffy the Beggar) / Lv 70 Unique Paculta I / Monster Fragment (chance)","weeklyRewards":"-","recommendation":"Plan about 13 minutes for a 4-player clear. Focus on EOL x4 and BDN Research; Monster Fragment is an additional chance drop."},{"id":"desert-dragon-hardcore","name":"Desert Dragon (Hardcore)","aliases":"DDN HC, DDN Hardcore","entries":"1","milestoneGoal":"-","partySize":"8","averageRunTime":"27 min max (or fail)","serviceable":"no","materials":"DDN Evolution Hammer (used to transition GDN Legend to DDN Legend equipment) / Lv 60 Legend Code / L DDN Accessory (chance) / Lv 60 Unique-to-Legend Offensive and Defensive Rune / Lv 60 Smelted Rune / Monster Fragment / DDN Monster Boss Fragment (chance)","weeklyRewards":"-","recommendation":"Allow up to 27 minutes and account for possible failure. Do not plan the rest of the week around this being a guaranteed clear."},{"id":"desert-dragon-classic","name":"Desert Dragon (Classic)","aliases":"DDN Classic","entries":"1","milestoneGoal":"-","partySize":"8","averageRunTime":"35 min","serviceable":"no","materials":"Unique DDN Equipment / Lv 60 Legend Code / L DDN Accessory (chance) / Lv 60 Unique-to-Legend Offensive and Defensive Rune / Lv 60 Smelted Rune / Monster Fragment / DDN Monster Boss Fragment (chance) / DDN Teardrop (cosmetic currency for Loffy the Beggar)","weeklyRewards":"x2 Lv 50 Card Box / x10 EOL / x6 Polished Diamond / x2 Lv 60 Heraldry Pouch","recommendation":"Budget about 35 minutes for an 8-player clear. Weekly rewards include 10 EOL, 6 Polished Diamonds, 2 Lv 50 Card Boxes and 2 Lv 60 Heraldry Pouches."},{"id":"green-dragon-hardcore","name":"Green Dragon (Hardcore)","aliases":"GDN HC, GDN Hardcore","entries":"1","milestoneGoal":"-","partySize":"8","averageRunTime":"15 min","serviceable":"no","materials":"Lv 50 Legend Code / L GDN Accessory (chance, reported below 1,000g) / Lv 50 Unique-to-Legend Offensive and Defensive Rune / GDN Monster Boss Fragment (chance)","weeklyRewards":"-","recommendation":"Plan around 15 minutes. Consider the Lv 50 Legend Code rewards, but do not treat the L accessory chance as a major payout at the reported value below 1,000g."},{"id":"black-dragon-classic","name":"Black Dragon (Classic)","aliases":"BDN Classic","entries":"1","milestoneGoal":"-","partySize":"8","averageRunTime":"50 min+","serviceable":"no","materials":"Unique BDN Equipment / Lv 70 Epic-to-Unique Code / Lv 70 Unique-to-Legend Offensive and Defensive Rune / Monster Fragment / DDN Monster Boss Fragment (chance) / BDN Teardrop (cosmetic currency for Loffy the Beggar)","weeklyRewards":"x2 Lv 60 Card Box / x10 EOL / x3 Polished Diamond / x2 Lv 70 Heraldry Pouch","recommendation":"Allow at least 50 minutes. Weekly rewards include 10 EOL, 3 Polished Diamonds, 2 Lv 60 Card Boxes and 2 Lv 70 Heraldry Pouches."},{"id":"dragon-fellowship","name":"Dragon Fellowship","aliases":"Fellowship","entries":"1","milestoneGoal":"-","partySize":"2","averageRunTime":"20 min (about 10 min with service; costs gold)","serviceable":"yes","materials":"x2 Lv 70 Heraldry Pouch OR x1 Lv 70 Fellowship Heraldry Pouch","weeklyRewards":"-","recommendation":"If duoing is not practical, compare the service cost with the weekly Heraldry rewards. A service may cut the run to about 10 minutes."},{"id":"abyssal-mire","name":"Abyssal Mire","aliases":"Mire","entries":"-","milestoneGoal":"Until 5,000 points","partySize":"4","averageRunTime":"2F: about 5 min / 5F: about 15 min","serviceable":"yes","materials":"Points shop: Essence of Life (240 points) / Polished Diamond (300) / Flawless Diamond (300) / Crystal of Power (30) / Job Change Scroll (18,000) / cosmetic rewards, mounts and Paculta suffix materials","weeklyRewards":"x2 Lv 70 Epic Paculta I; 3,000-point payout on Saturday reset","recommendation":"For 5,000 weekly points, run 2F + 5F and leave 1 key for reset. A service is a practical fallback if your group cannot clear it."},{"id":"theme-park-jelly-x5","name":"Theme Park (Jelly x5)","aliases":"Theme Park, Jelly x5","entries":"1","milestoneGoal":"Any Theme Park dungeon","partySize":"1","averageRunTime":"2 min","serviceable":"no","materials":"Jelly x5","weeklyRewards":"-","recommendation":"Use Persian Goblin with auto-attacking units if you want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts toward this task."},{"id":"guardian-nest","name":"Guardian Nest","aliases":"GN","entries":"2","milestoneGoal":"-","partySize":"4","averageRunTime":"15 min","serviceable":"no","materials":"Lv 70 Epic Crafting Materials / Lv 70 Generic Accessories / Lv 70 Equipment / Lv 70 Epic Paculta I / Lv 70 Heraldry (chance) / Lv 70 Rare-to-Epic Offensive and Defensive Rune","weeklyRewards":"x5 EOL","recommendation":"There are two entries, so budget about 30 minutes for both. The weekly objective pays 5 EOL."},{"id":"anu-arendel-ordeal-nest","name":"Anu Arendel Ordeal Nest","aliases":"Anu Arendel, Ordeal Nest","entries":"1","milestoneGoal":"-","partySize":"4","averageRunTime":"25 min","serviceable":"yes","materials":"Lv 70 Epic Crafting Materials / Lv 70 Generic Accessories / Lv 70 Equipment / Lv 70 Epic Paculta I / Lv 70 Heraldry (chance) / Lv 70 Rare-to-Epic Offensive and Defensive Rune","weeklyRewards":"x3 Flawless Diamond","recommendation":"Plan about 25 minutes for a 4-player clear. A service is an option if needed; the weekly reward is 3 Flawless Diamonds."}];
+let activityReferenceEntries = [];
+function normalizeAdminActivityProfile(profile={},index=0){
+  const aliases=Array.isArray(profile.aliases)?profile.aliases:String(profile.aliases||'').split(',');
+  const serviceable=['yes','no','unknown'].includes(String(profile.serviceable||'').toLowerCase())?String(profile.serviceable).toLowerCase():'unknown';
+  return {id:String(profile.id||profile.name||`activity-${index+1}`).trim(),name:String(profile.name||'').trim(),aliases:aliases.map(v=>String(v||'').trim()).filter(Boolean).slice(0,20),entries:String(profile.entries??'-'),milestoneGoal:String(profile.milestoneGoal||'-'),partySize:String(profile.partySize??'-'),averageRunTime:String(profile.averageRunTime||'-'),serviceable,materials:String(profile.materials||'-'),weeklyRewards:String(profile.weeklyRewards||'-'),recommendation:String(profile.recommendation||'')};
+}
+function activityReferenceRow(profile={},index=0){
+  const p=normalizeAdminActivityProfile(profile,index);
+  const open=p.name==='New Activity'?' open':'';
+  return `<details class="activity-reference-card" data-activity-reference-row${open}>
+    <summary class="activity-reference-summary"><span class="activity-reference-summary-main"><strong data-ar-summary-title>${escapeHtml(p.name||'Unnamed activity')}</strong><small data-ar-summary-meta>${escapeHtml([p.partySize&&p.partySize!=='-'?`${p.partySize} players`:'Party size not set',p.averageRunTime&&p.averageRunTime!=='-'?p.averageRunTime:'Time not set',p.serviceable==='yes'?'Service available':p.serviceable==='no'?'Not serviceable':'Serviceability unknown'].join(' · '))}</small></span></summary>
+    <div class="activity-reference-card-body"><div class="activity-reference-card-head"><label class="field">Activity name<input data-ar-name maxlength="100" value="${escapeHtml(p.name)}" placeholder="Exact task or activity name"></label><button class="activity-reference-remove" type="button" data-ar-remove>Remove activity</button></div>
+    <div class="activity-reference-fields">
+      <label class="field">Aliases (comma-separated)<input data-ar-aliases maxlength="500" value="${escapeHtml(p.aliases.join(', '))}" placeholder="Optional task-name variants"></label>
+      <label class="field">Number of entries<input data-ar-entries maxlength="80" value="${escapeHtml(p.entries)}" placeholder="1, 2 or -"></label>
+      <label class="field">Milestone goal<input data-ar-milestone maxlength="180" value="${escapeHtml(p.milestoneGoal)}" placeholder="- or target goal"></label>
+      <label class="field">Party size<input data-ar-party maxlength="50" value="${escapeHtml(p.partySize)}" placeholder="e.g. 4 or 8"></label>
+      <label class="field">Average run time<input data-ar-time maxlength="80" value="${escapeHtml(p.averageRunTime)}" placeholder="e.g. 15 min"></label>
+      <label class="field">Serviceable?<select data-ar-serviceable><option value="unknown" ${p.serviceable==='unknown'?'selected':''}>Unknown / not confirmed</option><option value="yes" ${p.serviceable==='yes'?'selected':''}>Yes</option><option value="no" ${p.serviceable==='no'?'selected':''}>No</option></select></label>
+      <label class="field wide">Weekly rewards<textarea data-ar-rewards maxlength="1200" rows="2">${escapeHtml(p.weeklyRewards)}</textarea></label>
+      <label class="field wide">Materials / notable drops<textarea data-ar-materials maxlength="1800" rows="2">${escapeHtml(p.materials)}</textarea></label>
+      <label class="field full">Practical recommendation shown to players<textarea data-ar-recommendation maxlength="1500" rows="2" placeholder="One clear suggestion and why it's worth doing.">${escapeHtml(p.recommendation)}</textarea><small>Keep this actionable: what to run, how long to allow, and the useful reward or fallback. This is the short guidance used by Activity Insights.</small></label>
+    </div></div>
+  </details>`;
+}
+function updateActivityReferenceSummary(row){
+  if(!row)return;
+  const val=selector=>row.querySelector(selector)?.value?.trim()||'';
+  const title=val('[data-ar-name]')||'Unnamed activity';
+  const titleNode=row.querySelector('[data-ar-summary-title]');if(titleNode)titleNode.textContent=title;
+  const party=val('[data-ar-party]');const time=val('[data-ar-time]');const service=val('[data-ar-serviceable]');
+  const meta=[party&&party!=='-'?`${party} players`:'Party size not set',time&&time!=='-'?time:'Time not set',service==='yes'?'Service available':service==='no'?'Not serviceable':'Serviceability unknown'].join(' · ');
+  const metaNode=row.querySelector('[data-ar-summary-meta]');if(metaNode)metaNode.textContent=meta;
+}
+function renderActivityReference(){
+  const list=$('activity-reference-list');if(!list)return;
+  list.innerHTML=activityReferenceEntries.map((profile,index)=>activityReferenceRow(profile,index)).join('');
+  $('activity-reference-count').textContent=`${activityReferenceEntries.length} activities in the editor. Save to publish changes to the shared guild record.`;
+}
+function collectActivityReference(){
+  return [...document.querySelectorAll('[data-activity-reference-row]')].map((row,index)=>normalizeAdminActivityProfile({
+    id:row.dataset.activityId||row.querySelector('[data-ar-name]')?.value||`activity-${index+1}`,
+    name:row.querySelector('[data-ar-name]')?.value||'',aliases:row.querySelector('[data-ar-aliases]')?.value||'',
+    entries:row.querySelector('[data-ar-entries]')?.value||'-',milestoneGoal:row.querySelector('[data-ar-milestone]')?.value||'-',
+    partySize:row.querySelector('[data-ar-party]')?.value||'-',averageRunTime:row.querySelector('[data-ar-time]')?.value||'-',
+    serviceable:row.querySelector('[data-ar-serviceable]')?.value||'unknown',materials:row.querySelector('[data-ar-materials]')?.value||'-',
+    weeklyRewards:row.querySelector('[data-ar-rewards]')?.value||'-',recommendation:row.querySelector('[data-ar-recommendation]')?.value||''
+  },index)).filter(profile=>profile.name);
+}
+async function refreshActivityReference(){
+  try{
+    const data=await api('/api/admin/activity-reference');
+    activityReferenceEntries=Array.isArray(data.activities)&&data.activities.length?data.activities.map(normalizeAdminActivityProfile):ACTIVITY_REFERENCE_STARTER.map(normalizeAdminActivityProfile);
+    renderActivityReference();
+    if(data.activities?.length)setStatus('activity-reference-status',`Loaded ${activityReferenceEntries.length} saved activity profiles${data.updatedAt?` · updated ${new Date(data.updatedAt).toLocaleString()}`:''}.`,'ok');
+    else setStatus('activity-reference-status','No activity profiles have been saved yet. The starter list is loaded for editing; press Save Activity Reference to publish it.','');
+  }catch(error){setStatus('activity-reference-status',error.message,'error');}
+}
+async function saveActivityReference(){
+  const button=$('save-activity-reference');button.disabled=true;
+  try{
+    const profiles=collectActivityReference();
+    if(!profiles.length)throw new Error('Add at least one named activity before saving.');
+    const seen=new Set();for(const p of profiles){const key=p.name.toLocaleLowerCase();if(seen.has(key))throw new Error(`Duplicate activity name: ${p.name}.`);seen.add(key);}
+    const data=await api('/api/admin/activity-reference',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({activities:profiles})});
+    activityReferenceEntries=(Array.isArray(data.activities)?data.activities:profiles).map(normalizeAdminActivityProfile);renderActivityReference();
+    setStatus('activity-reference-status',`Saved ${activityReferenceEntries.length} activity profiles to the shared Pantheon record. Reload Pantheon in the app to pick up the latest reference if it is already open.`,'ok');
+  }catch(error){setStatus('activity-reference-status',error.message,'error');}finally{button.disabled=false;}
+}
+$('activity-reference-list')?.addEventListener('click',event=>{
+  if(event.target.closest('[data-ar-remove]')){event.preventDefault();event.target.closest('[data-activity-reference-row]')?.remove();$('activity-reference-count').textContent=`${document.querySelectorAll('[data-activity-reference-row]').length} activities in the editor. Save to publish changes.`;}
+});
+$('activity-reference-list')?.addEventListener('input',event=>{const row=event.target.closest('[data-activity-reference-row]');if(row)updateActivityReferenceSummary(row);});
+$('activity-reference-list')?.addEventListener('change',event=>{const row=event.target.closest('[data-activity-reference-row]');if(row)updateActivityReferenceSummary(row);});
+$('add-activity-reference')?.addEventListener('click',()=>{const list=$('activity-reference-list');list.insertAdjacentHTML('beforeend',activityReferenceRow({name:'New Activity',entries:'1',milestoneGoal:'-',partySize:'-',averageRunTime:'-',serviceable:'unknown',materials:'-',weeklyRewards:'-',recommendation:''},document.querySelectorAll('[data-activity-reference-row]').length));const last=list.querySelector('[data-activity-reference-row]:last-child');updateActivityReferenceSummary(last);const rows=list.querySelectorAll('[data-ar-name]');rows[rows.length-1]?.focus();});
+$('load-activity-reference-starter')?.addEventListener('click',()=>{if(!confirm('Replace the editor contents with the starter list? Saved data will not change until you press Save Activity Reference.'))return;activityReferenceEntries=ACTIVITY_REFERENCE_STARTER.map(normalizeAdminActivityProfile);renderActivityReference();setStatus('activity-reference-status','Starter list loaded in the editor. Save to publish it.','');});
+$('save-activity-reference')?.addEventListener('click',saveActivityReference);$('save-activity-reference-bottom')?.addEventListener('click',saveActivityReference);$('refresh-activity-reference')?.addEventListener('click',refreshActivityReference);
+$('export-activity-reference')?.addEventListener('click',()=>{try{const profiles=collectActivityReference();const blob=new Blob([JSON.stringify({schemaVersion:1,activities:profiles},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='pantheon-activity-reference.json';link.click();URL.revokeObjectURL(url);setStatus('activity-reference-status',`Exported ${profiles.length} activities from the editor.`,'ok');}catch(error){setStatus('activity-reference-status',error.message,'error');}});
+$('import-activity-reference')?.addEventListener('click',()=>$('activity-reference-import-file')?.click());
+$('activity-reference-import-file')?.addEventListener('change',async event=>{const file=event.target.files?.[0];if(!file)return;try{const raw=JSON.parse(await file.text());const profiles=Array.isArray(raw)?raw:raw.activities;if(!Array.isArray(profiles)||profiles.length>100)throw new Error('JSON must contain an activities array of up to 100 profiles.');activityReferenceEntries=profiles.map(normalizeAdminActivityProfile).filter(p=>p.name);renderActivityReference();setStatus('activity-reference-status',`Imported ${activityReferenceEntries.length} activities into the editor. Save to publish them.`,'ok');}catch(error){setStatus('activity-reference-status',`Import failed: ${error.message}`,'error');}finally{event.target.value='';}});
+
 function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function characterJobOptions(selected=''){
   const current=String(selected||'');
@@ -214,7 +338,7 @@ $('character-admin-list')?.addEventListener('click',async event=>{
 $('refresh-character-list')?.addEventListener('click',refreshCharacterAdmin);
 function setStatus(id, text, kind=''){const el=$(id);el.textContent=text;el.className='status'+(kind?' '+kind:'');el.classList.remove('hidden');}
 async function api(url, options={}){const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||data.message||`Request failed (${response.status})`);return data;}
-async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
+async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();await refreshActivityReference();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
 async function refreshAllowlist(){try{const data=await api('/api/admin/allowlist');const list=$('allowlist-list');list.replaceChildren();if(!data.users?.length){list.textContent='No approved accounts yet.';return;}for(const user of data.users){const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=user.label||user.discord_id;const meta=document.createElement('small');meta.textContent=`${user.discord_id} · ${user.enabled?'Enabled':'Disabled'} · added by ${user.created_by||'system'}`;info.append(name,meta);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='7px';const badge=document.createElement('span');badge.className='badge';badge.textContent=user.role==='admin'?'ADMIN':'MEMBER';right.append(badge);if(user.enabled && user.role!=='admin'){const button=document.createElement('button');button.className='btn danger';button.type='button';button.textContent='Revoke';button.addEventListener('click',async()=>{if(!confirm(`Revoke access for ${user.label||user.discord_id}?`))return;try{await api('/api/admin/allowlist?discordId='+encodeURIComponent(user.discord_id),{method:'DELETE'});setStatus('allowlist-status',`Access revoked for ${user.discord_id}.`,'ok');await refreshAllowlist();}catch(error){setStatus('allowlist-status',error.message,'error');}});right.append(button);}row.append(info,right);list.append(row);}}catch(error){setStatus('allowlist-status',error.message,'error');}}
 $('allowlist-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;try{const data=await api('/api/admin/allowlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discordId:$('discord-id').value.trim(),label:$('discord-label').value.trim()})});setStatus('allowlist-status',`Approved Discord account ${data.discordId}.`,'ok');$('allowlist-form').reset();await refreshAllowlist();}catch(error){setStatus('allowlist-status',error.message,'error');}finally{button.disabled=false;}});
 $('refresh-list').addEventListener('click',refreshAllowlist);

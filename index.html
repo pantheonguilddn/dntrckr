@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r17</title>
+    <title>Pantheon Tools v1.6.8-r18</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3105,9 +3105,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r17</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r18</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r17 update:</strong> Activity Insights now recommends a specific next task using character history and activity value, with a plain-language reason instead of generic encouragement.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r18 update:</strong> Activity Insights now uses the shared, admin-managed Activity Reference for run times, party size, serviceability, milestone goals, materials and weekly rewards.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3775,6 +3775,27 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             };
         }
 
+        function normalizeActivityReferenceProfiles(value) {
+            return (Array.isArray(value) ? value : []).slice(0, 100).map((item, index) => {
+                const profile = safeObject(item);
+                const serviceable = ['yes', 'no', 'unknown'].includes(String(profile.serviceable || '').toLowerCase()) ? String(profile.serviceable).toLowerCase() : 'unknown';
+                const aliases = Array.isArray(profile.aliases) ? profile.aliases : String(profile.aliases || '').split(',');
+                return {
+                    id: String(profile.id || profile.name || `activity-${index + 1}`).trim().slice(0, 100),
+                    name: String(profile.name || '').trim().slice(0, 100),
+                    aliases: aliases.map(alias => String(alias || '').trim().slice(0, 80)).filter(Boolean).slice(0, 20),
+                    entries: String(profile.entries ?? '-').trim().slice(0, 80),
+                    milestoneGoal: String(profile.milestoneGoal || '-').trim().slice(0, 180),
+                    partySize: String(profile.partySize ?? '-').trim().slice(0, 50),
+                    averageRunTime: String(profile.averageRunTime || '-').trim().slice(0, 80),
+                    serviceable,
+                    materials: String(profile.materials || '-').trim().slice(0, 1800),
+                    weeklyRewards: String(profile.weeklyRewards || '-').trim().slice(0, 1200),
+                    recommendation: String(profile.recommendation || '').trim().slice(0, 1500)
+                };
+            }).filter(profile => profile.name);
+        }
+
         function createEmptyData() {
             return {
                 schemaVersion: APP_SCHEMA_VERSION,
@@ -3782,7 +3803,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 history: {},
                 weeklyArchive: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -4581,6 +4602,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             norm.settings.jobProfiles = normalizeJobProfiles(sets.jobProfiles);
             norm.settings.jobProfilesUpdatedAt = Number(sets.jobProfilesUpdatedAt) || 0;
             norm.settings.jobProfilesUpdatedBy = String(sets.jobProfilesUpdatedBy || '');
+            norm.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(sets.activityReferenceProfiles);
+            norm.settings.activityReferenceProfilesUpdatedAt = Number(sets.activityReferenceProfilesUpdatedAt) || 0;
+            norm.settings.activityReferenceProfilesUpdatedBy = String(sets.activityReferenceProfilesUpdatedBy || '');
             norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
             ensureMemberRosterMaster(norm);
             const historyClearAt = Number(norm.settings.analyticsHistoryClearedAt) || 0;
@@ -4838,6 +4862,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             merged.settings.jobProfiles = normalizeJobProfiles(jsrc.jobProfiles);
             merged.settings.jobProfilesUpdatedAt = Math.max(ljp, rjp);
             merged.settings.jobProfilesUpdatedBy = jsrc.jobProfilesUpdatedBy || '';
+            const larTime = Number(local.settings.activityReferenceProfilesUpdatedAt) || 0, rarTime = Number(remote.settings.activityReferenceProfilesUpdatedAt) || 0;
+            const arSrc = (larTime > rarTime || (larTime === rarTime && String(local.settings.activityReferenceProfilesUpdatedBy) >= String(remote.settings.activityReferenceProfilesUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(arSrc.activityReferenceProfiles);
+            merged.settings.activityReferenceProfilesUpdatedAt = Math.max(larTime, rarTime);
+            merged.settings.activityReferenceProfilesUpdatedBy = String(arSrc.activityReferenceProfilesUpdatedBy || '');
             merged.settings.teamBuilder = mergeTeamBuilder(local.settings.teamBuilder, remote.settings.teamBuilder);
             ensureMemberRosterMaster(merged);
 
@@ -6547,15 +6576,90 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         ];
 
+        function normalizeActivityReferenceMatch(value) {
+            return String(value || '').toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+        }
+
+        function findActivityReferenceProfile(taskName) {
+            const target = normalizeActivityReferenceMatch(taskName);
+            if (!target) return null;
+            const refs = normalizeActivityReferenceProfiles(cloudData.settings?.activityReferenceProfiles);
+            const matches = [];
+            for (const ref of refs) {
+                const names = [ref.name, ...(Array.isArray(ref.aliases) ? ref.aliases : [])].map(normalizeActivityReferenceMatch).filter(Boolean);
+                for (const candidate of names) {
+                    if (target === candidate) matches.push({ ref, score: 10000 + candidate.length });
+                    else if (candidate.length >= 6 && target.includes(candidate)) matches.push({ ref, score: 5000 + candidate.length });
+                }
+            }
+            matches.sort((a, b) => b.score - a.score);
+            return matches[0]?.ref || null;
+        }
+
+        function getActivityReferenceMinutes(ref) {
+            const raw = String(ref?.averageRunTime || '').split('(')[0];
+            const values = [...raw.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|mins|minute|minutes)\b/ig)].map(match => Number(match[1])).filter(value => Number.isFinite(value) && value > 0);
+            if (!values.length) return 0;
+            let minutes = values.reduce((sum, value) => sum + value, 0);
+            const entries = Number(String(ref?.entries || '').trim());
+            if (Number.isFinite(entries) && entries > 1) minutes *= Math.min(entries, 5);
+            return minutes;
+        }
+
+        function getActivityReferenceEffortModifier(ref) {
+            const minutes = getActivityReferenceMinutes(ref);
+            if (!minutes) return 1;
+            // Use time as a modest efficiency nudge, not a substitute for reward value or the shared Loot Weight.
+            const efficiency = Math.max(.85, Math.min(1.12, 1.12 - Math.max(0, minutes - 5) * .004));
+            const fifteenMinuteBaseline = 1.08;
+            return Math.max(.90, Math.min(1.05, efficiency / fifteenMinuteBaseline));
+        }
+
+        function activityReferenceDetail(ref, fallbackDetail = '') {
+            if (!ref) return fallbackDetail;
+            const facts = [];
+            if (ref.entries && ref.entries !== '-') facts.push(`Entries: ${ref.entries}`);
+            if (ref.milestoneGoal && ref.milestoneGoal !== '-') facts.push(`Goal: ${ref.milestoneGoal}`);
+            if (ref.partySize && ref.partySize !== '-') facts.push(`Party: ${ref.partySize}`);
+            if (ref.averageRunTime && ref.averageRunTime !== '-') facts.push(`Typical time: ${ref.averageRunTime}`);
+            if (ref.serviceable !== 'unknown') facts.push(`Serviceable: ${ref.serviceable === 'yes' ? 'Yes' : 'No'}`);
+            if (ref.weeklyRewards && ref.weeklyRewards !== '-') facts.push(`Weekly rewards: ${ref.weeklyRewards}`);
+            if (ref.materials && ref.materials !== '-') facts.push(`Materials: ${ref.materials}`);
+            const tip = String(ref.recommendation || '').trim();
+            return [tip, facts.join('. '), fallbackDetail && !tip ? fallbackDetail : ''].filter(Boolean).join(' ');
+        }
+
         function getActivityValueProfile(taskName) {
             const name = String(taskName || '').trim();
-            const profile = ACTIVITY_VALUE_PROFILES.find(item => item.match.test(name));
-            if (!profile) return {
+            const isBlackDragonMemoria = /\bblack\s+dragon\s+memoria\b/i.test(name);
+            const builtIn = ACTIVITY_VALUE_PROFILES.find(item => !(isBlackDragonMemoria && item.key === 'black-dragon') && item.match.test(name));
+            const reference = findActivityReferenceProfile(name);
+            if (!builtIn && !reference) return {
                 key:'standard', label:'Shared task value', multiplier:1,
                 rewardUtility:1, effortMultiplier:1, accessibilityMultiplier:1, objectiveMultiplier:1, resourceMultiplier:1,
                 shortNote:'', detail:'No activity-specific value profile is configured for this task; ranking relies on the shared Loot Weight and recorded character history.',
                 carryPotential:false, resetSensitive:false, cadence:'weekly'
             };
+            const profile = builtIn ? { ...builtIn } : {
+                key: String(reference.id || normalizeActivityReferenceMatch(reference.name).replace(/\s+/g, '-')),
+                match: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i'),
+                label: reference.milestoneGoal && reference.milestoneGoal !== '-' ? reference.milestoneGoal : 'Activity rewards and effort',
+                cadence:'weekly', rewardUtility:1, effortMultiplier:1, accessibilityMultiplier:1, objectiveMultiplier:1, resourceMultiplier:1,
+                shortNote:'', detail:'', carryPotential:false, resetSensitive:false
+            };
+            if (reference) {
+                profile.reference = reference;
+                // Admin-entered availability is the source of truth for service/carry viability.
+                if (reference.serviceable === 'yes') profile.carryPotential = true;
+                else if (reference.serviceable === 'no') profile.carryPotential = false;
+                // Activity times modestly adjust effort efficiency; reward weights and Loot Weight stay separate.
+                profile.timeEfficiencyModifier = getActivityReferenceEffortModifier(reference);
+                profile.effortMultiplier = (Number(profile.effortMultiplier) || 1) * profile.timeEfficiencyModifier;
+                profile.shortNote = String(reference.recommendation || profile.shortNote || '').trim();
+                profile.detail = activityReferenceDetail(reference, profile.detail || '');
+                if (reference.milestoneGoal && reference.milestoneGoal !== '-') profile.label = reference.milestoneGoal;
+                else if (reference.weeklyRewards && reference.weeklyRewards !== '-') profile.label = 'Weekly rewards and materials';
+            }
             const multiplier = Math.max(.85, Math.min(1.2,
                 (Number(profile.rewardUtility)||1) * (Number(profile.effortMultiplier)||1) *
                 (Number(profile.accessibilityMultiplier)||1) * (Number(profile.objectiveMultiplier)||1) *
@@ -6576,7 +6680,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getTaskDemandTier(taskName) {
             const name = String(taskName || '').toLowerCase();
-            // Explicit activity tiers come first: 'Classic' is not automatically high difficulty.
+            // Explicit activity tiers come first: Memoria mini-runs and 'Classic' are not automatically endgame.
+            if (/\bblack\s+dragon\s+memoria\b/.test(name)) return 'medium';
             if (/\bblack\s+dragon\b|\bbdn\b/.test(name)) return 'endgame';
             if (/\bgreen\s+dragon\b.*\bhardcore\b|\bgdn\s*(?:hc|hardcore)\b|\bdesert\s+dragon\b.*\bhardcore\b|\bddn\s*(?:hc|hardcore)\b/.test(name)) return 'high';
             if (/abyssal\s+mire|theme\s*park|bounty\s+claim/.test(name)) return 'farm';
@@ -6697,12 +6802,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const activityAdvice = {
                 'theme-park':'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.',
                 'abyssal-mire':'Run 2F + 5F and leave 1 key for reset to reach 5,000 weekly points. Consider a service if you cannot clear it yourself.',
-                'dragon-fellowship':'Aim for the weekly Heraldry pouches. If duoing is not practical, a service may still be worthwhile.',
-                'gdn-classic':'Prioritize it for weekly Essence of Life and Polished Diamonds; codes and gold are extra value.',
-                'gdn-hardcore':'Check whether the 36g chest, Legend Codes, and L Accessories justify the seal-stamp cost.',
-                'ddn-hardcore':'If a personal clear is not practical, check for a carry or service instead of ruling it out.',
+                'dragon-fellowship':'If duoing is not practical, compare the service cost with the weekly Heraldry rewards.',
+                'gdn-classic':'Prioritize its weekly Polished Diamonds and Lv 50 Heraldry Pouch if those rewards help your current goals.',
+                'gdn-hardcore':'Plan around the run time and check whether its Legend Code rewards justify the seal-stamp cost.',
+                'ddn-hardcore':'Allow for up to 27 minutes and a possible failure; do not build the week around a guaranteed clear.',
                 'black-dragon':'Use this character’s Black Dragon results to judge readiness; lower-tier clears do not confirm it.'
             };
+            const referenceAdvice = String(item.activityProfile?.reference?.recommendation || '').trim();
+            if (referenceAdvice) return `${historyLead}${referenceAdvice}`;
             if (activityAdvice[profileKey]) return `${historyLead}${activityAdvice[profileKey]}`;
             if (recentClear) return 'This character cleared it recently, so repeating it is a reliable next step.';
             if (priorClear) return 'This character has cleared it before, making it a sensible repeat if time allows.';
@@ -6714,6 +6821,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getRecommendationActivityNote(item) {
             const profileKey = String(item.activityProfile?.key || 'standard');
+            const ref = item.activityProfile?.reference;
+            if (ref) {
+                const facts = [];
+                if (ref.averageRunTime && ref.averageRunTime !== '-') facts.push(`Time: ${ref.averageRunTime}`);
+                if (ref.partySize && ref.partySize !== '-') facts.push(`Party: ${ref.partySize}`);
+                if (ref.serviceable !== 'unknown') facts.push(`Serviceable: ${ref.serviceable === 'yes' ? 'Yes' : 'No'}`);
+                if (ref.milestoneGoal && ref.milestoneGoal !== '-') facts.push(`Goal: ${ref.milestoneGoal}`);
+                return facts.join(' · ') || 'See the activity reference below for rewards and materials.';
+            }
             const notes = {
                 'abyssal-mire':'Best plan: 2F + 5F, with 1 key remaining for the reset payout. This reaches 5,000 weekly points; a service can be a practical fallback.',
                 'gdn-classic':'Focus on the weekly Essence of Life and Polished Diamond rewards.',
@@ -6723,7 +6839,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 'dragon-fellowship':'Weekly Heraldry pouches. If a duo clear is out of reach, a service may still be worthwhile.',
                 'theme-park':'Persian Goblin suits auto-attacking units if you want to idle. Treacherous Path is good for fast clears. Any Theme Park activity counts.'
             };
-            return notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
+            const referenceAdvice = String(item.activityProfile?.reference?.recommendation || '').trim();
+            return referenceAdvice || notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
         }
 
         function buildRecommendationExplanation(item) {
@@ -6755,7 +6872,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const recentArchiveEntries = sortedArchiveEntries.slice(-3);
             const modelNote = document.createElement('div');
             modelNote.className = 'analytics-personalization-note';
-            modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Activity Insights works</summary><p>Suggestions combine task importance, activity tips, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p></details>';
+            modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Activity Insights works</summary><p>Suggestions combine task importance, admin-managed Activity Reference details, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p></details>';
             cont.appendChild(modelNote);
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
@@ -6782,7 +6899,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const plainReason = getRecommendationPlainReason(i);
                     const activityNote = getRecommendationActivityNote(i);
                     const scoreLine = explanation.scoreLine;
-                    return `<div class="missed-item analytics-recommendation-card"><div class="analytics-recommendation-main"><strong>${escapeHTML(i.t)}</strong><p class="analytics-recommendation-plain-reason">${escapeHTML(plainReason)}</p><details class="analytics-recommendation-explanation"><summary>Why suggested?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>History:</strong> ${escapeHTML(evidence.description)}</p><p><strong>Activity tip:</strong> ${escapeHTML(activityNote)}</p><details class="analytics-score-details"><summary>Past results and score (optional)</summary><p><strong>Past results:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'} · ${evidence.notCompleted} week${evidence.notCompleted === 1 ? '' : 's'} not completed · ${evidence.excluded} N/A ignored.</p><p><strong>Why it fits:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value:</strong> ${escapeHTML(explanation.profileDetail)}</p><p class="analytics-recommendation-scoring"><strong>Score details:</strong> ${escapeHTML(scoreLine)}</p><p>Shared Loot Weight stays the same for everyone. The personal priority adjusts it using activity value and this character’s history.</p></details></div></details></div><div class="analytics-recommendation-rank" title="Suggested priority ${rank + 1}">#${rank + 1}</div></div>`;
+                    return `<div class="missed-item analytics-recommendation-card"><div class="analytics-recommendation-main"><strong>${escapeHTML(i.t)}</strong><p class="analytics-recommendation-plain-reason">${escapeHTML(plainReason)}</p><details class="analytics-recommendation-explanation"><summary>Why suggested?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>History:</strong> ${escapeHTML(evidence.description)}</p><p><strong>${i.activityProfile?.reference ? 'Activity facts:' : 'Activity tip:'}</strong> ${escapeHTML(activityNote)}</p><details class="analytics-score-details"><summary>Past results and score (optional)</summary><p><strong>Past results:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'} · ${evidence.notCompleted} week${evidence.notCompleted === 1 ? '' : 's'} not completed · ${evidence.excluded} N/A ignored.</p><p><strong>Why it fits:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value:</strong> ${escapeHTML(explanation.profileDetail)}</p><p class="analytics-recommendation-scoring"><strong>Score details:</strong> ${escapeHTML(scoreLine)}</p><p>Shared Loot Weight stays the same for everyone. The personal priority adjusts it using activity value and this character’s history.</p></details></div></details></div><div class="analytics-recommendation-rank" title="Suggested priority ${rank + 1}">#${rank + 1}</div></div>`;
                 }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No next steps suggested from the saved history yet.</div>';
 
                 card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:4px;">Personalized Task Priorities</div>${prioHTML}</div>`;
@@ -8601,7 +8718,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r17';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r18';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
