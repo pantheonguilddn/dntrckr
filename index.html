@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r23</title>
+    <title>Pantheon Tools v1.6.8-r27</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1885,7 +1885,13 @@
 .rate-up-editor-card { min-width:0; padding:12px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-raised); }
 .rate-up-editor-card h4 { margin:0 0 8px; }
 .rate-up-editor-card label { display:flex; align-items:center; gap:7px; margin:8px 0; color:var(--pt-text); }
-.rate-up-editor-card input[type="datetime-local"],.rate-up-editor-card select,.admin-view-as-field select { box-sizing:border-box; width:100%; min-height:36px; padding:7px 9px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-input); color:var(--pt-text); }
+.rate-up-editor-card input[type="datetime-local"],.rate-up-editor-card input[type="text"],.rate-up-editor-card select,.rate-up-editor-card textarea,.admin-view-as-field select { box-sizing:border-box; width:100%; min-height:36px; padding:7px 9px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-input); color:var(--pt-text); }
+.rate-up-editor-card textarea { min-height:64px; resize:vertical; }
+.rate-up-custom-events-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin:18px 0 8px; }
+.rate-up-custom-events-head h4 { margin:0; }
+.rate-up-custom-events-empty { padding:12px; border:1px dashed var(--pt-border); border-radius:9px; color:var(--pt-muted); }
+.rate-up-custom-event-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:10px; }
+.rate-up-custom-event-actions button { font-size:.8rem; }
 .admin-view-as-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .admin-view-as-field { display:grid; gap:6px; color:var(--pt-muted); font-weight:800; }
 body.admin-view-as-active .admin-preview-disable { pointer-events:none !important; opacity:.55 !important; }
@@ -2665,6 +2671,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:520px){.analytics-recommendation-rank{min-width:26px;padding:4px;font-size:.69rem}.analytics-recommendation-plain-reason{font-size:.7rem}.analytics-recommendation-explanation>summary{align-items:flex-start;flex-wrap:wrap}}
 </style>
 
+
+<style id="pantheon-r24-deadline-mode">
+.deadline-strategy-banner{display:flex;flex-direction:column;gap:7px;margin:10px 0 12px;padding:12px 13px;border:1px solid var(--pt-border);border-left:4px solid var(--pt-accent);border-radius:11px;background:var(--pt-surface-raised);color:var(--pt-text);box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.deadline-strategy-banner[data-deadline-scope="tracker"]{grid-column:1/-1;width:100%;box-sizing:border-box}.deadline-strategy-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.deadline-strategy-top strong{font-size:.72rem;letter-spacing:.07em;font-weight:950}.deadline-strategy-top span{font-size:.67rem;font-weight:850;font-variant-numeric:tabular-nums;color:var(--pt-muted)}
+.deadline-strategy-banner p{margin:0;color:var(--pt-text);font-size:.72rem;font-weight:680;line-height:1.48}.deadline-strategy-foot{color:var(--pt-muted);font-size:.61rem;line-height:1.4}
+.deadline-strategy-banner[data-phase="build"],.deadline-strategy-banner[data-phase="plan"]{border-left-color:#779b83}
+.deadline-strategy-banner[data-phase="focus"],.deadline-strategy-banner[data-phase="raid-window"]{border-left-color:#c28b35}
+.deadline-strategy-banner[data-phase="deadline-push"]{border-color:#c48a36;border-left-color:#d77a22;background:color-mix(in srgb,var(--pt-surface-raised) 92%,#f4a340 8%)}
+.deadline-strategy-banner[data-phase="final-push"],.deadline-strategy-banner[data-phase="last-call"],.deadline-strategy-banner[data-phase="reset-imminent"]{border-color:#c65343;border-left-color:#c65343;background:color-mix(in srgb,var(--pt-surface-raised) 91%,#d95f4d 9%)}
+.deadline-strategy-banner[data-phase="final-push"] .deadline-strategy-top strong,.deadline-strategy-banner[data-phase="last-call"] .deadline-strategy-top strong,.deadline-strategy-banner[data-phase="reset-imminent"] .deadline-strategy-top strong{color:var(--pt-text)}
+@media(max-width:640px){.deadline-strategy-banner{padding:10px}.deadline-strategy-banner p{font-size:.68rem}}
+</style>
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3105,9 +3123,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r23</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r27</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r23 update:</strong> Tracker saves are more reliable: recent checkbox changes survive refresh, and concurrent syncs no longer let a stale whole-record write undo a newer task update.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r27 update:</strong> Guild raid-day planning now starts on Saturday. Friday uses the normal weekday baseline, with Monday retained as possible spillover.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3358,7 +3376,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     </section>
                     <section class="help-topic" data-help-topic="analytics">
                         <h4>Roster Analytics</h4>
-                        <p>Weekly analytics is <b>opt-in</b>. When <b>Track weekly analytics</b> is unchecked, normal daily and weekly task resets still run, but new historical snapshots are not saved. This switch is shared across connected clients.</p>
+                        <p>Weekly analytics is <b>opt-in</b>. When <b>Track weekly analytics</b> is checked, the tool saves weekly snapshots and rolling timestamps for group-task completions so it can learn when guild runs usually happen. Weekend group-run timing is kept separate from a character’s personal clear history. When unchecked, normal resets still run, but no new analytics or group-timing history is collected. This switch is shared across connected clients.</p>
                         <p>When enabled, the tracker retains up to five weekly snapshots to support the visible trend and priority calculations. Use <b>Clear Stored History</b> to remove old snapshots and reduce the shared cloud record size.</p>
                         <h5>5-Week Trend</h5>
                         <p>Shows the most recent weekly completion percentages available for that character.</p>
@@ -3797,7 +3815,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return {
                 itemDrop: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
                 enhancement: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
-                expBoost: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' }
+                expBoost: { enabled: false, schedule: 'weekend', customStart: '', customEnd: '' },
+                otherEvents: []
             };
         }
         function normalizeRateUpEvents(value) {
@@ -3811,12 +3830,79 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     customEnd: String(raw.customEnd || '').slice(0, 16)
                 };
             };
+            const normalizeCustom = (event, index) => {
+                const raw = safeObject(event);
+                const name = String(raw.name || '').trim().slice(0, 100);
+                return {
+                    id: String(raw.id || `custom-event-${index + 1}`).trim().slice(0, 120),
+                    name,
+                    description: String(raw.description || '').trim().slice(0, 300),
+                    enabled: raw.enabled === true,
+                    schedule: raw.schedule === 'custom' ? 'custom' : 'weekend',
+                    customStart: String(raw.customStart || '').slice(0, 16),
+                    customEnd: String(raw.customEnd || '').slice(0, 16)
+                };
+            };
             const defaults = createDefaultRateUpEvents();
+            const otherEvents = (Array.isArray(source.otherEvents) ? source.otherEvents : [])
+                .slice(0, 30).map(normalizeCustom).filter(event => event.name);
             return {
                 itemDrop: normalizeOne(source.itemDrop || defaults.itemDrop),
                 enhancement: normalizeOne(source.enhancement || defaults.enhancement),
-                expBoost: normalizeOne(source.expBoost || defaults.expBoost)
+                expBoost: normalizeOne(source.expBoost || defaults.expBoost),
+                otherEvents
             };
+        }
+
+        // Compact, rolling completion timing is collected only when weekly analytics is enabled.
+        // It stores group-task state/timestamps, allowing the model to learn guild-run timing without
+        // confusing weekend attendance with a character's individual ability to clear content.
+        function normalizeCompletionTiming(value, clearedAt = 0) {
+            const source = safeObject(value);
+            const now = Date.now();
+            const cutoff = now - 42 * 24 * 60 * 60 * 1000;
+            const rows = Object.entries(source).filter(([weekKey, chars]) => {
+                const wk = Number(weekKey);
+                return Number.isFinite(wk) && wk >= cutoff && wk <= now + 24 * 60 * 60 * 1000 && chars && typeof chars === 'object';
+            }).sort((a,b) => Number(a[0])-Number(b[0])).slice(-6);
+            const cleaned = {};
+            rows.forEach(([weekKey, chars]) => {
+                const cleanChars = {};
+                Object.entries(safeObject(chars)).slice(0, 120).forEach(([charName, tasks]) => {
+                    const safeName = String(charName || '').trim().slice(0, 120);
+                    if (!safeName) return;
+                    const cleanTasks = {};
+                    Object.entries(safeObject(tasks)).slice(0, 100).forEach(([taskName, item]) => {
+                        const safeTask = String(taskName || '').trim().slice(0, 140);
+                        const raw = safeObject(item);
+                        const at = Number(raw.at) || Number(raw.updatedAt) || (typeof item === 'number' ? Number(item) : 0);
+                        if (!safeTask || !at || at < Number(clearedAt || 0)) return;
+                        const state = (raw.state === 'done' || typeof item === 'number') ? 'done' : 'open';
+                        cleanTasks[safeTask] = { state, at, ownerKey:String(raw.ownerKey || raw.owner || '').trim().slice(0, 120) };
+                    });
+                    if (Object.keys(cleanTasks).length) cleanChars[safeName] = cleanTasks;
+                });
+                if (Object.keys(cleanChars).length) cleaned[String(weekKey)] = cleanChars;
+            });
+            return cleaned;
+        }
+        function mergeCompletionTiming(localValue, remoteValue, clearedAt = 0) {
+            const local = normalizeCompletionTiming(localValue, clearedAt);
+            const remote = normalizeCompletionTiming(remoteValue, clearedAt);
+            const merged = { ...remote };
+            Object.entries(local).forEach(([weekKey, chars]) => {
+                if (!merged[weekKey]) merged[weekKey] = {};
+                Object.entries(chars).forEach(([charName, tasks]) => {
+                    if (!merged[weekKey][charName]) merged[weekKey][charName] = {};
+                    Object.entries(tasks).forEach(([taskName, entry]) => {
+                        const current = merged[weekKey][charName][taskName];
+                        if (!current || Number(entry.at) > Number(current.at) || (Number(entry.at) === Number(current.at) && entry.state === 'open')) {
+                            merged[weekKey][charName][taskName] = { state:entry.state, at:Number(entry.at) || 0, ownerKey:String(entry.ownerKey || '').slice(0, 120) };
+                        }
+                    });
+                });
+            });
+            return normalizeCompletionTiming(merged, clearedAt);
         }
 
         function normalizeActivityReferenceProfiles(value) {
@@ -3846,6 +3932,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 cells: {},
                 history: {},
                 weeklyArchive: {},
+                completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
                 settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
@@ -4629,6 +4716,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             norm.settings.analyticsTrackingUpdatedBy = String(sets.analyticsTrackingUpdatedBy || '');
             norm.settings.analyticsHistoryClearedAt = Number(sets.analyticsHistoryClearedAt) || 0;
             norm.settings.analyticsHistoryClearedBy = String(sets.analyticsHistoryClearedBy || '');
+            norm.completionTiming = normalizeCompletionTiming(source.completionTiming, norm.settings.analyticsHistoryClearedAt);
             norm.settings.lootWeights = { ...DEFAULT_LOOT_WEIGHTS, ...safeObject(sets.lootWeights) };
             norm.settings.lootWeightUpdatedAt = safeObject(sets.lootWeightUpdatedAt);
             norm.settings.rosters = Array.isArray(sets.rosters) ? normalizeRosters(sets.rosters) : [];
@@ -4852,6 +4940,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
             });
 
+            merged.completionTiming = mergeCompletionTiming(local.completionTiming, remote.completionTiming, merged.settings.analyticsHistoryClearedAt);
             merged.weeklyArchive = { ...remote.weeklyArchive, ...local.weeklyArchive };
             Object.keys(merged.weeklyArchive).forEach(k => {
                 if (local.weeklyArchive[k] && remote.weeklyArchive[k]) {
@@ -5383,6 +5472,21 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         document.addEventListener('DOMContentLoaded', async () => {
             initializeBountyBoardsToggle();
             ['item','enhancement','exp'].forEach(prefix => document.getElementById(`rateup-${prefix}-schedule`)?.addEventListener('change', () => updateRateUpEventFields(prefix)));
+            const customEventsList = document.getElementById('rateup-custom-events-list');
+            customEventsList?.addEventListener('input', event => {
+                const field = event.target.dataset.customEventField, id = event.target.dataset.customEventId;
+                if (field && id) updateCustomRateUpEventField(id, field, field === 'enabled' ? event.target.checked : event.target.value);
+            });
+            customEventsList?.addEventListener('change', event => {
+                const field = event.target.dataset.customEventField, id = event.target.dataset.customEventId;
+                if (field && id) updateCustomRateUpEventField(id, field, field === 'enabled' ? event.target.checked : event.target.value);
+            });
+            customEventsList?.addEventListener('click', event => {
+                const removeButton = event.target.closest('[data-remove-custom-event]');
+                if (!removeButton) return;
+                rateUpCustomEventDrafts = rateUpCustomEventDrafts.filter(item => item.id !== removeButton.dataset.removeCustomEvent);
+                renderCustomRateUpEvents();
+            });
             const canEnter = await pantheonCheckSessionAndBoot();
             if (!canEnter) return;
             hydrateCardWikiData();
@@ -5422,10 +5526,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function clearAnalyticsHistory() {
             const weeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
             const legacy = Object.keys(safeObject(cloudData.history)).length;
-            if (!weeks && !legacy) { alert('There is no stored analytics history to clear.'); return; }
-            if (!confirm(`Clear ${weeks} archived week${weeks === 1 ? '' : 's'} and legacy analytics history? This cannot be undone. Task progress, roster data, salary logs, and other tracker settings will be kept.`)) return;
+            const timingWeeks = Object.keys(safeObject(cloudData.completionTiming)).length;
+            if (!weeks && !legacy && !timingWeeks) { alert('There is no stored analytics or group-timing history to clear.'); return; }
+            if (!confirm(`Clear ${weeks} archived week${weeks === 1 ? '' : 's'}, legacy analytics, and ${timingWeeks} week${timingWeeks === 1 ? '' : 's'} of learned group-run timing? This cannot be undone. Task progress, roster data, salary logs, and other tracker settings will be kept.`)) return;
             cloudData.weeklyArchive = {};
             cloudData.history = {};
+            cloudData.completionTiming = {};
             cloudData.settings.analyticsHistoryClearedAt = Date.now();
             cloudData.settings.analyticsHistoryClearedBy = deviceId;
             persistLocalData();
@@ -5663,10 +5769,34 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         
         function setCellState(c, t, state, forcedTime) {
             ensureCellMap(cloudData, c);
-            const cur = cloudData.cells[c][t] || { note: '', updatedAt: 0 };
-            cloudData.cells[c][t] = { state, note: cur.note, updatedAt: Math.max(forcedTime || Date.now(), cur.updatedAt + 1), deviceId };
+            const cur = cloudData.cells[c][t] || { state:'open', note: '', updatedAt: 0 };
+            const updatedAt = Math.max(forcedTime || Date.now(), (Number(cur.updatedAt) || 0) + 1);
+            cloudData.cells[c][t] = { state, note: cur.note, updatedAt, deviceId };
             cloudData.updatedAt = Date.now();
+            // Forced timestamps are used by automatic resets; they are not player activity.
+            if (!forcedTime && cur.state !== state && cloudData.settings?.analyticsTrackingEnabled === true && isGuildRunTimingTask(t)) {
+                recordGuildRunTimingTransition(c, t, state, updatedAt);
+            }
             rememberPendingCellWrite(c, t);
+        }
+
+        function isGuildRunTimingTask(taskName) {
+            const name = String(taskName || '').trim();
+            if (!name || /bounty\s+claim|bounty\s+board/i.test(name)) return false;
+            const profile = getActivityValueProfile(name);
+            const features = getDeadlineTaskFeatures(name, profile);
+            return features.groupDependent && Number(features.partySize) >= 2;
+        }
+
+        function recordGuildRunTimingTransition(charName, taskName, state, at) {
+            const weekKey = String(getTargetResetTimeUTC(true));
+            if (!cloudData.completionTiming || typeof cloudData.completionTiming !== 'object') cloudData.completionTiming = {};
+            if (!cloudData.completionTiming[weekKey]) cloudData.completionTiming[weekKey] = {};
+            if (!cloudData.completionTiming[weekKey][charName]) cloudData.completionTiming[weekKey][charName] = {};
+            const owner = getCurrentMemberDirectoryEntry();
+            cloudData.completionTiming[weekKey][charName][taskName] = { state:state === 'done' ? 'done' : 'open', at:Number(at) || Date.now(), ownerKey:String(owner?.id || owner?.name || '').trim().slice(0, 120) };
+            cloudData.completionTiming = normalizeCompletionTiming(cloudData.completionTiming, cloudData.settings?.analyticsHistoryClearedAt || 0);
+            guildRaidTimingSummaryCache = null;
         }
 
         function setCellNote(c, t, note) {
@@ -6000,6 +6130,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (item.status === 'active' && item.end > now) parts.push(`＋50% Item Drop · ${formatEventTimeRemaining(item.end - now)}`);
             if (enhance.status === 'active' && enhance.end > now) parts.push(`＋30% Enhancement · ${formatEventTimeRemaining(enhance.end - now)}`);
             if (exp.status === 'active' && exp.end > now) parts.push(`＋100% EXP Boost · ${formatEventTimeRemaining(exp.end - now)}`);
+            const activeCustom = (Array.isArray(events.otherEvents) ? events.otherEvents : []).map(event => ({ event, window:getRateUpWindow(event, now) })).filter(item => item.window.status === 'active' && item.window.end > now);
+            activeCustom.slice(0, 2).forEach(({event,window}) => parts.push(`${event.name} · ${formatEventTimeRemaining(window.end - now)}`));
+            if (activeCustom.length > 2) parts.push(`+${activeCustom.length - 2} more guild event${activeCustom.length - 2 === 1 ? '' : 's'}`);
             const active = parts.length > 0;
             el.textContent = parts.join('   |   ');
             el.hidden = !active;
@@ -6064,8 +6197,287 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const nextReset = cycleStart + weekMs;
             const elapsedHours = Math.max(0, Math.min(168, (now - cycleStart) / 3600000));
             const hoursLeft = Math.max(0, (nextReset - now) / 3600000);
-            const label = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? 'Final 2 days' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : hoursLeft <= 120 ? 'Early week' : 'Week just started';
+            const label = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 24 ? 'Last call' : hoursLeft <= 48 ? 'Final push' : hoursLeft <= 72 ? 'Deadline push' : hoursLeft <= 96 ? 'Raid window' : hoursLeft <= 120 ? 'Focus' : hoursLeft <= 144 ? 'Build momentum' : 'Plan ahead';
             return { cycleStart, nextReset, elapsedHours, hoursLeft, label };
+        }
+
+        // Reset pressure is a planning input, not just a badge. Long/group-dependent tasks
+        // get promoted while there is still time to assemble a party; near reset, proven and
+        // faster clears gain priority unless the character has relevant clear history.
+        function getDeadlineMode(pace = getWeeklyPaceContext()) {
+            const h = Number(pace?.hoursLeft ?? 168);
+            if (h <= 2) return { key:'reset-imminent', label:'RESET IMMINENT', tone:'critical', cardLabel:'Reset imminent', message:'Only finish tasks you can realistically complete before cutoff. Do not start assembling a new group or assume a booster is still taking runs.', strategy:'Finish only what fits before cutoff; no new group assembly or unconfirmed services.' };
+            if (h <= 24) return { key:'last-call', label:'LAST CALL', tone:'critical', cardLabel:'Last call', message:'The final 24 hours are for realistic clears. Prioritize short, proven tasks; launch a raid only if the party is ready. Do not count on paid services unless a booster confirms availability.', strategy:'Proven clears first; no unplanned raids or assumed last-minute services.' };
+            if (h <= 48) return { key:'final-push', label:'FINAL PUSH', tone:'urgent', cardLabel:'Final push', message:'Finish high-value goals and book any needed service now. Boosters may have cleared their characters or stopped taking runs by Last Call, so keep a reliable-clear fallback.', strategy:'Close out serviceable goals now; confirm groups and pivot promptly if plans stall.' };
+            if (h <= 72) return { key:'deadline-push', label:'DEADLINE PUSH', tone:'urgent', cardLabel:'Deadline push', message:'Reset is 2–3 days away. Organize valuable group runs and arrange paid services now, while there is still time to regroup or find another provider.', strategy:'Schedule high-value raids and book serviceable goals before the final day.' };
+            if (h <= 96) return { key:'raid-window', label:'RAID WINDOW', tone:'urgent', cardLabel:'Raid window', message:'Use this window to organize high-value group runs and book services while there is still time to recover from a failed plan. Keep fast clears ready as backup.', strategy:'Form groups and arrange services early; keep dependable clears ready.' };
+            if (h <= 120) return { key:'focus', label:'FOCUS MODE', tone:'watch', cardLabel:'Focus', message:'Build weekly progress while there is time: clear routine rewards, arrange longer raids, and schedule any serviceable objectives ahead of reset weekend.', strategy:'Make progress and book time-sensitive help early.' };
+            if (h <= 144) return { key:'build', label:'BUILD MOMENTUM', tone:'calm', cardLabel:'Build momentum', message:'Clear routine rewards and line up party-dependent activities early. If a paid service would save a difficult alt time, arrange it before providers finish their weekly runs.', strategy:'Make steady progress and plan any carries early.' };
+            return { key:'plan', label:'PLAN AHEAD', tone:'calm', cardLabel:'Plan ahead', message:'Start with your best-value weekly goals. Plan group runs and any needed paid services early, then let the recommendations become more selective as reset approaches.', strategy:'Plan the week, reserve help early, and gather evidence before urgency rises.' };
+        }
+
+        function getDeadlineTaskFeatures(taskName, activityProfile) {
+            const profile = activityProfile || getActivityValueProfile(taskName);
+            const ref = profile?.reference || findActivityReferenceProfile(taskName);
+            let minutes = getActivityReferenceMinutes(ref);
+            const key = String(profile?.key || '').toLowerCase();
+            if (!minutes) {
+                if (key === 'theme-park') minutes = 2;
+                else if (key === 'dragon-fellowship') minutes = 20;
+                else if (key === 'abyssal-mire') minutes = 20;
+                else if (key === 'ddn-hardcore') minutes = 27;
+                else if (key === 'black-dragon') minutes = 50;
+                else if (key === 'gdn-classic' || key === 'gdn-hardcore') minutes = 15;
+                else if (key === 'guardian-nest') minutes = 30;
+                else if (key === 'anu-arendel-ordeal-nest') minutes = 25;
+                else if (/black-dragon-memoria/.test(key)) minutes = 13;
+            }
+            const partyRaw = String(ref?.partySize || '');
+            const partyMatch = partyRaw.match(/\d+/);
+            let partySize = partyMatch ? Number(partyMatch[0]) : 0;
+            if (!partySize) {
+                if (['ddn-hardcore','black-dragon','gdn-classic','gdn-hardcore'].includes(key)) partySize = 8;
+                else if (key === 'dragon-fellowship') partySize = 2;
+                else if (key === 'theme-park') partySize = 1;
+                else if (key === 'abyssal-mire' || key === 'guardian-nest' || key === 'anu-arendel-ordeal-nest') partySize = 4;
+                else if (/black-dragon-memoria/.test(key)) partySize = 4;
+            }
+            const serviceable = ref?.serviceable === 'yes' || (ref?.serviceable !== 'no' && profile?.carryPotential === true);
+            const groupDependent = partySize > 1;
+            const hasDocumentedReward = !!(ref && [ref.weeklyRewards, ref.materials, ref.milestoneGoal].some(value => String(value || '').trim() && String(value).trim() !== '-'));
+            const highValue = profile?.salaryRun === true || profile?.endgame === true || profile?.resetSensitive === true || Number(profile?.priorityBonus) >= 6 || Number(profile?.rewardUtility) >= 1.08 || hasDocumentedReward;
+            return { reference:ref, minutes, partySize, groupDependent, serviceable, highValue, key };
+        }
+
+        let guildRaidTimingSummaryCache = null;
+        function getGuildRaidTimingSummary(now = Date.now()) {
+            const p = getManilaDateParts(now);
+            const dayStamp = `${p.year}-${p.month}-${p.day}`;
+            if (guildRaidTimingSummaryCache && guildRaidTimingSummaryCache.data === cloudData.completionTiming && guildRaidTimingSummaryCache.dayStamp === dayStamp) return guildRaidTimingSummaryCache.summary;
+            const rows = [];
+            const timing = safeObject(cloudData?.completionTiming);
+            Object.entries(timing).forEach(([weekKey, chars]) => {
+                Object.entries(safeObject(chars)).forEach(([charName, tasks]) => {
+                    Object.entries(safeObject(tasks)).forEach(([taskName, event]) => {
+                        if (event?.state !== 'done' || !Number(event.at) || !isGuildRunTimingTask(taskName)) return;
+                        const day = getManilaDateParts(Number(event.at)).weekday;
+                        rows.push({ weekKey:String(weekKey), taskKey:String(taskName).trim().toLocaleLowerCase(), taskName, charName, ownerKey:String(event.ownerKey || '').trim(), at:Number(event.at), day });
+                    });
+                });
+            });
+            const days = { Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0, Sun:0 };
+            const byTask = {};
+            let sessions = 0;
+            const grouped = new Map();
+            rows.forEach(row => {
+                const key = `${row.weekKey}|${row.taskKey}`;
+                if (!grouped.has(key)) grouped.set(key, []);
+                grouped.get(key).push(row);
+            });
+            grouped.forEach((items, groupKey) => {
+                items.sort((a,b) => a.at-b.at);
+                let cluster = [];
+                const flush = () => {
+                    if (!cluster.length) return;
+                    const distinctCharacters = new Set(cluster.map(item => item.charName));
+                    const ownerKeys = cluster.map(item => item.ownerKey).filter(Boolean);
+                    const distinctOwners = new Set(ownerKeys);
+                    // Prefer distinct guild members as evidence of an organized group session. If ownership
+                    // is unavailable for every row (legacy/imported timing), fall back to distinct characters.
+                    // A single member clearing several alts must not be mistaken for guild attendance.
+                    const indicatesGuildSession = ownerKeys.length ? distinctOwners.size >= 2 : distinctCharacters.size >= 2;
+                    if (indicatesGuildSession) {
+                        const medianRow = cluster[Math.floor((cluster.length-1)/2)];
+                        days[medianRow.day] = (days[medianRow.day] || 0) + 1;
+                        const taskKey = medianRow.taskKey;
+                        if (!byTask[taskKey]) byTask[taskKey] = { Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0, Sun:0, sessions:0 };
+                        byTask[taskKey][medianRow.day]++;
+                        byTask[taskKey].sessions++;
+                        sessions++;
+                    }
+                    cluster = [];
+                };
+                items.forEach(item => {
+                    if (cluster.length && item.at - cluster[0].at > 3 * 60 * 60 * 1000) flush();
+                    cluster.push(item);
+                });
+                flush();
+            });
+            const summary = { days, byTask, sessions, rows:rows.length };
+            guildRaidTimingSummaryCache = { data:cloudData.completionTiming, dayStamp, summary };
+            return summary;
+        }
+
+        function getGuildRunScheduleContext(taskName, now = Date.now()) {
+            const parts = getManilaDateParts(now);
+            const day = parts.weekday;
+            // Guild cadence prior: Saturday is the start of raid day, Saturday/Sunday are peak days,
+            // and Monday is possible spillover. Friday uses a normal weekday baseline; it is not
+            // treated as a guild raid-preparation day. Public-party clears still inform personal readiness.
+            const prior = { Mon:0.96, Tue:0.68, Wed:0.66, Thu:0.72, Fri:0.68, Sat:1.22, Sun:1.20 };
+            const summary = getGuildRaidTimingSummary(now);
+            const all = Object.values(summary.days).reduce((sum,n)=>sum+Number(n||0),0);
+            const dayCount = Number(summary.days[day]) || 0;
+            const mean = all / 7;
+            const empirical = Math.max(0.55, Math.min(1.35, (dayCount + 0.5) / (mean + 0.5)));
+            const sampleWeight = Math.min(0.72, summary.sessions / (summary.sessions + 8));
+            let multiplier = (Number(prior[day]) || 0.8) * (1-sampleWeight) + empirical * sampleWeight;
+            const activityKey = String(taskName || '').trim().toLocaleLowerCase();
+            const taskHistory = summary.byTask[activityKey];
+            if (taskHistory && taskHistory.sessions >= 3) {
+                const activityTotal = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].reduce((sum,key)=>sum+taskHistory[key],0);
+                const taskEmpirical = Math.max(0.6, Math.min(1.3, ((Number(taskHistory[day])||0)+0.5)/(activityTotal/7+0.5)));
+                multiplier = multiplier * 0.75 + taskEmpirical * 0.25;
+            }
+            multiplier = Math.max(0.58, Math.min(1.28, multiplier));
+            const peakShare = all ? (summary.days.Sat + summary.days.Sun + summary.days.Mon) / all : null;
+            const learned = summary.sessions >= 4;
+            const isPeak = ['Sat','Sun','Mon'].includes(day);
+            let reason;
+            if (learned) {
+                reason = `Recent shared completions show ${Math.round(peakShare*100)}% of detected group-run sessions on Saturday through Monday. This adjusts expectations for guild-party availability, not this character's individual clearability.`;
+            } else {
+                reason = 'Guild-run planning starts from the known cadence: weekend is the peak for organized parties, with some runs extending into Monday. This affects group availability, not personal clearability; weekday public clears still count as evidence.';
+            }
+            return { day, multiplier, learned, sessions:summary.sessions, weekendMondayShare:peakShare, isPeak, reason, label:isPeak ? 'Guild raid window' : 'Lower guild availability' };
+        }
+
+        function getDeadlinePriorityAdjustment(taskName, activityProfile, taskStats, fit, character, pace = getWeeklyPaceContext()) {
+            const mode = getDeadlineMode(pace);
+            const features = getDeadlineTaskFeatures(taskName, activityProfile);
+            const clears = Math.max(0, Number(taskStats?.c) || 0);
+            const misses = Math.max(0, Number(taskStats?.m) || 0);
+            const fitLabel = String(fit?.label || '').toLowerCase();
+            const hasClear = clears > 0 || fitLabel.includes('recent clear') || fitLabel.includes('previously cleared') || fitLabel.includes('prior clear');
+            const historyCount = clears + misses;
+            const reliableHistory = clears >= 2 || (historyCount >= 2 && clears / Math.max(1, historyCount) >= 0.5);
+            const minutes = Number(features.minutes) || 0;
+            const group = features.groupDependent;
+            const highValue = features.highValue;
+            const serviceWindowOpen = features.serviceable && Number(pace?.hoursLeft ?? 168) > 24;
+            let multiplier = 1;
+            let reason = '';
+            let label = 'Normal weekly ranking';
+            const h = Number(pace?.hoursLeft ?? 168);
+
+            if (h > 96) {
+                if (group && highValue) { multiplier = serviceWindowOpen ? 1.03 : 1; label = serviceWindowOpen ? 'Plan group or service early' : 'Plan group run early'; reason = serviceWindowOpen ? 'This high-value goal has a service option; arrange it early while there is time to recover if plans change.' : 'There is time to organize this high-value group activity and recover if plans change.'; }
+                else if (serviceWindowOpen) { multiplier = 1.03; label = 'Service option · plan early'; reason = 'A service may save time, so arrange it early rather than relying on last-minute availability.'; }
+            } else if (h > 72) {
+                if (group && highValue) { multiplier = features.serviceable ? 1.06 : 1.05; label = features.serviceable ? 'Group/service planning window' : 'Group planning window'; reason = features.serviceable ? 'This valuable activity has a service route; arrange it early while providers may still have openings.' : 'This valuable group activity gets a lift while there is time to organize the party.'; }
+                else if (serviceWindowOpen) { multiplier = 1.04; label = 'Service window open'; reason = 'A service can make this objective easier to finish; arrange it while providers may still have openings.'; }
+                else if (!group && minutes > 0 && minutes <= 15 && reliableHistory) { multiplier = 1.03; label = 'Quick reliable clear'; reason = 'A short, previously reliable clear helps build progress before the final push.'; }
+            } else if (h > 48) {
+                if (group && highValue) { multiplier = features.serviceable ? 1.10 : 1.08; label = features.serviceable ? 'Group/service deadline push' : 'Deadline group push'; reason = features.serviceable ? 'This valuable group goal can be done via service; book it while there is time to regroup if needed.' : 'Prioritize organizing this valuable group run while there is still time to regroup if needed.'; }
+                else if (serviceWindowOpen) { multiplier = 1.06; label = 'Serviceable weekly goal'; reason = 'A service is a practical route to completion, but book it before the final day when providers may be unavailable.'; }
+                else if (!group && minutes > 0 && minutes <= 20 && (hasClear || reliableHistory)) { multiplier = 1.04; label = 'Quick reliable clear'; reason = 'This manageable clear helps secure weekly progress while there is time for other goals.'; }
+            } else if (h > 24) {
+                // Final Push (24–48h): still promote group organization and paid services, but urge an early decision.
+                if (group && highValue) { multiplier = features.serviceable ? 1.12 : 1.10; label = features.serviceable ? 'Book service before Last Call' : 'Final-push group run'; reason = features.serviceable ? 'This valuable goal has a service route; book it now rather than leaving it until boosters may have finished their weekly runs.' : 'This high-value group run is still worth arranging now; set a cutoff and switch to dependable clears if the party does not form.'; }
+                else if (serviceWindowOpen) { multiplier = 1.08; label = 'Book service before Last Call'; reason = 'A service can save time, but arrange it now rather than leaving it until boosters may have finished their weekly runs.'; }
+                else if (group && !hasClear) {
+                    multiplier = activityProfile?.salaryRun ? 0.78 : activityProfile?.endgame ? 0.60 : 0.72;
+                    label = 'Unproven group run · final push';
+                    reason = 'A group-dependent run without a recorded clear falls behind dependable alternatives unless the party is already forming.';
+                } else if (group && hasClear) {
+                    multiplier = 1.02; label = 'Known group clear'; reason = 'Prior clears make this group run more plausible, but make the group decision promptly.';
+                } else if (!group && minutes > 0 && minutes <= 20 && (hasClear || reliableHistory)) {
+                    multiplier = 1.10; label = 'Quick reliable clear'; reason = 'This short, proven clear is a strong use of the remaining time.';
+                } else if (!group && minutes > 0 && minutes <= 20) {
+                    multiplier = 1.05; label = 'Quick achievable task'; reason = 'Its short expected run time makes it a practical option while finishing weekly goals.';
+                } else if (minutes >= 30 && !hasClear) {
+                    multiplier = 0.82; label = 'Long unproven task'; reason = 'This longer activity is less dependable without a recorded clear this close to reset.';
+                }
+            } else {
+                // Last Call (24h or less): never assume that a booster is still offering services.
+                // Paid-service convenience is removed from the ranking unless the player has a prior clear.
+                if (group && features.serviceable && !hasClear) {
+                    multiplier = h <= 2 ? 0.32 : 0.48;
+                    label = 'Service not assumed · last call';
+                    reason = 'Do not count on a booster in the final 24 hours. Without a recorded clear, this group goal falls behind reliable tasks unless a provider confirms or your own party is ready.';
+                } else if (group && !hasClear) {
+                    multiplier = activityProfile?.salaryRun ? (h <= 2 ? 0.38 : 0.58) : activityProfile?.endgame ? (h <= 2 ? 0.24 : 0.38) : (h <= 2 ? 0.32 : 0.48);
+                    label = 'Group not proven · last call'; reason = 'With 24 hours or less left, do not spend the window assembling an unproven group run unless the party is already ready.';
+                } else if (group && hasClear) {
+                    multiplier = 0.96; label = 'Known group clear · last call'; reason = 'Run this only while the party is available; otherwise use the remaining time on shorter clears.';
+                } else if (!group && minutes > 0 && minutes <= 20 && (hasClear || reliableHistory)) {
+                    multiplier = 1.18; label = 'Proven quick clear · last call'; reason = 'This short, proven clear is a strong way to secure rewards before cutoff.';
+                } else if (!group && minutes > 0 && minutes <= 20) {
+                    multiplier = 1.08; label = 'Quick achievable task · last call'; reason = 'Its short run time gives it a practical chance of being finished before reset.';
+                } else if (features.serviceable && !hasClear) {
+                    multiplier = h <= 2 ? 0.70 : 0.90; label = 'Service availability uncertain · last call'; reason = 'Do not count on a booster at this stage unless availability is confirmed.';
+                } else if (minutes >= 30 && !hasClear) {
+                    multiplier = 0.65; label = 'Long unproven task · last call'; reason = 'Choose a more dependable clear unless this longer activity is already well organized.';
+                }
+            }
+            const guildSchedule = group ? getGuildRunScheduleContext(taskName) : null;
+            if (guildSchedule) {
+                // Only a modest factor: guild run availability is separate from the character's own
+                // demonstrated clearability and does not override activity value or deadline decisions.
+                multiplier = Math.max(0.25, Math.min(1.55, multiplier * guildSchedule.multiplier));
+                if (guildSchedule.isPeak) label += ' · weekend guild window';
+            }
+            return { multiplier, reason, label, mode:mode.key, minutes, partySize:features.partySize, groupDependent:group, serviceable:features.serviceable, serviceWindowOpen, hasClear, reliableHistory, phaseLabel:mode.label, guildSchedule };
+        }
+
+        function getDeadlineCountdownText(pace = getWeeklyPaceContext()) {
+            const minutes = Math.max(0, Math.round(Number(pace.hoursLeft || 0) * 60));
+            const hours = Math.floor(minutes / 60);
+            const remainder = minutes % 60;
+            return `${hours}h ${remainder}m until reset`;
+        }
+
+        function buildDeadlineStrategyBannerHtml(scope = 'overview') {
+            const pace = getWeeklyPaceContext();
+            const mode = getDeadlineMode(pace);
+            const esc = value => escapeHTML(String(value ?? ''));
+            const guildWindowLine = 'Guild raid day starts Saturday, with the weekend as the peak and Monday as possible spillover. Timing estimates guild-party availability only; public clears still count toward personal readiness.';
+            return `<div class="deadline-strategy-banner" data-phase="${esc(mode.key)}" data-deadline-scope="${esc(scope)}"><div class="deadline-strategy-top"><strong>${esc(mode.label)}</strong><span data-deadline-countdown>${esc(getDeadlineCountdownText(pace))}</span></div><p>${esc(mode.message)}</p><div class="deadline-strategy-foot">${esc(guildWindowLine)} Task rankings also adapt to reset urgency: arrange group runs early, then favor proven clears as the window closes.</div></div>`;
+        }
+
+        function removeGenericLastCallServicePrompts(text) {
+            return String(text || '')
+                .replace(/A service may be worthwhile if you cannot clear it yourself\.?/ig, '')
+                .replace(/A service may still be worthwhile if you cannot clear it yourself\.?/ig, '')
+                .replace(/If duoing is not practical, a service may still be worthwhile\.?/ig, '')
+                .replace(/If duoing is not practical, compare the service cost with the weekly Heraldry rewards\.?/ig, '')
+                .replace(/A service can be a practical fallback\.?/ig, '')
+                .replace(/A service may be a practical fallback if you cannot clear it yourself\.?/ig, '')
+                .replace(/\s{2,}/g, ' ').replace(/\s+([,.])/g, '$1').trim();
+        }
+
+        function getDeadlineRecommendationHint(item, pace = getWeeklyPaceContext()) {
+            const h = Number(pace?.hoursLeft ?? 168);
+            if (h > 96 || !item) return '';
+            const profileKey = String(item.activityProfile?.key || '').toLowerCase();
+            const features = getDeadlineTaskFeatures(item.t, item.activityProfile);
+            const hasClear = Number(item.c) > 0 || /recent clear|previously cleared|prior clear/i.test(String(item.fit?.label || ''));
+            if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) return '';
+            if (profileKey === 'ddn-hardcore' || isDDNHardcoreTask(item.t)) {
+                if (h <= 2) return 'Reset is imminent: if the eight-player group is not ready, secure dependable weekly clears instead.';
+                if (h <= 24) return 'Last Call: run DDN HC only if the eight-player group is ready; otherwise secure dependable weekly rewards.';
+                if (h <= 48) return 'Final Push: line up the eight-player group now; if it does not form promptly, pivot to reliable clears.';
+                if (h <= 72) return 'Deadline Push: organize the eight-player salary run now and set a cutoff so you do not lose the week waiting.';
+                return 'Raid Window: arrange the eight-player group early while there is still time to regroup if needed.';
+            }
+            if (features.serviceable) {
+                if (h <= 24) return 'Last Call: booster availability may have dried up. Count on a service only if a provider confirms; otherwise choose a clear your group can finish.';
+                if (h <= 48) return 'Final Push: if paying for a service is your fastest route, arrange it now rather than leaving it until Last Call.';
+                if (h <= 72) return 'Deadline Push: a service can save time here, so arrange it before the final 24 hours.';
+                return 'Raid Window: if the service cost is worthwhile, arrange it early while providers may still have openings.';
+            }
+            if (features.groupDependent) {
+                if (h <= 2) return 'Reset is imminent: start only if the party is ready; otherwise finish a proven clear.';
+                if (h <= 24) return hasClear ? 'Last Call: run it only with a ready party, then use remaining time for quick clears.' : 'Last Call: attempt only if the party is already formed; otherwise switch to proven rewards.';
+                if (h <= 48) return 'Final Push: line up the party now; if it does not form promptly, pivot to reliable clears.';
+                if (h <= 72) return 'Deadline Push: arrange the party today and set a cutoff for switching to reliable clears.';
+                return 'Raid Window: arrange the party early so the run does not become a reset-day gamble.';
+            }
+            if (h <= 2) return 'Reset is imminent: secure this achievable reward, then use any remaining time on other quick clears.';
+            if (h <= 24) return 'Last Call: secure this realistic clear before spending time on uncertain long runs.';
+            if (h <= 48) return hasClear || features.minutes <= 20 ? 'Final Push: secure this practical reward now and keep moving down the list.' : 'Final Push: prioritize tasks you can finish reliably before the cutoff.';
+            if (h <= 72 && features.minutes > 0 && features.minutes <= 20) return 'Deadline Push: secure this quick reward while there is still time for the longer group goals.';
+            return '';
         }
 
         function getPacedCompletionBadge(item, pace) {
@@ -6080,7 +6492,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (item.done === 0 && !item.thisWeekActivity) return ['No completions', 'watch'];
                 return item.rate < 25 ? ['Behind pace', 'watch'] : item.rate < 55 ? ['Needs attention', 'watch'] : item.rate < 75 ? ['In progress', 'good'] : ['On pace', 'good'];
             }
-            if (pace.hoursLeft <= 8 && item.rate < 70) return [item.rate < 40 ? 'Low completion' : 'Final push', 'watch'];
+            if (pace.hoursLeft <= 24 && item.rate < 70) return [item.rate < 40 ? 'Low completion' : 'Last call', 'watch'];
             return item.rate < 40 ? ['Low completion', 'watch'] : item.rate < 70 ? ['Final push', 'watch'] : ['On pace', 'good'];
         }
 
@@ -6118,10 +6530,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const activityPriorityBonus = Math.max(0, Math.round((Number(activityProfile.priorityBonus) || 0) * Math.min(1.5, Math.max(0.5, w / 5))));
             const characterFitPriorityBonus = Math.max(0, Math.round(Number(fit.priorityBonus) || 0));
             const scoreBeforeFit = baseScore + completionPatternBonus + activityPriorityBonus + characterFitPriorityBonus;
-            // P combines fixed shared Loot Weight, activity value/effort, and character fit.
-            // Both Overview and Tracker call this function so their task ranking stays consistent.
-            const personalizedScore = Math.max(0, Math.round(scoreBeforeFit * fit.multiplier * activityValueMultiplier));
-            return { t:taskName, m, c, e, x, o, w, sc:personalizedScore, baseScore, scoreBeforeFit, completionPatternBonus, activityPriorityBonus, characterFitPriorityBonus, fit, activityProfile, activityValueMultiplier, characterIsMain:character?.isMain === true, suppress:fit.suppress };
+            // Shared scorer for Overview and Tracker. Near reset, schedule-dependent work is favored
+            // while there is time to organize; proven short clears take over in the final window.
+            const scoreBeforeDeadline = Math.max(0, Math.round(scoreBeforeFit * fit.multiplier * activityValueMultiplier));
+            const deadline = getDeadlinePriorityAdjustment(taskName, activityProfile, { m, c, x, o }, fit, character);
+            const personalizedScore = Math.max(0, Math.round(scoreBeforeDeadline * deadline.multiplier));
+            return { t:taskName, m, c, e, x, o, w, sc:personalizedScore, baseScore, scoreBeforeFit, scoreBeforeDeadline, completionPatternBonus, activityPriorityBonus, characterFitPriorityBonus, fit, activityProfile, activityValueMultiplier, deadline, characterIsMain:character?.isMain === true, suppress:fit.suppress };
         }
 
         function buildOverviewTaskRecommendation(character, taskName, archiveEntries, recentArchiveEntries) {
@@ -6190,9 +6604,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const nextTask = item.nextTask || item.pendingTasks[0]?.task || '';
                 const nextReason = item.nextReason || 'It is one of the highest-priority tasks still open for this character.';
                 const nextAction = nextTask ? `Next: “${nextTask}”. ${nextReason}` : 'Review the remaining tasks and choose one that fits the time available.';
-                // Ease into the week. Use the personalized task ranking for the next action,
-                // and let reset timing change urgency rather than adding generic encouragement.
-                if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 48) {
+                // During Deadline Push and later, every character with remaining work gets an actionable reminder.
+                // Ranking comes from the shared deadline-aware scorer above, not completion percentage alone.
+                if (item.eligible > 0 && item.pending > 0 && pace.hoursLeft <= 72) {
+                    const mode = getDeadlineMode(pace);
+                    const isLastDay = pace.hoursLeft <= 24;
+                    priorities.push({
+                        rank:(item.isMain ? -10 : 0) + (item.rate / 100) * 3 - Math.min(5, item.pending) * 0.12,
+                        tone:isLastDay ? 'watch' : 'watch', icon:isLastDay ? '!' : '↗',
+                        label:mode.cardLabel,
+                        title:`${item.name}${item.isMain ? ' · Main' : ''}`,
+                        body:`${Math.ceil(pace.hoursLeft)}h until reset. ${nextAction}`,
+                        meta:`${item.done}/${item.eligible} complete · ${item.pending} left · ${mode.strategy}`
+                    });
+                } else if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 48) {
                     const late = pace.elapsedHours >= 144;
                     const midweek = pace.elapsedHours >= 96;
                     priorities.push({
@@ -6241,11 +6666,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Weekly progress appears here after you opt a character into Tracker. Other members' rosters and progress are not shown.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
-            let insightHtml = `<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(pace.label)}</span></div>`;
+            let insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(getDeadlineMode(pace).label)}</span></div>`;
             if (shownPriorities.length) {
                 insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
-                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.elapsedHours < 48 ? 'The week has just started' : 'No urgent follow-up'}</strong><p>${pace.elapsedHours < 48 ? 'Plenty of time remains. Check back later as reminders gradually sharpen near Saturday.' : pace.elapsedHours < 96 ? 'Choose tasks that fit your plan and available time.' : 'Nothing urgent is flagged. Recheck open tasks before Saturday’s reset.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
+                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.hoursLeft <= 72 ? 'No weekly tasks remain' : 'No urgent follow-up'}</strong><p>${pace.hoursLeft <= 72 ? 'Your tracked weekly tasks are complete. Use the remaining time for valuable group runs already organized; arrange any needed services before Last Call.' : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as reset approaches.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
             }
             if (cont) cont.innerHTML = insightHtml;
 
@@ -6343,7 +6768,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const nextReset = getTargetResetTimeUTC(true) + RATEUP_WEEK_MS;
             const minsLeft = Math.max(0, Math.round((nextReset - now) / 60000));
             const hoursLeft = minsLeft / 60;
-            const urgency = hoursLeft <= 2 ? 'Reset imminent' : hoursLeft <= 8 ? 'Final hours' : hoursLeft <= 24 ? 'Final day' : hoursLeft <= 48 ? 'Final 2 days' : hoursLeft <= 72 ? '3 days left' : hoursLeft <= 96 ? 'Midweek' : hoursLeft <= 120 ? 'Early week' : 'Week just started';
+            const urgency = getDeadlineMode({ hoursLeft }).label;
             const recent = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0])).slice(-3);
             const cycleStart = getTargetResetTimeUTC(false);
             const cycleHours = Math.max(0, (now - cycleStart) / 3600000);
@@ -6409,9 +6834,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const hasAbyssalMireTask = cloudData.settings.categories.some(category => (category.tasks || []).some(task => /abyssal\s+mire/i.test(String(task))));
             const hasWeeklyDragonFellowship = cloudData.settings.categories.some(category => category.group === 'Weeklies' && (category.tasks || []).some(task => /dragon\s+fellowship/i.test(String(task))));
             const activityPlanningHints = [];
-            if (hasAbyssalMireTask) activityPlanningHints.push({ title:'Abyssal Mire', text:'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset. A service may be worthwhile if you cannot clear it yourself.' });
+            const planningHoursLeft = getWeeklyPaceContext().hoursLeft;
+            const servicePlanningNote = planningHoursLeft <= 24
+                ? ' Last Call: do not assume a booster is still taking runs; rely on a service only after availability is confirmed.'
+                : planningHoursLeft <= 48
+                    ? ' If a service is your fastest route, arrange it now rather than leaving it until Last Call.'
+                    : ' If you cannot clear it yourself, a service can save time; arrange it early while providers may still have openings.';
+            if (hasAbyssalMireTask) activityPlanningHints.push({ title:'Abyssal Mire', text:'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset.' + servicePlanningNote });
             if (hasThemeParkTask) activityPlanningHints.push({ title:'Theme Park', text:'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.' });
-            if (hasWeeklyDragonFellowship) activityPlanningHints.push({ title:'Dragon Fellowship', text:'Weekly Heraldry rewards. If duoing is not practical, a service may still be worthwhile.' });
+            if (hasWeeklyDragonFellowship) activityPlanningHints.push({ title:'Dragon Fellowship', text:'Weekly Heraldry rewards.' + servicePlanningNote });
             const activityPlanningHint = activityPlanningHints.length ? `<div class="analytics-activity-value-note"><strong>Quick activity tips</strong><ul>${activityPlanningHints.map(hint => `<li><strong>${escapeHTML(hint.title)}:</strong> ${escapeHTML(hint.text)}</li>`).join('')}</ul></div>` : '';
             const configuredEvents = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
             const itemEvent = getRateUpWindow(configuredEvents.itemDrop, now);
@@ -6419,6 +6850,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const expEvent = getRateUpWindow(configuredEvents.expBoost, now);
             const manilaDOW = getManilaDateParts(now).weekday;
             const eventNotes = [];
+            const customEventNotes = (Array.isArray(configuredEvents.otherEvents) ? configuredEvents.otherEvents : []).map(event => {
+                const window = getRateUpWindow(event, now);
+                if (window.status === 'active') return `${event.name} active${event.description ? ` · ${event.description}` : ''}${window.end ? ` · ${formatEventTimeRemaining(window.end-now)} left` : ''}`;
+                if (window.status === 'upcoming' && window.start && window.start-now <= 72*60*60*1000) return `${event.name} starts ${formatManilaStamp(window.start)}${event.description ? ` · ${event.description}` : ''}`;
+                return '';
+            }).filter(Boolean);
             if (itemEvent.status === 'active') {
                 const m = itemEvent.end ? Math.max(0, Math.round((itemEvent.end-now)/60000)) : 0;
                 const remaining = itemEvent.end ? `${Math.floor(m/60)}h ${m%60}m left` : 'active';
@@ -6432,10 +6869,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             else if (enhanceEvent.status === 'upcoming' && enhanceEvent.start && enhanceEvent.start-now <= 72*60*60*1000) eventNotes.push(`+30% Enhancement starts ${formatManilaStamp(enhanceEvent.start)} · prepare materials and gold`);
             if (expEvent.status === 'active') eventNotes.push('+100% EXP Boost active · use the bonus for planned EXP runs');
             else if (expEvent.status === 'upcoming' && expEvent.start && expEvent.start-now <= 72*60*60*1000) eventNotes.push(`+100% EXP Boost starts ${formatManilaStamp(expEvent.start)} · prepare EXP runs`);
+            eventNotes.push(...customEventNotes.slice(0, 2));
+            if (customEventNotes.length > 2) eventNotes.push(`+${customEventNotes.length - 2} more custom guild event${customEventNotes.length - 2 === 1 ? '' : 's'} · see the active-event banner`);
             const panel = document.createElement('section');
             panel.className = 'weekly-plan-card weekly-plan-card-compact';
             panel.innerHTML = `
-                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity Summary</h3></div><span class="weekly-plan-status${hoursLeft <= 24 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
+                <div class="focus-summary-head"><div><div class="weekly-plan-kicker">${escapeHTML(isAdminViewAsActive() ? `Preview · ${getCurrentOwnerName()}` : getCurrentMemberDirectoryEntry() ? getCurrentOwnerName() : 'Personal tracker')}</div><h3>Character Activity Summary</h3></div><span class="weekly-plan-status${hoursLeft <= 72 ? ' urgent' : ''}">${escapeHTML(urgency)} · ${Math.floor(minsLeft/60)}h ${minsLeft%60}m</span></div>
                 <p class="focus-model-explainer">Tracks weekly progress and learns which characters you usually play. Unticked tasks may just be missed checkmarks. Lucky Zone time is estimated, not tracked.</p>
                 <div class="focus-summary-line"><strong>Likely priorities:</strong> ${focusText}${recent.length < 2 ? ' <span class="focus-learning-note">Early estimate</span>' : ''}</div>
                 ${chips ? `<div class="focus-character-chips">${chips}${signals.length>8?`<span class="focus-character-more">+${signals.length-8} more</span>`:''}</div>` : '<div class="focus-character-empty">Register characters to see their recorded progress.</div>'}
@@ -6443,11 +6882,61 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 ${reviewText ? `<div class="focus-review-note">${reviewText}</div>` : ''}
                 <div class="focus-summary-line"><strong>Recorded today:</strong> ${todayWins.length} task completions · <strong>Lucky Zone estimate:</strong> about ${lzMinutes} min across ${registeredCount} registered character${registeredCount===1?'':'s'} (3 solo runs × ~8 min each; not tracked)</div>
                 ${activityPlanningHint}
-                ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,3).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
+                ${eventNotes.length ? `<div class="focus-event-strip">${eventNotes.slice(0,5).map(note=>`<span>${escapeHTML(note)}</span>`).join('')}</div>` : ''}
                 ${isAdminViewAsActive() ? '<div class="focus-learning-note">Read-only preview</div>' : ''}`;
             container.appendChild(panel);
         }
 
+        let rateUpCustomEventDrafts = [];
+        function createRateUpCustomEventDraft() {
+            return { id:`custom-${Date.now()}-${Math.random().toString(36).slice(2,8)}`, name:'', description:'', enabled:false, schedule:'custom', customStart:'', customEnd:'' };
+        }
+        function renderCustomRateUpEvents() {
+            const list = document.getElementById('rateup-custom-events-list');
+            if (!list) return;
+            if (!rateUpCustomEventDrafts.length) {
+                list.innerHTML = '<div class="rate-up-custom-events-empty">No additional events yet. Add an event for a special dungeon, seasonal event, bonus shop, or other temporary opportunity.</div>';
+                return;
+            }
+            list.innerHTML = rateUpCustomEventDrafts.map((event,index) => {
+                const id = escapeHTML(event.id);
+                const custom = event.schedule === 'custom';
+                return `<section class="rate-up-editor-card rate-up-custom-event-card" data-custom-event-card="${id}">
+                    <h4>Other Event ${index+1}</h4>
+                    <label>Event name<input type="text" maxlength="100" data-custom-event-id="${id}" data-custom-event-field="name" placeholder="e.g. Special Dungeon Bonus" value="${escapeHTML(event.name)}"></label>
+                    <label>What to know (optional)<textarea maxlength="300" data-custom-event-id="${id}" data-custom-event-field="description" placeholder="Short note for members">${escapeHTML(event.description)}</textarea></label>
+                    <label><input type="checkbox" data-custom-event-id="${id}" data-custom-event-field="enabled" ${event.enabled?'checked':''}> Event is enabled</label>
+                    <label>Schedule<select data-custom-event-id="${id}" data-custom-event-field="schedule"><option value="custom" ${custom?'selected':''}>One-time custom date/time</option><option value="weekend" ${!custom?'selected':''}>Recurring weekend (Sat–Mon)</option></select></label>
+                    <label class="rate-up-custom-field">Start (Manila)<input type="datetime-local" data-custom-event-id="${id}" data-custom-event-field="customStart" value="${escapeHTML(event.customStart)}" ${custom?'':'disabled'}></label>
+                    <label class="rate-up-custom-field">End (Manila)<input type="datetime-local" data-custom-event-id="${id}" data-custom-event-field="customEnd" value="${escapeHTML(event.customEnd)}" ${custom?'':'disabled'}></label>
+                    <div class="rate-up-custom-event-actions"><button class="btn btn-secondary" type="button" data-remove-custom-event="${id}">Remove event</button></div>
+                </section>`;
+            }).join('');
+        }
+        function addCustomRateUpEvent() {
+            if (!isPantheonAdmin()) return;
+            if (rateUpCustomEventDrafts.length >= 30) { alert('You can configure up to 30 additional events.'); return; }
+            rateUpCustomEventDrafts.push(createRateUpCustomEventDraft());
+            renderCustomRateUpEvents();
+            const list = document.getElementById('rateup-custom-events-list');
+            list?.lastElementChild?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+        }
+        function updateCustomRateUpEventField(id, field, value) {
+            const event = rateUpCustomEventDrafts.find(item => item.id === id);
+            if (!event) return;
+            if (field === 'enabled') event.enabled = value === true;
+            else if (field === 'schedule') event.schedule = value === 'weekend' ? 'weekend' : 'custom';
+            else if (field === 'name') event.name = String(value || '').slice(0,100);
+            else if (field === 'description') event.description = String(value || '').slice(0,300);
+            else if (field === 'customStart' || field === 'customEnd') event[field] = String(value || '').slice(0,16);
+            if (field === 'schedule') {
+                const card = document.querySelector(`[data-custom-event-card="${CSS.escape(id)}"]`);
+                ['customStart','customEnd'].forEach(part => {
+                    const input = card?.querySelector(`[data-custom-event-field="${part}"]`);
+                    if (input) { input.disabled = event.schedule !== 'custom'; const label = input.closest('label'); if (label) label.style.opacity = event.schedule === 'custom' ? '1' : '.65'; }
+                });
+            }
+        }
         function openRateUpEventsModal() {
             if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
             const events = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
@@ -6460,8 +6949,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 updateRateUpEventFields(prefix);
             };
             fill('item','itemDrop'); fill('enhancement','enhancement'); fill('exp','expBoost');
+            rateUpCustomEventDrafts = events.otherEvents.map(event => ({...event}));
+            renderCustomRateUpEvents();
             const summary = document.getElementById('rateup-events-summary');
-            if (summary) summary.textContent = `Item Drop: ${getRateUpWindow(events.itemDrop).label}. Enhancement: ${getRateUpWindow(events.enhancement).label}. EXP Boost: ${getRateUpWindow(events.expBoost).label}.`;
+            if (summary) {
+                const customSummary = events.otherEvents.map(event => `${event.name}: ${getRateUpWindow(event).label}`).join('. ');
+                summary.textContent = `Item Drop: ${getRateUpWindow(events.itemDrop).label}. Enhancement: ${getRateUpWindow(events.enhancement).label}. EXP Boost: ${getRateUpWindow(events.expBoost).label}.${customSummary ? ` ${customSummary}.` : ''}`;
+            }
             openModal('rateup-events-modal');
         }
         function updateRateUpEventFields(prefix) {
@@ -6473,8 +6967,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function saveRateUpEvents() {
             if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
-            const next = normalizeRateUpEvents({ itemDrop:readRateUpEventForm('item'), enhancement:readRateUpEventForm('enhancement'), expBoost:readRateUpEventForm('exp') });
-            for (const [label, event] of [['Item Drop Rate',next.itemDrop],['Enhancement Rate',next.enhancement],['EXP Boost',next.expBoost]]) {
+            const unnamedEnabled = rateUpCustomEventDrafts.find(event => event.enabled && !String(event.name || '').trim());
+            if (unnamedEnabled) { alert('Give each enabled guild event a name before saving.'); return; }
+            const next = normalizeRateUpEvents({ itemDrop:readRateUpEventForm('item'), enhancement:readRateUpEventForm('enhancement'), expBoost:readRateUpEventForm('exp'), otherEvents:rateUpCustomEventDrafts });
+            for (const [label, event] of [['Item Drop Rate',next.itemDrop],['Enhancement Rate',next.enhancement],['EXP Boost',next.expBoost], ...next.otherEvents.map(event => [event.name,event])]) {
                 if (!event.enabled || event.schedule !== 'custom') continue;
                 const start = manilaLocalDateTimeToUTC(event.customStart), end = manilaLocalDateTimeToUTC(event.customEnd);
                 if (!start || !end || end <= start) { alert(`${label}: enter a valid custom start and end in Manila time. End must be after start.`); return; }
@@ -6670,8 +7166,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function getActivityReferenceMinutes(ref) {
-            const raw = String(ref?.averageRunTime || '').split('(')[0];
-            const values = [...raw.matchAll(/(\d+(?:\.\d+)?)\s*(?:min|mins|minute|minutes)\b/ig)].map(match => Number(match[1])).filter(value => Number.isFinite(value) && value > 0);
+            const text = String(ref?.averageRunTime || '');
+            const leading = text.split('(')[0];
+            const findValues = value => [...String(value || '').matchAll(/(\d+(?:\.\d+)?)\s*(?:min|mins|minute|minutes)\b/ig)].map(match => Number(match[1])).filter(value => Number.isFinite(value) && value > 0);
+            // Prefer the primary duration before a parenthetical service estimate. If no primary
+            // duration exists (e.g. Mire 2F/5F), sum the named floor times in the full string.
+            let values = findValues(leading);
+            if (!values.length) values = findValues(text);
             if (!values.length) return 0;
             let minutes = values.reduce((sum, value) => sum + value, 0);
             const entries = Number(String(ref?.entries || '').trim());
@@ -7031,7 +7532,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         // One short sentence for the default view. The detailed factors remain available only on request.
-        function getRecommendationPlainReason(item) {
+        function getRecommendationPlainReasonBase(item) {
             const fitLabel = String(item.fit?.label || '').toLowerCase();
             const profileKey = String(item.activityProfile?.key || 'standard');
             const recentClear = fitLabel.includes('recent clear');
@@ -7048,11 +7549,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             if (profileKey === 'black-dragon' || isBlackDragonEndgameTask(item.t)) {
                 const pace = getWeeklyPaceContext();
-                const resetGate = pace.hoursLeft <= 8
-                    ? ' With reset this close, start only if the geared group is already assembled.'
+                const resetGate = pace.hoursLeft <= 2
+                    ? ' Reset is imminent: only start if the geared group is already assembled; otherwise finish proven weekly clears.'
                     : pace.hoursLeft <= 24
-                        ? ' In the final day, confirm the group before committing.'
-                        : ' Arrange the group ahead of time.';
+                        ? ' Last Call: attempt only if the geared group is ready; otherwise pivot to reliable clears.'
+                        : pace.hoursLeft <= 48
+                            ? ' Final Push: organize the group now; if it does not form promptly, pivot to reliable clears.'
+                            : pace.hoursLeft <= 72
+                                ? ' Deadline Push: line up the geared group now and set a cutoff for switching to reliable clears.'
+                                : ' Arrange the group early so it is not left until reset weekend.';
                 if (item.characterIsMain) {
                     return `${historyLead}BDN is Level 70 endgame and can take 50+ minutes. If this is your best-geared entrant, organize a geared party or guild run and judge readiness from BDN-specific results.${resetGate}`;
                 }
@@ -7093,6 +7598,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return 'This is among the highest-ranked tasks left for this character. Completing it advances weekly progress and gives future recommendations more evidence.';
         }
 
+        function getRecommendationPlainReason(item) {
+            const pace = getWeeklyPaceContext();
+            const serviceFeatures = getDeadlineTaskFeatures(item?.t, item?.activityProfile);
+            let base = getRecommendationPlainReasonBase(item);
+            if (pace.hoursLeft <= 24 && serviceFeatures.serviceable) base = removeGenericLastCallServicePrompts(base);
+            const hint = getDeadlineRecommendationHint(item, pace);
+            if (!hint) return base;
+            // Keep the default view to one base reason plus one time-sensitive action.
+            // BDN already has a phase-aware group instruction in its base explanation.
+            if (isBlackDragonEndgameTask(item?.t)) return base;
+            return `${base} ${hint}`.replace(/\s+/g, ' ').trim();
+        }
+
         function getRecommendationActivityNote(item) {
             const profileKey = String(item.activityProfile?.key || 'standard');
             const ref = item.activityProfile?.reference;
@@ -7110,7 +7628,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (ref.partySize && ref.partySize !== '-') facts.push(`Party: ${ref.partySize}`);
                 if (ref.serviceable !== 'unknown') facts.push(`Serviceable: ${ref.serviceable === 'yes' ? 'Yes' : 'No'}`);
                 if (ref.milestoneGoal && ref.milestoneGoal !== '-') facts.push(`Goal: ${ref.milestoneGoal}`);
-                const tip = getActivityReferenceRecommendation(ref);
+                let tip = getActivityReferenceRecommendation(ref);
+                const pace = getWeeklyPaceContext();
+                if (pace.hoursLeft <= 24 && ref.serviceable === 'yes') {
+                    tip = removeGenericLastCallServicePrompts(tip);
+                    facts.unshift('Last Call: booster availability is not assumed; only count on a service if a provider confirms.');
+                }
                 if (tip) facts.unshift(tip);
                 return facts.join(' · ') || 'See the activity reference below for rewards and materials.';
             }
@@ -7131,14 +7654,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const profileLabel = item.activityProfile?.label || 'Shared task value';
             const profileDetail = item.activityProfile?.detail || 'No activity-specific value profile is configured.';
             const fitReason = item.fit?.reason || 'No character-specific explanation is available.';
-            const scoreLine = `Score factors: base priority ${baseAndBonus}; character fit ×${Number(item.fit?.multiplier || 1).toFixed(2)}; activity value ×${Number(item.activityValueMultiplier || 1).toFixed(2)}; final personalized priority P${item.sc}. L${item.w} remains the shared Loot Weight and is never changed for this character.`;
-            return { evidence, profileLabel, profileDetail, fitReason, scoreLine };
+            const deadlinePart = item.deadline && Math.abs(Number(item.deadline.multiplier || 1) - 1) >= 0.01 ? `; deadline ${item.deadline.phaseLabel || 'phase'} ×${Number(item.deadline.multiplier).toFixed(2)}` : '';
+            const guildReason = item.deadline?.guildSchedule?.reason || '';
+            const scoreLine = `Score factors: base priority ${baseAndBonus}; character fit ×${Number(item.fit?.multiplier || 1).toFixed(2)}; activity value ×${Number(item.activityValueMultiplier || 1).toFixed(2)}${deadlinePart}; final personalized priority P${item.sc}. L${item.w} remains the shared Loot Weight and is never changed for this character.`;
+            return { evidence, profileLabel, profileDetail, fitReason, scoreLine, guildReason };
         }
 
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
             renderDailyPlanningPanel(cont);
+            const deadlineBanner = document.createElement('div');
+            deadlineBanner.innerHTML = buildDeadlineStrategyBannerHtml('tracker');
+            cont.appendChild(deadlineBanner.firstElementChild);
             const trackingToggle = document.getElementById('analytics-tracking-enabled');
             const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true;
             if (trackingToggle) trackingToggle.checked = analyticsEnabled;
@@ -7146,7 +7674,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
                 const disabled = document.createElement('div');
                 disabled.className = 'analytics-disabled';
-                disabled.innerHTML = `<strong>Stored weekly analytics tracking is off.</strong><br>Live planning and today’s completion highlights still work. No new weekly history will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting five weeks of history.'}`;
+                disabled.innerHTML = `<strong>Stored weekly analytics tracking is off.</strong><br>Live planning and today’s completion highlights still work. No new weekly snapshots or group-run timing will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting weekly outcomes and learning guild-run timing.'}`;
                 cont.appendChild(disabled);
                 return;
             }
@@ -7170,8 +7698,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
                 
                 const p = Object.entries(stats).map(([t, taskStats]) => buildPersonalizedTaskRecommendation(char, t, taskStats, sortedArchiveEntries, recentArchiveEntries))
-                    .filter(item => item.m > 0 && !item.suppress)
-                    .sort((a, b) => b.sc - a.sc || b.w - a.w || b.m - a.m)
+                    // Show currently open weekly tasks even before they have a missed-week history.
+                    // Otherwise the Tracker's lower insights can stay blank precisely when reset urgency matters most.
+                    .filter(item => !item.suppress && !isBountyTask(item.t))
+                    .sort((a, b) => b.sc - a.sc || b.w - a.w || b.c - a.c || a.t.localeCompare(b.t))
                     .slice(0, 3);
                 
                 const prioHTML = p.length ? p.map((i, rank) => {
@@ -7181,7 +7711,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const plainReason = getRecommendationPlainReason(i);
                     const activityNote = getRecommendationActivityNote(i);
                     const scoreLine = explanation.scoreLine;
-                    return `<div class="missed-item analytics-recommendation-card"><div class="analytics-recommendation-main"><strong>${escapeHTML(i.t)}</strong><p class="analytics-recommendation-plain-reason">${escapeHTML(plainReason)}</p><details class="analytics-recommendation-explanation"><summary>Why suggested?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>History:</strong> ${escapeHTML(evidence.description)}</p><p><strong>${i.activityProfile?.reference ? 'Activity facts:' : 'Activity tip:'}</strong> ${escapeHTML(activityNote)}</p><details class="analytics-score-details"><summary>Past results and score (optional)</summary><p><strong>Past results:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'} · ${evidence.notCompleted} week${evidence.notCompleted === 1 ? '' : 's'} not completed · ${evidence.excluded} N/A ignored.</p><p><strong>Why it fits:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value:</strong> ${escapeHTML(explanation.profileDetail)}</p><p class="analytics-recommendation-scoring"><strong>Score details:</strong> ${escapeHTML(scoreLine)}</p><p>Shared Loot Weight stays the same for everyone. The personal priority adjusts it using activity value and this character’s history.</p></details></div></details></div><div class="analytics-recommendation-rank" title="Suggested priority ${rank + 1}">#${rank + 1}</div></div>`;
+                    return `<div class="missed-item analytics-recommendation-card"><div class="analytics-recommendation-main"><strong>${escapeHTML(i.t)}</strong><p class="analytics-recommendation-plain-reason">${escapeHTML(plainReason)}</p><details class="analytics-recommendation-explanation"><summary>Why suggested?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>History:</strong> ${escapeHTML(evidence.description)}</p><p><strong>${i.activityProfile?.reference ? 'Activity facts:' : 'Activity tip:'}</strong> ${escapeHTML(activityNote)}</p><details class="analytics-score-details"><summary>Past results and score (optional)</summary><p><strong>Past results:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'} · ${evidence.notCompleted} week${evidence.notCompleted === 1 ? '' : 's'} not completed · ${evidence.excluded} N/A ignored.</p><p><strong>Why it fits:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value:</strong> ${escapeHTML(explanation.profileDetail)}</p><p class="analytics-recommendation-scoring"><strong>Score details:</strong> ${escapeHTML(scoreLine)}</p>${explanation.guildReason ? `<p><strong>Guild timing:</strong> ${escapeHTML(explanation.guildReason)}</p>` : ''}${i.deadline?.reason && i.deadline?.multiplier !== 1 ? `<p><strong>Reset timing:</strong> ${escapeHTML(i.deadline.reason)}</p>` : ''}<p>Shared Loot Weight stays the same for everyone. The personal priority adjusts it using activity value, this character’s history, and time remaining.</p></details></div></details></div><div class="analytics-recommendation-rank" title="Suggested priority ${rank + 1}">#${rank + 1}</div></div>`;
                 }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No next steps suggested from the saved history yet.</div>';
 
                 card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:4px;">Personalized Task Priorities</div>${prioHTML}</div>`;
@@ -9000,7 +9530,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r23';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r27';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -9414,6 +9944,29 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (button) removeCardWikiBatch(button.dataset.removeCardBatch);
         });
 
+        let deadlineModeRefreshTimer = null;
+        let lastRenderedDeadlineMode = '';
+        function refreshDeadlineModeDisplay() {
+            if (document.visibilityState !== 'visible') return;
+            const pace = getWeeklyPaceContext();
+            const mode = getDeadlineMode(pace);
+            document.querySelectorAll('[data-deadline-countdown]').forEach(node => { node.textContent = getDeadlineCountdownText(pace); });
+            if (lastRenderedDeadlineMode && mode.key !== lastRenderedDeadlineMode) {
+                lastRenderedDeadlineMode = mode.key;
+                const overview = document.getElementById('overview-page');
+                const tracker = document.getElementById('tracker-page');
+                if (overview && !overview.classList.contains('hidden-page')) renderOverviewActivity();
+                if (tracker && !tracker.classList.contains('hidden-page') && isAnalyticsVisible) renderAnalytics();
+            } else if (!lastRenderedDeadlineMode) lastRenderedDeadlineMode = mode.key;
+        }
+        function startDeadlineModeRefresh() {
+            if (deadlineModeRefreshTimer) return;
+            lastRenderedDeadlineMode = getDeadlineMode().key;
+            deadlineModeRefreshTimer = window.setInterval(refreshDeadlineModeDisplay, 60000);
+            window.addEventListener('focus', refreshDeadlineModeDisplay);
+            document.addEventListener('visibilitychange', refreshDeadlineModeDisplay);
+        }
+
         function showAppPage(page) {
             const pages = {
                 overview: document.getElementById('overview-page'),
@@ -9435,6 +9988,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
             else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster') history.replaceState(null, '', location.pathname + location.search);
             if (isAdminViewAsActive()) applyAdminPreviewReadOnly();
+            startDeadlineModeRefresh();
         }
 
 
@@ -9621,6 +10175,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         <label class="rate-up-custom-field">End (Manila)<input id="rateup-exp-end" type="datetime-local"></label>
       </section>
     </div>
+    <div class="rate-up-custom-events-head"><h4>Other Guild Events</h4><button class="btn btn-cloud" type="button" onclick="addCustomRateUpEvent()">＋ Add Event</button></div>
+    <p class="modal-note">Add temporary events beyond the three rate-up boosts. Give each event a name, optional member-facing note, and either a one-time Manila-time window or the recurring weekend schedule.</p>
+    <div id="rateup-custom-events-list" class="rate-up-editor-grid"></div>
     <div id="rateup-events-summary" class="modal-note" aria-live="polite"></div>
     <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="saveRateUpEvents()">Save shared event schedule</button><button class="btn btn-secondary" type="button" onclick="closeModal('rateup-events-modal')">Cancel</button></div>
   </div>

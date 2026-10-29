@@ -37,6 +37,41 @@ function mergeCellRecords(currentCells, incomingCells) {
   }
   return merged;
 }
+function normalizeTimingEntry(value) {
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) return { state: 'done', at: value, ownerKey: '' };
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const at = Number(value.at) || Number(value.updatedAt) || 0;
+  if (!at) return null;
+  return { state: value.state === 'done' ? 'done' : 'open', at, ownerKey: String(value.ownerKey || value.owner || '').slice(0, 120) };
+}
+function chooseTimingEntry(existingValue, incomingValue) {
+  const existing = normalizeTimingEntry(existingValue), incoming = normalizeTimingEntry(incomingValue);
+  if (!existing) return incoming;
+  if (!incoming) return existing;
+  if (incoming.at !== existing.at) return incoming.at > existing.at ? incoming : existing;
+  // Match the browser: an explicit open/reopen at the same timestamp wins.
+  return incoming.state === 'open' ? incoming : existing;
+}
+function mergeCompletionTimingRecords(currentValue, incomingValue, clearedAt = 0) {
+  const current = obj(currentValue), incoming = obj(incomingValue), merged = {};
+  const now = Date.now(), cutoff = now - 42 * 24 * 60 * 60 * 1000, clearAt = Number(clearedAt) || 0;
+  for (const weekKey of new Set([...Object.keys(current), ...Object.keys(incoming)])) {
+    const wk = Number(weekKey);
+    if (!Number.isFinite(wk) || wk < cutoff || wk > now + 24 * 60 * 60 * 1000) continue;
+    const curChars = obj(current[weekKey]), incChars = obj(incoming[weekKey]), chars = {};
+    for (const charName of new Set([...Object.keys(curChars), ...Object.keys(incChars)])) {
+      const curTasks = obj(curChars[charName]), incTasks = obj(incChars[charName]), tasks = {};
+      for (const taskName of new Set([...Object.keys(curTasks), ...Object.keys(incTasks)])) {
+        const entry = chooseTimingEntry(curTasks[taskName], incTasks[taskName]);
+        if (entry && entry.at >= clearAt && entry.at >= cutoff && entry.at <= now + 24 * 60 * 60 * 1000) tasks[taskName] = entry;
+      }
+      if (Object.keys(tasks).length) chars[String(charName).slice(0, 120)] = tasks;
+    }
+    if (Object.keys(chars).length) merged[String(wk)] = chars;
+  }
+  const latestWeeks = Object.keys(merged).sort((a,b) => Number(a) - Number(b)).slice(-6);
+  return Object.fromEntries(latestWeeks.map(key => [key, merged[key]]));
+}
 function normalizeOwner(value) { return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]/g, ''); }
 function hasLedgerAccess(session, record) {
   if (!session?.discordId) return false;
@@ -104,6 +139,17 @@ export async function onRequestPut(context) {
         // A stale tab may submit an old value for tasks it never edited. Keep the newer
         // per-cell record from D1 instead of allowing a routine sync to undo it.
         next.cells = mergeCellRecords(previous?.cells, next.cells);
+        // Group-run timing is shared learning data. Merge it independently so members' whole-record
+        // syncs cannot erase another member's timestamps. A newer history-clear marker always wins.
+        next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};
+        const previousClearAt = Number(previous?.settings?.analyticsHistoryClearedAt) || 0;
+        const incomingClearAt = Number(next.settings.analyticsHistoryClearedAt) || 0;
+        const timingClearAt = Math.max(previousClearAt, incomingClearAt);
+        if (previousClearAt > incomingClearAt) {
+          next.settings.analyticsHistoryClearedAt = previousClearAt;
+          next.settings.analyticsHistoryClearedBy = String(previous?.settings?.analyticsHistoryClearedBy || '');
+        }
+        next.completionTiming = mergeCompletionTimingRecords(previous?.completionTiming, next.completionTiming, timingClearAt);
 
         if (context.data?.session?.role !== 'admin') {
           const violation = registrationWriteViolation(previous, next, context.data?.session);

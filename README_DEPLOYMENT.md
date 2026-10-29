@@ -1,3 +1,51 @@
+# Pantheon Tools v1.6.8-r25 — Earlier Last Call and service-window planning
+
+This release continues directly from v1.6.8-r24. It retains the adaptive urgency scorer, shared D1 persistence fixes, Activity Reference editor, bounty logic, and raid role-fit recommendations.
+
+## v1.6.8-r25 reset phase adjustments
+
+- Last Call now begins 24 hours before Saturday 9:00 AM Manila reset. The preceding 24-hour phases shift earlier: Final Push is 24–48 hours, Deadline Push is 48–72 hours, Raid Window is 72–96 hours, Focus is 96–120 hours, Build Momentum is 120–144 hours, and Plan Ahead is more than 144 hours from reset. Reset Imminent remains the final two hours.
+- Overview and Tracker banners, task-ranking adjustments, completion badges, reminder timing, BDN/DDN hints, and serviceable-activity recommendations use the same updated phase boundaries.
+- Serviceable activities receive a modest scheduling/feasibility lift earlier in the week, with stronger guidance to arrange a paid service during the Raid Window, Deadline Push, or Final Push. During the final 24 hours, the model no longer assumes a booster is available: serviceability no longer boosts ranking, and an unproven service-dependent group goal is downgraded similarly to other unproven group runs unless the character has a prior clear. Last Call guidance says to rely on a service only after a provider confirms availability.
+- The activity-planning tips for Abyssal Mire and Dragon Fellowship now change with the countdown rather than unconditionally suggesting a service. Generic built-in service prompts are removed from the default Last Call recommendation when a time-sensitive warning is shown; unrelated/custom Admin guidance is preserved.
+- Overview starts actionable reminders at 72 hours, when Deadline Push begins, rather than waiting until the final 48 hours. The countdown still updates every minute.
+- No database migration or new API route. Only `index.html` and this deployment README are changed from r24; the package preserves all 32 original entries and paths.
+
+## Validation
+
+- JavaScript syntax checks passed for all inline app scripts.
+- CSS parsing and duplicate HTML ID checks passed.
+- Targeted phase-boundary tests passed at 144, 120, 96, 72, 48, 24, 8, and 2 hours.
+- Scoring tests confirm serviceable activities get their convenience lift before the final 24 hours but do not receive a serviceability boost during Last Call; unproven service-dependent objectives fall behind more reliable options, while prior clears remain recognized.
+- ZIP integrity and exact package-path preservation passed. Live Cloudflare Pages, D1, and Discord-session end-to-end behavior still requires post-deployment verification.
+
+---
+
+# Pantheon Tools v1.6.8-r24 — Reset urgency and adaptive task triage
+
+This release continues directly from v1.6.8-r23. It retains the shared D1 persistence fix, Activity Reference editor, bounty behavior, and personalized raid-role rules.
+
+## v1.6.8-r24 reset urgency and time-aware recommendations
+
+- Replaces passive “Final 2 days” labeling with a visible reset strategy banner in Overview Activity Insights and the Tracker's lower Activity Insights panel. It displays an exact countdown to Saturday 9:00 AM Manila reset and adjusts its advice through Plan Ahead, Build Momentum, Focus, Raid Window, Deadline Push, Final Push, Last Call, and Reset Imminent phases.
+- Adds time remaining to the shared Overview/Tracker recommendation scorer. During the Thursday-style deadline push (48–24 hours left), valuable party-dependent runs get a nudge while there is still time to organize a group. In the final day, unproven, non-serviceable group runs fall behind realistic alternatives; in the last eight hours, short clears with prior completion evidence rise further. Serviceable objectives such as Abyssal Mire and Dragon Fellowship retain their fallback advantage.
+- DDN HC keeps its salary-run value and is favored during the group-planning window. It is gradually outranked by more reliable clears late in the week when there is no recorded clear and no service path; that is a feasibility adjustment, not a claim the reward stopped being valuable. BDN remains conditional on relevant character history/role and group readiness, and is progressively downranked late if no clear is recorded.
+- Ensures Overview highlights every tracked character with remaining tasks during the last 48 hours instead of only displaying reminders for low completion percentages. The reminders show the top time-aware next action, progress, and remaining task count.
+- Removes the Tracker analytics filter that required a task to have been marked incomplete in archived weeks before it could ever be recommended. The Tracker now ranks current open weekly tasks even when a character has little or no saved history; old history improves ranking but is not required for advice.
+- The activity reference runtime parser now correctly reads floor-based times such as Abyssal Mire's 2F + 5F estimate, while keeping parenthetical service-time alternatives from inflating a normal run estimate.
+- Re-evaluates the displayed countdown every minute and refreshes the recommendation panel when the urgency phase changes, so the strategy evolves even if a player leaves the app open.
+- Uses the same scorer in Overview and Tracker. Shared Loot Weight is not changed. Bounty tasks are excluded from the weekly recommendation list, and the weekly reset remains Saturday at 9:00 AM Manila time.
+
+## Validation
+
+- JavaScript syntax checks passed for all inline application script blocks.
+- CSS parsing and duplicate HTML ID checks passed.
+- Targeted reset-phase, time-parser, and activity adjustment tests passed for DDN HC, BDN, Theme Park, Dragon Fellowship, and Abyssal Mire across early deadline, final-day, and last-call windows.
+- Package integrity and exact path preservation passed. Built from the actual r23 Cloudflare Pages ZIP; only `index.html` and this README change within the archive.
+- Live Cloudflare Pages, D1, and Discord-session integration has not been tested in this environment and must be checked after deployment.
+
+---
+
 # Pantheon Tools v1.6.8-r23 — Cloudflare Pages + D1
 
 This release continues directly from v1.6.8-r22 and addresses Tracker checkmarks that appear to save but revert after a refresh.
@@ -410,3 +458,20 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - Character Activity Summary uses plain-language status labels, separates recorded task progress from Lucky Zone time estimates, and explains that unticked tasks are not proof the character was not played.
 - Lucky Zones are not tracked; estimated time is calculated as three solo runs at approximately eight minutes per registered character. Removed the confusing 'open tracked dailies' count.
 - Reworked only the existing Main/Pulse appearance and copy; no schema or API changes.
+
+
+## v1.6.8-r27 – Saturday-start raid cadence
+
+- Corrected the baseline guild-run schedule: Saturday is the start of raid day, Saturday/Sunday are the peak days, and Monday remains a possible spillover day. Friday is treated as a normal weekday and no longer receives a preparation-day multiplier or “Prepare weekend group” label.
+- Removed the Friday-only recommendation in the Overview deadline banner. The banner now explains the Saturday-start cadence without telling players to pre-plan guild raids on Friday.
+- The timing signal remains separate from personal clearability: weekday public clears continue to count for the character, and actual opt-in completion timestamps may refine the weekday baselines over time.
+- No API or schema change. Built directly from r26; all existing 32 package paths are preserved.
+
+## v1.6.8-r26 – Weekend guild-run learning and custom events
+
+- Added rolling completion-time records for group-dependent tasks when shared weekly analytics is enabled. Records are bounded to the latest six weekly windows and merge by most recent state/timestamp. Analytics history clear also clears this timing record.
+- Added a separate guild-run cadence model. It starts from the guild's known pattern (Saturday/Sunday peak, Monday spillover, Friday preparation, lower Tue–Thu availability) and learns from clustered same-activity clears across different registered guild members. Where member ownership is available, multiple alts belonging to one person do not count as multiple attendees. This signal only adjusts group-availability planning; it does not lower a character's personal clearability or replace their archived per-activity completion history. Public-party clears still count toward the character's own history. Where roster ownership is available, multiple alts belonging to one member are not counted as multiple guild attendees. The starting weekend/Monday pattern applies even before enough opt-in timing observations exist.
+- Added an optional guild-cadence explanation to the existing Overview/Tracker deadline banner and detailed score explanation.
+- Added up to 30 administrator-managed custom events under Rate-Up Event Settings. Each event has a name, optional note, enabled status, recurring weekend or one-time Manila-time schedule, and start/end. Active events appear in the shared active-event strip (capped to two custom events plus a count to keep the banner readable); active/upcoming events can appear in Overview planning notes. Enabled custom events require a name before saving. Existing Item Drop, Enhancement, and EXP Boost settings remain unchanged.
+- No D1 schema migration required; the new properties use the existing shared tracker record and Rate-Up settings timestamp.
+- Validation notes: JavaScript syntax, CSS parsing, package integrity, event normalizer, timing merge, weekday schedule behavior, and UI event form tests were run locally. Live Cloudflare Pages/D1/Discord integration still needs production verification.
