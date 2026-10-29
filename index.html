@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r27</title>
+    <title>Pantheon Tools v1.6.8-r28</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3123,9 +3123,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r27</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r28</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r27 update:</strong> Guild raid-day planning now starts on Saturday. Friday uses the normal weekday baseline, with Monday retained as possible spillover.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r28 update:</strong> Reset warnings now stay focused on the player’s actual tasks. Service advice appears with a specific unfinished activity only when that activity is marked serviceable.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6206,14 +6206,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // faster clears gain priority unless the character has relevant clear history.
         function getDeadlineMode(pace = getWeeklyPaceContext()) {
             const h = Number(pace?.hoursLeft ?? 168);
-            if (h <= 2) return { key:'reset-imminent', label:'RESET IMMINENT', tone:'critical', cardLabel:'Reset imminent', message:'Only finish tasks you can realistically complete before cutoff. Do not start assembling a new group or assume a booster is still taking runs.', strategy:'Finish only what fits before cutoff; no new group assembly or unconfirmed services.' };
-            if (h <= 24) return { key:'last-call', label:'LAST CALL', tone:'critical', cardLabel:'Last call', message:'The final 24 hours are for realistic clears. Prioritize short, proven tasks; launch a raid only if the party is ready. Do not count on paid services unless a booster confirms availability.', strategy:'Proven clears first; no unplanned raids or assumed last-minute services.' };
-            if (h <= 48) return { key:'final-push', label:'FINAL PUSH', tone:'urgent', cardLabel:'Final push', message:'Finish high-value goals and book any needed service now. Boosters may have cleared their characters or stopped taking runs by Last Call, so keep a reliable-clear fallback.', strategy:'Close out serviceable goals now; confirm groups and pivot promptly if plans stall.' };
-            if (h <= 72) return { key:'deadline-push', label:'DEADLINE PUSH', tone:'urgent', cardLabel:'Deadline push', message:'Reset is 2–3 days away. Organize valuable group runs and arrange paid services now, while there is still time to regroup or find another provider.', strategy:'Schedule high-value raids and book serviceable goals before the final day.' };
-            if (h <= 96) return { key:'raid-window', label:'RAID WINDOW', tone:'urgent', cardLabel:'Raid window', message:'Use this window to organize high-value group runs and book services while there is still time to recover from a failed plan. Keep fast clears ready as backup.', strategy:'Form groups and arrange services early; keep dependable clears ready.' };
-            if (h <= 120) return { key:'focus', label:'FOCUS MODE', tone:'watch', cardLabel:'Focus', message:'Build weekly progress while there is time: clear routine rewards, arrange longer raids, and schedule any serviceable objectives ahead of reset weekend.', strategy:'Make progress and book time-sensitive help early.' };
-            if (h <= 144) return { key:'build', label:'BUILD MOMENTUM', tone:'calm', cardLabel:'Build momentum', message:'Clear routine rewards and line up party-dependent activities early. If a paid service would save a difficult alt time, arrange it before providers finish their weekly runs.', strategy:'Make steady progress and plan any carries early.' };
-            return { key:'plan', label:'PLAN AHEAD', tone:'calm', cardLabel:'Plan ahead', message:'Start with your best-value weekly goals. Plan group runs and any needed paid services early, then let the recommendations become more selective as reset approaches.', strategy:'Plan the week, reserve help early, and gather evidence before urgency rises.' };
+            // This banner is shared across a player's Overview/Tracker, so keep it about timing and next-step strategy.
+            // Paid-service advice belongs on a specific unfinished task only when its Activity Reference says it is serviceable.
+            if (h <= 2) return { key:'reset-imminent', label:'RESET IMMINENT', tone:'critical', cardLabel:'Reset imminent', message:'Only start tasks you can realistically finish before cutoff. Prioritize short, reliable clears; take a raid only if the party is already ready.', strategy:'Finish proven tasks; avoid new group assembly this close to reset.' };
+            if (h <= 24) return { key:'last-call', label:'LAST CALL', tone:'critical', cardLabel:'Last call', message:'The final 24 hours are for realistic clears. Prioritize short, proven tasks; attempt a raid only if the party is ready.', strategy:'Proven clears first; no unplanned raids.' };
+            if (h <= 48) return { key:'final-push', label:'FINAL PUSH', tone:'urgent', cardLabel:'Final push', message:'Finish high-value goals while there is still time. Line up any raid group now, set a cutoff, and keep a reliable-clear fallback.', strategy:'Close high-value goals; confirm groups and pivot promptly if plans stall.' };
+            if (h <= 72) return { key:'deadline-push', label:'DEADLINE PUSH', tone:'urgent', cardLabel:'Deadline push', message:'Reset is 2–3 days away. Organize valuable group runs while there is time to regroup, then use dependable clears if the party does not form.', strategy:'Schedule high-value group runs and set a cutoff for switching to reliable clears.' };
+            if (h <= 96) return { key:'raid-window', label:'RAID WINDOW', tone:'urgent', cardLabel:'Raid window', message:'Use this window to organize high-value group runs. Keep fast, dependable clears ready as backup.', strategy:'Form groups early; keep dependable clears ready.' };
+            if (h <= 120) return { key:'focus', label:'FOCUS MODE', tone:'watch', cardLabel:'Focus', message:'Clear routine rewards and begin longer group runs while the week still has room for a second attempt.', strategy:'Build progress and start long activities before deadline pressure rises.' };
+            if (h <= 144) return { key:'build', label:'BUILD MOMENTUM', tone:'calm', cardLabel:'Build momentum', message:'Clear routine weekly rewards and make steady progress on the tasks that matter most.', strategy:'Make steady progress on high-value weekly goals.' };
+            return { key:'plan', label:'PLAN AHEAD', tone:'calm', cardLabel:'Plan ahead', message:'Start with your best-value weekly goals and make steady progress. Recommendations will become more selective as reset approaches.', strategy:'Work through high-value objectives and adapt as reset approaches.' };
         }
 
         function getDeadlineTaskFeatures(taskName, activityProfile) {
@@ -6670,7 +6672,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (shownPriorities.length) {
                 insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
-                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.hoursLeft <= 72 ? 'No weekly tasks remain' : 'No urgent follow-up'}</strong><p>${pace.hoursLeft <= 72 ? 'Your tracked weekly tasks are complete. Use the remaining time for valuable group runs already organized; arrange any needed services before Last Call.' : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as reset approaches.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
+                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.hoursLeft <= 72 ? 'No weekly tasks remain' : 'No urgent follow-up'}</strong><p>${pace.hoursLeft <= 72 ? 'Your tracked weekly tasks are complete. Use the remaining time for optional goals or help organize a group run that is already planned.' : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as reset approaches.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
             }
             if (cont) cont.innerHTML = insightHtml;
 
@@ -6830,9 +6832,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const reviewText = reviewTextParts.join(' ');
             const activitySummary = `Main: ${signals.filter(item=>item.isMain).length} · Active alts: ${signals.filter(item=>!item.isMain && (item.regular || item.emerging)).length} · To review: ${signals.filter(item=>item.reviewNA).length}`;
             const historySummary = recent.length ? `${recent.length} saved week${recent.length===1?'':'s'}` : 'No saved history yet';
-            const hasThemeParkTask = cloudData.settings.categories.some(category => (category.tasks || []).some(task => /theme\s*park/i.test(String(task))));
-            const hasAbyssalMireTask = cloudData.settings.categories.some(category => (category.tasks || []).some(task => /abyssal\s+mire/i.test(String(task))));
-            const hasWeeklyDragonFellowship = cloudData.settings.categories.some(category => category.group === 'Weeklies' && (category.tasks || []).some(task => /dragon\s+fellowship/i.test(String(task))));
+            const allConfiguredTasks = cloudData.settings.categories.flatMap(category => category.tasks || []);
+            const themeParkTaskName = allConfiguredTasks.find(task => /theme\s*park/i.test(String(task)));
+            const abyssalMireTaskName = allConfiguredTasks.find(task => /abyssal\s+mire/i.test(String(task)));
+            const dragonFellowshipTaskName = cloudData.settings.categories
+                .filter(category => category.group === 'Weeklies')
+                .flatMap(category => category.tasks || [])
+                .find(task => /dragon\s+fellowship/i.test(String(task)));
+            const hasThemeParkTask = !!themeParkTaskName;
+            const hasAbyssalMireTask = !!abyssalMireTaskName;
+            const hasWeeklyDragonFellowship = !!dragonFellowshipTaskName;
+            // Only mention services if this member has an unfinished, tracked task whose current
+            // Activity Reference explicitly or compatibly says it is serviceable. A category's
+            // mere existence is not enough to recommend spending gold on a carry.
+            const hasOpenServiceableTask = taskName => {
+                if (!taskName || !getDeadlineTaskFeatures(taskName, getActivityValueProfile(taskName)).serviceable) return false;
+                return tracked.some(profile => {
+                    const state = getTrackerCellState(profile.name, taskName);
+                    return state !== 'done' && state !== 'excluded';
+                });
+            };
+            const abyssalServicePending = hasOpenServiceableTask(abyssalMireTaskName);
+            const fellowshipServicePending = hasOpenServiceableTask(dragonFellowshipTaskName);
             const activityPlanningHints = [];
             const planningHoursLeft = getWeeklyPaceContext().hoursLeft;
             const servicePlanningNote = planningHoursLeft <= 24
@@ -6840,9 +6861,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 : planningHoursLeft <= 48
                     ? ' If a service is your fastest route, arrange it now rather than leaving it until Last Call.'
                     : ' If you cannot clear it yourself, a service can save time; arrange it early while providers may still have openings.';
-            if (hasAbyssalMireTask) activityPlanningHints.push({ title:'Abyssal Mire', text:'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset.' + servicePlanningNote });
+            if (hasAbyssalMireTask) activityPlanningHints.push({ title:'Abyssal Mire', text:'Aim for 2F + 5F with 1 key remaining to reach the 5,000-point weekly total after reset.' + (abyssalServicePending ? servicePlanningNote : '') });
             if (hasThemeParkTask) activityPlanningHints.push({ title:'Theme Park', text:'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.' });
-            if (hasWeeklyDragonFellowship) activityPlanningHints.push({ title:'Dragon Fellowship', text:'Weekly Heraldry rewards.' + servicePlanningNote });
+            if (hasWeeklyDragonFellowship) activityPlanningHints.push({ title:'Dragon Fellowship', text:'Weekly Heraldry rewards.' + (fellowshipServicePending ? servicePlanningNote : '') });
             const activityPlanningHint = activityPlanningHints.length ? `<div class="analytics-activity-value-note"><strong>Quick activity tips</strong><ul>${activityPlanningHints.map(hint => `<li><strong>${escapeHTML(hint.title)}:</strong> ${escapeHTML(hint.text)}</li>`).join('')}</ul></div>` : '';
             const configuredEvents = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
             const itemEvent = getRateUpWindow(configuredEvents.itemDrop, now);
@@ -7207,7 +7228,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (isBlackDragonEndgameTask(ref?.name) && /secondary utility character can also be a good pick|a secondary can also be worthwhile when its recent activity is strong and its configured utility role|this alt has a utility role, but the saved history does not yet show consistently strong activity/i.test(tip)) {
                 return 'BDN is Level 70 endgame and can take 50+ minutes. Main is the default focus. Recommend a secondary when its configured raid role is backed by sustained weekly activity and strong completions, or it has a prior BDN clear. A geared group may still invite a DPS alt for a planned late-patch carry; the tracker cannot assume the party has enough damage.';
             }
-            return tip;
+            return String(ref?.serviceable || '').toLowerCase() === 'no' ? removeUnsupportedServiceAdvice(tip) : tip;
         }
 
         function activityReferenceDetail(ref, fallbackDetail = '') {
@@ -7531,6 +7552,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return evidence.level === 'High' ? 'Good history' : evidence.level === 'Moderate' ? 'Some history' : 'Early data';
         }
 
+        function removeUnsupportedServiceAdvice(text) {
+            return String(text || '').split(/(?<=[.!?])\s+/)
+                .filter(sentence => /^\s*(?:this activity is )?not serviceable[.!]?\s*$/i.test(sentence.trim()) || !/\b(?:book|arrange|consider|use|pay for|service|booster|carry|paid help)\b/i.test(sentence))
+                .join(' ').replace(/\s{2,}/g, ' ').trim();
+        }
+
         // One short sentence for the default view. The detailed factors remain available only on request.
         function getRecommendationPlainReasonBase(item) {
             const fitLabel = String(item.fit?.label || '').toLowerCase();
@@ -7580,19 +7607,34 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return `${historyLead}BDN is a 50+ minute Level 70 endgame run. This alt has no prior BDN clear or demonstrated role fit, so it should not outrank dependable weekly tasks unless a geared group specifically invites it.${resetGate}`;
             }
 
+            const activityFeatures = getDeadlineTaskFeatures(item.t, item.activityProfile);
             const activityAdvice = {
                 'theme-park':'Use Persian Goblin if you have auto-attacking units and want to idle, or Treacherous Path for fast clears. Any Theme Park activity counts.',
-                'abyssal-mire':'Run 2F + 5F and leave 1 key for reset to reach 5,000 weekly points. Consider a service if you cannot clear it yourself.',
-                'dragon-fellowship':'If duoing is not practical, compare the service cost with the weekly Heraldry rewards.',
+                'abyssal-mire':'Run 2F + 5F and leave 1 key for reset to reach 5,000 weekly points.',
+                'dragon-fellowship':'Prioritize the weekly Heraldry rewards; if duoing is not practical, compare available completion options with the reward.',
                 'gdn-classic':'Prioritize its weekly Polished Diamonds and Lv 50 Heraldry Pouch if those rewards help your current goals.',
                 'gdn-hardcore':'Plan the run as an optional code/accessory opportunity; weigh its chest against the seal-stamp cost.',
             };
             const referenceAdvice = getActivityReferenceRecommendation(item.activityProfile?.reference);
-            if (referenceAdvice) return `${historyLead}${referenceAdvice}`;
-            if (activityAdvice[profileKey]) return `${historyLead}${activityAdvice[profileKey]}`;
+            if (referenceAdvice) {
+                // Explicitly non-serviceable references must not inherit service/carry suggestions from stale built-in text.
+                if (item.activityProfile?.reference?.serviceable === 'no') return `${historyLead}${removeUnsupportedServiceAdvice(referenceAdvice) || 'This activity is not serviceable; pursue it only if the reward and party requirements fit your plan.'}`;
+                return `${historyLead}${referenceAdvice}`;
+            }
+            if (activityAdvice[profileKey]) {
+                let advice = activityAdvice[profileKey];
+                if (activityFeatures.serviceable && profileKey === 'abyssal-mire') advice += ' A service is an option if you cannot clear it yourself.';
+                if (activityFeatures.serviceable && profileKey === 'dragon-fellowship') advice += ' If duoing is not practical, a service may be worthwhile.';
+                return `${historyLead}${advice}`;
+            }
             if (recentClear) return 'This character cleared it recently, so repeating it is a reliable next step.';
             if (priorClear) return 'This character has cleared it before, making it a sensible repeat if time allows.';
-            if (fitLabel.includes('carry may fit')) return 'No personal clear is recorded. A service or a better-matched group can make the rewards accessible without relying on a solo clear.';
+            if (fitLabel.includes('carry may fit')) {
+                const serviceable = getDeadlineTaskFeatures(item.t, item.activityProfile).serviceable;
+                return serviceable
+                    ? 'No personal clear is recorded. A confirmed service or a better-matched group may make the rewards accessible.'
+                    : 'No personal clear is recorded. A better-matched group or route may make the rewards accessible; this activity is not marked serviceable.';
+            }
             if (fitLabel.includes('repeated misses')) return 'This has been left unfinished repeatedly. Check whether the route or group setup can make it achievable this week.';
             if (fitLabel.includes('main high-tier focus')) return 'This is a high-tier target for your Main. Plan the right group for this specific raid instead of assuming lower-tier clears carry over.';
             return 'This is among the highest-ranked tasks left for this character. Completing it advances weekly progress and gives future recommendations more evidence.';
@@ -7629,6 +7671,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (ref.serviceable !== 'unknown') facts.push(`Serviceable: ${ref.serviceable === 'yes' ? 'Yes' : 'No'}`);
                 if (ref.milestoneGoal && ref.milestoneGoal !== '-') facts.push(`Goal: ${ref.milestoneGoal}`);
                 let tip = getActivityReferenceRecommendation(ref);
+                if (ref.serviceable === 'no') tip = removeUnsupportedServiceAdvice(tip);
                 const pace = getWeeklyPaceContext();
                 if (pace.hoursLeft <= 24 && ref.serviceable === 'yes') {
                     tip = removeGenericLastCallServicePrompts(tip);
@@ -7638,13 +7681,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return facts.join(' · ') || 'See the activity reference below for rewards and materials.';
             }
             const notes = {
-                'abyssal-mire':'Best plan: 2F + 5F, with 1 key remaining for the reset payout. This reaches 5,000 weekly points; a service can be a practical fallback.',
+                'abyssal-mire':'Best plan: 2F + 5F, with 1 key remaining for the reset payout. This reaches 5,000 weekly points.',
                 'gdn-classic':'Focus on the weekly Essence of Life and Polished Diamond rewards.',
                 'gdn-hardcore':'Check whether the chest and gear-code rewards are worth the seal stamps.',
-                'dragon-fellowship':'Weekly Heraldry pouches. If a duo clear is out of reach, a service may still be worthwhile.',
+                'dragon-fellowship':'Weekly Heraldry pouches. If a duo clear is out of reach, consider the most practical available completion route.',
                 'theme-park':'Persian Goblin suits auto-attacking units if you want to idle. Treacherous Path is good for fast clears. Any Theme Park activity counts.'
             };
-            return notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
+            let note = notes[profileKey] || 'This suggestion uses the shared task priority and this character’s saved history.';
+            const noteFeatures = getDeadlineTaskFeatures(item.t, item.activityProfile);
+            if (noteFeatures.serviceable && profileKey === 'abyssal-mire') note += ' A service can be a fallback if you cannot clear it yourself.';
+            if (noteFeatures.serviceable && profileKey === 'dragon-fellowship') note += ' If duoing is not practical, a service may be worthwhile.';
+            return note;
         }
 
         function buildRecommendationExplanation(item) {
@@ -9530,7 +9577,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r27';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r28';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

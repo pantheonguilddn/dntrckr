@@ -1,3 +1,11 @@
+## v1.6.8-r28 – Task-specific reset/service warnings
+
+- Removed paid-service instructions from the global urgency banner and reset-phase strategy. The banner now gives generally useful timing advice without assuming a player has a serviceable unfinished dungeon.
+- Service/carry recommendations remain tied to the selected activity and its Activity Reference `serviceable` field; activities marked `No` do not inherit generic service advice from built-in fallbacks.
+- Updated the Overview's no-open-tasks message to avoid recommending services when there are no unfinished weekly tasks.
+- Kept the existing serviceable-activity Last Call checks and urgency ranking; the change is about contextual messaging, not weakening or removing task-specific service recommendations.
+- Built directly from v1.6.8-r27. No data schema or API changes. Local syntax/targeted logic tests passed; production deployment and live Cloudflare/D1/Discord integration remain untested.
+
 # Pantheon Tools v1.6.8-r25 — Earlier Last Call and service-window planning
 
 This release continues directly from v1.6.8-r24. It retains the adaptive urgency scorer, shared D1 persistence fixes, Activity Reference editor, bounty logic, and raid role-fit recommendations.
