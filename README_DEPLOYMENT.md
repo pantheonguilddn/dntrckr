@@ -1,3 +1,9 @@
+## Packaging correction
+
+The browser tab title, What’s New release badge, update text, and `PANTHEON_TOOLS_VERSION` constant are aligned to `v1.6.8-r29`. This corrects stale r28 metadata in the initial r29 package; no application behavior or data schema was changed by this packaging correction.
+
+---
+
 # v1.6.8-r29 – Wait for initial shared-data hydration
 
 - Fixed startup sequencing: `forceSync()` now returns its actual asynchronous sync promise, so `loadLiveTracker()` genuinely waits for the cloud read/merge/write cycle instead of awaiting an undefined return value.
