@@ -1,3 +1,19 @@
+# v1.6.8-r29 – Wait for initial shared-data hydration
+
+- Fixed startup sequencing: `forceSync()` now returns its actual asynchronous sync promise, so `loadLiveTracker()` genuinely waits for the cloud read/merge/write cycle instead of awaiting an undefined return value.
+- After the initial sync attempt completes, the app refreshes the UI from the final merged state before routing finishes. This prevents a stale locally cached checkbox from appearing unchecked on the first Tracker visit and then changing to checked only after navigating away and back.
+- The existing local pending-cell queue, conflict handling, member-safe writes, and retry behavior are retained. Normal cloud latency still exists; the UI now waits for initial hydration rather than presenting stale progress as if it were authoritative.
+- Built directly from v1.6.8-r28. No data schema or API changes. Production Cloudflare Pages/D1/Discord multi-user verification remains outstanding.
+
+## Validation
+
+- JavaScript syntax checks passed for all inline application scripts.
+- Static startup-order checks confirm `loadLiveTracker()` awaits a returned `forceSync()` promise and performs a post-hydration UI refresh.
+- Existing pending-write persistence and compare/write verification code remains intact.
+- ZIP integrity and original package-path preservation passed.
+
+---
+
 ## v1.6.8-r28 – Task-specific reset/service warnings
 
 - Removed paid-service instructions from the global urgency banner and reset-phase strategy. The banner now gives generally useful timing advice without assuming a player has a serviceable unfinished dungeon.

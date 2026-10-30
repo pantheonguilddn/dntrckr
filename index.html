@@ -5043,7 +5043,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             getLocalTeamBuilderState();
             refreshTrackerUI();
             if (!hasCloudConfig()) return setStatus('⚪ Local mode — click Cloud Setup');
+            // Wait for the actual cloud hydration before the app finishes routing.
+            // This prevents the Tracker from briefly showing stale cached checkboxes
+            // and only correcting them after the user leaves and re-enters the page.
             await forceSync(false);
+            refreshTrackerUI();
             const rb = String(cloudData.settings?.versionControl?.revisionBinId || '');
             if (rb) setRevisionBinIdLocal(rb);
         }
@@ -5312,11 +5316,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // Normal sync. The revision journal is a separate best-effort service.
         // The main tracker sync succeeds independently of journal availability.
         function forceSync(showSuccess = false){
-            if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return;}
-            if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return;}
+            if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return Promise.resolve(false);}
+            if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return Promise.resolve(false);}
             syncInProgress=true;setStatus('🟡 Merging Cloud Data...');const config=getCloudConfig();
             const hasMeaningfulLocalData = hasActualTrackerActivity(cloudData) || cloudData.settings.rosters.length > 0 || cloudData.settings.categories.length > 0;
-            (async()=>{
+            return (async()=>{
                 try{
                     let remoteChangedSinceUI = false;
                     for(let attempt=1;attempt<=3;attempt++){
