@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r29</title>
+    <title>Pantheon Tools v1.6.8-r30</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3123,9 +3123,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r29</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r30</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r29 update:</strong> Tracker startup now waits for the initial shared-data sync before showing the final task state, preventing saved checkboxes from briefly appearing unchecked after refresh.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r30 update:</strong> Opening Tracker now checks the latest shared D1 progress instead of relying only on the background refresh, so newly saved character checkmarks appear sooner when viewing the guild tracker.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -9581,7 +9581,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r29';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r30';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10033,7 +10033,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (page === 'tracker' && pantheonDiscordUser?.id && !isAdminViewAsActive()) applyDiscordIdentityDefaults();
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
             if (page === 'overview') { renderOverviewActivity(); updateOverviewStatusCards(); }
-            if (page === 'tracker') { syncDataStructures(); buildTrackerTable(); applyBoardState(); if (isAnalyticsVisible) renderAnalytics(); updateClassSetupSummary(); }
+            if (page === 'tracker') {
+                syncDataStructures(); buildTrackerTable(); applyBoardState();
+                if (isAnalyticsVisible) renderAnalytics();
+                updateClassSetupSummary();
+                // A local page switch does not trigger the browser focus event. Pull the
+                // current D1 marker whenever Tracker is opened so an administrator or
+                // member does not mistake a cached view for the latest shared progress.
+                // The helper skips when a local save/sync is in flight and redraws the
+                // Tracker only when the remote revision has actually changed.
+                if (typeof refreshSharedDataIfChanged === 'function') {
+                    refreshSharedDataIfChanged().catch(() => {});
+                }
+            }
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }

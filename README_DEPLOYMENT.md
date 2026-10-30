@@ -1,3 +1,21 @@
+# Pantheon Tools v1.6.8-r30 — Refresh shared progress when opening Tracker
+
+- Fixed stale admin/member Tracker views when navigating between Overview and Tracker. Entering Tracker now requests the latest shared D1 revision immediately instead of waiting for the two-minute background poll or a browser-focus event.
+- If the shared record has changed, the existing `refreshSharedDataIfChanged()` path replaces the stale local view with the latest merged record and redraws the Tracker. If there is a local save, sync, or pending write in progress, the refresh helper safely defers rather than overwriting it.
+- This addresses the case where one member's weekly completion was already saved to D1 but another member/admin continued seeing an older cached Tracker view after an in-app page switch.
+- Existing local pending-cell queue, CAS write retries, per-cell timestamp merge, ownership restrictions, and startup hydration wait are retained. No data schema or API changes.
+- A browser tab that was already open during a Pages deployment continues running its previously loaded JavaScript until reloaded. The shared-data format remains compatible; members should reload once after a deployment to pick up new client behavior. A stale tab alone should not make a successful server save disappear.
+- Built directly from the corrected v1.6.8-r29 package. Live Cloudflare Pages/D1/Discord end-to-end verification remains outstanding.
+
+## Validation
+
+- JavaScript syntax, CSS parsing, and duplicate-ID checks passed.
+- Static behavior check confirms opening Tracker invokes the no-store shared-data refresh path; the refresh redraws the table only when the D1 revision marker changes and does not overwrite local unsaved edits.
+- Existing multi-character member-save simulation passes for three character checkmarks, with all three visible on an administrator read in the mocked D1 environment. This is a local API simulation, not a live production test.
+- ZIP integrity and exact preservation of the 32 existing package paths passed.
+
+---
+
 ## Packaging correction
 
 The browser tab title, What’s New release badge, update text, and `PANTHEON_TOOLS_VERSION` constant are aligned to `v1.6.8-r29`. This corrects stale r28 metadata in the initial r29 package; no application behavior or data schema was changed by this packaging correction.
