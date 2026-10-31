@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r45</title>
+    <title>Pantheon Tools v1.6.8-r46</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2848,6 +2848,27 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:700px){.weekly-report-modal .weekly-report-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.weekly-report-modal .weekly-report-chart-row{grid-template-columns:90px minmax(70px,1fr) 40px;gap:7px}.bounty-share-preview{padding:8px}.bounty-share-receipt{padding:14px}.bounty-share-preview-item{grid-template-columns:minmax(80px,1fr) minmax(100px,1.3fr) 32px;gap:6px}.bounty-share-row{grid-template-columns:1fr 1fr;gap:8px}}
 @media(max-width:480px){.weekly-report-modal{padding:15px}.bounty-share-modal{padding:13px}.bounty-share-row{grid-template-columns:1fr}.bounty-share-dungeon{grid-column:auto}}
 </style>
+
+<style id="pantheon-r46-topbar-alignment">
+/* r46: compact roster dropdown keeps the adjacent help control on the same baseline. */
+.controls .topbar-player { align-items:center !important; gap:6px !important; }
+.controls .roster-filter-top {
+  width:124px !important; min-width:124px !important; max-width:124px !important;
+  flex:0 0 124px !important; box-sizing:border-box !important;
+  height:34px !important; min-height:34px !important;
+  padding:6px 8px !important; font-size:.74rem !important;
+}
+.controls .mini-help {
+  flex:0 0 20px !important; width:20px !important; height:20px !important;
+  margin-left:0 !important; align-self:center !important;
+}
+@media (max-width:900px) {
+  .controls .topbar-player { flex-wrap:wrap !important; }
+}
+@media (max-width:760px) {
+  .controls .roster-filter-top { width:auto !important; min-width:0 !important; max-width:none !important; flex:1 1 130px !important; }
+}
+</style>
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3292,9 +3313,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r45</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r46</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r45 hotfix:</strong> Corrects the release-check version mismatch that caused r44 to reload continuously. Existing authentication, tracker permissions, and shared-data behavior are preserved.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r46 hotfix:</strong> Corrects the release-check version mismatch that caused r44 to reload continuously. Existing authentication, tracker permissions, and shared-data behavior are preserved.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -10482,7 +10503,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r45';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r46';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -11154,7 +11175,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r45';
+  const CURRENT_BUILD = '1.6.8-r46';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
