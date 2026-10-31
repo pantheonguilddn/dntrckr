@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r35</title>
+    <title>Pantheon Tools v1.6.8-r36</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2727,7 +2727,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:640px){.deadline-strategy-banner{padding:10px}.deadline-strategy-banner p{font-size:.68rem}}
 </style>
 
-<style id="pantheon-r35-weekly-recap">
+<style id="pantheon-r36-weekly-recap">
 .tracker-live-sync-note{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:4px 8px;border:1px solid var(--pt-border);border-radius:999px;background:var(--pt-surface-raised);color:var(--pt-muted);font-size:.62rem;font-weight:750;line-height:1.3;white-space:nowrap}
 .tracker-live-sync-note:before{content:"";width:6px;height:6px;border-radius:50%;background:#6caa7a;flex:0 0 6px}
 .tracker-live-sync-note[data-state="checking"]:before{background:#c28b35}
@@ -2738,7 +2738,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r35-weekly-report-styles">
+<style id="pantheon-r36-weekly-report-styles">
 .weekly-report-card{grid-column:1/-1;min-width:0;padding:15px;border:1px solid var(--pt-border);border-radius:12px;background:var(--pt-surface);color:var(--pt-text);box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .weekly-report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--pt-border);margin-bottom:10px}
 .weekly-report-head h3{margin:0;color:var(--pt-text);font-size:.9rem}.weekly-report-period{margin-top:4px;color:var(--pt-muted);font-size:.67rem}
@@ -2746,6 +2746,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .weekly-report-characters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.weekly-report-character{min-width:0;padding:11px;border:1px solid var(--pt-border);border-radius:10px;background:var(--pt-surface-raised)}
 .weekly-report-character-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.weekly-report-character-head strong{min-width:0;color:var(--pt-text);font-size:.75rem;overflow-wrap:anywhere}.weekly-report-rate{flex:0 0 auto;color:var(--pt-accent);font-weight:900;font-size:.8rem}
 .weekly-report-meta{color:var(--pt-muted);font-size:.64rem;line-height:1.5}.weekly-report-missed{margin:8px 0 4px;color:var(--pt-text);font-weight:850;font-size:.66rem}.weekly-report-task-list{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 8px}.weekly-report-task-list span{padding:3px 6px;border:1px solid var(--pt-border);border-radius:6px;background:var(--pt-surface);color:var(--pt-muted);font-size:.61rem}.weekly-report-recs{display:grid;gap:7px;margin:7px 0 0;padding:0;list-style:none}.weekly-report-recs li{padding-top:7px;border-top:1px solid var(--pt-border)}.weekly-report-recs strong{display:block;color:var(--pt-text);font-size:.68rem}.weekly-report-recs p{margin:3px 0 0;color:var(--pt-muted);font-size:.64rem;line-height:1.5}
+.weekly-report-chart{display:grid;gap:7px;margin:9px 0 10px}.weekly-report-chart-row{display:grid;grid-template-columns:minmax(92px,150px) minmax(90px,1fr) 42px;gap:9px;align-items:center}.weekly-report-chart-name{font-size:.66rem;font-weight:800;color:var(--pt-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.weekly-report-bar{height:12px;display:flex;overflow:hidden;border-radius:999px;background:var(--pt-border);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pt-border) 70%,transparent)}.weekly-report-bar-done{height:100%;background:#4b9b72}.weekly-report-bar-missed{height:100%;background:#c96a60}.weekly-report-chart-value{text-align:right;font-size:.68rem;font-weight:900;color:var(--pt-accent);font-variant-numeric:tabular-nums}.weekly-report-legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--pt-muted);font-size:.62rem;margin:2px 0 12px}.weekly-report-legend span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:#4b9b72}.weekly-report-legend span+span:before{background:#c96a60}.weekly-report-character-chart{margin:8px 0 5px}.weekly-report-character-chart .weekly-report-bar{height:9px}@media(max-width:520px){.weekly-report-chart-row{grid-template-columns:82px minmax(70px,1fr) 36px;gap:6px}.weekly-report-chart-name{font-size:.6rem}}
 .weekly-report-empty{padding:11px;border:1px dashed var(--pt-border);border-radius:9px;color:var(--pt-muted);font-size:.7rem;line-height:1.55}.weekly-report-foot{margin:10px 0 0;color:var(--pt-muted);font-size:.62rem;line-height:1.5}
 @media(max-width:700px){.weekly-report-characters{grid-template-columns:1fr}.weekly-report-card{padding:12px}}
 </style>
@@ -3192,9 +3193,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r35</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r36</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r35 update:</strong> Bounty Share Builder now consolidates repeated dungeon entries per character, shows the highest-tier condition once, and lets you count weekly claims with + controls against the six-claim limit. Tracker sync protections and the previous-week report are retained.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r36 update:</strong> Bounty sharing is now a single copy-and-paste action with independent six-claim limits per character. Weekly reports now include visual completion charts. Automatic release checks help active pages move to the newest build without discarding unsaved tracker edits. Tracker cell-save and ownership protections are retained.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3570,13 +3571,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         <div class="modal-card wide-modal bounty-share-modal">
             <h3 id="bounty-share-title">↗ Bounty Share Builder</h3>
             <p class="modal-note">Bounties are grouped by character and dungeon. Set the highest-tier requirement once, then use + to increase how many weekly claims that dungeon takes. Each character has a maximum of 6 claims per week; repeated Tracker slots are consolidated into one line.</p>
-            <div class="bounty-share-toolbar"><span id="bounty-share-count" class="bounty-share-count">0 bounty entries</span><span class="bounty-share-scope">Uses the characters currently shown in Tracker.</span></div>
+            <div class="bounty-share-toolbar"><span id="bounty-share-count" class="bounty-share-count">0 characters listed</span><span class="bounty-share-scope">Each character has an independent limit of 6 claims.</span></div>
             <div id="bounty-share-list" class="bounty-share-list"><div class="bounty-share-empty">Loading listed bounties…</div></div>
-            <div class="bounty-share-preview-wrap"><div class="bounty-share-preview-head"><strong>Share preview</strong><span>PNG export uses this exact list</span></div><div id="bounty-share-preview" class="bounty-share-preview"><div class="bounty-share-empty">Add bounty targets to the Tracker to populate this preview.</div></div></div>
+            <div class="bounty-share-preview-wrap"><div class="bounty-share-preview-head"><strong>Copy preview</strong><span>Formatted roster ready to paste</span></div><div id="bounty-share-preview" class="bounty-share-preview"><div class="bounty-share-empty">Add bounty targets to the Tracker to populate this preview.</div></div></div>
             <div class="modal-actions bounty-share-actions">
-                <button class="btn btn-secondary" type="button" onclick="copyBountyShareText()">Copy Text</button>
-                <button class="btn btn-cloud" type="button" onclick="downloadBountySharePng()">Download PNG</button>
-                <button class="btn btn-sync" type="button" onclick="shareBountyShare()">Share</button>
+                <button class="btn btn-cloud" type="button" onclick="copyBountyShareText()">📋 Copy Bounty List</button>
                 <button class="btn btn-secondary" type="button" onclick="closeModal('bounty-share-modal')">Close</button>
             </div>
             <div id="bounty-share-status" class="version-status" role="status" aria-live="polite"></div>
@@ -5754,14 +5753,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const rows=bountyShareItems.filter(item=>item.charName===charName).map(item=>`<div class="bounty-share-preview-item"><div class="bounty-share-preview-dungeon"><strong>${escapeHTML(item.dungeon)}</strong>${item.sourceSlots.length>1?`<small>${item.sourceSlots.length} Tracker slots listed</small>`:''}</div><div class="bounty-share-preview-condition"><span class="bounty-share-tier ${item.tier==='legendary'?'is-legendary':item.tier==='unique'?'is-unique':''}">${escapeHTML(bountyShareTierLabel(item))}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div><strong class="bounty-share-preview-multiplier">×${item.count}</strong></div>`).join('');
                 return `<section class="bounty-share-preview-character"><div class="bounty-share-preview-character-head"><strong>${escapeHTML(charName)}</strong><span>${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} weekly claims</span></div>${rows}</section>`;
             }).join('');
-            const totalClaims=Object.values(totals).reduce((sum,count)=>sum+count,0);
-            preview.innerHTML=`<h4 class="bounty-share-preview-title">PANTHEON · GUILD BOUNTIES</h4><p class="bounty-share-preview-subtitle">${bountyShareItems.length} dungeon entr${bountyShareItems.length===1?'y':'ies'} · ${totalClaims} claims across ${chars.length} character${chars.length===1?'':'s'}</p>${sections}`;
+            preview.innerHTML=`<h4 class="bounty-share-preview-title">PANTHEON · GUILD BOUNTIES</h4><p class="bounty-share-preview-subtitle">${bountyShareItems.length} dungeon entr${bountyShareItems.length===1?'y':'ies'} · each character tracked against their own 6-claim limit</p>${sections}`;
         }
         function renderBountyShareList(){
             const list=document.getElementById('bounty-share-list');if(!list)return;
             const count=document.getElementById('bounty-share-count'),totals=bountyShareCharacterTotals();
-            const totalClaims=Object.values(totals).reduce((sum,value)=>sum+value,0),charCount=Object.keys(totals).length;
-            if(count)count.textContent=`${totalClaims} / ${charCount*BOUNTY_SHARE_WEEKLY_LIMIT} weekly claims used`;
+            const charCount=new Set(bountyShareItems.map(item=>item.charName)).size;
+            if(count)count.textContent=`${charCount} character${charCount===1?'':'s'} · separate 6-claim limits`;
             if(!bountyShareItems.length){list.innerHTML='<div class="bounty-share-empty">No bounty targets are filled in the currently displayed Tracker columns. Add targets in the Bounty Board rows, then reopen this builder.</div>';renderBountySharePreview();return;}
             const chars=[...new Set(bountyShareItems.map(item=>item.charName))];
             list.innerHTML=chars.map(charName=>{
@@ -5801,47 +5799,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             catch(_){const box=document.createElement('textarea');box.value=value;document.body.appendChild(box);box.select();const ok=document.execCommand('copy');box.remove();setBountyShareStatus(ok?'Bounty list copied.':'Clipboard access was blocked. Select the preview text and copy it manually.');}
         }
         function setBountyShareStatus(message){const el=document.getElementById('bounty-share-status');if(el)el.textContent=String(message||'');}
-        function bountyShareSvg(){
-            const width=1400,pad=48,headerH=190,charHeadH=54,rowH=86,footer=50;
-            const chars=[...new Set(bountyShareItems.map(item=>item.charName))],totals=bountyShareCharacterTotals();
-            const height=headerH+chars.reduce((sum,charName)=>sum+charHeadH+bountyShareItems.filter(item=>item.charName===charName).length*rowH,0)+footer;
-            const safe=txt=>String(txt||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-            let y=headerH,sections='';
-            chars.forEach((charName,charIndex)=>{
-                sections+=`<rect x="${pad}" y="${y}" width="${width-pad*2}" height="${charHeadH-4}" rx="10" fill="#e6ebf2"/>`+
-                    `<text x="${pad+20}" y="${y+33}" font-family="Arial,sans-serif" font-size="21" font-weight="800" fill="#203047">${safe(charName)}</text>`+
-                    `<text x="${width-pad-20}" y="${y+33}" text-anchor="end" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#42536b">${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} WEEKLY CLAIMS</text>`;
-                y+=charHeadH;
-                bountyShareItems.filter(item=>item.charName===charName).forEach((item,index)=>{
-                    const tier=bountyShareTierLabel(item),condition=bountyShareRequirement(item)+(item.state==='done'?' · Completed':'');
-                    sections+=`<rect x="${pad}" y="${y}" width="${width-pad*2}" height="${rowH-8}" rx="10" fill="${index%2?'#f0f3f7':'#f8fafc'}"/>`+
-                        `<text x="${pad+20}" y="${y+33}" font-family="Arial,sans-serif" font-size="20" font-weight="800" fill="#203047">${safe(item.dungeon)}</text>`+
-                        `<text x="${pad+20}" y="${y+58}" font-family="Arial,sans-serif" font-size="14" fill="#65758b">${safe(item.sourceSlots.length>1?`${item.sourceSlots.length} Tracker slots consolidated`:'Guild bounty')}</text>`+
-                        `<text x="760" y="${y+34}" font-family="Arial,sans-serif" font-size="18" font-weight="800" fill="#203047">${safe(tier)}</text>`+
-                        `<text x="760" y="${y+59}" font-family="Arial,sans-serif" font-size="15" fill="#506078">${safe(condition)}</text>`+
-                        `<text x="${width-pad-22}" y="${y+48}" text-anchor="end" font-family="Arial,sans-serif" font-size="26" font-weight="900" fill="#203047">×${item.count}</text>`;
-                    y+=rowH;
-                });
-            });
-            return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ffffff"/><rect x="0" y="0" width="${width}" height="164" fill="#1e2d45"/><text x="${pad}" y="74" font-family="Arial,sans-serif" font-size="36" font-weight="900" fill="#ffffff">PANTHEON · GUILD BOUNTIES</text><text x="${pad}" y="119" font-family="Arial,sans-serif" font-size="19" fill="#d8e2f1">Highest-tier bounty per dungeon · claim counts consolidated · 6 weekly claims per character</text>${sections}<text x="${pad}" y="${height-18}" font-family="Arial,sans-serif" font-size="13" fill="#78879c">Pantheon Tools · Dragon Nest Classic SEA</text></svg>`;
-        }
-        async function downloadBountySharePng(){
-            if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to export.');return;}
-            try{
-                const svg=bountyShareSvg(),blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),img=new Image();
-                await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});
-                const canvas=document.createElement('canvas');canvas.width=img.width*2;canvas.height=img.height*2;
-                const context=canvas.getContext('2d');context.scale(2,2);context.drawImage(img,0,0);URL.revokeObjectURL(url);
-                const png=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('PNG encoding failed.')),'image/png'));
-                const downloadUrl=URL.createObjectURL(png),link=document.createElement('a');link.href=downloadUrl;link.download=`Pantheon_Bounties_${new Date().toISOString().slice(0,10)}.png`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(downloadUrl),1500);setBountyShareStatus('Bounty screenshot exported as PNG.');
-            }catch(error){setBountyShareStatus(`PNG export failed: ${String(error?.message||error)}`);}
-        }
-        async function shareBountyShare(){
-            if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to share.');return;}
-            const textValue=buildBountyShareText();
-            if(navigator.share){try{await navigator.share({title:'Pantheon Guild Bounties',text:textValue});setBountyShareStatus('Share sheet opened.');return;}catch(error){if(error?.name==='AbortError')return;}}
-            await copyBountyShareText();
-        }
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
@@ -8204,9 +8161,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const main = row.isMain ? ' <span aria-label="Main character">★</span>' : '';
                 const missedHtml = row.missedTasks.length ? `<div class="weekly-report-missed">Left unfinished</div><div class="weekly-report-task-list">${row.missedTasks.map(task => `<span>${escapeHTML(task)}</span>`).join('')}</div>` : `<div class="weekly-report-missed">No eligible weekly tasks were left unfinished.</div>`;
                 const recHtml = row.recs.length ? `<div class="weekly-report-missed">Recommended priorities next week</div><ul class="weekly-report-recs">${row.recs.map(item => `<li><strong>${escapeHTML(item.t)}</strong><p>${escapeHTML(getRecommendationPlainReason(item))}</p></li>`).join('')}</ul>` : '';
-                return `<article class="weekly-report-character"><div class="weekly-report-character-head"><strong>${escapeHTML(row.name)}${main}</strong><span class="weekly-report-rate">${row.eligible ? `${row.rate}%` : '—'}</span></div><div class="weekly-report-meta">${row.done}/${row.eligible} eligible tasks completed · ${row.missed} unfinished · ${row.excluded} N/A ignored</div>${missedHtml}${recHtml}</article>`;
+                const bar = row.eligible ? `<div class="weekly-report-character-chart" role="img" aria-label="${row.done} completed and ${row.missed} unfinished"><div class="weekly-report-bar"><span class="weekly-report-bar-done" style="width:${row.rate}%"></span><span class="weekly-report-bar-missed" style="width:${100-row.rate}%"></span></div></div>` : '';
+                return `<article class="weekly-report-character"><div class="weekly-report-character-head"><strong>${escapeHTML(row.name)}${main}</strong><span class="weekly-report-rate">${row.eligible ? `${row.rate}%` : '—'}</span></div>${bar}<div class="weekly-report-meta">${row.done} done · ${row.missed} unfinished · ${row.excluded} N/A</div>${missedHtml}${recHtml}</article>`;
             }).join('');
-            card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} character${rows.length === 1 ? '' : 's'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible ? `${average}%` : '—'}</strong>combined completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>unfinished</span><span class="weekly-report-kpi"><strong>${rows.reduce((sum,row)=>sum+row.excluded,0)}</strong>N/A ignored</span></div><div class="weekly-report-characters">${rowsHtml}</div><p class="weekly-report-foot">Unfinished means the task was not marked complete before reset; it does not prove the character is unable to clear it. Recommendations use the shared task priority, activity details, and the saved history available for that character.</p>`;
+            const chartRows = rows.slice().sort((a,b)=>b.rate-a.rate || a.name.localeCompare(b.name)).map(row=>`<div class="weekly-report-chart-row"><span class="weekly-report-chart-name" title="${escapeHTML(row.name)}">${escapeHTML(row.name)}</span><div class="weekly-report-bar" role="img" aria-label="${row.done} completed, ${row.missed} unfinished"><span class="weekly-report-bar-done" style="width:${row.eligible?row.rate:0}%"></span><span class="weekly-report-bar-missed" style="width:${row.eligible?100-row.rate:0}%"></span></div><strong class="weekly-report-chart-value">${row.eligible?row.rate+'%':'—'}</strong></div>`).join('');
+            card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} character${rows.length === 1 ? '' : 's'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible ? `${average}%` : '—'}</strong>combined completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>unfinished</span><span class="weekly-report-kpi"><strong>${rows.reduce((sum,row)=>sum+row.excluded,0)}</strong>N/A ignored</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div><div class="weekly-report-characters">${rowsHtml}</div><p class="weekly-report-foot">Unfinished means the task was not marked complete before reset; it does not prove the character is unable to clear it. N/A tasks are excluded from completion rates.</p>`;
             container.appendChild(card);
         }
 
@@ -10081,7 +10040,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r35';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r36';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10747,5 +10706,57 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   </div>
 </div>
 
+
+<script id="pantheon-release-auto-refresh">
+(() => {
+  const CURRENT_BUILD = '1.6.8-r36';
+  let newestBuild = '';
+  let checkBusy = false;
+  let reloadQueued = false;
+  function hasUnsentEdits() {
+    try {
+      return !!((typeof syncInProgress !== 'undefined' && syncInProgress) || window.__pantheonVersionWriteBusy || (typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) || (typeof pendingCellWrites !== 'undefined' && Object.keys(pendingCellWrites).length));
+    } catch (_) { return true; }
+  }
+  function reloadToNewestBuild() {
+    const target = new URL(location.href);
+    target.searchParams.set('pt_release', newestBuild || CURRENT_BUILD);
+    location.replace(target.toString());
+  }
+  function showUpdateNotice(message) {
+    let node = document.getElementById('pantheon-release-update-notice');
+    if (!node) {
+      node = document.createElement('div'); node.id='pantheon-release-update-notice';
+      node.style.cssText='position:fixed;z-index:99999;left:50%;bottom:18px;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));padding:12px 14px;border:1px solid #6f8fbf;border-radius:10px;background:#182437;color:#f3f6fc;box-shadow:0 8px 28px #0005;font:600 13px/1.45 system-ui;';
+      document.body.appendChild(node);
+    }
+    node.textContent=message;
+  }
+  async function checkRelease() {
+    if (checkBusy || document.visibilityState !== 'visible') return;
+    checkBusy=true;
+    try {
+      const response=await fetch('/version.json?check='+Date.now(),{cache:'no-store',credentials:'same-origin'});
+      if (!response.ok) return;
+      const data=await response.json();
+      const remote=String(data.build||'');
+      if (!remote || remote===CURRENT_BUILD) return;
+      newestBuild=remote;
+      if (hasUnsentEdits()) {
+        reloadQueued=true;
+        showUpdateNotice('Pantheon update '+remote+' is ready. Your pending tracker edits are being saved; this page will refresh after they are confirmed.');
+        return;
+      }
+      showUpdateNotice('Pantheon updated to '+remote+'. Refreshing this page…');
+      setTimeout(()=>{ if(!hasUnsentEdits()) reloadToNewestBuild(); else {reloadQueued=true;showUpdateNotice('Update ready. Refresh will wait until your tracker edits are safely synced.');}},1200);
+    } catch (_) { /* Offline or not yet deployed; retry on the next interval. */ }
+    finally { checkBusy=false; }
+  }
+  setInterval(()=>{ if(reloadQueued && newestBuild && !hasUnsentEdits()){reloadToNewestBuild();return;} checkRelease(); },30000);
+  window.addEventListener('focus',checkRelease);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkRelease();});
+  setTimeout(checkRelease,2500);
+})();
+</script>
 </body>
 </html>

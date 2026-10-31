@@ -630,3 +630,8 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - No database schema migration is required.
 
 This improves freshness but remains polling-based rather than instant push. A visible Tracker should normally reflect another member's successful save within approximately 15 seconds, subject to browser throttling and network availability.
+
+
+## Release auto-refresh (r36)
+
+The static `version.json` file is deployed with the app. Open pages check it every 30 seconds and when the tab regains focus. If a newer build is detected, the page reloads only when there are no unsaved cloud changes, active sync, or queued tracker cell edits. If edits are pending, the page waits and checks again rather than risking their loss. Keep `version.json` in the deployed root alongside `index.html`.
