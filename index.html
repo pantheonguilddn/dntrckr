@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r44</title>
+    <title>Pantheon Tools v1.6.8-r40</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1653,38 +1653,7 @@
         .overview-profile-actions button:hover, .overview-profile-actions a:hover { border-color:var(--pt-accent); background:var(--pt-hover); }
         @media(max-width:760px) { .overview-profile-chip { align-items:center; } .overview-profile-actions { margin-left:auto; } }
         @media(max-width:520px) { .overview-profile-chip { gap:8px; } .overview-profile-actions { flex-basis:100%; justify-content:flex-end; } }
-    
-        /* r44: compact Admin View switch. This replaces the wide text button. */
-        .admin-mode-switch {
-            appearance:none !important; -webkit-appearance:none !important;
-            display:inline-flex; align-items:center; justify-content:center; gap:5px;
-            flex:0 0 auto; min-width:0; min-height:31px; height:31px; box-sizing:border-box;
-            padding:3px 6px; border:1px solid var(--pt-border) !important; border-radius:999px;
-            background:var(--pt-surface-soft) !important; color:var(--pt-text) !important;
-            font:inherit; font-size:.64rem; font-weight:850; line-height:1;
-            white-space:nowrap; cursor:pointer;
-        }
-        .admin-mode-switch[hidden] { display:none !important; }
-        .admin-mode-switch-text { letter-spacing:.01em; }
-        .admin-mode-switch-track {
-            display:inline-flex; align-items:center; width:25px; height:14px; box-sizing:border-box;
-            padding:1px; border:1px solid var(--pt-border); border-radius:999px;
-            background:var(--pt-muted); transition:background .16s ease,border-color .16s ease;
-        }
-        .admin-mode-switch-thumb {
-            display:block; width:10px; height:10px; border-radius:50%; background:#fff;
-            box-shadow:0 1px 2px rgba(0,0,0,.25); transform:translateX(0); transition:transform .16s ease;
-        }
-        .admin-mode-switch[aria-checked="true"] .admin-mode-switch-track {
-            background:var(--pt-accent); border-color:var(--pt-accent);
-        }
-        .admin-mode-switch[aria-checked="true"] .admin-mode-switch-thumb { transform:translateX(10px); }
-        .admin-mode-switch:focus-visible { outline:2px solid var(--pt-accent); outline-offset:2px; }
-        .admin-mode-switch:hover { border-color:var(--pt-accent) !important; }
-        .topbar-player { gap:6px !important; }
-        @media(max-width:900px) { .topbar-player { gap:6px !important; } }
-
-</style>
+    </style>
     <script>
     try { document.documentElement.setAttribute('data-pantheon-theme', localStorage.getItem('pantheon-theme-choice-v1') || 'dark'); }
     catch (_) { document.documentElement.setAttribute('data-pantheon-theme', 'dark'); }
@@ -2889,7 +2858,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <option value="">👤 Your roster (auto)</option>
                 </select>
                 <button id="mode-toggle-btn" class="btn btn-view-toggle personal-active" type="button" onclick="togglePersonalView()">👤 Personal View</button>
-                <button id="admin-view-toggle-btn" class="admin-mode-switch" type="button" onclick="toggleAdminView()" role="switch" aria-label="Admin View" aria-checked="false" aria-pressed="false" title="Enable administrator tools and guild-wide editing" hidden><span class="admin-mode-switch-text">Admin</span><span class="admin-mode-switch-track" aria-hidden="true"><span class="admin-mode-switch-thumb"></span></span></button>
+                <button id="admin-view-toggle-btn" class="btn admin-view-toggle-btn" type="button" onclick="toggleAdminView()" aria-pressed="false" hidden>⚙ Admin View</button>
                 <select id="roster-filter" class="btn roster-filter-top" onchange="applyRosterFilter()">
                     <option value="all">👁️ All Rosters</option>
                 </select>
@@ -4484,11 +4453,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const toggle = document.getElementById('admin-view-toggle-btn');
             if (toggle) {
                 toggle.hidden = !admin;
+                toggle.textContent = active ? `↩ Return to ${personalName}` : '⚙ Admin View';
                 toggle.setAttribute('aria-pressed', String(active));
-                toggle.setAttribute('aria-checked', String(active));
-                toggle.title = active
-                    ? `Admin View is on. Switch off to return to ${personalName}’s Personal View.`
-                    : 'Admin View is off. Switch on to enable administrator tools and guild-wide editing.';
+                toggle.title = active ? `Leave Admin View and return to ${personalName}’s Personal Tracker` : 'Enable administrator tools and guild-wide editing';
             }
             const menuToggle = document.getElementById('menu-toggle');
             const drawer = document.getElementById('tool-drawer');
@@ -4506,14 +4473,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             document.body.classList.toggle('pantheon-admin-mode-active', active);
             const identity = document.getElementById('user-identity');
             const personalToggle = document.getElementById('mode-toggle-btn');
-            // Admin permission and view mode are independent. With Admin View off,
-            // this account may still select Universal View; only owned characters edit.
-            if (identity) identity.disabled = admin && !active ? true : false;
-            if (personalToggle) {
-                personalToggle.textContent = isPersonalView ? '👤 Personal View' : '🌍 Universal View';
-                personalToggle.classList.toggle('personal-active', !!isPersonalView);
-                personalToggle.disabled = isAdminViewAsActive();
-            }
+            if (identity && admin && !active) identity.disabled = true;
+            else if (identity && active) identity.disabled = false;
+            if (personalToggle && admin && !active) {
+                personalToggle.textContent = `👤 ${personalName} · Personal View`;
+                personalToggle.classList.add('personal-active');
+                personalToggle.disabled = true;
+            } else if (personalToggle && active) personalToggle.disabled = false;
             if (!active) document.body.classList.remove('drawer-open');
         }
         async function toggleAdminView() {
@@ -4549,7 +4515,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 clearAdminPreviewReadOnly();
                 applyDiscordIdentityDefaults();
                 const mode = document.getElementById('mode-toggle-btn');
-                if (mode) { mode.textContent = '👤 Personal View'; mode.classList.add('personal-active'); }
+                if (mode) { mode.textContent = `👤 ${getCurrentOwnerName() || 'Personal'} · Personal View`; mode.classList.add('personal-active'); }
                 setStatus(`🟢 Returned to ${getCurrentOwnerName() || 'your'} · Personal View. Other members’ trackers are read-only.`);
             } else {
                 adminModeEnabled = true;
@@ -5035,7 +5001,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 discordIdentityMatchStatus = 'unmatched';
                 isPersonalView = true;
                 const modeButton = document.getElementById('mode-toggle-btn');
-                if (modeButton) { modeButton.textContent = '👤 Personal View'; modeButton.classList.add('personal-active'); }
+                if (modeButton) { modeButton.textContent = `👤 ${getCurrentOwnerName() || 'Personal'} · Personal View`; modeButton.classList.add('personal-active'); }
                 const filter = document.getElementById('roster-filter');
                 if (filter) { filter.value = '__unregistered__'; filter.disabled = true; }
                 activeRosterFilter = '__unregistered__';
@@ -5052,7 +5018,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // the Tracker in Universal View even when the correct member identity says Cho.
             isPersonalView = true;
             const modeButton = document.getElementById('mode-toggle-btn');
-            if (modeButton) { modeButton.textContent = '👤 Personal View'; modeButton.classList.add('personal-active'); }
+            if (modeButton) { modeButton.textContent = `👤 ${roster.name || 'Personal'} · Personal View`; modeButton.classList.add('personal-active'); }
             const filter = document.getElementById('roster-filter');
             if (filter) { filter.value = roster.id; filter.disabled = true; }
             activeRosterFilter = roster.id;
@@ -10933,9 +10899,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 'member-roster': document.getElementById('member-roster-page')
             };
             if (!pages[page]) page = 'tracker';
-            // Preserve the selected Personal/Universal viewing scope on navigation.
-            // Initial login still establishes the account's personal default; returning to
-            // Tracker must not silently undo a member's deliberate Universal View selection.
+            // On every Tracker entry, restore the authenticated member's own roster unless
+            // the administrator explicitly enabled Admin View.
+            if (page === 'tracker' && pantheonDiscordUser?.id && !isAdminModeActive() && !isAdminViewAsActive()) applyDiscordIdentityDefaults();
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
             if (page === 'overview') { renderOverviewActivity(); updateOverviewStatusCards(); }
             if (page === 'tracker') {

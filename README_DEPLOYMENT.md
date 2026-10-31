@@ -1,31 +1,23 @@
-# Pantheon Tools v1.6.8-r44 — compact Admin switch and read-only Universal View
+# Pantheon Tools v1.6.8-r43 — one Discord identity, personal Cho view, optional Admin View
 
-## Changes in r44
+## What changed
 
-- Replaces the wide Admin View text button with a compact, theme-aware on/off switch. The existing Admin View permission model and toggle handler are retained.
-- The Admin switch displays only the short label `Admin` and its on/off track, reducing the width added to the top toolbar.
-- Admin permission and viewing scope are independent. With Admin View off, the administrator account may switch between Personal View and Universal View.
-- Universal View is read-only for other members' characters. The authenticated account may still edit only its own registered characters. The existing per-cell owner checks and server-side member-safe writes are retained.
-- Removes the navigation behavior that forcibly reset every non-admin Tracker visit to Personal View. The initial login still defaults to the authenticated account's Personal View; the selected Personal/Universal scope is preserved while navigating between pages.
-- Returning from Admin View still defaults to the canonical personal roster (Cho), after pending edits are confirmed. The user can then switch to Universal View without enabling Admin View.
-
-## Preserved from r43
-
-- One Discord identity with a canonical personal owner and optional Admin View.
-- Duplicate Discord-ID roster link repair behavior.
-- Startup initialization order fix from r42.
-- Per-character acknowledged cell saves, retry queue, server timestamping, compare-and-swap writes, and cache-bypassing refresh behavior.
-- Existing Pages Functions, database schema, OAuth callback, session handling, and access-control routes are carried forward unchanged.
+- The bootstrap administrator is represented as one authenticated Discord account with a separate permission role and working mode. The account opens in Cho Personal View; Admin View remains an explicit toggle.
+- Added `BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME` as an optional Pages environment variable. It defaults to `Cho`, per the requested personal default. It is derived server-side and is not accepted from browser input.
+- Owner resolution now selects the configured personal owner even when the same Discord ID was accidentally attached to multiple Member Roster entries. It no longer treats the Admin role as a second roster identity.
+- On the first successful Personal View write, the server repairs the duplicate account links: it keeps the verified Discord ID on the canonical personal owner and clears only that duplicate ID from other entries. It does not delete member records, characters, classes, tracker rosters, or progress.
+- Client identity selection, server registration validation, cell-save analytics attribution, and Ledger identity checks use the same canonical owner resolver.
+- Ordinary members still resolve by their unique confirmed Discord link (or unique label/username fallback). A preferred personal owner already confirmed to a different Discord ID is rejected rather than taken over.
+- Retains r42's startup initialization fix, r41's Admin View permission toggle, per-character acknowledged saves, server timestamping, CAS writes, cache-bypassing refresh, and existing Pages routes/database schema.
 
 ## Deployment
 
 1. Deploy the complete ZIP contents to the existing Cloudflare Pages project. Do not upload only `index.html`.
-2. Preserve the existing D1 database/binding, Discord OAuth configuration, and Pages environment variables.
-3. Verify `https://dntrckr.pages.dev/version.json` reports `1.6.8-r44` after deployment.
-4. Test the administrator account in Cho Personal View, switch to Universal View with Admin off, verify other members' cells and bounty notes are read-only, and confirm Cho's own cells remain editable.
-5. Switch Admin View on and verify authorized administrator editing; switch it off again and confirm the UI returns to Cho Personal View while Universal View remains available.
-6. Test a normal member account separately to confirm it can view the guild board but can edit only its own registered characters.
+2. Preserve the existing D1 database and bindings, Discord OAuth credentials, and `BOOTSTRAP_ADMIN_DISCORD_ID` secret.
+3. No D1 schema migration is required. If desired, set `BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME=Cho`; the application defaults to Cho when this optional variable is absent.
+4. Verify `/version.json` reports `1.6.8-r43`.
+5. Test the bootstrap administrator in Cho Personal View first, including the retained `Vaelyth → Theme Park (Jelly x5)` edit. Confirm it saves and the duplicate Discord-ID link is repaired. Then enable Admin View and verify the separate administrator controls appear. Finally test an ordinary member account to confirm it remains limited to its own roster.
 
 ## Validation boundary
 
-This release is built locally from the complete r43 Cloudflare Pages package and preserves its archive paths and server functions. Local structural, JavaScript syntax, CSS parsing, archive integrity, and targeted view/permission regression checks are performed. No production deployment or live multi-account D1 test is claimed by this package.
+Local checks cover JavaScript syntax for every Pages Function and inline app script, CSS parsing, HTML ID uniqueness, package integrity and path preservation, deterministic canonical-owner selection, duplicate-link repair, and rejection when Cho is already confirmed to a different Discord ID. Live Cloudflare/D1/Discord multi-account testing is still required after deployment.
