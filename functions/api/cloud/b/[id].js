@@ -2,7 +2,6 @@ import { getRecord, jsonResponse, resolveRecordId, storeRecord } from '../../../
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../_utils/compact.js';
 import { registrationWriteViolation, repairBootstrapAdminOwnerLinks, resolveDiscordOwnerMember } from '../../../_utils/registration-guard.js';
 import { denyNonAdminRevisionJournalAccess } from '../../../_utils/admin-tool-access.js';
-import { getCharacterStorageState, hydrateCharacterProgress, isCharacterStorageMigrationBusy, syncCharacterIndexes, syncCharacterStorageSettings } from '../../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const LEDGER_OWNER_NAMES = new Set(['bio', 'cheean', 'cho']);
@@ -88,9 +87,11 @@ function hasLedgerAccess(session, record) {
   }
   return false;
 }
-function redactLedgerRecord(decoded) {
-  if (!decoded || typeof decoded !== 'object') return decoded;
-  return encodePantheonCompactRecord({ ...decoded, scholarship: {} });
+function redactLedgerRecord(packed) {
+  const decoded = decodePantheonCompactRecord(packed);
+  if (!decoded || typeof decoded !== 'object') return packed;
+  decoded.scholarship = {};
+  return encodePantheonCompactRecord(decoded);
 }
 
 export async function onRequestGet(context) {
@@ -103,12 +104,9 @@ export async function onRequestGet(context) {
   try {
     const packed = JSON.parse(row.record_json);
     const resolvedId = await resolveRecordId(env, requestedId);
-    let decoded = decodePantheonCompactRecord(packed);
-    if (resolvedId === MAIN_ID) decoded = await hydrateCharacterProgress(env, decoded);
+    const decoded = decodePantheonCompactRecord(packed);
     const session = context.data?.session;
-    const responseRecord = resolvedId === MAIN_ID
-      ? (hasLedgerAccess(session, decoded) ? encodePantheonCompactRecord(decoded) : redactLedgerRecord(decoded))
-      : packed;
+    const responseRecord = resolvedId === MAIN_ID && !hasLedgerAccess(session, decoded) ? redactLedgerRecord(packed) : packed;
     return jsonResponse({ metadata: { id: requestedId, name: row.name, private: true, updatedAt: row.updated_at }, record: responseRecord });
   } catch (_) { return jsonResponse({ message: 'Stored record is corrupt.' }, 500); }
 }
@@ -119,9 +117,6 @@ export async function onRequestPut(context) {
   const targetId = await resolveRecordId(env, requestedId);
   const denied = await denyNonAdminRevisionJournalAccess(context, requestedId);
   if (denied) return denied;
-  if (targetId === MAIN_ID && await isCharacterStorageMigrationBusy(env)) {
-    return jsonResponse({ code:'CHARACTER_STORAGE_MIGRATION_BUSY', retryable:true, message:'Player storage migration is copying a consistent Tracker snapshot. Your edit is retained; retry after the migration finishes.' }, 503);
-  }
   let incomingRecord;
   try { incomingRecord = await request.json(); } catch (_) { return jsonResponse({ message: 'Invalid JSON body.' }, 400); }
 
@@ -143,19 +138,9 @@ export async function onRequestPut(context) {
         if (!next || typeof next !== 'object') return jsonResponse({ message: 'Invalid tracker record.' }, 400);
         // A stale tab may submit an old value for tasks it never edited. Keep the newer
         // per-cell record from D1 instead of allowing a routine sync to undo it.
-        let storageState = null;
-        try { storageState = await getCharacterStorageState(env); } catch (_) {}
-        const separateCharacterStorage = Number(storageState?.migration_complete) === 1;
         const incomingCells = obj(next.cells);
-        const cellWriteIntents = separateCharacterStorage ? [] : (Array.isArray(incomingRecord?.cellWriteIntents) ? incomingRecord.cellWriteIntents.slice(0, 5000) : []);
-        if (separateCharacterStorage) {
-          // Preserve the immutable legacy snapshot in the main record. Live progress is
-          // overlaid from character_task_cells by the read endpoints after migration.
-          next.cells = obj(previous?.cells);
-          next.completionTiming = obj(previous?.completionTiming);
-        } else {
-          next.cells = mergeCellRecords(previous?.cells, incomingCells);
-        }
+        const cellWriteIntents = Array.isArray(incomingRecord?.cellWriteIntents) ? incomingRecord.cellWriteIntents.slice(0, 5000) : [];
+        next.cells = mergeCellRecords(previous?.cells, incomingCells);
         for (const rawIntent of cellWriteIntents) {
           const intent = obj(rawIntent);
           const charName = String(intent.charName || '').trim().slice(0, 40);
@@ -179,8 +164,7 @@ export async function onRequestPut(context) {
           next.settings.analyticsHistoryClearedAt = previousClearAt;
           next.settings.analyticsHistoryClearedBy = String(previous?.settings?.analyticsHistoryClearedBy || '');
         }
-        if (!separateCharacterStorage) next.completionTiming = mergeCompletionTimingRecords(previous?.completionTiming, next.completionTiming, timingClearAt);
-        else next.completionTiming = obj(previous?.completionTiming);
+        next.completionTiming = mergeCompletionTimingRecords(previous?.completionTiming, next.completionTiming, timingClearAt);
 
         const adminOverride = context.data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
         if (!adminOverride) {
@@ -228,7 +212,6 @@ export async function onRequestPut(context) {
         };
       }
 
-      repairBootstrapAdminOwnerLinks(next, context.data?.session);
       recordToStore = encodePantheonCompactRecord(next);
       responseRecord = recordToStore;
         const previousDecoded = previous;
@@ -236,19 +219,13 @@ export async function onRequestPut(context) {
           // Preserve ledger contents for every non-allowlisted account, including admins.
           next.scholarship = previousDecoded.scholarship || {};
           recordToStore = encodePantheonCompactRecord(next);
-          responseRecord = redactLedgerRecord(next);
+          responseRecord = redactLedgerRecord(recordToStore);
         }
       } catch (error) {
         return jsonResponse({ error: `Could not validate tracker update: ${String(error?.message || error).slice(0, 250)}` }, 400);
       }
     }
 
-    // Re-check immediately before committing. A legacy whole-record write may have
-    // passed the first guard just before the automatic migration acquired its lock.
-    // Reject it here rather than allowing it to race the migration snapshot.
-    if (targetId === MAIN_ID && await isCharacterStorageMigrationBusy(env)) {
-      return jsonResponse({ code:'CHARACTER_STORAGE_MIGRATION_BUSY', retryable:true, message:'Player storage migration has started. Your shared settings change is retained locally; retry when setup completes.' }, 503);
-    }
     let writeResult;
     const savedAt = Math.max(Date.now(), (Number(current.updated_at) || 0) + 1);
     try {
@@ -260,25 +237,6 @@ export async function onRequestPut(context) {
       return jsonResponse({ message: String(error?.message || error) }, 413);
     }
     if (Number(writeResult?.meta?.changes) > 0) {
-      if (targetId === MAIN_ID) {
-        const previousDecoded = decodePantheonCompactRecord(JSON.parse(current.record_json));
-        const savedDecoded = decodePantheonCompactRecord(recordToStore);
-        const ownerIndexChanged = JSON.stringify(previousDecoded?.settings?.memberDirectory || []) !== JSON.stringify(savedDecoded?.settings?.memberDirectory || [])
-          || JSON.stringify(previousDecoded?.settings?.rosters || []) !== JSON.stringify(savedDecoded?.settings?.rosters || [])
-          || JSON.stringify(previousDecoded?.settings?.categories || []) !== JSON.stringify(savedDecoded?.settings?.categories || []);
-        if (ownerIndexChanged) {
-          try { await syncCharacterIndexes(env, savedDecoded, savedAt); }
-          catch (error) { return jsonResponse({ code:'OWNER_INDEX_REFRESH_FAILED', retryable:true, message:`Tracker settings were saved, but the player ownership index needs a retry: ${String(error?.message || error).slice(0,180)}` }, 503); }
-        }
-        try { await syncCharacterStorageSettings(env, savedDecoded, savedAt); } catch (_) {}
-        try {
-          const storageState = await getCharacterStorageState(env);
-          if (Number(storageState?.migration_complete) === 1) {
-            const hydrated = await hydrateCharacterProgress(env, decodePantheonCompactRecord(recordToStore));
-            responseRecord = hasLedgerAccess(context.data?.session, hydrated) ? encodePantheonCompactRecord(hydrated) : redactLedgerRecord(hydrated);
-          }
-        } catch (_) { /* The committed settings response remains available; next live read will reconcile. */ }
-      }
       return jsonResponse({ metadata: { id: requestedId, name: current.name, private: true, updatedAt: savedAt }, record: responseRecord });
     }
     // Another writer changed the row between SELECT and UPDATE. Re-read and merge again.

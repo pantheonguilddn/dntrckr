@@ -1,6 +1,5 @@
 import { getRecord, jsonResponse, resolveRecordId } from '../../../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../../_utils/compact.js';
-import { hydrateCharacterProgress } from '../../../../_utils/character-storage.js';
 import { denyNonAdminRevisionJournalAccess } from '../../../../_utils/admin-tool-access.js';
 import { resolveDiscordOwnerMember } from '../../../../_utils/registration-guard.js';
 
@@ -21,10 +20,11 @@ function hasLedgerAccess(session, record) {
   }
   return false;
 }
-function redactLedgerRecord(decoded) {
-  if (!decoded || typeof decoded !== 'object') return decoded;
-  const safe = { ...decoded, scholarship: {} };
-  return encodePantheonCompactRecord(safe);
+function redactLedgerRecord(packed) {
+  const decoded = decodePantheonCompactRecord(packed);
+  if (!decoded || typeof decoded !== 'object') return packed;
+  decoded.scholarship = {};
+  return encodePantheonCompactRecord(decoded);
 }
 
 export async function onRequestGet(context) {
@@ -37,12 +37,9 @@ export async function onRequestGet(context) {
   try {
     const packed = JSON.parse(row.record_json);
     const resolvedId = await resolveRecordId(env, requestedId);
-    let decoded = decodePantheonCompactRecord(packed);
-    if (resolvedId === MAIN_ID) decoded = await hydrateCharacterProgress(env, decoded);
+    const decoded = decodePantheonCompactRecord(packed);
     const session = context.data?.session;
-    const responseRecord = resolvedId === MAIN_ID
-      ? (hasLedgerAccess(session, decoded) ? encodePantheonCompactRecord(decoded) : redactLedgerRecord(decoded))
-      : packed;
+    const responseRecord = resolvedId === MAIN_ID && !hasLedgerAccess(session, decoded) ? redactLedgerRecord(packed) : packed;
     return jsonResponse({ metadata: { id: requestedId, name: row.name, private: true, updatedAt: row.updated_at }, record: responseRecord });
   } catch (_) { return jsonResponse({ message: 'Stored record is corrupt.' }, 500); }
 }
