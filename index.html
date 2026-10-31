@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r30</title>
+    <title>Pantheon Tools v1.6.8-r31</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2683,6 +2683,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .deadline-strategy-banner[data-phase="final-push"] .deadline-strategy-top strong,.deadline-strategy-banner[data-phase="last-call"] .deadline-strategy-top strong,.deadline-strategy-banner[data-phase="reset-imminent"] .deadline-strategy-top strong{color:var(--pt-text)}
 @media(max-width:640px){.deadline-strategy-banner{padding:10px}.deadline-strategy-banner p{font-size:.68rem}}
 </style>
+
+<style id="pantheon-r31-live-tracker-sync">
+.tracker-live-sync-note{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:4px 8px;border:1px solid var(--pt-border);border-radius:999px;background:var(--pt-surface-raised);color:var(--pt-muted);font-size:.62rem;font-weight:750;line-height:1.3;white-space:nowrap}
+.tracker-live-sync-note:before{content:"";width:6px;height:6px;border-radius:50%;background:#6caa7a;flex:0 0 6px}
+.tracker-live-sync-note[data-state="checking"]:before{background:#c28b35}
+.tracker-live-sync-note[data-state="updated"]:before{background:#4c9c68}
+.tracker-live-sync-note[data-state="error"]:before{background:#c65343}
+.tracker-live-sync-note[data-state="pending"]:before{background:#c28b35}
+@media(max-width:640px){.tracker-live-sync-note{margin-left:0;white-space:normal}}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2853,6 +2864,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
         <button id="track-bounty-boards-btn" class="btn btn-secondary bounty-boards-toggle" type="button" aria-pressed="false" onclick="toggleBountyBoards()">Track Bounty Boards</button>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
+        <span id="tracker-live-sync-note" class="tracker-live-sync-note" role="status" aria-live="polite" data-state="checking">Checking shared progress…</span>
         <button id="tracker-add-characters-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()" hidden>＋ Add More Characters</button>
     </div>
     <section id="tracker-empty-state" class="tracker-empty-state hidden" aria-live="polite" hidden>
@@ -3123,9 +3135,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r30</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r31</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r30 update:</strong> Opening Tracker now checks the latest shared D1 progress instead of relying only on the background refresh, so newly saved character checkmarks appear sooner when viewing the guild tracker.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r31 update:</strong> Tracker now checks for guild updates about every 15 seconds while open, refreshes immediately when you return to the tab, and shows when shared progress was last checked.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3796,6 +3808,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let remoteRefreshBusy = false;
         let unsavedCloudChanges = false;
         let lastSeenRemoteMarker = '';
+        let lastRemoteRefreshAttemptAt = 0;
         let activeRosterFilter = 'all'; 
         let isAnalyticsVisible = true;
         let isPersonalView = true;
@@ -5351,7 +5364,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
-                            lastSeenRemoteMarker=remoteSyncMarker(latest);unsavedCloudChanges=false;
+                            lastSeenRemoteMarker=remoteSyncMarker(latest);lastRemoteRefreshAttemptAt=Date.now();unsavedCloudChanges=false;
                             let cellWriteConflicts = 0;
                             Object.entries(pendingWritesSent).forEach(([key, patch]) => {
                                 const latestCell = normalizeCellRecord(latest.cells?.[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
@@ -5394,24 +5407,57 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return `${Number(data.updatedAt)||0}:${String(sync.operationId||'')}:${String(sync.by||'')}`;
         }
 
+        function isTrackerPageCurrentlyVisible(){
+            const page=document.getElementById('tracker-page');
+            return !!page && !page.classList.contains('hidden-page');
+        }
+
+        function setTrackerLiveSyncNote(state, message){
+            const note=document.getElementById('tracker-live-sync-note');
+            if(!note)return;
+            note.dataset.state=state;
+            note.textContent=message;
+        }
+
+        function trackerSyncTimeLabel(timestamp=Date.now()){
+            try{return new Date(timestamp).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}catch(_){return 'just now';}
+        }
+
         async function refreshSharedDataIfChanged(){
-            if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return;
+            const hasQueuedCellEdits=Object.keys(safeObject(pendingCellWrites)).length>0;
+            if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || hasQueuedCellEdits){
+                if(isTrackerPageCurrentlyVisible() && (unsavedCloudChanges || hasQueuedCellEdits || syncInProgress)) setTrackerLiveSyncNote('pending','Your changes are still saving…');
+                return false;
+            }
+            if(!hasCloudConfig()){
+                if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('error','Local mode · cloud sync unavailable');
+                return false;
+            }
             remoteRefreshBusy = true;
+            lastRemoteRefreshAttemptAt = Date.now();
+            if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking guild updates…');
             try{
                 const remote = await fetchRemoteRecord(getCloudConfig());
-                if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return;
+                if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || Object.keys(safeObject(pendingCellWrites)).length) return false;
                 const marker = remoteSyncMarker(remote);
-                if(!marker || marker === lastSeenRemoteMarker) return;
-                cloudData = normalizeData(remote);
-                delete cloudData.syncInfo;
-                lastSeenRemoteMarker = marker;
-                setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
-                persistLocalData();
-                refreshTrackerUI();
-                updateOverviewEventNotice();
-                setStatus('🟢 Shared data refreshed from cloud');
-            }catch(_){
-                // Keep the current local view during transient connection failures.
+                if(!marker)throw new Error('The shared record did not include an update marker.');
+                const changed = marker !== lastSeenRemoteMarker;
+                if(changed){
+                    cloudData = normalizeData(remote);
+                    delete cloudData.syncInfo;
+                    lastSeenRemoteMarker = marker;
+                    setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                    persistLocalData();
+                    refreshTrackerUI();
+                    updateOverviewEventNotice();
+                }
+                if(isTrackerPageCurrentlyVisible()){
+                    setTrackerLiveSyncNote(changed?'updated':'current',changed?'Guild progress updated · '+trackerSyncTimeLabel():'Up to date · checked '+trackerSyncTimeLabel());
+                }
+                return true;
+            }catch(error){
+                if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('error','Could not check · retrying');
+                return false;
             }finally{
                 remoteRefreshBusy = false;
             }
@@ -5419,9 +5465,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function startRemoteRefresh(){
             if(remoteRefreshTimer) clearInterval(remoteRefreshTimer);
-            remoteRefreshTimer = setInterval(refreshSharedDataIfChanged, 120000);
-            window.addEventListener('focus', refreshSharedDataIfChanged);
-            document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged(); });
+            // Read more frequently while someone is actively looking at the Tracker,
+            // but keep the idle Overview cadence lighter to avoid unnecessary D1 reads.
+            // The 5-second scheduler lets us switch cadence immediately after navigation.
+            remoteRefreshTimer = setInterval(()=>{
+                if(document.visibilityState !== 'visible')return;
+                const cadence=isTrackerPageCurrentlyVisible()?15000:60000;
+                if(Date.now()-lastRemoteRefreshAttemptAt>=cadence)refreshSharedDataIfChanged();
+            },5000);
+            window.addEventListener('focus', () => refreshSharedDataIfChanged({force:true}));
+            document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged({force:true}); });
         }
 
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
@@ -9581,7 +9634,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r30';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r31';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10043,7 +10096,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 // The helper skips when a local save/sync is in flight and redraws the
                 // Tracker only when the remote revision has actually changed.
                 if (typeof refreshSharedDataIfChanged === 'function') {
-                    refreshSharedDataIfChanged().catch(() => {});
+                    setTrackerLiveSyncNote('checking','Checking guild updates…');
+                    refreshSharedDataIfChanged({force:true}).catch(() => {});
                 }
             }
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }

@@ -1,11 +1,32 @@
-# Pantheon Tools v1.6.8-r30 — Refresh shared progress when opening Tracker
+# Pantheon Tools v1.6.8-r31 — Keep open Tracker views current
+
+- Shared progress now refreshes about every **15 seconds while Tracker is visible**, replacing the previous two-minute background polling interval. Other pages use a lighter 60-second cadence.
+- Opening Tracker, returning to the browser tab, or restoring the tab from the background triggers an immediate no-store read of the shared D1 record.
+- Added a compact live-sync indicator to the Tracker toolbar. It reports when the app is checking, when guild progress has updated, the time of the last successful check, and when a check fails.
+- Remote refresh is deferred while a local save, pending cell write, sync, or version-history write is in progress. This protects edits from being replaced by a remote snapshot while they are still being committed.
+- The existing D1 API response already sends `Cache-Control: no-store`; the browser fetch also uses `cache: 'no-store'`. Both protections remain in place.
+- Built directly from the corrected v1.6.8-r30 package. No database schema migration or API route change is required.
+
+A visible Tracker should normally reflect another member's completed cloud save within approximately 15 seconds. This is frequent polling, not instant push; browser throttling, an offline tab, a pending local edit, or a network failure can delay the display.
+
+## Validation
+
+- JavaScript syntax, CSS parsing, static HTML ID uniqueness, and ZIP integrity passed.
+- Static behavior checks confirm 15-second polling on Tracker, 60-second polling elsewhere, and immediate refresh on tab focus/visibility and Tracker entry.
+- Refresh guards preserve pending local cell edits and in-flight cloud writes.
+- Live multi-user Cloudflare Pages/D1/Discord verification remains outstanding.
+
+---
+
+## v1.6.8-r30 — Refresh shared progress when opening Tracker
 
 - Fixed stale admin/member Tracker views when navigating between Overview and Tracker. Entering Tracker now requests the latest shared D1 revision immediately instead of waiting for the two-minute background poll or a browser-focus event.
 - If the shared record has changed, the existing `refreshSharedDataIfChanged()` path replaces the stale local view with the latest merged record and redraws the Tracker. If there is a local save, sync, or pending write in progress, the refresh helper safely defers rather than overwriting it.
 - This addresses the case where one member's weekly completion was already saved to D1 but another member/admin continued seeing an older cached Tracker view after an in-app page switch.
 - Existing local pending-cell queue, CAS write retries, per-cell timestamp merge, ownership restrictions, and startup hydration wait are retained. No data schema or API changes.
 - A browser tab that was already open during a Pages deployment continues running its previously loaded JavaScript until reloaded. The shared-data format remains compatible; members should reload once after a deployment to pick up new client behavior. A stale tab alone should not make a successful server save disappear.
-- Built directly from the corrected v1.6.8-r29 package. Live Cloudflare Pages/D1/Discord end-to-end verification remains outstanding.
+- Built directly from the corrected v1.6.8-r29 package.
+
 
 ## Validation
 
@@ -523,3 +544,16 @@ This release refreshes the presentation of the existing Tracker, Team Builder, C
 - Added up to 30 administrator-managed custom events under Rate-Up Event Settings. Each event has a name, optional note, enabled status, recurring weekend or one-time Manila-time schedule, and start/end. Active events appear in the shared active-event strip (capped to two custom events plus a count to keep the banner readable); active/upcoming events can appear in Overview planning notes. Enabled custom events require a name before saving. Existing Item Drop, Enhancement, and EXP Boost settings remain unchanged.
 - No D1 schema migration required; the new properties use the existing shared tracker record and Rate-Up settings timestamp.
 - Validation notes: JavaScript syntax, CSS parsing, package integrity, event normalizer, timing merge, weekday schedule behavior, and UI event form tests were run locally. Live Cloudflare Pages/D1/Discord integration still needs production verification.
+
+
+## v1.6.8-r31 — Live Tracker refresh
+
+- Tracker now polls the shared D1 record about every 15 seconds while the Tracker page is visible.
+- Other app pages use a lighter 60-second refresh cadence.
+- Returning to the browser tab or opening Tracker triggers an immediate shared-data check.
+- Added a Tracker toolbar status showing whether shared progress is being checked, is up to date, has updated, or could not be reached.
+- Remote refresh is deferred while local checkbox writes, pending cell edits, or other local cloud changes are being saved, preventing a remote read from replacing in-progress local work.
+- The existing D1 `Cache-Control: no-store` response and browser `cache: no-store` request behavior are retained.
+- No database schema migration is required.
+
+This improves freshness but remains polling-based rather than instant push. A visible Tracker should normally reflect another member's successful save within approximately 15 seconds, subject to browser throttling and network availability.
