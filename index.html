@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r36</title>
+    <title>Pantheon Tools v1.6.8-r37</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2751,6 +2751,69 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:700px){.weekly-report-characters{grid-template-columns:1fr}.weekly-report-card{padding:12px}}
 </style>
 
+
+<style id="pantheon-r37-report-and-bounty-layout">
+.modal-card.weekly-report-modal{width:min(1040px,calc(100vw - 30px));max-height:92vh;overflow:auto}
+.weekly-report-modal-head,.bounty-share-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:12px}
+.weekly-report-modal-head>div,.bounty-share-modal-head>div{min-width:0;flex:1}
+.weekly-report-modal-head h3,.bounty-share-modal-head h3{margin:3px 0 6px}
+.bounty-share-kicker{font-size:.62rem;font-weight:950;letter-spacing:.14em;color:var(--pt-accent)}
+.weekly-report-modal .weekly-report-card{box-shadow:none;border:0;padding:0;background:transparent}
+.weekly-report-modal .weekly-report-head{padding-bottom:8px;margin-bottom:10px}
+.weekly-report-modal .weekly-report-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:10px 0 16px}
+.weekly-report-modal .weekly-report-kpi{padding:11px 12px;font-size:.7rem}
+.weekly-report-modal .weekly-report-kpi strong{display:block;font-size:1.25rem;margin:0 0 3px}
+.weekly-report-modal .weekly-report-chart{gap:10px;margin:8px 0 15px}
+.weekly-report-modal .weekly-report-chart-row{grid-template-columns:minmax(115px,190px) minmax(120px,1fr) 48px;gap:12px}
+.weekly-report-modal .weekly-report-bar{height:14px}
+.weekly-report-modal .weekly-report-chart-name{font-size:.75rem}
+.weekly-report-modal .weekly-report-chart-value{font-size:.78rem}
+.weekly-report-focus{margin:14px 0 4px;padding:13px 14px;border:1px solid var(--pt-border);border-radius:11px;background:var(--pt-surface-soft);color:var(--pt-text)}
+.weekly-report-focus h4{margin:0 0 9px;font-size:.78rem}
+.weekly-report-focus-list{display:flex;flex-wrap:wrap;gap:8px}
+.weekly-report-focus-item{display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--pt-border);border-radius:8px;background:var(--pt-surface);font-size:.72rem}
+.weekly-report-focus-item strong{color:var(--pt-accent)}
+.weekly-report-empty{padding:14px;border:1px dashed var(--pt-border);border-radius:10px;color:var(--pt-muted);font-size:.8rem;line-height:1.55}
+.weekly-report-modal .weekly-report-foot{margin-top:12px;font-size:.68rem}
+.modal-card.bounty-share-modal{width:min(1540px,calc(100vw - 28px));max-height:94vh;overflow:auto;padding:clamp(16px,2vw,28px)}
+.bounty-share-modal-head{align-items:flex-start;margin-bottom:6px}
+.bounty-share-modal-head .modal-note{max-width:860px;margin:0}
+.bounty-share-toolbar{margin:12px 0 14px;padding:9px 12px;border:1px solid var(--pt-border);border-radius:9px;background:var(--pt-surface-soft)}
+.bounty-share-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(390px,.95fr);gap:18px;align-items:start}
+.bounty-share-list{max-height:68vh;overflow:auto;padding:1px 4px 2px 1px}
+.bounty-share-character{margin-bottom:11px}
+.bounty-share-row{grid-template-columns:minmax(150px,1.15fr) minmax(115px,.85fr) minmax(130px,1fr) minmax(145px,1fr) minmax(105px,.7fr);gap:8px;padding:10px}
+.bounty-share-preview-wrap{position:sticky;top:0;min-width:0;margin-top:0;border:1px solid var(--pt-border);border-radius:13px;overflow:hidden;background:var(--pt-surface-soft)}
+.bounty-share-preview-head{align-items:center;padding:12px 14px;font-size:.8rem}
+.bounty-share-preview{max-height:68vh;overflow:auto;padding:14px;background:var(--pt-surface-soft)}
+.bounty-share-receipt{width:100%;box-sizing:border-box;padding:22px;border:1px solid var(--pt-border);border-radius:12px;background:var(--pt-surface);color:var(--pt-text);font-family:Arial,Helvetica,sans-serif}
+.bounty-share-receipt-brand{padding:0 0 13px;border-bottom:2px solid var(--pt-accent);margin-bottom:13px}
+.bounty-share-receipt-brand small{display:block;color:var(--pt-muted);font-size:10px;font-weight:900;letter-spacing:2px}
+.bounty-share-receipt-brand h4{margin:5px 0 3px;font-size:21px;font-weight:950;letter-spacing:.04em;color:var(--pt-text)}
+.bounty-share-receipt-brand p{margin:0;color:var(--pt-muted);font-size:11px}
+.bounty-share-preview-character{margin-top:12px;border:1px solid var(--pt-border);border-radius:9px;overflow:hidden;background:var(--pt-surface)}
+.bounty-share-preview-character-head{padding:10px 12px;background:var(--pt-surface-soft)}
+.bounty-share-preview-character-head strong{font-size:13px}
+.bounty-share-preview-character-head span{font-size:10px;font-weight:900;letter-spacing:.04em}
+.bounty-share-preview-item{grid-template-columns:minmax(105px,1fr) minmax(130px,1.3fr) 44px;padding:10px 12px;font-size:11px}
+.bounty-share-preview-dungeon strong{font-size:12px}
+.bounty-share-preview-condition>span:last-child{font-size:10px}
+.bounty-share-preview-multiplier{font-size:14px}
+.bounty-share-receipt-footer{margin-top:13px;padding-top:10px;border-top:1px solid var(--pt-border);color:var(--pt-muted);font-size:10px;line-height:1.5}
+/* html2canvas-safe receipt rows: flex layout mirrors the Salary Calculator receipt renderer. */
+.bounty-share-receipt .bounty-share-preview-item{display:flex;align-items:center;gap:14px;padding:11px 12px}
+.bounty-share-receipt .bounty-share-preview-dungeon{flex:1 1 34%;min-width:0}
+.bounty-share-receipt .bounty-share-preview-condition{flex:1 1 54%;min-width:0}
+.bounty-share-receipt .bounty-share-preview-multiplier{flex:0 0 42px;text-align:right}
+.bounty-share-receipt .bounty-share-preview-character-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+.bounty-share-preview-hint{padding:0 14px 12px;color:var(--pt-muted);font-size:.68rem}
+.bounty-share-actions{justify-content:flex-end;margin-top:14px}
+@media(max-width:1180px){.bounty-share-layout{grid-template-columns:1fr}.bounty-share-preview-wrap{position:static}.bounty-share-list{max-height:50vh}.bounty-share-preview{max-height:50vh}}
+@media(max-width:980px){.bounty-share-row{grid-template-columns:repeat(2,minmax(0,1fr))}.bounty-share-dungeon{grid-column:1/-1}}
+@media(max-width:700px){.weekly-report-modal .weekly-report-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.weekly-report-modal .weekly-report-chart-row{grid-template-columns:90px minmax(70px,1fr) 40px;gap:7px}.bounty-share-preview{padding:8px}.bounty-share-receipt{padding:14px}.bounty-share-preview-item{grid-template-columns:minmax(80px,1fr) minmax(100px,1.3fr) 32px;gap:6px}.bounty-share-row{grid-template-columns:1fr 1fr;gap:8px}}
+@media(max-width:480px){.weekly-report-modal{padding:15px}.bounty-share-modal{padding:13px}.bounty-share-row{grid-template-columns:1fr}.bounty-share-dungeon{grid-column:auto}}
+</style>
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2921,6 +2984,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
         <button id="track-bounty-boards-btn" class="btn btn-secondary bounty-boards-toggle" type="button" aria-pressed="false" onclick="toggleBountyBoards()">Track Bounty Boards</button>
         <button id="share-bounties-btn" class="btn btn-secondary" type="button" onclick="openBountyShareModal()">↗ Share Bounties</button>
+        <button id="weekly-report-btn" class="btn btn-secondary" type="button" onclick="openWeeklyReportModal()">📊 Weekly Report</button>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
         <span id="tracker-live-sync-note" class="tracker-live-sync-note" role="status" aria-live="polite" data-state="checking">Checking shared progress…</span>
         <button id="tracker-add-characters-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()" hidden>＋ Add More Characters</button>
@@ -3193,9 +3257,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r36</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r37</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r36 update:</strong> Bounty sharing is now a single copy-and-paste action with independent six-claim limits per character. Weekly reports now include visual completion charts. Automatic release checks help active pages move to the newest build without discarding unsaved tracker edits. Tracker cell-save and ownership protections are retained.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r37 update:</strong> Bounty Share now has a wide editor and a receipt-style screenshot that can be copied as an image for Discord. The Weekly Report has moved out of the Tracker and opens once after weekly reset, with a toolbar button to reopen it. Active pages now check for releases and update automatically after pending tracker edits are safely saved.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3569,16 +3633,31 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <!-- Bounty Share Builder -->
     <div class="modal-overlay hidden" id="bounty-share-modal" role="dialog" aria-modal="true" aria-labelledby="bounty-share-title">
         <div class="modal-card wide-modal bounty-share-modal">
-            <h3 id="bounty-share-title">↗ Bounty Share Builder</h3>
-            <p class="modal-note">Bounties are grouped by character and dungeon. Set the highest-tier requirement once, then use + to increase how many weekly claims that dungeon takes. Each character has a maximum of 6 claims per week; repeated Tracker slots are consolidated into one line.</p>
-            <div class="bounty-share-toolbar"><span id="bounty-share-count" class="bounty-share-count">0 characters listed</span><span class="bounty-share-scope">Each character has an independent limit of 6 claims.</span></div>
-            <div id="bounty-share-list" class="bounty-share-list"><div class="bounty-share-empty">Loading listed bounties…</div></div>
-            <div class="bounty-share-preview-wrap"><div class="bounty-share-preview-head"><strong>Copy preview</strong><span>Formatted roster ready to paste</span></div><div id="bounty-share-preview" class="bounty-share-preview"><div class="bounty-share-empty">Add bounty targets to the Tracker to populate this preview.</div></div></div>
+            <div class="bounty-share-modal-head">
+                <div><div class="bounty-share-kicker">PANTHEON · GUILD OPERATIONS</div><h3 id="bounty-share-title">↗ Bounty Share Builder</h3><p class="modal-note">One row per character and dungeon. Consolidated entries use the highest requirement. Adjust × claims with + or −; every character has their own six-claim limit.</p></div>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('bounty-share-modal')">Close</button>
+            </div>
+            <div class="bounty-share-toolbar"><span id="bounty-share-count" class="bounty-share-count">0 characters listed</span><span class="bounty-share-scope">Separate 6-claim limit for each character</span></div>
+            <div class="bounty-share-layout">
+                <div id="bounty-share-list" class="bounty-share-list"><div class="bounty-share-empty">Loading listed bounties…</div></div>
+                <section class="bounty-share-preview-wrap" aria-label="Bounty screenshot preview">
+                    <div class="bounty-share-preview-head"><strong>Share Card Preview</strong><span>The image below is what gets copied</span></div>
+                    <div class="bounty-share-preview"><div id="bounty-share-preview"><div class="bounty-share-empty">Add bounty targets to the Tracker to populate this preview.</div></div></div>
+                    <div class="bounty-share-preview-hint">The screenshot is copied as an image. Paste it directly into Discord.</div>
+                </section>
+            </div>
             <div class="modal-actions bounty-share-actions">
-                <button class="btn btn-cloud" type="button" onclick="copyBountyShareText()">📋 Copy Bounty List</button>
+                <button class="btn btn-cloud" type="button" onclick="shareBountyListAsImage()">📸 Share Bounty List as Image</button>
                 <button class="btn btn-secondary" type="button" onclick="closeModal('bounty-share-modal')">Close</button>
             </div>
             <div id="bounty-share-status" class="version-status" role="status" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="weekly-report-modal" role="dialog" aria-modal="true" aria-labelledby="weekly-report-title">
+        <div class="modal-card wide-modal weekly-report-modal">
+            <div class="weekly-report-modal-head"><div><div class="bounty-share-kicker">PANTHEON · WEEKLY REVIEW</div><h3 id="weekly-report-title">📊 Previous Week Report</h3><p class="modal-note">A quick view of last week’s completion. Unfinished means it was not checked off before reset; it does not automatically mean the character cannot clear it.</p></div><button class="btn btn-secondary" type="button" onclick="closeModal('weekly-report-modal')">Close</button></div>
+            <div id="weekly-report-content"><div class="weekly-report-empty">Loading previous week’s results…</div></div>
         </div>
     </div>
 
@@ -5753,7 +5832,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const rows=bountyShareItems.filter(item=>item.charName===charName).map(item=>`<div class="bounty-share-preview-item"><div class="bounty-share-preview-dungeon"><strong>${escapeHTML(item.dungeon)}</strong>${item.sourceSlots.length>1?`<small>${item.sourceSlots.length} Tracker slots listed</small>`:''}</div><div class="bounty-share-preview-condition"><span class="bounty-share-tier ${item.tier==='legendary'?'is-legendary':item.tier==='unique'?'is-unique':''}">${escapeHTML(bountyShareTierLabel(item))}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div><strong class="bounty-share-preview-multiplier">×${item.count}</strong></div>`).join('');
                 return `<section class="bounty-share-preview-character"><div class="bounty-share-preview-character-head"><strong>${escapeHTML(charName)}</strong><span>${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} weekly claims</span></div>${rows}</section>`;
             }).join('');
-            preview.innerHTML=`<h4 class="bounty-share-preview-title">PANTHEON · GUILD BOUNTIES</h4><p class="bounty-share-preview-subtitle">${bountyShareItems.length} dungeon entr${bountyShareItems.length===1?'y':'ies'} · each character tracked against their own 6-claim limit</p>${sections}`;
+            preview.innerHTML=`<div class="bounty-share-receipt" id="bounty-share-receipt"><div class="bounty-share-receipt-brand"><small>PANTHEON · GUILD OPERATIONS</small><h4>WEEKLY BOUNTY LIST</h4><p>${bountyShareItems.length} dungeon entr${bountyShareItems.length===1?'y':'ies'} · each character has a separate 6-claim limit</p></div>${sections}<div class="bounty-share-receipt-footer">Bounty requirements are grouped by character and dungeon. × indicates how many weekly claims the entry consumes. Each character is limited to 6 claims.</div></div>`;
         }
         function renderBountyShareList(){
             const list=document.getElementById('bounty-share-list');if(!list)return;
@@ -5782,21 +5861,31 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const status=document.getElementById('bounty-share-status');if(status)status.textContent='Repeated dungeon slots are consolidated by character. Set the highest tier/condition once, then use + to tally additional weekly claims. Counts are saved on this device.';
             openModal('bounty-share-modal');
         }
-        function buildBountyShareText(){
-            const totals=bountyShareCharacterTotals(),chars=[...new Set(bountyShareItems.map(item=>item.charName))];
-            const lines=['PANTHEON · GUILD BOUNTIES','Weekly bounty claims · maximum 6 per character',''];
-            chars.forEach(charName=>{
-                lines.push(`${charName} · ${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} claims`);
-                bountyShareItems.filter(item=>item.charName===charName).forEach(item=>lines.push(`• ${item.dungeon} ×${item.count} — ${bountyShareTierLabel(item)} — ${bountyShareRequirement(item)}${item.state==='done'?' — Completed':''}`));
-                lines.push('');
-            });
-            return lines.join('\n').trim();
-        }
-        async function copyBountyShareText(){
-            if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to copy.');return;}
-            const value=buildBountyShareText();
-            try{await navigator.clipboard.writeText(value);setBountyShareStatus('Bounty list copied.');}
-            catch(_){const box=document.createElement('textarea');box.value=value;document.body.appendChild(box);box.select();const ok=document.execCommand('copy');box.remove();setBountyShareStatus(ok?'Bounty list copied.':'Clipboard access was blocked. Select the preview text and copy it manually.');}
+        async function shareBountyListAsImage(){
+            if(!bountyShareItems.length){setBountyShareStatus('There are no bounty targets to share.');return false;}
+            const receipt=document.getElementById('bounty-share-receipt');
+            if(!receipt){setBountyShareStatus('The bounty screenshot is not ready yet.');return false;}
+            let staging=null;
+            try{
+                const html2canvas=await loadHtml2Canvas();
+                staging=document.createElement('div');
+                staging.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;width:980px;padding:0;margin:0;background:#17191e;pointer-events:none;';
+                const clone=receipt.cloneNode(true);
+                clone.style.width='980px';clone.style.maxWidth='none';clone.style.boxSizing='border-box';
+                staging.appendChild(clone);document.body.appendChild(staging);
+                const canvas=await html2canvas(clone,{backgroundColor:'#17191e',scale:2,useCORS:true,logging:false,allowTaint:false,windowWidth:1020,scrollX:0,scrollY:0});
+                const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+                if(!blob)throw new Error('PNG creation failed');
+                if(navigator.clipboard?.write&&window.ClipboardItem){
+                    try{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);setBountyShareStatus('Bounty list copied as an image. Paste it directly into Discord.');return true;}
+                    catch(_){}
+                }
+                const url=URL.createObjectURL(blob),link=document.createElement('a');
+                link.href=url;link.download='pantheon-weekly-bounty-list.png';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+                setBountyShareStatus('Your browser blocked image clipboard access, so the bounty screenshot was saved as a PNG.');
+                return false;
+            }catch(err){setBountyShareStatus(`Bounty screenshot failed: ${err.message}`);return false;}
+            finally{staging?.remove();}
         }
         function setBountyShareStatus(message){const el=document.getElementById('bounty-share-status');if(el)el.textContent=String(message||'');}
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
@@ -5888,7 +5977,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 initializeWelcomeModal();
                 maybeOpenProfileConfirmation();
                 startRemoteRefresh();
-            }).catch(() => { applyDiscordIdentityDefaults(); applySavedLandingPage(); initializeWelcomeModal(); maybeOpenProfileConfirmation(); startRemoteRefresh(); });
+                setTimeout(maybeOpenWeeklyReportAfterReset, 900);
+            }).catch(() => { applyDiscordIdentityDefaults(); applySavedLandingPage(); initializeWelcomeModal(); maybeOpenProfileConfirmation(); startRemoteRefresh(); setTimeout(maybeOpenWeeklyReportAfterReset, 1200); });
         });
 
         function rateElementId(charName) { return `rate-${encodeURIComponent(charName)}`; }
@@ -8101,8 +8191,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return `${fmt(startDate)} – ${fmt(endDate)} · Manila time`;
         }
 
+        const WEEKLY_REPORT_SEEN_PREFIX = 'pantheon-weekly-report-seen-v2';
         function renderPreviousWeekReport(container) {
             if (!container) return;
+            container.innerHTML = '';
             const archives = Object.entries(safeObject(cloudData?.weeklyArchive))
                 .filter(([key, value]) => Number.isFinite(Number(key)) && value && typeof value === 'object')
                 .sort((a,b) => Number(a[0]) - Number(b[0]));
@@ -8110,30 +8202,25 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const card = document.createElement('section');
             card.className = 'weekly-report-card';
             if (!latest) {
-                card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">No saved snapshot is available yet</div></div></div><div class="weekly-report-empty">The week that just ended was not archived by the previous build, so its completion cannot be reconstructed after the checkboxes have reset. This version will save a compact report automatically at the next Saturday reset, even when extended analytics is off.</div>`;
+                card.innerHTML = '<div class="weekly-report-empty">There is no saved weekly snapshot yet. The next report will be available after the next Saturday reset.</div>';
                 container.appendChild(card);
                 return;
             }
-
             const [weekKey, archive] = latest;
             const taskOrder = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
             const stateMap = safeObject(archive.states);
-            // Use the same visible roster set as the Tracker table. This respects Personal,
-            // Universal, and admin View As filters instead of accidentally showing guild-wide
-            // history while an admin is viewing one member's experience.
             const profiles = (Array.isArray(characters) ? characters : []).filter(profile =>
                 profile && String(profile.name || '').trim() && profile.trackerEnabled === true
             );
             const reportProfiles = profiles.filter(profile => typeof stateMap[profile.name] === 'string' && stateMap[profile.name].length > 0);
             if (!reportProfiles.length) {
-                card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div></div><div class="weekly-report-empty">A weekly snapshot exists, but it does not contain a saved result for the characters currently in this view. Newly registered or newly opted-in characters will appear after their first completed weekly cycle.</div>`;
+                card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div></div><div class="weekly-report-empty">No saved results are available for the characters in this view. Newly registered or newly tracked characters will appear after their first full weekly cycle.</div>`;
                 container.appendChild(card);
                 return;
             }
-
+            const taskCounts = new Map();
             const rows = reportProfiles.map(profile => {
-                const name = String(profile.name).trim();
-                const codes = String(stateMap[name] || '');
+                const name = String(profile.name).trim(), codes = String(stateMap[name] || '');
                 let done = 0, missed = 0, excluded = 0;
                 const missedTasks = [];
                 taskOrder.forEach((task, index) => {
@@ -8141,32 +8228,43 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const code = codes[index] || '';
                     if (code === 'd') done++;
                     else if (code === 'x') excluded++;
-                    else if (code === 'm') { missed++; missedTasks.push(task); }
+                    else if (code === 'm') {
+                        missed++; missedTasks.push(task);
+                        taskCounts.set(task, (taskCounts.get(task) || 0) + 1);
+                    }
                 });
                 const eligible = done + missed;
-                const rate = eligible ? Math.round(done / eligible * 100) : 0;
-                const recs = missedTasks.map(task => {
-                    const stats = getArchivedTaskRecommendationStats(name, task, archives);
-                    return buildPersonalizedTaskRecommendation(profile, task, stats, archives, archives.slice(-3));
-                }).filter(item => !item.suppress)
-                    .sort((a,b) => b.sc - a.sc || b.w - a.w || b.c - a.c || a.t.localeCompare(b.t))
-                    .slice(0, 2);
-                return { name, isMain:profile.isMain === true, done, missed, excluded, eligible, rate, missedTasks, recs };
-            });
+                return { name, done, missed, excluded, eligible, rate:eligible?Math.round(done/eligible*100):0 };
+            }).sort((a,b) => (a.eligible ? a.rate : 101) - (b.eligible ? b.rate : 101) || b.missed-a.missed || a.name.localeCompare(b.name));
             const totalDone = rows.reduce((sum,row)=>sum+row.done,0);
             const totalMissed = rows.reduce((sum,row)=>sum+row.missed,0);
+            const totalExcluded = rows.reduce((sum,row)=>sum+row.excluded,0);
             const totalEligible = totalDone + totalMissed;
             const average = totalEligible ? Math.round(totalDone / totalEligible * 100) : 0;
-            const rowsHtml = rows.map(row => {
-                const main = row.isMain ? ' <span aria-label="Main character">★</span>' : '';
-                const missedHtml = row.missedTasks.length ? `<div class="weekly-report-missed">Left unfinished</div><div class="weekly-report-task-list">${row.missedTasks.map(task => `<span>${escapeHTML(task)}</span>`).join('')}</div>` : `<div class="weekly-report-missed">No eligible weekly tasks were left unfinished.</div>`;
-                const recHtml = row.recs.length ? `<div class="weekly-report-missed">Recommended priorities next week</div><ul class="weekly-report-recs">${row.recs.map(item => `<li><strong>${escapeHTML(item.t)}</strong><p>${escapeHTML(getRecommendationPlainReason(item))}</p></li>`).join('')}</ul>` : '';
-                const bar = row.eligible ? `<div class="weekly-report-character-chart" role="img" aria-label="${row.done} completed and ${row.missed} unfinished"><div class="weekly-report-bar"><span class="weekly-report-bar-done" style="width:${row.rate}%"></span><span class="weekly-report-bar-missed" style="width:${100-row.rate}%"></span></div></div>` : '';
-                return `<article class="weekly-report-character"><div class="weekly-report-character-head"><strong>${escapeHTML(row.name)}${main}</strong><span class="weekly-report-rate">${row.eligible ? `${row.rate}%` : '—'}</span></div>${bar}<div class="weekly-report-meta">${row.done} done · ${row.missed} unfinished · ${row.excluded} N/A</div>${missedHtml}${recHtml}</article>`;
-            }).join('');
-            const chartRows = rows.slice().sort((a,b)=>b.rate-a.rate || a.name.localeCompare(b.name)).map(row=>`<div class="weekly-report-chart-row"><span class="weekly-report-chart-name" title="${escapeHTML(row.name)}">${escapeHTML(row.name)}</span><div class="weekly-report-bar" role="img" aria-label="${row.done} completed, ${row.missed} unfinished"><span class="weekly-report-bar-done" style="width:${row.eligible?row.rate:0}%"></span><span class="weekly-report-bar-missed" style="width:${row.eligible?100-row.rate:0}%"></span></div><strong class="weekly-report-chart-value">${row.eligible?row.rate+'%':'—'}</strong></div>`).join('');
-            card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} character${rows.length === 1 ? '' : 's'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible ? `${average}%` : '—'}</strong>combined completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>unfinished</span><span class="weekly-report-kpi"><strong>${rows.reduce((sum,row)=>sum+row.excluded,0)}</strong>N/A ignored</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div><div class="weekly-report-characters">${rowsHtml}</div><p class="weekly-report-foot">Unfinished means the task was not marked complete before reset; it does not prove the character is unable to clear it. N/A tasks are excluded from completion rates.</p>`;
+            const chartRows = rows.map(row => `<div class="weekly-report-chart-row"><span class="weekly-report-chart-name" title="${escapeHTML(row.name)}">${escapeHTML(row.name)}</span><div class="weekly-report-bar" role="img" aria-label="${row.done} completed, ${row.missed} unfinished"><span class="weekly-report-bar-done" style="width:${row.eligible?row.rate:0}%"></span><span class="weekly-report-bar-missed" style="width:${row.eligible?100-row.rate:0}%"></span></div><strong class="weekly-report-chart-value">${row.eligible?row.rate+'%':'—'}</strong></div>`).join('');
+            const topMisses = [...taskCounts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,3);
+            const focusHtml = topMisses.length ? `<section class="weekly-report-focus"><h4>Most often left unfinished</h4><div class="weekly-report-focus-list">${topMisses.map(([task,count])=>`<span class="weekly-report-focus-item">${escapeHTML(task)} <strong>${count} character${count===1?'':'s'}</strong></span>`).join('')}</div></section>` : '<section class="weekly-report-focus"><h4>Weekly result</h4><div class="weekly-report-empty">Every eligible task in this view was marked complete.</div></section>';
+            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks do not count against completion. This report reflects tracker checkmarks, not proof of dungeon clears.</p>`;
             container.appendChild(card);
+        }
+        function openWeeklyReportModal({automatic=false}={}) {
+            renderPreviousWeekReport(document.getElementById('weekly-report-content'));
+            openModal('weekly-report-modal');
+            const archiveKeys = Object.keys(safeObject(cloudData?.weeklyArchive)).sort((a,b)=>Number(a)-Number(b));
+            const key = String(archiveKeys[archiveKeys.length-1] || getTargetResetTimeUTC(true));
+            const account = String(pantheonDiscordUser?.id || 'unknown');
+            try { localStorage.setItem(`${WEEKLY_REPORT_SEEN_PREFIX}:${account}:${key}`, '1'); } catch (_) {}
+        }
+        function maybeOpenWeeklyReportAfterReset() {
+            if (!pantheonDiscordUser?.id || !cloudData?.weeklyArchive) return false;
+            const weekKey = String(getTargetResetTimeUTC(true));
+            if (!safeObject(cloudData.weeklyArchive)[weekKey]) return false;
+            const storageKey = `${WEEKLY_REPORT_SEEN_PREFIX}:${String(pantheonDiscordUser.id)}:${weekKey}`;
+            try { if (localStorage.getItem(storageKey) === '1') return false; } catch (_) { return false; }
+            // Never layer the report over welcome, profile confirmation, or another tool modal.
+            if ([...document.querySelectorAll('.modal-overlay')].some(el => !el.classList.contains('hidden'))) return false;
+            openWeeklyReportModal({automatic:true});
+            return true;
         }
 
         function renderAnalytics() {
@@ -8176,7 +8274,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const deadlineBanner = document.createElement('div');
             deadlineBanner.innerHTML = buildDeadlineStrategyBannerHtml('tracker');
             cont.appendChild(deadlineBanner.firstElementChild);
-            renderPreviousWeekReport(cont);
             const trackingToggle = document.getElementById('analytics-tracking-enabled');
             const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true;
             if (trackingToggle) trackingToggle.checked = analyticsEnabled;
@@ -8184,7 +8281,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
                 const disabled = document.createElement('div');
                 disabled.className = 'analytics-disabled';
-                disabled.innerHTML = `<strong>Extended weekly analytics tracking is off.</strong><br>The compact previous-week report above is still saved automatically. Rolling multi-week trends and group-run timing are not collected. ${savedWeeks ? `${savedWeeks} weekly snapshot${savedWeeks === 1 ? '' : 's'} are currently stored. Use <b>Clear Stored History</b> to remove them.` : 'Enable the checkbox above to collect up to five weeks of trends and learn guild-run timing.'}`;
+                disabled.innerHTML = `<strong>Extended weekly analytics tracking is off.</strong><br>The previous-week report is still saved automatically. Open it with the Weekly Report button in the Tracker toolbar. Rolling multi-week trends and group-run timing are not collected. ${savedWeeks ? `${savedWeeks} weekly snapshot${savedWeeks === 1 ? '' : 's'} are currently stored. Use <b>Clear Stored History</b> to remove them.` : 'Enable the checkbox above to collect up to five weeks of trends and learn guild-run timing.'}`;
                 cont.appendChild(disabled);
                 return;
             }
@@ -10040,7 +10137,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r36';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r37';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10512,6 +10609,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster') history.replaceState(null, '', location.pathname + location.search);
             if (isAdminViewAsActive()) applyAdminPreviewReadOnly();
             startDeadlineModeRefresh();
+            setTimeout(maybeOpenWeeklyReportAfterReset, 150);
         }
 
 
@@ -10609,6 +10707,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (['welcome-modal','salary-modal','help-modal','tracker-empty-state'].includes(id)) {
                 setTimeout(maybeOpenProfileConfirmation, 0);
             }
+            if (['welcome-modal','profile-confirm-modal','salary-modal','help-modal'].includes(id)) setTimeout(maybeOpenWeeklyReportAfterReset, 80);
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
@@ -10709,53 +10808,79 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r36';
+  const CURRENT_BUILD = '1.6.8-r37';
   let newestBuild = '';
   let checkBusy = false;
   let reloadQueued = false;
+  let lastSyncNudgeAt = 0;
+  let reloadStarted = false;
   function hasUnsentEdits() {
     try {
-      return !!((typeof syncInProgress !== 'undefined' && syncInProgress) || window.__pantheonVersionWriteBusy || (typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) || (typeof pendingCellWrites !== 'undefined' && Object.keys(pendingCellWrites).length));
+      return !!((typeof syncInProgress !== 'undefined' && syncInProgress) || window.__pantheonVersionWriteBusy ||
+        (typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) ||
+        (typeof pendingCellWrites !== 'undefined' && Object.keys(pendingCellWrites).length));
     } catch (_) { return true; }
-  }
-  function reloadToNewestBuild() {
-    const target = new URL(location.href);
-    target.searchParams.set('pt_release', newestBuild || CURRENT_BUILD);
-    location.replace(target.toString());
   }
   function showUpdateNotice(message) {
     let node = document.getElementById('pantheon-release-update-notice');
     if (!node) {
       node = document.createElement('div'); node.id='pantheon-release-update-notice';
-      node.style.cssText='position:fixed;z-index:99999;left:50%;bottom:18px;transform:translateX(-50%);max-width:min(560px,calc(100vw - 24px));padding:12px 14px;border:1px solid #6f8fbf;border-radius:10px;background:#182437;color:#f3f6fc;box-shadow:0 8px 28px #0005;font:600 13px/1.45 system-ui;';
+      node.style.cssText='position:fixed;z-index:99999;left:50%;bottom:18px;transform:translateX(-50%);max-width:min(600px,calc(100vw - 24px));padding:12px 14px;border:1px solid #6f8fbf;border-radius:10px;background:#182437;color:#f3f6fc;box-shadow:0 8px 28px #0005;font:600 13px/1.45 system-ui;text-align:center;';
       document.body.appendChild(node);
     }
     node.textContent=message;
   }
+  function reloadToNewestBuild() {
+    if (reloadStarted) return;
+    reloadStarted = true;
+    const target = new URL(location.href);
+    target.searchParams.set('__pt_build', newestBuild || CURRENT_BUILD);
+    target.searchParams.set('__pt_reload', String(Date.now()));
+    location.replace(target.toString());
+  }
   async function checkRelease() {
-    if (checkBusy || document.visibilityState !== 'visible') return;
+    if (checkBusy || document.visibilityState !== 'visible' || reloadStarted) return;
     checkBusy=true;
     try {
-      const response=await fetch('/version.json?check='+Date.now(),{cache:'no-store',credentials:'same-origin'});
+      const response=await fetch('/version.json?pt_check='+Date.now(),{
+        cache:'no-store',credentials:'same-origin',headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
+      });
       if (!response.ok) return;
       const data=await response.json();
-      const remote=String(data.build||'');
+      const remote=String(data.build||'').trim();
       if (!remote || remote===CURRENT_BUILD) return;
       newestBuild=remote;
+      reloadQueued=true;
       if (hasUnsentEdits()) {
-        reloadQueued=true;
-        showUpdateNotice('Pantheon update '+remote+' is ready. Your pending tracker edits are being saved; this page will refresh after they are confirmed.');
+        showUpdateNotice('Pantheon '+remote+' is ready. The page will update automatically after your tracker edits are safely saved.');
         return;
       }
-      showUpdateNotice('Pantheon updated to '+remote+'. Refreshing this page…');
-      setTimeout(()=>{ if(!hasUnsentEdits()) reloadToNewestBuild(); else {reloadQueued=true;showUpdateNotice('Update ready. Refresh will wait until your tracker edits are safely synced.');}},1200);
-    } catch (_) { /* Offline or not yet deployed; retry on the next interval. */ }
+      showUpdateNotice('Pantheon '+remote+' is ready. Updating this page…');
+      setTimeout(attemptQueuedReload,900);
+    } catch (_) { /* Offline or deployment incomplete; retry on the next interval. */ }
     finally { checkBusy=false; }
   }
-  setInterval(()=>{ if(reloadQueued && newestBuild && !hasUnsentEdits()){reloadToNewestBuild();return;} checkRelease(); },30000);
-  window.addEventListener('focus',checkRelease);
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkRelease();});
-  setTimeout(checkRelease,2500);
+  function attemptQueuedReload() {
+    if (!reloadQueued || reloadStarted || document.visibilityState !== 'visible') return;
+    if (hasUnsentEdits()) {
+      showUpdateNotice('Pantheon '+newestBuild+' is ready. Saving your pending tracker changes before the automatic update…');
+      const now=Date.now();
+      if (typeof forceSync==='function' && typeof hasCloudConfig==='function' && hasCloudConfig() && now-lastSyncNudgeAt>12000 && !syncInProgress && !window.__pantheonVersionWriteBusy) {
+        lastSyncNudgeAt=now;
+        try { Promise.resolve(forceSync(false)).catch(()=>{}); } catch (_) {}
+      }
+      return;
+    }
+    showUpdateNotice('Update saved. Reloading Pantheon '+newestBuild+'…');
+    setTimeout(()=>{ if(!hasUnsentEdits()) reloadToNewestBuild(); },350);
+  }
+  // The current document now polls the release manifest itself. Cache headers in
+  // _headers ensure the next navigation/reload fetches the current HTML as well.
+  setTimeout(checkRelease,1200);
+  setInterval(()=>{ if(reloadQueued)attemptQueuedReload(); else checkRelease(); },10000);
+  window.addEventListener('pageshow',()=>{if(reloadQueued)attemptQueuedReload();else checkRelease();});
+  window.addEventListener('focus',()=>{if(reloadQueued)attemptQueuedReload();else checkRelease();});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(reloadQueued)attemptQueuedReload();else checkRelease();}});
 })();
 </script>
 </body>

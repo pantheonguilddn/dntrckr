@@ -1,3 +1,31 @@
+# Pantheon Tools v1.6.8-r37
+
+## What changed
+
+- Bounty Share is now a genuinely wide builder with an editing column and a visual receipt-style share preview. The single share action copies a PNG screenshot to the clipboard for direct pasting into Discord. If the browser blocks image clipboard access, it saves the screenshot as a PNG. It does not open an email or native share sheet.
+- The screenshot groups entries by character and dungeon, shows the configured highest requirement, claim multiplier, and that character's own 0–6 weekly tally. Claim limits are independent per character.
+- The Weekly Report no longer appears inside the Tracker analytics area. It is shown in a dedicated popup on the first app opening after a weekly reset (once per Discord account and weekly reset), and can be reopened from the Tracker toolbar with the Weekly Report button. The report is condensed to overall completion, totals, a ranked character bar chart, and the most commonly unfinished tasks.
+- The release watcher polls `/version.json` every 10 seconds and on focus/visibility changes. It automatically reloads to the latest build after pending tracker writes and versioned admin writes are clear. It actively nudges a normal sync while an update is queued.
+- Added Cloudflare Pages `_headers` rules so the app HTML is not kept in stale browser caches and `version.json` is never cached.
+
+## Deployment
+
+1. Deploy the complete ZIP contents to Cloudflare Pages. Do not upload only `index.html`; `_headers` and `version.json` are required for the release-update behavior.
+2. Existing tabs running builds from before the release watcher was introduced (including r34) cannot execute an update check that was not present in their already-loaded JavaScript. Those tabs need one initial reload to load r37. After that bootstrap reload, later deployments are detected and applied automatically.
+3. After deploying, verify that `https://dntrckr.pages.dev/version.json` returns `build: 1.6.8-r37`, and that the new page title/What's New release label show r37.
+
+## Sync safety
+
+This release is built from r36. It changes the frontend presentation and update lifecycle only. The D1 Functions, tracker cell-save endpoint, status endpoint, ownership validation, schema, and existing sync/merge code are carried forward unchanged. Pending cell changes continue to block an automatic reload until they are confirmed.
+
+## Validation boundary
+
+Local syntax, CSS, package integrity, path preservation, and targeted UI behavior checks are run for this package. This is not a live Cloudflare Pages/D1 multi-account test, and no production deployment is claimed.
+
+---
+
+## Previous release documentation
+
 # Pantheon Tools v1.6.8-r35 — consolidated bounty claims and share roster
 
 - **Bounty Share layout:** the popup now follows a roster/table-style layout similar to Salary Calculator and Team Builder. Rows are grouped by character + dungeon instead of showing every Bounty Board slot as a separate share entry. The same dungeon on two different characters remains separate.
