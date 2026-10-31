@@ -1,3 +1,23 @@
+# Pantheon Tools v1.6.8-r35 — consolidated bounty claims and share roster
+
+- **Bounty Share layout:** the popup now follows a roster/table-style layout similar to Salary Calculator and Team Builder. Rows are grouped by character + dungeon instead of showing every Bounty Board slot as a separate share entry. The same dungeon on two different characters remains separate.
+- **Highest-tier summary:** each character/dungeon row has one tier and one set of conditions. When migrating earlier r34 preferences, the builder selects the highest saved tier (Legendary above Unique); within the same tier it prefers the stricter saved condition (time-limited, 8-man guild-only, then the shorter time). Members can edit the selected requirement once for the grouped row.
+- **Manual claim tally:** every grouped dungeon starts at `×1`; use `+` / `−` to reflect how many of that character's weekly claims it consumes. Totals are shown per character, with a hard maximum of **6 claims per character**. The `+` control is disabled once that character reaches 6/6.
+- **Share output:** the live preview, copied text, native Share sheet text, and PNG screenshot all use the same grouped rows, highest-tier conditions, per-dungeon `×N` counts, and per-character `N/6` totals.
+- **Data separation:** dungeon names and checkbox state still come from the shared Tracker. Tier, time, party requirement, and manual claim counts remain local Bounty Share preferences on the device doing the export; they do not write into or alter shared Tracker data. Existing per-slot r34 preferences are migrated automatically into the new per-character/dungeon rows when the builder opens.
+- **Retained:** r34's server-ordered task writes, five-second visible-Tracker revision checks, view-only ownership protections, and r33's previous-week recap are unchanged. No new Pages Function, D1 schema migration, or database operation is required for r35.
+
+## r35 validation
+
+- Client logic test: duplicate dungeon slots on one character collapse to one share row; same dungeon on a second character remains a separate row.
+- Migration test: a Unique basic-clear slot plus a Legendary timed 8-man slot for the same dungeon chooses Legendary / timed / 8-man / 15 minutes.
+- Claim tally test: one grouped row increments from `×1` to `×2`; character total updates to `6/6`; further increments are blocked.
+- Export tests: text and SVG/PNG source contain the grouped dungeon, selected highest-tier condition, multiplier, and weekly claim count.
+- JavaScript syntax, CSS parsing, duplicate static HTML ID checks, package path preservation, and ZIP integrity checked locally.
+- **Not live-verified:** the Bounty Share layout and local preferences were tested in local client fixtures. No live Cloudflare deployment or multi-device preference sync was performed. Shared Tracker sync behaviour from r34 has not changed in this release.
+
+---
+
 # Pantheon Tools v1.6.8-r34 — authoritative task saves, automatic live checks, and bounty sharing
 
 - **Task-write integrity:** checkbox and bounty-note saves now include explicit per-cell write intents. The authenticated Cloudflare Pages API checks that the intended state/note matches the submitted, ownership-guarded candidate, then assigns a monotonically increasing server timestamp against the latest D1 cell value before the compare-and-swap write. This removes member-device clock skew from the conflict decision for new clients. Older clients remain compatible through the existing timestamp merge fallback.

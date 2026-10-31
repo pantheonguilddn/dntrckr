@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r34</title>
+    <title>Pantheon Tools v1.6.8-r35</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1549,28 +1549,49 @@
         :root[data-pantheon-theme] .team-job.team-unknown { background:#55505f !important; border-color:#81788e !important; color:#fff !important; }
         .tracker-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:11px; width:100%; max-width:1600px; margin:0 auto 12px; padding:12px 14px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); color:var(--pt-text); box-sizing:border-box; }
         .bounty-boards-toggle { min-height:36px; font-weight:800; }
-        .bounty-share-modal { width:min(1120px, calc(100vw - 28px)); max-height:min(92vh, 980px); overflow:auto; }
+        .bounty-share-modal { width:min(1180px, calc(100vw - 28px)); max-height:min(92vh, 980px); overflow:auto; }
         .bounty-share-toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin:10px 0; color:var(--pt-muted); font-size:.78rem; }
-        .bounty-share-count { color:var(--pt-text); font-weight:900; }
-        .bounty-share-list { display:grid; gap:10px; max-height:42vh; overflow:auto; padding:2px; }
-        .bounty-share-row { display:grid; grid-template-columns:minmax(150px,1.15fr) minmax(150px,1.2fr) minmax(125px,.8fr) minmax(155px,1fr) minmax(150px,1fr) minmax(90px,.55fr); gap:8px; align-items:end; padding:10px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-soft); color:var(--pt-text); }
-        .bounty-share-field { display:grid; gap:4px; min-width:0; }
-        .bounty-share-field small { color:var(--pt-muted); font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
-        .bounty-share-field strong { overflow-wrap:anywhere; font-size:.82rem; }
-        .bounty-share-field select,.bounty-share-field input { width:100%; min-width:0; min-height:36px; box-sizing:border-box; border:1px solid var(--pt-border); border-radius:7px; padding:6px 8px; background:var(--pt-input); color:var(--pt-text); font:inherit; }
-        .bounty-share-timer[hidden] { display:none!important; }
+        .bounty-share-count { color:var(--pt-text); font-weight:950; }
+        .bounty-share-list { display:grid; gap:12px; max-height:44vh; overflow:auto; padding:2px; }
+        .bounty-share-character { overflow:hidden; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); color:var(--pt-text); }
+        .bounty-share-character-head,.bounty-share-preview-character-head { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 13px; background:var(--pt-surface-soft); border-bottom:1px solid var(--pt-border); }
+        .bounty-share-character-head strong,.bounty-share-preview-character-head strong { font-size:.9rem; font-weight:950; }
+        .bounty-share-character-total,.bounty-share-preview-character-head span { color:var(--pt-muted); font-size:.75rem; font-weight:850; white-space:nowrap; }
+        .bounty-share-character-rows { display:grid; }
+        .bounty-share-row { display:grid; grid-template-columns:minmax(175px,1.25fr) minmax(125px,.85fr) minmax(145px,1fr) minmax(155px,1fr) minmax(118px,.7fr); gap:10px; align-items:center; padding:11px 12px; border-top:1px solid var(--pt-border); }
+        .bounty-share-row:first-child { border-top:0; }
+        .bounty-share-dungeon,.bounty-share-control,.bounty-share-count-control { display:grid; gap:5px; min-width:0; }
+        .bounty-share-dungeon strong { font-size:.84rem; line-height:1.35; overflow-wrap:anywhere; }
+        .bounty-share-dungeon small,.bounty-share-control small,.bounty-share-count-control>small { color:var(--pt-muted); font-size:.64rem; font-weight:850; text-transform:uppercase; letter-spacing:.035em; }
+        .bounty-share-control select,.bounty-share-inline-input input { width:100%; min-width:0; min-height:34px; box-sizing:border-box; border:1px solid var(--pt-border); border-radius:7px; padding:5px 8px; background:var(--pt-input); color:var(--pt-text); font:inherit; font-size:.76rem; }
+        .bounty-share-inline-input { display:flex; align-items:center; gap:6px; }
+        .bounty-share-inline-input input { width:72px; }
+        .bounty-share-inline-input small { white-space:nowrap; }
+        .bounty-share-stepper { display:flex; align-items:center; justify-content:flex-start; gap:8px; }
+        .bounty-share-stepper button { width:30px; height:30px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface-soft); color:var(--pt-text); font-size:1.05rem; font-weight:900; cursor:pointer; }
+        .bounty-share-stepper button:disabled { opacity:.35; cursor:not-allowed; }
+        .bounty-share-stepper strong { min-width:30px; text-align:center; font-size:.88rem; font-weight:950; }
         .bounty-share-preview-wrap { margin-top:14px; border:1px solid var(--pt-border); border-radius:12px; overflow:hidden; background:var(--pt-surface-soft); }
         .bounty-share-preview-head { display:flex; justify-content:space-between; gap:10px; padding:10px 12px; border-bottom:1px solid var(--pt-border); color:var(--pt-text); font-size:.78rem; }
         .bounty-share-preview-head span { color:var(--pt-muted); }
-        .bounty-share-preview { max-height:260px; overflow:auto; padding:12px; color:var(--pt-text); }
+        .bounty-share-preview { max-height:300px; overflow:auto; padding:12px; color:var(--pt-text); }
         .bounty-share-preview-title { margin:0 0 4px; font-size:1rem; font-weight:950; }
         .bounty-share-preview-subtitle { margin:0 0 12px; color:var(--pt-muted); font-size:.74rem; }
-        .bounty-share-preview-item { display:grid; grid-template-columns:minmax(120px,.8fr) minmax(140px,1.3fr) minmax(180px,1fr); gap:8px; padding:8px 0; border-top:1px solid var(--pt-border); font-size:.78rem; }
-        .bounty-share-preview-item strong { overflow-wrap:anywhere; }
+        .bounty-share-preview-character { margin-top:10px; border:1px solid var(--pt-border); border-radius:9px; overflow:hidden; background:var(--pt-surface); }
+        .bounty-share-preview-character-head { padding:8px 10px; }
+        .bounty-share-preview-item { display:grid; grid-template-columns:minmax(160px,1fr) minmax(210px,1.5fr) 54px; gap:10px; align-items:center; padding:9px 10px; border-top:1px solid var(--pt-border); font-size:.76rem; }
+        .bounty-share-preview-dungeon,.bounty-share-preview-condition { display:grid; gap:3px; min-width:0; }
+        .bounty-share-preview-dungeon strong { overflow-wrap:anywhere; }
+        .bounty-share-preview-dungeon small { color:var(--pt-muted); font-size:.66rem; }
+        .bounty-share-preview-condition>span:last-child { color:var(--pt-muted); font-size:.71rem; }
+        .bounty-share-tier { width:max-content; padding:2px 7px; border-radius:6px; background:var(--pt-surface-soft); border:1px solid var(--pt-border); font-size:.65rem; font-weight:950; text-transform:uppercase; }
+        .bounty-share-tier.is-unique { color:#3c719d; }
+        .bounty-share-tier.is-legendary { color:#b27a22; }
+        .bounty-share-preview-multiplier { justify-self:end; font-size:.92rem; font-weight:950; }
         .bounty-share-empty { padding:14px; color:var(--pt-muted); font-size:.82rem; }
         .bounty-share-actions { flex-wrap:wrap; }
-        @media(max-width:900px) { .bounty-share-row { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media(max-width:540px) { .bounty-share-row { grid-template-columns:1fr 1fr; } .bounty-share-preview-item { grid-template-columns:1fr; gap:3px; } }
+        @media(max-width:980px) { .bounty-share-row { grid-template-columns:repeat(2,minmax(0,1fr)); } .bounty-share-dungeon { grid-column:1/-1; } }
+        @media(max-width:540px) { .bounty-share-row { grid-template-columns:1fr 1fr; gap:8px; } .bounty-share-dungeon { grid-column:1/-1; } .bounty-share-preview-item { grid-template-columns:1fr auto; gap:6px; } .bounty-share-preview-condition { grid-column:1/-1; } .bounty-share-preview-multiplier { grid-column:2; grid-row:1; } }
         :root[data-pantheon-theme] #track-bounty-boards-btn[aria-pressed="true"] { background:var(--pt-accent) !important; border-color:var(--pt-accent) !important; color:#fff !important; }
         .tracker-toolbar-hint { color:var(--pt-muted); font-size:.67rem; line-height:1.5; }
         :root[data-pantheon-theme] #dn-tracker { color:var(--pt-text) !important; background:var(--pt-surface) !important; border-color:var(--pt-border) !important; }
@@ -2706,7 +2727,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:640px){.deadline-strategy-banner{padding:10px}.deadline-strategy-banner p{font-size:.68rem}}
 </style>
 
-<style id="pantheon-r34-weekly-recap">
+<style id="pantheon-r35-weekly-recap">
 .tracker-live-sync-note{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:4px 8px;border:1px solid var(--pt-border);border-radius:999px;background:var(--pt-surface-raised);color:var(--pt-muted);font-size:.62rem;font-weight:750;line-height:1.3;white-space:nowrap}
 .tracker-live-sync-note:before{content:"";width:6px;height:6px;border-radius:50%;background:#6caa7a;flex:0 0 6px}
 .tracker-live-sync-note[data-state="checking"]:before{background:#c28b35}
@@ -2717,7 +2738,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r34-weekly-report-styles">
+<style id="pantheon-r35-weekly-report-styles">
 .weekly-report-card{grid-column:1/-1;min-width:0;padding:15px;border:1px solid var(--pt-border);border-radius:12px;background:var(--pt-surface);color:var(--pt-text);box-shadow:0 4px 14px rgba(0,0,0,.06)}
 .weekly-report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--pt-border);margin-bottom:10px}
 .weekly-report-head h3{margin:0;color:var(--pt-text);font-size:.9rem}.weekly-report-period{margin-top:4px;color:var(--pt-muted);font-size:.67rem}
@@ -3171,9 +3192,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r34</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r35</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r34 update:</strong> Task saves are now server-ordered to protect legitimate edits from device-clock conflicts, Tracker views auto-check for shared changes every few seconds, and the Bounty Share Builder creates a shareable list or image with per-bounty requirements.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r35 update:</strong> Bounty Share Builder now consolidates repeated dungeon entries per character, shows the highest-tier condition once, and lets you count weekly claims with + controls against the six-claim limit. Tracker sync protections and the previous-week report are retained.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3548,7 +3569,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="bounty-share-modal" role="dialog" aria-modal="true" aria-labelledby="bounty-share-title">
         <div class="modal-card wide-modal bounty-share-modal">
             <h3 id="bounty-share-title">↗ Bounty Share Builder</h3>
-            <p class="modal-note">Every populated bounty slot in the current Tracker view is listed separately. Duplicate dungeons remain separate entries, so one dungeon can show a Unique basic-clear bounty and a separate Legendary timed bounty.</p>
+            <p class="modal-note">Bounties are grouped by character and dungeon. Set the highest-tier requirement once, then use + to increase how many weekly claims that dungeon takes. Each character has a maximum of 6 claims per week; repeated Tracker slots are consolidated into one line.</p>
             <div class="bounty-share-toolbar"><span id="bounty-share-count" class="bounty-share-count">0 bounty entries</span><span class="bounty-share-scope">Uses the characters currently shown in Tracker.</span></div>
             <div id="bounty-share-list" class="bounty-share-list"><div class="bounty-share-empty">Loading listed bounties…</div></div>
             <div class="bounty-share-preview-wrap"><div class="bounty-share-preview-head"><strong>Share preview</strong><span>PNG export uses this exact list</span></div><div id="bounty-share-preview" class="bounty-share-preview"><div class="bounty-share-empty">Add bounty targets to the Tracker to populate this preview.</div></div></div>
@@ -5633,28 +5654,61 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         // ----------------------------------------------------------
         // Bounty Share Builder
-        // The tracker note remains the source of truth for the dungeon name.
-        // Requirement labels are browser-local presentation settings and do not
-        // change or overwrite shared character progress.
+        // One row represents one character + dungeon. The row shows the
+        // highest saved bounty requirement and a manually adjustable claim
+        // count. Counts are local share-builder settings, not Tracker data.
         // ----------------------------------------------------------
         const BOUNTY_SHARE_PREFS_KEY = 'pantheon-bounty-share-prefs-v1';
+        const BOUNTY_SHARE_WEEKLY_LIMIT = 6;
         let bountyShareItems = [];
         function loadBountySharePrefs(){try{return JSON.parse(localStorage.getItem(BOUNTY_SHARE_PREFS_KEY)||'{}')||{};}catch(_){return {};}}
         function saveBountySharePrefs(prefs){try{localStorage.setItem(BOUNTY_SHARE_PREFS_KEY,JSON.stringify(prefs||{}));}catch(_){}}
         function bountyShareKey(charName,slot,dungeon){return JSON.stringify([String(charName||''),String(slot||''),String(dungeon||'').trim().toLowerCase()]);}
+        function bountyShareGroupKey(charName,dungeon){return bountyShareKey(charName,'__group__',dungeon);}
+        function bountySharePreferenceScore(pref){
+            const value=safeObject(pref),tier=value.tier==='legendary'?2:value.tier==='unique'?1:0;
+            const timed=value.clearMode==='timed'?1:0,party=value.partyMode==='guild8'?1:0;
+            const minutes=Math.max(0,Math.min(999,Number(value.minutes)||0));
+            // Tier is the primary ordering. Within a tier, timed + guild-only
+            // requirements are stricter; a shorter valid time is preferred.
+            return tier*100000+timed*10000+party*1000+(minutes>0?Math.max(0,999-minutes):0);
+        }
         function collectBountyShareItems(){
             const category=getBountyCategory();
             if(!category)return [];
-            const prefs=loadBountySharePrefs(),items=[];
+            const prefs=loadBountySharePrefs(),groups=new Map();
             (Array.isArray(characters)?characters:[]).forEach(char=>{
                 (category.tasks||[]).forEach(slot=>{
                     const record=getCellRecord(char.name,slot),dungeon=String(record.note||'').trim();
                     if(!dungeon)return;
-                    const key=bountyShareKey(char.name,slot,dungeon),saved=safeObject(prefs[key]);
-                    items.push({id:key,charName:String(char.name),slot:String(slot),dungeon,state:getCellState(char.name,slot),tier:['unique','legendary'].includes(saved.tier)?saved.tier:'',clearMode:saved.clearMode==='timed'?'timed':'basic',partyMode:saved.partyMode==='guild8'?'guild8':'any',minutes:Math.max(0,Math.min(999,Number(saved.minutes)||0))});
+                    const id=bountyShareGroupKey(char.name,dungeon);
+                    if(!groups.has(id))groups.set(id,{id,charName:String(char.name),dungeon,sourceSlots:[],sourceStates:[],sourcePreferences:[]});
+                    const group=groups.get(id),saved=safeObject(prefs[bountyShareKey(char.name,slot,dungeon)]);
+                    group.sourceSlots.push(String(slot));
+                    group.sourceStates.push(getCellState(char.name,slot));
+                    if(Object.keys(saved).length)group.sourcePreferences.push(saved);
                 });
             });
-            return items;
+            return Array.from(groups.values()).map(group=>{
+                const savedGroup=safeObject(prefs[group.id]);
+                const migratedBest=group.sourcePreferences.slice().sort((a,b)=>bountySharePreferenceScore(b)-bountySharePreferenceScore(a))[0]||{};
+                const chosen=Object.keys(savedGroup).length?savedGroup:migratedBest;
+                const item={
+                    ...group,
+                    tier:['unique','legendary'].includes(chosen.tier)?chosen.tier:'',
+                    clearMode:chosen.clearMode==='timed'?'timed':'basic',
+                    partyMode:chosen.partyMode==='guild8'?'guild8':'any',
+                    minutes:Math.max(0,Math.min(999,Number(chosen.minutes)||0)),
+                    count:Math.max(1,Math.min(BOUNTY_SHARE_WEEKLY_LIMIT,Math.floor(Number(chosen.count)||1))),
+                    state:group.sourceStates.length&&group.sourceStates.every(state=>state==='done')?'done':'active'
+                };
+                // Migrate old per-slot preferences into one preference per
+                // character + dungeon. Existing tier/condition data is retained.
+                if(!Object.keys(savedGroup).length){
+                    prefs[group.id]={tier:item.tier,clearMode:item.clearMode,partyMode:item.partyMode,minutes:item.minutes,count:item.count};
+                }
+                return item;
+            }).sort((a,b)=>a.charName.localeCompare(b.charName)||a.dungeon.localeCompare(b.dungeon));
         }
         function bountyShareRequirement(item){
             const parts=[];
@@ -5662,47 +5716,83 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(item.partyMode==='guild8')parts.push('8-man Guild Members');
             return parts.join(' · ');
         }
+        function bountyShareTierLabel(item){return item.tier?item.tier[0].toUpperCase()+item.tier.slice(1):'Tier not set';}
+        function bountyShareCharacterTotals(){
+            const totals={};
+            bountyShareItems.forEach(item=>{totals[item.charName]=(totals[item.charName]||0)+item.count;});
+            return totals;
+        }
+        function saveBountyShareItem(item){
+            const prefs=loadBountySharePrefs();
+            prefs[item.id]={tier:item.tier,clearMode:item.clearMode,partyMode:item.partyMode,minutes:item.minutes,count:item.count};
+            saveBountySharePrefs(prefs);
+        }
         function updateBountyShareField(index,field,value){
             const item=bountyShareItems[index];if(!item)return;
             if(field==='tier')item.tier=['unique','legendary'].includes(value)?value:'';
             if(field==='clearMode')item.clearMode=value==='timed'?'timed':'basic';
             if(field==='partyMode')item.partyMode=value==='guild8'?'guild8':'any';
-            if(field==='minutes')item.minutes=Math.max(0,Math.min(999,Number(value)||0));
-            const prefs=loadBountySharePrefs();prefs[item.id]={tier:item.tier,clearMode:item.clearMode,partyMode:item.partyMode,minutes:item.minutes};saveBountySharePrefs(prefs);
-            renderBountySharePreview();
-            const timer=document.querySelector(`[data-bounty-share-timer="${index}"]`);if(timer)timer.hidden=item.clearMode!=='timed';
+            if(field==='minutes')item.minutes=Math.max(1,Math.min(999,Math.floor(Number(value)||15)));
+            saveBountyShareItem(item);
+            renderBountyShareList();
+        }
+        function updateBountyShareCount(index,delta){
+            const item=bountyShareItems[index];if(!item)return;
+            const total=bountyShareItems.filter(entry=>entry.charName===item.charName).reduce((sum,entry)=>sum+entry.count,0);
+            const next=item.count+(Number(delta)||0);
+            if(next<1)return;
+            if(next>item.count&&total>=BOUNTY_SHARE_WEEKLY_LIMIT){setBountyShareStatus(`${item.charName} has already reached the ${BOUNTY_SHARE_WEEKLY_LIMIT}-claim weekly limit.`);return;}
+            item.count=Math.max(1,Math.min(BOUNTY_SHARE_WEEKLY_LIMIT,next));
+            saveBountyShareItem(item);
+            renderBountyShareList();
         }
         function renderBountySharePreview(){
             const preview=document.getElementById('bounty-share-preview');if(!preview)return;
-            const title='PANTHEON · GUILD BOUNTIES';
             if(!bountyShareItems.length){preview.innerHTML='<div class="bounty-share-empty">No bounty targets are currently listed in this Tracker view.</div>';return;}
-            const rows=bountyShareItems.map(item=>`<div class="bounty-share-preview-item"><strong>${escapeHTML(item.charName)} · ${escapeHTML(item.slot)}</strong><span>${escapeHTML(item.dungeon)}${item.tier?` · ${escapeHTML(item.tier[0].toUpperCase()+item.tier.slice(1))}`:' · Tier not set'}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div>`).join('');
-            preview.innerHTML=`<h4 class="bounty-share-preview-title">${title}</h4><p class="bounty-share-preview-subtitle">${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'} · duplicate dungeon entries are intentionally kept separate</p>${rows}`;
+            const totals=bountyShareCharacterTotals(),chars=[...new Set(bountyShareItems.map(item=>item.charName))];
+            const sections=chars.map(charName=>{
+                const rows=bountyShareItems.filter(item=>item.charName===charName).map(item=>`<div class="bounty-share-preview-item"><div class="bounty-share-preview-dungeon"><strong>${escapeHTML(item.dungeon)}</strong>${item.sourceSlots.length>1?`<small>${item.sourceSlots.length} Tracker slots listed</small>`:''}</div><div class="bounty-share-preview-condition"><span class="bounty-share-tier ${item.tier==='legendary'?'is-legendary':item.tier==='unique'?'is-unique':''}">${escapeHTML(bountyShareTierLabel(item))}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div><strong class="bounty-share-preview-multiplier">×${item.count}</strong></div>`).join('');
+                return `<section class="bounty-share-preview-character"><div class="bounty-share-preview-character-head"><strong>${escapeHTML(charName)}</strong><span>${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} weekly claims</span></div>${rows}</section>`;
+            }).join('');
+            const totalClaims=Object.values(totals).reduce((sum,count)=>sum+count,0);
+            preview.innerHTML=`<h4 class="bounty-share-preview-title">PANTHEON · GUILD BOUNTIES</h4><p class="bounty-share-preview-subtitle">${bountyShareItems.length} dungeon entr${bountyShareItems.length===1?'y':'ies'} · ${totalClaims} claims across ${chars.length} character${chars.length===1?'':'s'}</p>${sections}`;
         }
         function renderBountyShareList(){
             const list=document.getElementById('bounty-share-list');if(!list)return;
-            const count=document.getElementById('bounty-share-count');if(count)count.textContent=`${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'}`;
+            const count=document.getElementById('bounty-share-count'),totals=bountyShareCharacterTotals();
+            const totalClaims=Object.values(totals).reduce((sum,value)=>sum+value,0),charCount=Object.keys(totals).length;
+            if(count)count.textContent=`${totalClaims} / ${charCount*BOUNTY_SHARE_WEEKLY_LIMIT} weekly claims used`;
             if(!bountyShareItems.length){list.innerHTML='<div class="bounty-share-empty">No bounty targets are filled in the currently displayed Tracker columns. Add targets in the Bounty Board rows, then reopen this builder.</div>';renderBountySharePreview();return;}
-            list.innerHTML=bountyShareItems.map((item,index)=>`<div class="bounty-share-row" data-bounty-share-index="${index}">
-                <div class="bounty-share-field"><small>Character · ${escapeHTML(item.slot)}</small><strong>${escapeHTML(item.charName)}</strong></div>
-                <div class="bounty-share-field"><small>Dungeon</small><strong>${escapeHTML(item.dungeon)}${item.state==='done'?' · Completed':''}</strong></div>
-                <label class="bounty-share-field"><small>Bounty rank</small><select aria-label="Bounty rank for ${escapeHTML(item.charName)} ${escapeHTML(item.slot)}" onchange="updateBountyShareField(${index},'tier',this.value)"><option value="" ${!item.tier?'selected':''}>Select rank</option><option value="unique" ${item.tier==='unique'?'selected':''}>Unique</option><option value="legendary" ${item.tier==='legendary'?'selected':''}>Legendary</option></select></label>
-                <label class="bounty-share-field"><small>Clear condition</small><select aria-label="Clear condition" onchange="updateBountyShareField(${index},'clearMode',this.value)"><option value="basic" ${item.clearMode==='basic'?'selected':''}>Basic clear</option><option value="timed" ${item.clearMode==='timed'?'selected':''}>Time-limited</option></select></label>
-                <label class="bounty-share-field"><small>Party requirement</small><select aria-label="Party requirement" onchange="updateBountyShareField(${index},'partyMode',this.value)"><option value="any" ${item.partyMode==='any'?'selected':''}>Any party</option><option value="guild8" ${item.partyMode==='guild8'?'selected':''}>8-man Guild Members</option></select></label>
-                <label class="bounty-share-field bounty-share-timer" data-bounty-share-timer="${index}" ${item.clearMode!=='timed'?'hidden':''}><small>Time limit · minutes</small><input type="number" inputmode="numeric" min="1" max="999" step="1" value="${item.minutes||''}" placeholder="e.g. 15" aria-label="Time limit in minutes" onchange="updateBountyShareField(${index},'minutes',this.value)"></label>
-            </div>`).join('');
+            const chars=[...new Set(bountyShareItems.map(item=>item.charName))];
+            list.innerHTML=chars.map(charName=>{
+                const charItems=bountyShareItems.map((item,index)=>({item,index})).filter(entry=>entry.item.charName===charName);
+                const spent=totals[charName]||0,atLimit=spent>=BOUNTY_SHARE_WEEKLY_LIMIT;
+                const rows=charItems.map(({item,index})=>`<div class="bounty-share-row" data-bounty-share-index="${index}">
+                    <div class="bounty-share-dungeon"><strong>${escapeHTML(item.dungeon)}</strong><small>${item.sourceSlots.length>1?`${item.sourceSlots.length} Tracker bounty slots consolidated`:'Listed bounty'}</small></div>
+                    <label class="bounty-share-control"><small>Highest bounty tier</small><select aria-label="Highest bounty tier for ${escapeHTML(charName)} ${escapeHTML(item.dungeon)}" onchange="updateBountyShareField(${index},'tier',this.value)"><option value="" ${!item.tier?'selected':''}>Select tier</option><option value="unique" ${item.tier==='unique'?'selected':''}>Unique</option><option value="legendary" ${item.tier==='legendary'?'selected':''}>Legendary</option></select></label>
+                    <label class="bounty-share-control"><small>Clear condition</small><select aria-label="Clear condition for ${escapeHTML(item.dungeon)}" onchange="updateBountyShareField(${index},'clearMode',this.value)"><option value="basic" ${item.clearMode==='basic'?'selected':''}>Basic clear</option><option value="timed" ${item.clearMode==='timed'?'selected':''}>Time-limited</option></select>${item.clearMode==='timed'?`<span class="bounty-share-inline-input"><input type="number" inputmode="numeric" min="1" max="999" step="1" value="${item.minutes||''}" placeholder="e.g. 15" aria-label="Time limit in minutes" onchange="updateBountyShareField(${index},'minutes',this.value)"><small>minutes</small></span>`:''}</label>
+                    <label class="bounty-share-control"><small>Party requirement</small><select aria-label="Party requirement for ${escapeHTML(item.dungeon)}" onchange="updateBountyShareField(${index},'partyMode',this.value)"><option value="any" ${item.partyMode==='any'?'selected':''}>Any party</option><option value="guild8" ${item.partyMode==='guild8'?'selected':''}>8-man Guild Members</option></select></label>
+                    <div class="bounty-share-count-control"><small>Weekly claims</small><div class="bounty-share-stepper"><button type="button" aria-label="Decrease ${escapeHTML(item.dungeon)} claim count" ${item.count<=1?'disabled':''} onclick="updateBountyShareCount(${index},-1)">−</button><strong>×${item.count}</strong><button type="button" aria-label="Increase ${escapeHTML(item.dungeon)} claim count" ${atLimit?'disabled':''} onclick="updateBountyShareCount(${index},1)">+</button></div></div>
+                </div>`).join('');
+                return `<section class="bounty-share-character"><div class="bounty-share-character-head"><strong>${escapeHTML(charName)}</strong><span class="bounty-share-character-total">${spent}/${BOUNTY_SHARE_WEEKLY_LIMIT} claims${atLimit?' · Weekly limit reached':''}</span></div><div class="bounty-share-character-rows">${rows}</div></section>`;
+            }).join('');
             renderBountySharePreview();
         }
         function openBountyShareModal(){
             bountyShareItems=collectBountyShareItems();
             renderBountyShareList();
-            const status=document.getElementById('bounty-share-status');if(status)status.textContent='Selections are saved on this device and do not alter shared Tracker checkmarks.';
+            const status=document.getElementById('bounty-share-status');if(status)status.textContent='Repeated dungeon slots are consolidated by character. Set the highest tier/condition once, then use + to tally additional weekly claims. Counts are saved on this device.';
             openModal('bounty-share-modal');
         }
         function buildBountyShareText(){
-            const lines=['PANTHEON · GUILD BOUNTIES',`${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'}`,''];
-            bountyShareItems.forEach(item=>lines.push(`${item.charName} — ${item.dungeon} — ${item.tier?item.tier[0].toUpperCase()+item.tier.slice(1):'Tier not set'} — ${bountyShareRequirement(item)}${item.state==='done'?' — Completed':''} [${item.slot}]`));
-            return lines.join('\n');
+            const totals=bountyShareCharacterTotals(),chars=[...new Set(bountyShareItems.map(item=>item.charName))];
+            const lines=['PANTHEON · GUILD BOUNTIES','Weekly bounty claims · maximum 6 per character',''];
+            chars.forEach(charName=>{
+                lines.push(`${charName} · ${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} claims`);
+                bountyShareItems.filter(item=>item.charName===charName).forEach(item=>lines.push(`• ${item.dungeon} ×${item.count} — ${bountyShareTierLabel(item)} — ${bountyShareRequirement(item)}${item.state==='done'?' — Completed':''}`));
+                lines.push('');
+            });
+            return lines.join('\n').trim();
         }
         async function copyBountyShareText(){
             if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to copy.');return;}
@@ -5712,20 +5802,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function setBountyShareStatus(message){const el=document.getElementById('bounty-share-status');if(el)el.textContent=String(message||'');}
         function bountyShareSvg(){
-            const width=1200,rowH=82,pad=54,headerH=190,height=headerH+Math.max(1,bountyShareItems.length)*rowH+pad;
+            const width=1400,pad=48,headerH=190,charHeadH=54,rowH=86,footer=50;
+            const chars=[...new Set(bountyShareItems.map(item=>item.charName))],totals=bountyShareCharacterTotals();
+            const height=headerH+chars.reduce((sum,charName)=>sum+charHeadH+bountyShareItems.filter(item=>item.charName===charName).length*rowH,0)+footer;
             const safe=txt=>String(txt||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
-            let rows='';
-            bountyShareItems.forEach((item,index)=>{
-                const y=headerH+index*rowH;
-                const tier=item.tier?item.tier[0].toUpperCase()+item.tier.slice(1):'Tier not set';
-                const condition=bountyShareRequirement(item)+(item.state==='done'?' · Completed':'');
-                rows+=`<rect x="42" y="${y}" width="1116" height="68" rx="12" fill="${index%2?'#eef2f7':'#f7f9fc'}"/>`+
-                    `<text x="66" y="${y+27}" font-size="19" font-weight="700" fill="#203047">${safe(item.charName)} · ${safe(item.slot)}</text>`+
-                    `<text x="66" y="${y+51}" font-size="16" fill="#506078">${safe(item.dungeon)}</text>`+
-                    `<text x="690" y="${y+28}" font-size="18" font-weight="800" fill="#203047">${safe(tier)}</text>`+
-                    `<text x="690" y="${y+52}" font-size="16" fill="#506078">${safe(condition)}</text>`;
+            let y=headerH,sections='';
+            chars.forEach((charName,charIndex)=>{
+                sections+=`<rect x="${pad}" y="${y}" width="${width-pad*2}" height="${charHeadH-4}" rx="10" fill="#e6ebf2"/>`+
+                    `<text x="${pad+20}" y="${y+33}" font-family="Arial,sans-serif" font-size="21" font-weight="800" fill="#203047">${safe(charName)}</text>`+
+                    `<text x="${width-pad-20}" y="${y+33}" text-anchor="end" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#42536b">${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} WEEKLY CLAIMS</text>`;
+                y+=charHeadH;
+                bountyShareItems.filter(item=>item.charName===charName).forEach((item,index)=>{
+                    const tier=bountyShareTierLabel(item),condition=bountyShareRequirement(item)+(item.state==='done'?' · Completed':'');
+                    sections+=`<rect x="${pad}" y="${y}" width="${width-pad*2}" height="${rowH-8}" rx="10" fill="${index%2?'#f0f3f7':'#f8fafc'}"/>`+
+                        `<text x="${pad+20}" y="${y+33}" font-family="Arial,sans-serif" font-size="20" font-weight="800" fill="#203047">${safe(item.dungeon)}</text>`+
+                        `<text x="${pad+20}" y="${y+58}" font-family="Arial,sans-serif" font-size="14" fill="#65758b">${safe(item.sourceSlots.length>1?`${item.sourceSlots.length} Tracker slots consolidated`:'Guild bounty')}</text>`+
+                        `<text x="760" y="${y+34}" font-family="Arial,sans-serif" font-size="18" font-weight="800" fill="#203047">${safe(tier)}</text>`+
+                        `<text x="760" y="${y+59}" font-family="Arial,sans-serif" font-size="15" fill="#506078">${safe(condition)}</text>`+
+                        `<text x="${width-pad-22}" y="${y+48}" text-anchor="end" font-family="Arial,sans-serif" font-size="26" font-weight="900" fill="#203047">×${item.count}</text>`;
+                    y+=rowH;
+                });
             });
-            return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ffffff"/><rect x="0" y="0" width="1200" height="164" fill="#1e2d45"/><text x="54" y="74" font-family="Arial,sans-serif" font-size="34" font-weight="900" fill="#ffffff">PANTHEON · GUILD BOUNTIES</text><text x="54" y="118" font-family="Arial,sans-serif" font-size="19" fill="#d8e2f1">${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'} · duplicate dungeons listed separately</text><text x="54" y="151" font-family="Arial,sans-serif" font-size="13" fill="#d8e2f1">Generated from the current Tracker view</text>${rows}<text x="54" y="${height-18}" font-family="Arial,sans-serif" font-size="12" fill="#78879c">Pantheon Tools · Dragon Nest Classic SEA</text></svg>`;
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ffffff"/><rect x="0" y="0" width="${width}" height="164" fill="#1e2d45"/><text x="${pad}" y="74" font-family="Arial,sans-serif" font-size="36" font-weight="900" fill="#ffffff">PANTHEON · GUILD BOUNTIES</text><text x="${pad}" y="119" font-family="Arial,sans-serif" font-size="19" fill="#d8e2f1">Highest-tier bounty per dungeon · claim counts consolidated · 6 weekly claims per character</text>${sections}<text x="${pad}" y="${height-18}" font-family="Arial,sans-serif" font-size="13" fill="#78879c">Pantheon Tools · Dragon Nest Classic SEA</text></svg>`;
         }
         async function downloadBountySharePng(){
             if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to export.');return;}
@@ -5744,7 +5842,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(navigator.share){try{await navigator.share({title:'Pantheon Guild Bounties',text:textValue});setBountyShareStatus('Share sheet opened.');return;}catch(error){if(error?.name==='AbortError')return;}}
             await copyBountyShareText();
         }
-
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
@@ -9984,7 +10081,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r34';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r35';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
