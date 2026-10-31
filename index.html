@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r47</title>
+    <title>Pantheon Tools v1.6.8-r50</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3313,9 +3313,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r47</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r50</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r47 hotfix:</strong> Corrects the release-check version mismatch that caused r44 to reload continuously. Existing authentication, tracker permissions, and shared-data behavior are preserved.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r50:</strong> Fixes player-storage startup ordering: administrators initialize and migrate storage before the first Tracker write; members wait safely for setup. Pending character edits are retained locally without retry spam until storage is confirmed ready. Existing data remains backed up before import.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3807,12 +3807,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const charName = String(item.charName || '').trim(), taskName = String(item.taskName || '').trim();
                     if (!charName || !taskName) return;
                     const state = ['open','done','excluded','marked','reset'].includes(item.state) ? item.state : 'open';
-                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), retryCount: Math.max(0, Math.min(5, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0 };
+                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), retryCount: Math.max(0, Math.min(5, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0, lastError: String(item.lastError || '').slice(0,260), lastCode: String(item.lastCode || '').slice(0,60), lastStatus: Number(item.lastStatus) || 0, retryable: item.lastCode ? item.retryable !== false : true };
                 });
                 return cleaned;
             } catch (_) { return {}; }
         }
         let pendingCellWrites = loadPendingCellWrites();
+        // Player-scoped saves stay paused until D1 confirms the one-time migration is complete.
+        // This prevents members' queued edits from repeatedly hitting an uninitialized table.
+        let characterStorageReady = false;
+        let characterStorageSetupError = '';
         const pendingCellRetryTimers = new Map();
         const pendingCellSyncBusy = new Set();
         const pendingCellDebounceTimers = new Map();
@@ -3833,7 +3837,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const mismatches = [];
             const acknowledged = [];
             Object.entries(pendingSnapshot || {}).forEach(([key, patch]) => {
-                const latestCell = normalizeCellRecord(latest?.cells?.[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
+                const latestCell = normalizeCellRecord(latest?.cells?.[patch.charName]?.[patch.taskName]) || { state:'__unconfirmed__', note:'__unconfirmed__', updatedAt:0, deviceId:'' };
                 const savedAsRequested = latestCell.state === patch.state && latestCell.note === patch.note;
                 const current = pendingCellWrites[key];
                 const stillCurrent = current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note;
@@ -3844,7 +3848,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 } else {
                     // Never discard an edit merely because the server returned a different value.
                     // Retain it locally for bounded automatic retries or an explicit manual retry.
-                    pendingCellWrites[key] = { ...current, retryCount:Math.min(5, (Number(current.retryCount)||0)+1), lastAttemptAt:Date.now() };
+                    pendingCellWrites[key] = { ...current, retryCount:Math.min(5, (Number(current.retryCount)||0)+1), lastAttemptAt:Date.now(), lastError:'Server acknowledgement did not match the requested task state.', lastCode:'ACK_MISMATCH', lastStatus:200, retryable:false };
                     mismatches.push({ charName:patch.charName, taskName:patch.taskName, requestedState:patch.state, actualState:latestCell.state, retryCount:pendingCellWrites[key].retryCount });
                 }
             });
@@ -3854,6 +3858,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function getPendingCellCharacterNames() {
             return [...new Set(Object.values(pendingCellWrites).map(item => String(item.charName || '').trim()).filter(Boolean))];
         }
+        function resumePendingCellWritesAfterMigration() {
+            let changed = false;
+            for (const item of Object.values(pendingCellWrites)) {
+                if (['CHARACTER_STORAGE_NOT_MIGRATED','CHARACTER_STORAGE_SCHEMA_MISSING','OWNER_INDEX_REFRESH_FAILED'].includes(item.lastCode) || !item.lastCode) {
+                    if (item.retryable === false || Number(item.retryCount) >= 5) { item.retryable = true; item.retryCount = 0; changed = true; }
+                }
+            }
+            if (changed) persistPendingCellWrites();
+            schedulePendingCellRetry();
+        }
         function pendingCellEntriesForCharacter(charName) {
             return Object.entries(pendingCellWrites).filter(([,item]) => String(item.charName || '') === String(charName));
         }
@@ -3861,7 +3875,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const names = getPendingCellCharacterNames();
             if (names.length) {
                 const summary = names.slice(0,4).join(', ') + (names.length > 4 ? ', …' : '');
-                const text = message || `Saving ${names.length} character${names.length === 1 ? '' : 's'}: ${summary}`;
+                const failed = Object.values(pendingCellWrites).find(item => item.retryable === false && item.lastError);
+                const text = message || (failed ? `${names.length} character${names.length === 1 ? '' : 's'} have unconfirmed saves · ${failed.charName} · ${failed.taskName}: ${failed.lastError}` : `Saving ${names.length} character${names.length === 1 ? '' : 's'}: ${summary}`);
                 setStatus(`🟡 ${text}`);
                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('pending', text);
             } else {
@@ -3870,11 +3885,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         }
         function schedulePendingCellRetry(charName = '') {
+            if (!characterStorageReady) return;
             const targets = charName ? [String(charName)] : getPendingCellCharacterNames();
             targets.forEach(name => {
                 if (!name || pendingCellRetryTimers.has(name) || pendingCellSyncBusy.has(name)) return;
                 const entries = pendingCellEntriesForCharacter(name);
-                if (!entries.length || !entries.some(([,item]) => (Number(item.retryCount)||0) < 5)) return;
+                if (!entries.length || !entries.some(([,item]) => item.retryable !== false && (Number(item.retryCount)||0) < 5)) return;
                 const maxAttempts = Math.max(0, ...entries.map(([,item]) => Number(item.retryCount)||0));
                 const delay = Math.min(8000, 900 * Math.pow(2, maxAttempts));
                 const timer = setTimeout(() => {
@@ -3904,6 +3920,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 updatePendingCellStatus('Saved locally only · connect to the shared Tracker to publish these changes');
                 return false;
             }
+            if (!characterStorageReady) {
+                // This is a setup prerequisite, not a transient cell-save failure. Keep the
+                // edit in local storage and wait for the status endpoint to report readiness.
+                updatePendingCellStatus('Player storage is not ready yet · your edits are retained locally and will sync when setup completes');
+                return false;
+            }
             if (window.__pantheonVersionWriteBusy) { schedulePendingCellRetry(name); return false; }
             const snapshot = Object.fromEntries(snapshotEntries);
             const config = getCloudConfig();
@@ -3911,17 +3933,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             try {
                 const edits = snapshotEntries.map(([,item]) => ({ taskName:item.taskName, state:item.state, note:item.note }));
                 const weekKey = String(getTargetResetTimeUTC(true));
-                const timing = snapshotEntries.map(([,item]) => {
-                    const saved = cloudData?.completionTiming?.[weekKey]?.[name]?.[item.taskName];
-                    if (!saved || !['done','open'].includes(saved.state) || saved.state !== item.state) return null;
-                    return { taskName:item.taskName, weekKey, state:saved.state };
-                }).filter(Boolean);
+                const timing = cloudData?.settings?.analyticsTrackingEnabled === true
+                    ? snapshotEntries.filter(([,item]) => ['done','open'].includes(item.state)).map(([,item]) => ({ taskName:item.taskName, weekKey, state:item.state }))
+                    : [];
                 const response = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/cells`, {
                     method:'POST', headers:{'Content-Type':'application/json',...authHeaders(config)},
                     body:JSON.stringify({ character:name, edits, timing })
                 }, 10000);
                 const payload = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(payload.message || payload.error || `Character save failed (${response.status})`);
+                if (!response.ok) { const error = new Error(payload.message || payload.error || `Character save failed (${response.status})`); error.status=response.status; error.code=String(payload.code || ''); error.retryable=typeof payload.retryable === 'boolean' ? payload.retryable : ([409,425,429].includes(response.status) || response.status >= 500); throw error; }
                 const confirmedCells = {};
                 (Array.isArray(payload.edits) ? payload.edits : []).forEach(item => {
                     if (!item?.taskName) return;
@@ -3936,7 +3956,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
                 const stillPending = pendingCellEntriesForCharacter(name);
                 if (stillPending.length) {
-                    updatePendingCellStatus(`${name}: ${stillPending.length} edit${stillPending.length === 1 ? '' : 's'} still awaiting confirmation`);
+                    const permanent = stillPending.find(([,item]) => item.retryable === false)?.[1];
+                    updatePendingCellStatus(`${name}: ${stillPending.length} edit${stillPending.length === 1 ? '' : 's'} not confirmed${permanent?.lastError ? ` · ${permanent.lastError}` : ' · awaiting confirmation'}`);
                     schedulePendingCellRetry(name);
                 } else if (getPendingCellCharacterNames().length) {
                     updatePendingCellStatus();
@@ -3953,14 +3974,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 snapshotEntries.forEach(([key,patch]) => {
                     const current = pendingCellWrites[key];
                     if (current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note) {
-                        pendingCellWrites[key] = { ...current, retryCount:Math.min(5,(Number(current.retryCount)||0)+1), lastAttemptAt:Date.now() };
+                        const status = Number(error?.status) || 0;
+                        const retryableError = typeof error?.retryable === 'boolean' ? error.retryable : (status === 409 || status === 425 || status === 429 || status >= 500 || /timeout|network|fetch failed|temporar/i.test(String(error?.message || '')));
+                        pendingCellWrites[key] = { ...current, retryCount:retryableError ? Math.min(5,(Number(current.retryCount)||0)+1) : Number(current.retryCount)||0, lastAttemptAt:Date.now(), lastError:String(error?.message || 'Unknown save error').slice(0,260), lastCode:String(error?.code || '').slice(0,60), lastStatus:status, retryable:retryableError };
                     }
                 });
                 persistPendingCellWrites();
                 const entries = pendingCellEntriesForCharacter(name);
-                const retryable = entries.some(([,item]) => (Number(item.retryCount)||0) < 5);
-                setStatus(`🔴 ${name} save not confirmed · ${error.message} · changes retained on this device`);
-                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', `${name} save not confirmed · retained locally`);
+                const retryable = entries.some(([,item]) => item.retryable !== false && (Number(item.retryCount)||0) < 5);
+                const permanent = entries.find(([,item]) => item.retryable === false)?.[1];
+                const detail = permanent?.lastError || error.message;
+                const statusText = error?.status ? `HTTP ${error.status}: ` : '';
+                setStatus(`🔴 ${name} save not confirmed · ${statusText}${detail} · changes retained on this device`);
+                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', `${name} save failed${error?.status ? ` (${error.status})` : ''} · ${detail.slice(0,120)} · retained locally`);
                 if (retryable) schedulePendingCellRetry(name);
                 return false;
             } finally {
@@ -5606,6 +5632,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!res.ok) throw new Error(payload.message || `Revision check failed (${res.status})`);
             const serverTime = Number(payload.metadata?.serverTime) || 0;
             if (serverTime > 0) serverClockOffsetMs = serverTime - Date.now();
+            const wasCharacterStorageReady = characterStorageReady;
+            characterStorageReady = payload.metadata?.characterStorageReady === true;
+            if (characterStorageReady) {
+                characterStorageSetupError = '';
+                resumePendingCellWritesAfterMigration();
+                if (!wasCharacterStorageReady && unsavedCloudChanges) {
+                    // A global setting changed locally while setup was pending. Resume its
+                    // normal sync only after the player-storage migration is confirmed.
+                    setTimeout(() => { if (characterStorageReady && unsavedCloudChanges && !syncInProgress) forceSync(false); }, 250);
+                }
+            }
             const revision = Number(payload.metadata?.updatedAt) || 0;
             if (!revision) throw new Error('The shared database did not return a valid revision.');
             return revision;
@@ -5618,12 +5655,50 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             getLocalTeamBuilderState();
             refreshTrackerUI();
             if (!hasCloudConfig()) return setStatus('⚪ Local mode — click Cloud Setup');
-            // Do not apply daily/weekly resets to a browser cache before the shared record
-            // has hydrated. A stale cache can otherwise make the reset appear to happen
-            // only after a second refresh, or temporarily overwrite a newer shared state.
-            // forceSync performs checkAutoResets only after the latest server record is
-            // loaded and the merged record is confirmed by the server.
-            try { await fetchRemoteRevision(getCloudConfig()); } catch (_) { /* D1 write timestamps remain authoritative if clock calibration is temporarily unavailable. */ }
+
+            // IMPORTANT: provision/migrate owner-scoped storage before any whole-record sync
+            // or pending character-save request can run. In r49 this happened after forceSync,
+            // allowing early cell writes to hit an uninitialized player-storage table.
+            if (isPantheonAdmin()) {
+                const setup = await refreshCharacterStorageStatus();
+                if (!setup || setup.migrationComplete !== true) {
+                    characterStorageReady = false;
+                    // Continue to display the preserved legacy Tracker, but do not write it.
+                    try {
+                        const legacy = normalizeData(await fetchRemoteRecord(getCloudConfig()));
+                        const pendingSnapshot = clonePendingCellWrites();
+                        cloudData = legacy;
+                        if (Object.keys(pendingSnapshot).length) cloudData = applyPendingCellWrites(cloudData, legacy, pendingSnapshot);
+                        refreshTrackerUI();
+                    } catch (_) { /* Keep the local snapshot available if the legacy read also fails. */ }
+                    setStatus(`🟠 Player storage setup is not complete · ${characterStorageSetupError || 'the original Tracker remains available; local edits are being retained'}`);
+                    return;
+                }
+            } else {
+                // A regular member must never attempt legacy whole-record writes before the
+                // administrator has completed the one-time migration. They can still view the
+                // legacy snapshot and their edits remain queued locally until readiness is true.
+                try { await fetchRemoteRevision(getCloudConfig()); } catch (_) {}
+                if (!characterStorageReady) {
+                    try {
+                        const legacy = normalizeData(await fetchRemoteRecord(getCloudConfig()));
+                        const pendingSnapshot = clonePendingCellWrites();
+                        cloudData = legacy;
+                        if (Object.keys(pendingSnapshot).length) cloudData = applyPendingCellWrites(cloudData, legacy, pendingSnapshot);
+                        refreshTrackerUI();
+                    } catch (_) { /* Leave cached data visible while setup is pending. */ }
+                    if (getPendingCellCharacterNames().length) {
+                        updatePendingCellStatus('Waiting for administrator to finish player-storage setup · your edits are retained locally');
+                    } else {
+                        setStatus('🟠 Player storage is being initialized by an administrator · Tracker is temporarily read-only');
+                    }
+                    if (pantheonDiscordUser) updateOverviewProfile(pantheonDiscordUser);
+                    return;
+                }
+            }
+
+            // At this point player storage is ready and reads aggregate the owner-scoped rows.
+            try { await fetchRemoteRevision(getCloudConfig()); } catch (_) { /* D1 timestamps remain authoritative if clock calibration is temporarily unavailable. */ }
             await forceSync(false);
             refreshTrackerUI();
             if (pantheonDiscordUser) updateOverviewProfile(pantheonDiscordUser);
@@ -5895,8 +5970,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // Normal sync. The revision journal is a separate best-effort service.
         // The main tracker sync succeeds independently of journal availability.
         function forceSync(showSuccess = false){
+            if (!characterStorageReady) {
+                persistLocalData();
+                if (getPendingCellCharacterNames().length) {
+                    updatePendingCellStatus('Player storage setup is pending · your edits are retained locally and will sync when setup completes');
+                } else {
+                    setStatus('🟠 Player storage is not ready · changes are being kept on this device');
+                }
+                return Promise.resolve(false);
+            }
             if (showSuccess) {
-                Object.values(pendingCellWrites).forEach(item => { item.retryCount = 0; item.lastAttemptAt = 0; });
+                Object.values(pendingCellWrites).forEach(item => { item.retryCount = 0; item.lastAttemptAt = 0; item.retryable = true; item.lastError = ''; item.lastCode = ''; item.lastStatus = 0; });
                 persistPendingCellWrites();
                 pendingCellRetryTimers.forEach(timer => clearTimeout(timer)); pendingCellRetryTimers.clear();
             }
@@ -6062,7 +6146,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     updateOverviewEventNotice();
                 }
                 if(isTrackerPageCurrentlyVisible()){
-                    setTrackerLiveSyncNote(changed?'updated':'current',changed?`Guild progress updated · ${getPendingCellCharacterNames().length ? getPendingCellCharacterNames().length+' of your character saves still pending · ' : ''}${trackerSyncTimeLabel()}`:'Live · checked '+trackerSyncTimeLabel());
+                    const pendingNames = getPendingCellCharacterNames();
+                    const failedSave = Object.values(pendingCellWrites).find(item => item.retryable === false && item.lastError);
+                    const pendingMessage = pendingNames.length ? `${pendingNames.length} character${pendingNames.length===1?'':'s'} have unconfirmed saves${failedSave ? ` · ${failedSave.charName}: ${failedSave.lastError}` : ''}` : '';
+                    setTrackerLiveSyncNote(pendingNames.length ? 'pending' : (changed?'updated':'current'), changed ? `Guild view refreshed${pendingMessage ? ` · ${pendingMessage}` : ''} · ${trackerSyncTimeLabel()}` : (pendingMessage || 'Live · checked '+trackerSyncTimeLabel()));
                 }
                 return true;
             }catch(error){
@@ -6246,6 +6333,47 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function setBountyShareStatus(message){const el=document.getElementById('bounty-share-status');if(el)el.textContent=String(message||'');}
         function openVersionHistoryModal(){if(!isAdminModeActive()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
+
+        async function refreshCharacterStorageStatus() {
+            if (!isPantheonAdmin()) return null;
+            try {
+                // This authenticated GET automatically creates the additive D1 tables and,
+                // if needed, imports the existing Tracker once. No dashboard SQL or button
+                // is required. The endpoint is idempotent after the first successful run.
+                const response = await fetch('/api/admin/character-storage', { method:'GET', credentials:'same-origin', cache:'no-store' });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || payload.migrationComplete !== true) throw new Error(payload.error || payload.message || `Player storage setup unavailable (${response.status})`);
+                if (payload.migratedNow === true) {
+                    // Re-read the canonical aggregated view after the one-time import, while
+                    // preserving this browser's explicit, unconfirmed cell edits.
+                    for (const item of Object.values(pendingCellWrites)) {
+                        item.retryCount = 0; item.retryable = true; item.lastError = ''; item.lastCode = ''; item.lastStatus = 0;
+                    }
+                    persistPendingCellWrites();
+                }
+                const pendingSnapshot = clonePendingCellWrites();
+                const latest = normalizeData(await fetchRemoteRecord());
+                cloudData = restoreRemoteCellsForPendingWrites(latest, latest, pendingSnapshot);
+                if (Object.keys(pendingSnapshot).length) cloudData = applyPendingCellWrites(cloudData, latest, pendingSnapshot);
+                lastRemoteRevision = await fetchRemoteRevision();
+                persistLocalData();
+                refreshTrackerUI();
+                updateAdminModeUI();
+                if (payload.migratedNow === true) {
+                    schedulePendingCellRetry();
+                    setStatus('🟢 Player storage is ready · existing character progress was preserved');
+                }
+                characterStorageReady = true;
+                characterStorageSetupError = '';
+                return payload;
+            } catch (error) {
+                characterStorageReady = false;
+                characterStorageSetupError = String(error?.message || error).slice(0,260);
+                setStatus(`🟠 Player storage setup is waiting · ${characterStorageSetupError}`);
+                updateAdminModeUI();
+                return null;
+            }
+        }
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
         function triggerAutoSync() {
@@ -10503,7 +10631,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r47';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r50';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -11221,7 +11349,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r47';
+  const CURRENT_BUILD = '1.6.8-r50';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

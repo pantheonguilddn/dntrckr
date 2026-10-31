@@ -1,5 +1,6 @@
 import { jsonResponse, requireAdmin, storeRecord } from '../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../_utils/compact.js';
+import { isCharacterStorageMigrationBusy, syncCharacterIndexes } from '../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const VALID_JOBS = new Set(['Adept','Physician','Gear Master','Shooting Star','Sniper','Artillery','Wind Walker','Tempest','Light Fury','Abyss Walker','Raven','Ripper','Saint','Inquisitor','Crusader','Guardian','Spirit Dancer','Blade Dancer','Dark Summoner','Soul Eater','Saleana','Elestra','Majesty','Smasher','Gladiator','Moonlord','Barbarian','Destroyer','Dark Avenger']);
@@ -57,6 +58,7 @@ export async function onRequestGet(context) {
 export async function onRequestPut(context) {
   const denied = await requireAdmin(context);
   if (denied) return denied;
+  if (await isCharacterStorageMigrationBusy(context.env)) return jsonResponse({ code:'CHARACTER_STORAGE_MIGRATION_BUSY', retryable:true, error:'Character registration is temporarily paused while player storage is being migrated.' }, 503);
   let body;
   try { body = await context.request.json(); } catch (_) { return jsonResponse({ error: 'Expected a JSON request body.' }, 400); }
   const memberId = String(body.memberId || '').trim();
@@ -139,6 +141,8 @@ export async function onRequestPut(context) {
 
     const packed = encodePantheonCompactRecord(record);
     await storeRecord(context.env, MAIN_ID, packed, result.row.name || 'Pantheon DN Tracker');
+    try { await syncCharacterIndexes(context.env, record, now); }
+    catch (indexError) { return jsonResponse({ error: `Character registrations were saved, but the owner index needs a retry: ${String(indexError?.message || indexError).slice(0,180)}` }, 503); }
     await context.env.PANTHEON_DB.prepare('INSERT INTO audit_events (actor_discord_id, action, target_discord_id, created_at, details_json) VALUES (?, ?, ?, ?, ?)')
       .bind(context.data.session.discordId, 'admin-character-registration-update', '', now, JSON.stringify({ memberId, memberName: member.name, characterCount: profiles.length })).run();
     return jsonResponse({ ok: true, memberId, memberName: member.name, members: serializeMembers(record), updatedAt: now });

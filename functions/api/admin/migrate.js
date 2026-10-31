@@ -1,4 +1,5 @@
 import { jsonResponse, requireAdmin, storeRecord } from '../../_utils/auth.js';
+import { isCharacterStorageMigrationBusy } from '../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const REVISION_ID = 'pantheon-revisions';
@@ -6,6 +7,7 @@ const REVISION_ID = 'pantheon-revisions';
 export async function onRequestPost(context) {
   const denied = await requireAdmin(context);
   if (denied) return denied;
+  if (await isCharacterStorageMigrationBusy(context.env)) return jsonResponse({ code:'CHARACTER_STORAGE_MIGRATION_BUSY', retryable:true, error:'Import is paused while the player-storage snapshot is being migrated.' }, 503);
   let body;
   try { body = await context.request.json(); } catch (_) { return jsonResponse({ error: 'Expected JSON request body.' }, 400); }
   const mainRecord = body.mainRecord;

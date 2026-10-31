@@ -1,18 +1,27 @@
-# Pantheon Tools v1.6.8-r47 — persistent What's New dismissal
+# Pantheon Tools v1.6.8-r49 — one-package update
 
-## What changed
+## Deploy
 
-- The What's New dismissal is now stored in both localStorage and a release-scoped cookie, so a normal navigation/reload does not repeatedly reopen the same release popup if localStorage is unavailable.
-- The dismissal value remains tied to the installed build; a genuinely newer release can still show its own What's New popup.
-- The Continue button and checkbox both persist the preference. Unchecking the option clears the saved dismissal so the next full app opening can show the release note again.
-- Welcome-modal initialization is idempotent within a page runtime, preventing duplicate boot paths from reopening the same popup.
-- The Help/Salary return-to-welcome path now uses the same shared dismissal check rather than reading localStorage alone.
-- No authentication, D1 schema, API endpoint, tracker ownership, sync, Admin View, or other permission behavior changed.
+1. Keep a copy of your currently working Pages deployment as rollback.
+2. Upload the complete contents of this ZIP to the existing Cloudflare Pages project.
+3. Keep the existing `PANTHEON_DB` D1 binding, Discord OAuth settings, environment variables, and project configuration unchanged.
+4. Open the app and sign in with the administrator Discord account. On the first administrator startup, Pantheon automatically creates the additional player-storage tables and imports the existing Tracker data. No separate SQL-console step and no migration button are required.
+5. Confirm the app reports **Player storage is ready**, then test one administrator-owned character and one other member's character before asking the guild to return.
 
-## Deployment
+## Safety
 
-Deploy the complete ZIP contents to the existing Cloudflare Pages project. Preserve the existing D1 binding and environment configuration. Verify `/version.json` reports `1.6.8-r47` after deployment.
+- The original `pantheon-main` Tracker record is backed up in D1 before the import.
+- Existing roster, settings, task cells, and completion timing are copied into owner-scoped tables.
+- The migration is protected by a tokenized lock and can be safely retried if interrupted.
+- Character saves are written to the affected character/task rows; they no longer rewrite the whole guild Tracker JSON.
+- Universal View is aggregated and read-only for non-admins. Admin View is required for cross-owner edits.
+- Do not delete the existing D1 database or its `pantheon-main` record.
 
 ## Validation boundary
 
-Frontend JavaScript syntax, CSS parsing, package integrity, package-path preservation, release-marker consistency, and targeted dismissal behavior tests pass locally. This package has not been deployed to production or tested against live guild accounts.
+Local syntax, SQLite-backed migration, ownership, aggregation, concurrent player-save, and package-integrity tests are run for this build. This is not a live Cloudflare Pages/D1 multi-account deployment test; verify the two-account workflow on production before guild-wide use.
+
+
+## r50 player-storage setup
+
+The first authenticated administrator startup creates the additive player-storage tables and migrates the existing `pantheon-main` data before the first normal Tracker write. No separate SQL-console action is required. Regular members wait in read-only mode until the status endpoint confirms storage readiness; queued edits remain in their browser and resume automatically after setup completes.
