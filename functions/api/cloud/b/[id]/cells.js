@@ -1,6 +1,6 @@
 import { jsonResponse, resolveRecordId } from '../../../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../../_utils/compact.js';
-import { registrationWriteViolation } from '../../../../_utils/registration-guard.js';
+import { registrationWriteViolation, repairBootstrapAdminOwnerLinks, resolveDiscordOwnerMember } from '../../../../_utils/registration-guard.js';
 
 const MAIN_ID = 'pantheon-main';
 const CELL_STATES = new Set(['open','done','excluded','marked','reset']);
@@ -68,8 +68,7 @@ export async function onRequestPost(context) {
     // Timing is accepted only for a task whose cell is included in this request and whose
     // saved state agrees with the timing state; the owner key is derived from the session.
     if (next.settings?.analyticsTrackingEnabled === true && data?.session?.discordId) {
-      const owner = (Array.isArray(previous.settings?.memberDirectory) ? previous.settings.memberDirectory : [])
-        .find(member => String(member?.profileConfirmedDiscordId || '') === String(data.session.discordId));
+      const owner = resolveDiscordOwnerMember(data.session, previous.settings?.memberDirectory);
       const ownerKey = String(owner?.id || owner?.name || '').slice(0,120);
       const now = Date.now();
       const cutoff = now - 42 * 24 * 60 * 60 * 1000;
@@ -101,6 +100,7 @@ export async function onRequestPost(context) {
     const adminOverride = data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
     const violation = registrationWriteViolation(previous,next,data?.session,{ enforceForAdmin:!adminOverride });
     if (violation) return jsonResponse({ error:violation, message:violation },403);
+    if (!adminOverride) repairBootstrapAdminOwnerLinks(next, data?.session);
 
     const savedAt = Math.max(Date.now(), (Number(row.updated_at) || 0) + 1);
     next.updatedAt = savedAt;

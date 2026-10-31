@@ -56,8 +56,9 @@ function keyed(items, fallback) {
 function candidatesFor(session) {
   const username = String(session?.username || '').trim();
   const label = String(session?.label || '').trim();
+  const personalOwner = session?.isBootstrapAdmin === true ? String(session?.personalOwnerName || '').trim() : '';
   const labelOverrides = !!label && key(label) !== key(username);
-  return [...new Set((labelOverrides ? [label, username] : [username, label]).filter(Boolean))];
+  return [...new Set([personalOwner, ...(labelOverrides ? [label, username] : [username, label])].filter(Boolean))];
 }
 function memberMatchesOwner(member, candidates) {
   if (!member) return false;
@@ -69,27 +70,103 @@ function memberMatchesOwner(member, candidates) {
   }
   return false;
 }
-function resolveOwnerCandidates(session, existingMembers) {
+function uniqueMemberForCandidate(members, candidate) {
+  const exact = arr(members).filter(member => key(member?.name) === key(candidate));
+  if (exact.length === 1) return exact[0];
+  if (exact.length > 1) return null;
+  const compact = compactKey(candidate);
+  if (!compact) return null;
+  const close = arr(members).filter(member => compactKey(member?.name) === compact);
+  return close.length === 1 ? close[0] : null;
+}
+
+/**
+ * Resolve one roster owner for one authenticated Discord identity.
+ * The bootstrap admin's personal identity is explicitly configured as Cho by default;
+ * Admin is a permission role, not a second roster owner. All other accounts continue to
+ * prefer a unique confirmed Discord link, with label/username as a safe disambiguation.
+ */
+export function resolveDiscordOwnerMember(session, existingMembers) {
+  const members = arr(existingMembers);
   const discordId = String(session?.discordId || '').trim();
+  const personalOwnerName = session?.isBootstrapAdmin === true ? String(session?.personalOwnerName || '').trim() : '';
+
+  if (personalOwnerName) {
+    const preferred = uniqueMemberForCandidate(members, personalOwnerName);
+    if (!preferred) return null;
+    const linkedDiscordId = String(preferred?.profileConfirmedDiscordId || '').trim();
+    // Never take over a roster explicitly confirmed to a different Discord account.
+    if (linkedDiscordId && linkedDiscordId !== discordId) return null;
+    return preferred;
+  }
+
   if (discordId) {
-    const confirmed = arr(existingMembers).filter(member => String(member?.profileConfirmedDiscordId || '').trim() === discordId);
-    if (confirmed.length === 1) {
-      const ownerName = String(confirmed[0]?.name || '').trim();
-      return ownerName ? [ownerName] : [];
+    const confirmed = members.filter(member => String(member?.profileConfirmedDiscordId || '').trim() === discordId);
+    if (confirmed.length === 1) return confirmed[0];
+    if (confirmed.length > 1) {
+      // Legacy duplicate links are disambiguated by a unique allowlist label/username.
+      // Do not treat the administrator role itself as another owner identity.
+      for (const candidate of candidatesFor(session)) {
+        const preferred = uniqueMemberForCandidate(confirmed, candidate);
+        if (preferred) return preferred;
+      }
+      return null;
     }
-    if (confirmed.length > 1) return [];
   }
-  const candidates = candidatesFor(session);
-  // Use exactly one name as the authenticated owner identity. Prefer the explicit
-  // admin-configured roster label when it maps to a record; otherwise use the first
-  // candidate that uniquely maps to an existing record. This prevents a user from
-  // claiming two different owner records merely because both label and username exist.
-  for (const candidate of candidates) {
-    const matches = arr(existingMembers).filter(member => memberMatchesOwner(member, [candidate]));
-    if (matches.length === 1) return [candidate];
-    if (matches.length > 1) return [];
+
+  for (const candidate of candidatesFor(session)) {
+    const match = uniqueMemberForCandidate(members, candidate);
+    if (match) return match;
+    const exactMatches = members.filter(member => key(member?.name) === key(candidate));
+    const compactMatches = members.filter(member => compactKey(member?.name) === compactKey(candidate));
+    if (exactMatches.length > 1 || (!exactMatches.length && compactMatches.length > 1)) return null;
   }
-  return candidates.length ? [candidates[0]] : [];
+  return null;
+}
+
+function resolveOwnerCandidates(session, existingMembers) {
+  const owner = resolveDiscordOwnerMember(session, existingMembers);
+  const ownerName = String(owner?.name || '').trim();
+  return ownerName ? [ownerName] : [];
+}
+
+/**
+ * Repair duplicate links created when the bootstrap admin was represented as both an
+ * administrator pseudo-owner and a personal owner. Preserve every roster and character;
+ * retain the verified Discord ID only on the configured personal owner (Cho by default).
+ * Called only by authenticated server write handlers after normal ownership validation.
+ */
+export function repairBootstrapAdminOwnerLinks(record, session) {
+  if (session?.isBootstrapAdmin !== true || !session?.discordId || !session?.personalOwnerName) return false;
+  const settings = obj(record?.settings);
+  const members = arr(settings.memberDirectory);
+  const owner = resolveDiscordOwnerMember(session, members);
+  if (!owner) return false;
+  const discordId = String(session.discordId);
+  const now = Date.now();
+  let changed = false;
+  for (const member of members) {
+    if (member === owner) {
+      if (String(member.profileConfirmedDiscordId || '').trim() !== discordId) {
+        member.profileConfirmedDiscordId = discordId;
+        member.profileConfirmedAt = now;
+        changed = true;
+      }
+      continue;
+    }
+    if (String(member?.profileConfirmedDiscordId || '').trim() === discordId) {
+      member.profileConfirmedDiscordId = '';
+      member.profileConfirmedAt = 0;
+      changed = true;
+    }
+  }
+  if (changed) {
+    settings.memberDirectory = members;
+    settings.memberDirectoryUpdatedAt = Math.max(now, Number(settings.memberDirectoryUpdatedAt) || 0);
+    settings.memberDirectoryUpdatedBy = discordId;
+    record.settings = settings;
+  }
+  return changed;
 }
 function changedMapKeys(before, after, projection) {
   const a = keyed(before, item => String(item?.name || '').trim());

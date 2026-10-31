@@ -56,12 +56,18 @@ export async function getSession(request, env) {
     LIMIT 1
   `).bind(tokenHash, now).first();
   if (!row) return null;
+  const discordId = String(row.discord_id);
+  const isBootstrapAdmin = discordId === String(env.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim();
   return {
-    discordId: String(row.discord_id),
+    discordId,
     username: String(row.username || row.label || 'Discord member'),
     label: String(row.label || ''),
     avatar: String(row.avatar || ''),
     role: row.role === 'admin' ? 'admin' : 'member',
+    // The bootstrap administrator is one authenticated Discord identity with two modes.
+    // Personal View is Cho by default; the separate UI toggle activates Admin View.
+    isBootstrapAdmin,
+    personalOwnerName: isBootstrapAdmin ? String(env.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho').trim().slice(0, 60) : '',
     expiresAt: Number(row.expires_at) || 0
   };
 }

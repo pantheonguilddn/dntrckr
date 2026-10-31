@@ -1,6 +1,7 @@
 import { getRecord, jsonResponse, resolveRecordId } from '../../../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../../_utils/compact.js';
 import { denyNonAdminRevisionJournalAccess } from '../../../../_utils/admin-tool-access.js';
+import { resolveDiscordOwnerMember } from '../../../../_utils/registration-guard.js';
 
 const MAIN_ID = 'pantheon-main';
 const LEDGER_OWNER_NAMES = new Set(['bio', 'cheean', 'cho']);
@@ -9,7 +10,7 @@ function hasLedgerAccess(session, record) {
   if (!session?.discordId) return false;
   const candidates = [session.label, session.username].map(normalizeOwner).filter(Boolean);
   const members = Array.isArray(record?.settings?.memberDirectory) ? record.settings.memberDirectory : [];
-  const confirmedOwner = members.find(member => String(member?.profileConfirmedDiscordId || '') === String(session.discordId));
+  const confirmedOwner = resolveDiscordOwnerMember(session, members);
   if (confirmedOwner && LEDGER_OWNER_NAMES.has(normalizeOwner(confirmedOwner.name))) return true;
   for (const candidate of candidates) {
     if (!LEDGER_OWNER_NAMES.has(candidate)) continue;

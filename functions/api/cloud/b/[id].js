@@ -1,6 +1,6 @@
 import { getRecord, jsonResponse, resolveRecordId, storeRecord } from '../../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../_utils/compact.js';
-import { registrationWriteViolation } from '../../../_utils/registration-guard.js';
+import { registrationWriteViolation, repairBootstrapAdminOwnerLinks, resolveDiscordOwnerMember } from '../../../_utils/registration-guard.js';
 import { denyNonAdminRevisionJournalAccess } from '../../../_utils/admin-tool-access.js';
 
 const MAIN_ID = 'pantheon-main';
@@ -77,7 +77,7 @@ function hasLedgerAccess(session, record) {
   if (!session?.discordId) return false;
   const candidates = [session.label, session.username].map(normalizeOwner).filter(Boolean);
   const members = Array.isArray(record?.settings?.memberDirectory) ? record.settings.memberDirectory : [];
-  const confirmedOwner = members.find(member => String(member?.profileConfirmedDiscordId || '') === String(session.discordId));
+  const confirmedOwner = resolveDiscordOwnerMember(session, members);
   if (confirmedOwner && LEDGER_OWNER_NAMES.has(normalizeOwner(confirmedOwner.name))) return true;
   for (const candidate of candidates) {
     if (!LEDGER_OWNER_NAMES.has(candidate)) continue;
@@ -170,6 +170,7 @@ export async function onRequestPut(context) {
         if (!adminOverride) {
           const violation = registrationWriteViolation(previous, next, context.data?.session, { enforceForAdmin:true });
           if (violation) return jsonResponse({ error: violation, message: violation }, 403);
+          if (!adminOverride) repairBootstrapAdminOwnerLinks(next, context.data?.session);
           // Rate-Up scheduling is a shared admin-owned setting. A member's ordinary tracker sync
           // must never alter or erase this schedule, even if their cached record predates the field.
           next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};

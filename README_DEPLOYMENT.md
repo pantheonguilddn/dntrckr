@@ -1,20 +1,23 @@
-# Pantheon Tools v1.6.8-r42 — startup initialization hotfix
+# Pantheon Tools v1.6.8-r43 — one Discord identity, personal Cho view, optional Admin View
 
-## Critical fix
+## What changed
 
-- Fixes the r41 login-screen lockout. The server-clock offset is now initialized **before** `createEmptyData()` runs. The data factory calls `getTargetResetTimeUTC()`, which calls `pantheonNow()`; r41 declared the offset later, triggering a JavaScript Temporal Dead Zone `ReferenceError` during initial script execution. Because that stopped the app before its DOMContentLoaded authentication boot handler, users returned from Discord authorization to the login gate.
-- This is an initialization-order fix only. It does not change Discord OAuth, session cookies, D1 schema, allowlist records, authentication middleware, tracker merge rules, or the r41 permission-mode changes.
+- The bootstrap administrator is represented as one authenticated Discord account with a separate permission role and working mode. The account opens in Cho Personal View; Admin View remains an explicit toggle.
+- Added `BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME` as an optional Pages environment variable. It defaults to `Cho`, per the requested personal default. It is derived server-side and is not accepted from browser input.
+- Owner resolution now selects the configured personal owner even when the same Discord ID was accidentally attached to multiple Member Roster entries. It no longer treats the Admin role as a second roster identity.
+- On the first successful Personal View write, the server repairs the duplicate account links: it keeps the verified Discord ID on the canonical personal owner and clears only that duplicate ID from other entries. It does not delete member records, characters, classes, tracker rosters, or progress.
+- Client identity selection, server registration validation, cell-save analytics attribution, and Ledger identity checks use the same canonical owner resolver.
+- Ordinary members still resolve by their unique confirmed Discord link (or unique label/username fallback). A preferred personal owner already confirmed to a different Discord ID is rejected rather than taken over.
+- Retains r42's startup initialization fix, r41's Admin View permission toggle, per-character acknowledged saves, server timestamping, CAS writes, cache-bypassing refresh, and existing Pages routes/database schema.
 
 ## Deployment
 
-Deploy the complete ZIP contents to the existing Cloudflare Pages project. Keep `_headers`, `version.json`, and the entire `functions/` directory. Do not reset or replace the D1 database or alter Discord OAuth settings.
+1. Deploy the complete ZIP contents to the existing Cloudflare Pages project. Do not upload only `index.html`.
+2. Preserve the existing D1 database and bindings, Discord OAuth credentials, and `BOOTSTRAP_ADMIN_DISCORD_ID` secret.
+3. No D1 schema migration is required. If desired, set `BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME=Cho`; the application defaults to Cho when this optional variable is absent.
+4. Verify `/version.json` reports `1.6.8-r43`.
+5. Test the bootstrap administrator in Cho Personal View first, including the retained `Vaelyth → Theme Park (Jelly x5)` edit. Confirm it saves and the duplicate Discord-ID link is repaired. Then enable Admin View and verify the separate administrator controls appear. Finally test an ordinary member account to confirm it remains limited to its own roster.
 
-After deployment, verify `https://dntrckr.pages.dev/version.json` reports `1.6.8-r42`. Then test Discord login with both an ordinary member account and the administrator account before inviting the guild back in.
+## Validation boundary
 
-## Validation
-
-- Verified the server-clock binding is initialized before `createEmptyData()` and that its only declaration is unique.
-- All inline application scripts pass `node --check`.
-- All Pages Function JavaScript files pass `node --check`.
-- Confirmed the r42 HTML build markers, `version.json`, ZIP integrity, and package file paths.
-- This is local validation only; production Cloudflare Pages/D1 and real Discord callback testing still must be confirmed after deployment.
+Local checks cover JavaScript syntax for every Pages Function and inline app script, CSS parsing, HTML ID uniqueness, package integrity and path preservation, deterministic canonical-owner selection, duplicate-link repair, and rejection when Cho is already confirmed to a different Discord ID. Live Cloudflare/D1/Discord multi-account testing is still required after deployment.

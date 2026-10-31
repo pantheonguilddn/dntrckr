@@ -4545,29 +4545,47 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (turningOff && typeof showAppPage === 'function') showAppPage('tracker');
         }
         function ownerCandidateNames() {
-            return [pantheonDiscordUser?.label, pantheonDiscordUser?.username]
+            return [pantheonDiscordUser?.personalOwnerName, pantheonDiscordUser?.label, pantheonDiscordUser?.username]
                 .map(value => String(value || '').trim()).filter(Boolean);
         }
+        function uniqueMemberForIdentityCandidate(entries, candidate) {
+            const exact = entries.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
+            if (exact.length === 1) return exact[0];
+            if (exact.length > 1) return null;
+            const compact = identityCompactKey(candidate);
+            if (!compact) return null;
+            const close = entries.filter(member => identityCompactKey(member.name) === compact);
+            return close.length === 1 ? close[0] : null;
+        }
         function getAuthenticatedMemberDirectoryEntry(data = cloudData) {
-            // Prefer the explicitly confirmed Discord account link. Display names/usernames can
-            // change or differ from the canonical Member Roster label; identity should not.
+            // One Discord account owns one personal roster. The bootstrap admin's personal
+            // roster (Cho by default) is separate from the Admin permission toggle.
             const entries = normalizeMemberDirectory(data?.settings?.memberDirectory);
             const discordId = String(pantheonDiscordUser?.id || '');
+            const personalOwnerName = String(pantheonDiscordUser?.personalOwnerName || '').trim();
+            if (personalOwnerName) {
+                const preferred = uniqueMemberForIdentityCandidate(entries, personalOwnerName);
+                if (!preferred) return null;
+                const linkedId = String(preferred.profileConfirmedDiscordId || '');
+                return !linkedId || linkedId === discordId ? preferred : null;
+            }
             if (discordId) {
                 const linked = entries.filter(member => String(member.profileConfirmedDiscordId || '') === discordId);
                 if (linked.length === 1) return linked[0];
-                if (linked.length > 1) return null; // Ambiguous account link: fail closed.
+                if (linked.length > 1) {
+                    for (const candidate of ownerCandidateNames()) {
+                        const preferred = uniqueMemberForIdentityCandidate(linked, candidate);
+                        if (preferred) return preferred;
+                    }
+                    return null;
+                }
             }
-            const candidates = ownerCandidateNames();
-            for (const candidate of candidates) {
+            for (const candidate of ownerCandidateNames()) {
+                const preferred = uniqueMemberForIdentityCandidate(entries, candidate);
+                if (preferred) return preferred;
                 const exact = entries.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
-                if (exact.length === 1) return exact[0];
-            }
-            for (const candidate of candidates) {
-                const compact = identityCompactKey(candidate);
-                if (!compact) continue;
-                const close = entries.filter(member => identityCompactKey(member.name) === compact);
-                if (close.length === 1) return close[0];
+                const compact = entries.filter(member => identityCompactKey(member.name) === identityCompactKey(candidate));
+                if (exact.length > 1 || (!exact.length && compact.length > 1)) return null;
             }
             return null;
         }
@@ -4579,6 +4597,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // selected roster if its linked owner also matches this authenticated account.
             const authenticated = getAuthenticatedMemberDirectoryEntry();
             if (authenticated) return authenticated;
+            // An explicitly configured personal owner must not fall through to a stale
+            // browser-selected roster if that owner is missing or linked to another ID.
+            if (String(pantheonDiscordUser?.personalOwnerName || '').trim()) return null;
             const candidates = ownerCandidateNames();
             const identity = String(localStorage.getItem(IDENTITY_KEY) || '');
             const roster = normalizeRosters(cloudData.settings?.rosters).find(item => item.id === identity);
@@ -4908,16 +4929,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const eligibleRosters = normalizeRosters(cloudData.settings?.rosters);
             const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
             const discordId = String(user?.id || '').trim();
-            // The confirmed Discord ID is the canonical identity. Admin labels and usernames
-            // are presentation fields and may not resemble the registered owner (for example Cho).
+            const personalOwnerName = String(user?.personalOwnerName || '').trim();
+            const rosterForMember = member => eligibleRosters.find(roster => roster.id === member.trackerRosterId)
+                || eligibleRosters.find(roster => identityMatchKey(roster.name) === identityMatchKey(member.name));
+            // The bootstrap admin is still one Discord identity: Cho is the canonical
+            // personal owner, while Admin View is enabled only through its explicit toggle.
+            if (personalOwnerName) {
+                const personal = uniqueMemberForIdentityCandidate(members, personalOwnerName);
+                if (!personal) return null;
+                const linkedId = String(personal.profileConfirmedDiscordId || '').trim();
+                if (linkedId && linkedId !== discordId) return null;
+                return rosterForMember(personal) || null;
+            }
+            // The confirmed Discord ID is the canonical identity for ordinary accounts.
             if (discordId) {
                 const confirmed = members.filter(member => String(member.profileConfirmedDiscordId || '').trim() === discordId);
-                if (confirmed.length > 1) return null; // Duplicate account links fail closed.
-                if (confirmed.length === 1) {
-                    const linked = confirmed[0];
-                    return eligibleRosters.find(roster => roster.id === linked.trackerRosterId)
-                        || eligibleRosters.find(roster => identityMatchKey(roster.name) === identityMatchKey(linked.name))
-                        || null;
+                if (confirmed.length === 1) return rosterForMember(confirmed[0]) || null;
+                if (confirmed.length > 1) {
+                    for (const candidate of [user?.label, user?.username].map(value => String(value || '').trim()).filter(Boolean)) {
+                        const preferred = uniqueMemberForIdentityCandidate(confirmed, candidate);
+                        if (preferred) return rosterForMember(preferred) || null;
+                    }
+                    return null;
                 }
             }
             // Legacy fallback applies only when no confirmed Discord-ID link exists.
@@ -4925,9 +4958,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const rosterMatchLabel = String(user?.label || '').trim();
             const aliasOverridesProfile = !!rosterMatchLabel && identityMatchKey(rosterMatchLabel) !== identityMatchKey(profileName);
             const candidates = (aliasOverridesProfile ? [rosterMatchLabel, profileName] : [profileName, rosterMatchLabel]).filter(Boolean);
-
-            const rosterForMember = member => eligibleRosters.find(roster => roster.id === member.trackerRosterId)
-                || eligibleRosters.find(roster => identityMatchKey(roster.name) === identityMatchKey(member.name));
 
             for (const candidate of candidates) {
                 const matchingMembers = members.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
@@ -10418,7 +10448,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r42';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r43';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -11090,7 +11120,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r42';
+  const CURRENT_BUILD = '1.6.8-r43';
   let newestBuild = '';
   let checkBusy = false;
   let reloadQueued = false;
