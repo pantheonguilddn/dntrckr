@@ -3259,7 +3259,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
                 <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r39</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r39 update:</strong> Bounty Share now has a wide editor and a receipt-style screenshot that can be copied as an image for Discord. The Weekly Report has moved out of the Tracker and opens once after weekly reset, with a toolbar button to reopen it. Routine character progress now saves independently per character; one character with an unresolved edit no longer blocks another character’s save or live refresh.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r39 update:</strong> Character progress now saves in independent character batches instead of waiting for one whole-roster checkbox queue. Other members’ updates continue loading while your own cell save is pending, and each character reports its own save result.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3742,51 +3742,26 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
         const PENDING_CELL_WRITES_KEY = 'pantheon-pending-cell-writes-v1';
-        let pendingCellWritesStorageKey = PENDING_CELL_WRITES_KEY;
-        function loadPendingCellWrites(storageKey = pendingCellWritesStorageKey) {
+        function loadPendingCellWrites() {
             try {
-                const source = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                const source = JSON.parse(localStorage.getItem(PENDING_CELL_WRITES_KEY) || '{}');
                 const cleaned = {};
                 Object.values(source && typeof source === 'object' ? source : {}).forEach(item => {
                     if (!item || typeof item !== 'object') return;
                     const charName = String(item.charName || '').trim(), taskName = String(item.taskName || '').trim();
                     if (!charName || !taskName) return;
                     const state = ['open','done','excluded','marked','reset'].includes(item.state) ? item.state : 'open';
-                    const timing = item.timing && typeof item.timing === 'object' ? item.timing : null;
-                    const timingSnapshot = timing && (timing.state === 'done' || timing.state === 'open') && Number(timing.at) > 0 && Number(timing.weekKey) > 0
-                        ? { weekKey:String(timing.weekKey), state:timing.state, at:Number(timing.at), ownerKey:String(timing.ownerKey || '').slice(0,120) } : null;
-                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), timing:timingSnapshot, retryCount: Math.max(0, Math.min(5, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0 };
+                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), retryCount: Math.max(0, Math.min(5, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0 };
                 });
                 return cleaned;
             } catch (_) { return {}; }
         }
         let pendingCellWrites = loadPendingCellWrites();
-        function switchPendingCellWriteAccount(discordId, previousDiscordId = '') {
-            const id = String(discordId || '').trim();
-            if (!id) return;
-            const nextKey = `${PENDING_CELL_WRITES_KEY}:${id}`;
-            try {
-                const legacy = localStorage.getItem(PENDING_CELL_WRITES_KEY);
-                if (legacy) {
-                    const legacyOwner = String(previousDiscordId || id).trim();
-                    const legacyKey = `${PENDING_CELL_WRITES_KEY}:${legacyOwner}`;
-                    if (legacyOwner && !localStorage.getItem(legacyKey)) localStorage.setItem(legacyKey, legacy);
-                    localStorage.removeItem(PENDING_CELL_WRITES_KEY);
-                }
-                pendingCellWritesStorageKey = nextKey;
-                pendingCellWrites = loadPendingCellWrites(nextKey);
-            } catch (_) {
-                pendingCellWritesStorageKey = nextKey;
-                pendingCellWrites = {};
-            }
-        }
-        let pendingCellRetryTimer = null;
-        let cellWriteFlushTimer = null;
-        let cellWriteFlushPromise = null;
-        let cellWriteInFlightCount = 0;
-        let localCellEditGeneration = 0;
+        const pendingCellRetryTimers = new Map();
+        const pendingCellSyncBusy = new Set();
+        const pendingCellDebounceTimers = new Map();
         function persistPendingCellWrites() {
-            try { localStorage.setItem(pendingCellWritesStorageKey, JSON.stringify(pendingCellWrites)); } catch (_) {}
+            try { localStorage.setItem(PENDING_CELL_WRITES_KEY, JSON.stringify(pendingCellWrites)); } catch (_) {}
         }
         function clonePendingCellWrites(source = pendingCellWrites) {
             try { return JSON.parse(JSON.stringify(source || {})); } catch (_) { return {}; }
@@ -3795,12 +3770,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const cell = cloudData?.cells?.[charName]?.[taskName];
             if (!cell) return;
             const key = JSON.stringify([String(charName), String(taskName)]);
-            const weekKey = String(getTargetResetTimeUTC(true));
-            const timing = cloudData?.completionTiming?.[weekKey]?.[charName]?.[taskName];
-            const timingSnapshot = timing && (timing.state === 'done' || timing.state === 'open') && Number(timing.at) > 0
-                ? { weekKey, state:timing.state, at:Number(timing.at), ownerKey:String(timing.ownerKey || '').slice(0,120) } : null;
-            pendingCellWrites[key] = { charName: String(charName), taskName: String(taskName), state: String(cell.state || 'open'), note: String(cell.note || '').slice(0,40), updatedAt: Number(cell.updatedAt) || 0, deviceId: String(cell.deviceId || deviceId || ''), timing:timingSnapshot, retryCount: 0, lastAttemptAt: 0 };
-            localCellEditGeneration++;
+            pendingCellWrites[key] = { charName: String(charName), taskName: String(taskName), state: String(cell.state || 'open'), note: String(cell.note || '').slice(0,40), updatedAt: Number(cell.updatedAt) || 0, deviceId: String(cell.deviceId || deviceId || ''), retryCount: 0, lastAttemptAt: 0 };
             persistPendingCellWrites();
         }
         function acknowledgePendingCellWrites(latest, pendingSnapshot) {
@@ -3825,18 +3795,129 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             persistPendingCellWrites();
             return { acknowledged, mismatches, remaining:Object.keys(pendingCellWrites).length };
         }
-        function schedulePendingCellRetry() {
-            if (pendingCellRetryTimer || !Object.keys(pendingCellWrites).length) return;
-            const pending = Object.values(pendingCellWrites);
-            if (!pending.some(item => (Number(item.retryCount)||0) < 3)) return;
-            const maxAttempts = Math.max(0, ...pending.map(item => Number(item.retryCount)||0));
-            const delay = Math.min(8000, 1200 * Math.pow(2, maxAttempts));
-            pendingCellRetryTimer = setTimeout(() => {
-                pendingCellRetryTimer = null;
-                if (!Object.keys(pendingCellWrites).length) return;
-                if (syncInProgress || window.__pantheonVersionWriteBusy) { schedulePendingCellRetry(); return; }
-                flushPendingCellWrites();
+        function getPendingCellCharacterNames() {
+            return [...new Set(Object.values(pendingCellWrites).map(item => String(item.charName || '').trim()).filter(Boolean))];
+        }
+        function pendingCellEntriesForCharacter(charName) {
+            return Object.entries(pendingCellWrites).filter(([,item]) => String(item.charName || '') === String(charName));
+        }
+        function updatePendingCellStatus(message = '') {
+            const names = getPendingCellCharacterNames();
+            if (names.length) {
+                const summary = names.slice(0,4).join(', ') + (names.length > 4 ? ', …' : '');
+                const text = message || `Saving ${names.length} character${names.length === 1 ? '' : 's'}: ${summary}`;
+                setStatus(`🟡 ${text}`);
+                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('pending', text);
+            } else {
+                setStatus(message || '🟢 Character progress saved to the shared Tracker');
+                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current', 'Your character changes are saved · live guild updates active');
+            }
+        }
+        function schedulePendingCellRetry(charName = '') {
+            const targets = charName ? [String(charName)] : getPendingCellCharacterNames();
+            targets.forEach(name => {
+                if (!name || pendingCellRetryTimers.has(name) || pendingCellSyncBusy.has(name)) return;
+                const entries = pendingCellEntriesForCharacter(name);
+                if (!entries.length || !entries.some(([,item]) => (Number(item.retryCount)||0) < 5)) return;
+                const maxAttempts = Math.max(0, ...entries.map(([,item]) => Number(item.retryCount)||0));
+                const delay = Math.min(8000, 900 * Math.pow(2, maxAttempts));
+                const timer = setTimeout(() => {
+                    pendingCellRetryTimers.delete(name);
+                    flushPendingCellWritesForCharacter(name);
+                }, delay);
+                pendingCellRetryTimers.set(name, timer);
+            });
+        }
+        function schedulePendingCellCharacterSave(charName, delay = 220) {
+            const name = String(charName || '').trim();
+            if (!name) return;
+            const previous = pendingCellDebounceTimers.get(name);
+            if (previous) clearTimeout(previous);
+            const timer = setTimeout(() => {
+                pendingCellDebounceTimers.delete(name);
+                flushPendingCellWritesForCharacter(name);
             }, delay);
+            pendingCellDebounceTimers.set(name, timer);
+        }
+        async function flushPendingCellWritesForCharacter(charName) {
+            const name = String(charName || '').trim();
+            if (!name || pendingCellSyncBusy.has(name)) return false;
+            const snapshotEntries = pendingCellEntriesForCharacter(name);
+            if (!snapshotEntries.length) return true;
+            if (!hasCloudConfig()) {
+                updatePendingCellStatus('Saved locally only · connect to the shared Tracker to publish these changes');
+                return false;
+            }
+            if (window.__pantheonVersionWriteBusy) { schedulePendingCellRetry(name); return false; }
+            const snapshot = Object.fromEntries(snapshotEntries);
+            const config = getCloudConfig();
+            pendingCellSyncBusy.add(name);
+            try {
+                const edits = snapshotEntries.map(([,item]) => ({ taskName:item.taskName, state:item.state, note:item.note }));
+                const weekKey = String(getTargetResetTimeUTC(true));
+                const timing = snapshotEntries.map(([,item]) => {
+                    const saved = cloudData?.completionTiming?.[weekKey]?.[name]?.[item.taskName];
+                    if (!saved || !['done','open'].includes(saved.state) || saved.state !== item.state) return null;
+                    return { taskName:item.taskName, weekKey, state:saved.state };
+                }).filter(Boolean);
+                const response = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/cells`, {
+                    method:'POST', headers:{'Content-Type':'application/json',...authHeaders(config)},
+                    body:JSON.stringify({ character:name, edits, timing })
+                }, 10000);
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(payload.message || payload.error || `Character save failed (${response.status})`);
+                const confirmedCells = {};
+                (Array.isArray(payload.edits) ? payload.edits : []).forEach(item => {
+                    if (!item?.taskName) return;
+                    confirmedCells[item.taskName] = { state:item.state, note:String(item.note || ''), updatedAt:Number(item.updatedAt)||0, deviceId:String(item.deviceId || '') };
+                });
+                const ack = acknowledgePendingCellWrites({cells:{[name]:confirmedCells}}, snapshot);
+                if (!cloudData.cells[name]) cloudData.cells[name] = {};
+                snapshotEntries.forEach(([key,patch]) => {
+                    const confirmed = confirmedCells[patch.taskName];
+                    const current = pendingCellWrites[key];
+                    if (confirmed && !current) cloudData.cells[name][patch.taskName] = confirmed;
+                });
+                const stillPending = pendingCellEntriesForCharacter(name);
+                if (stillPending.length) {
+                    updatePendingCellStatus(`${name}: ${stillPending.length} edit${stillPending.length === 1 ? '' : 's'} still awaiting confirmation`);
+                    schedulePendingCellRetry(name);
+                } else if (getPendingCellCharacterNames().length) {
+                    updatePendingCellStatus();
+                } else {
+                    updatePendingCellStatus(`${name} progress saved to the shared Tracker`);
+                }
+                // The cell route increments the shared D1 revision. Leave our remembered
+                // revision untouched so the normal poll fetches the complete current record,
+                // including changes made by other members in the same interval.
+                persistLocalData();
+                updateOverviewStatusCards();
+                return ack.mismatches.length === 0 && stillPending.length === 0;
+            } catch (error) {
+                snapshotEntries.forEach(([key,patch]) => {
+                    const current = pendingCellWrites[key];
+                    if (current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note) {
+                        pendingCellWrites[key] = { ...current, retryCount:Math.min(5,(Number(current.retryCount)||0)+1), lastAttemptAt:Date.now() };
+                    }
+                });
+                persistPendingCellWrites();
+                const entries = pendingCellEntriesForCharacter(name);
+                const retryable = entries.some(([,item]) => (Number(item.retryCount)||0) < 5);
+                setStatus(`🔴 ${name} save not confirmed · ${error.message} · changes retained on this device`);
+                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', `${name} save not confirmed · retained locally`);
+                if (retryable) schedulePendingCellRetry(name);
+                return false;
+            } finally {
+                pendingCellSyncBusy.delete(name);
+                const newer = pendingCellEntriesForCharacter(name);
+                if (newer.length && !pendingCellRetryTimers.has(name) && !pendingCellDebounceTimers.has(name)) schedulePendingCellRetry(name);
+            }
+        }
+        async function flushPendingCellWrites() {
+            const names = getPendingCellCharacterNames();
+            if (!names.length) return true;
+            const outcomes = await Promise.all(names.map(name => flushPendingCellWritesForCharacter(name)));
+            return outcomes.every(Boolean) && getPendingCellCharacterNames().length === 0;
         }
         function pendingCellWriteSummary(items = Object.values(pendingCellWrites)) {
             return (items || []).slice(0,4).map(item => `${item.charName} · ${item.taskName}`).join('; ');
@@ -3848,143 +3929,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             });
             persistPendingCellWrites();
         }
-        function pendingCellCharacters() {
-            return [...new Set(Object.values(pendingCellWrites).map(item => String(item.charName || '').trim()).filter(Boolean))];
-        }
-        function setPendingCellProgressNote(state='pending') {
-            const names = pendingCellCharacters();
-            if (!names.length) return false;
-            const shortNames = names.slice(0, 4).join(', ') + (names.length > 4 ? ` +${names.length - 4} more` : '');
-            if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote(state, state === 'error' ? `Could not confirm edits for ${shortNames} · retained locally` : `Saving edits for ${shortNames}…`);
-            return true;
-        }
-        function scheduleCellAutoSync() {
-            if (cellWriteFlushTimer) clearTimeout(cellWriteFlushTimer);
-            cellWriteFlushTimer = setTimeout(() => { cellWriteFlushTimer = null; flushPendingCellWrites(); }, 250);
-        }
-        async function flushOneCharacterCells(charName, patches) {
-            const config = getCloudConfig();
-            const writes = patches.map(patch => {
-                const currentWeekKey = String(getTargetResetTimeUTC(true));
-                const currentTiming = cloudData?.completionTiming?.[currentWeekKey]?.[charName]?.[patch.taskName];
-                const timing = patch.timing || (currentTiming && (currentTiming.state === 'done' || currentTiming.state === 'open') ? {
-                    weekKey:currentWeekKey, state:currentTiming.state, at:Number(currentTiming.at)||0,
-                    ownerKey:String(currentTiming.ownerKey||'')
-                } : null);
-                return { taskName:patch.taskName, state:patch.state, note:patch.note, timing };
+        function restoreRemoteCellsForPendingWrites(candidate, remote, pendingSnapshot = pendingCellWrites) {
+            Object.values(pendingSnapshot || {}).forEach(patch => {
+                if (!patch?.charName || !patch?.taskName) return;
+                const remoteCell = remote?.cells?.[patch.charName]?.[patch.taskName];
+                ensureCellMap(candidate, patch.charName);
+                if (remoteCell) candidate.cells[patch.charName][patch.taskName] = cloneDataObject(remoteCell);
+                else delete candidate.cells[patch.charName][patch.taskName];
             });
-            const response = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/cell`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...authHeaders(config) },
-                body: JSON.stringify({ charName, writes })
-            }, 15000);
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(payload.message || payload.error || `Character save failed (${response.status})`);
-            const savedCells = safeObject(payload.cells);
-            let acknowledged = 0;
-            let mismatch = 0;
-            patches.forEach(patch => {
-                const key = JSON.stringify([String(charName), String(patch.taskName)]);
-                const latestCell = normalizeCellRecord(savedCells[patch.taskName]);
-                const current = pendingCellWrites[key];
-                const stillCurrent = current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note;
-                if (stillCurrent && latestCell && latestCell.state === patch.state && latestCell.note === patch.note) {
-                    delete pendingCellWrites[key];
-                    ensureCellMap(cloudData, charName);
-                    cloudData.cells[charName][patch.taskName] = latestCell;
-                    acknowledged++;
-                } else if (stillCurrent) {
-                    mismatch++;
-                }
-                // A newer local click always stays visible and queued; an older response
-                // must never replace it in the UI or delete it from the retry queue.
-                const live = pendingCellWrites[key];
-                if (live) {
-                    ensureCellMap(cloudData, charName);
-                    cloudData.cells[charName][patch.taskName] = { state: live.state, note: live.note, updatedAt: live.updatedAt, deviceId: live.deviceId };
-                }
-            });
-            const revision = Number(payload.metadata?.updatedAt) || 0;
-            if (revision) {
-                cloudData.updatedAt = Math.max(Number(cloudData.updatedAt) || 0, revision);
-                lastRemoteRevision = Math.max(Number(lastRemoteRevision) || 0, revision);
-                lastRemoteRefreshAttemptAt = Date.now();
-            }
-            persistPendingCellWrites();
-            persistLocalData();
-            if (mismatch) throw new Error(`${mismatch} edit${mismatch === 1 ? '' : 's'} for ${charName} were not confirmed by the server.`);
-            return acknowledged;
-        }
-        function flushPendingCellWrites() {
-            if (cellWriteFlushPromise) return cellWriteFlushPromise;
-            if (cellWriteFlushTimer) { clearTimeout(cellWriteFlushTimer); cellWriteFlushTimer = null; }
-            const snapshot = clonePendingCellWrites(pendingCellWrites);
-            const entries = Object.values(snapshot);
-            if (!entries.length) return Promise.resolve(true);
-            if (!hasCloudConfig()) {
-                persistLocalData();
-                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', 'Saved on this device only · cloud connection unavailable');
-                return Promise.resolve(false);
-            }
-            if (syncInProgress || window.__pantheonVersionWriteBusy) {
-                schedulePendingCellRetry();
-                return Promise.resolve(false);
-            }
-            const groups = new Map();
-            entries.forEach(item => {
-                const name = String(item.charName || '').trim();
-                if (!name) return;
-                if (!groups.has(name)) groups.set(name, []);
-                groups.get(name).push(item);
-            });
-            setPendingCellProgressNote('pending');
-            if (!unsavedCloudChanges && !syncInProgress) setStatus(`🟡 Saving character progress · ${pendingCellCharacters().join(', ')}`);
-            const run = (async () => {
-                let cursor = 0;
-                const names = [...groups.keys()];
-                const worker = async () => {
-                    while (cursor < names.length) {
-                        const name = names[cursor++];
-                        const patches = groups.get(name) || [];
-                        cellWriteInFlightCount++;
-                        // Invalidate any remote read that began before this queued save
-                        // was dispatched, even if the save completes before that read returns.
-                        localCellEditGeneration++;
-                        try {
-                            await flushOneCharacterCells(name, patches);
-                            if (isTrackerPageCurrentlyVisible()) updateCellPresentationForCharacter(name);
-                        } catch (error) {
-                            patches.forEach(patch => {
-                                const key = JSON.stringify([String(name), String(patch.taskName)]);
-                                const current = pendingCellWrites[key];
-                                if (current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note) {
-                                    pendingCellWrites[key] = { ...current, retryCount: Math.min(5, (Number(current.retryCount) || 0) + 1), lastAttemptAt: Date.now() };
-                                }
-                            });
-                            persistPendingCellWrites();
-                            setStatus(`🔴 Could not confirm ${name}'s progress: ${String(error?.message || error)}`);
-                        } finally { cellWriteInFlightCount = Math.max(0, cellWriteInFlightCount - 1); }
-                    }
-                };
-                await Promise.all(Array.from({ length: Math.min(3, names.length) }, () => worker()));
-                const remainingNames = pendingCellCharacters();
-                if (remainingNames.length) {
-                    setPendingCellProgressNote('error');
-                    schedulePendingCellRetry();
-                } else {
-                    if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current', 'Your character progress is saved · checked ' + trackerSyncTimeLabel());
-                    if (!unsavedCloudChanges && !syncInProgress) setStatus('🟢 Character progress saved');
-                }
-                updateOverviewStatusCards();
-                return remainingNames.length === 0;
-            })();
-            cellWriteFlushPromise = run.finally(() => { cellWriteFlushPromise = null; cellWriteInFlightCount = 0; });
-            return cellWriteFlushPromise;
-        }
-        function updateCellPresentationForCharacter(charName) {
-            document.querySelectorAll(`td.interactive-cell[data-char="${CSS.escape(String(charName))}"]`).forEach(td => updateCellPresentation(charName, td.dataset.task));
-            updateRateForCharacter(charName);
-            renderOverviewIfVisible();
+            return candidate;
         }
         function applyPendingCellWrites(candidate, remote, pendingSnapshot) {
             Object.values(pendingSnapshot || {}).forEach(patch => {
@@ -5440,7 +5393,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // Poll a tiny D1 row revision first. A full shared tracker record is downloaded only
         // when the server revision changes, rather than transferring the whole payload every poll.
         async function fetchRemoteRevision(config = getCloudConfig()) {
-            const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/status`, { method:'GET', headers:authHeaders(config), cache:'no-store' });
+            const res = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/status`, { method:'GET', headers:authHeaders(config), cache:'no-store' }, 8000);
             const payload = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(payload.message || `Revision check failed (${res.status})`);
             const revision = Number(payload.metadata?.updatedAt) || 0;
@@ -5728,14 +5681,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         // Normal sync. The revision journal is a separate best-effort service.
         // The main tracker sync succeeds independently of journal availability.
-        function forceSync(showSuccess = false, afterCellDrain = false){
-            if (!afterCellDrain && Object.keys(pendingCellWrites).length) {
-                return flushPendingCellWrites().then(() => forceSync(showSuccess, true));
-            }
+        function forceSync(showSuccess = false){
             if (showSuccess) {
                 Object.values(pendingCellWrites).forEach(item => { item.retryCount = 0; item.lastAttemptAt = 0; });
                 persistPendingCellWrites();
-                if (pendingCellRetryTimer) { clearTimeout(pendingCellRetryTimer); pendingCellRetryTimer = null; }
+                pendingCellRetryTimers.forEach(timer => clearTimeout(timer)); pendingCellRetryTimers.clear();
             }
             if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return Promise.resolve(false);}
             if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return Promise.resolve(false);}
@@ -5753,18 +5703,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         // explicit global-impact edit (prepared by prepareGlobalChange)
                         // is versioned.
                         const ext={externalPatch:null};
-                        // Cell edits are saved through the character-scoped endpoint. A
-                        // character whose patch is still pending must not be smuggled back
-                        // into this whole-record settings sync or hold up other characters.
+                        // Character checkboxes/notes use the dedicated per-character endpoint.
+                        // A global/settings sync must not batch or acknowledge those cell edits.
                         const pendingWritesSent = {};
                         let candidate=hasMeaningfulLocalData?mergeData(cloudData,remote):remote;
-                        Object.values(pendingCellWrites).forEach(patch => {
-                            if (!patch?.charName || !patch?.taskName) return;
-                            ensureCellMap(candidate, patch.charName);
-                            const remoteCell = remote?.cells?.[patch.charName]?.[patch.taskName];
-                            if (remoteCell) candidate.cells[patch.charName][patch.taskName] = cloneDataObject(remoteCell);
-                            else delete candidate.cells[patch.charName][patch.taskName];
-                        });
+                        candidate = restoreRemoteCellsForPendingWrites(candidate, remote, pendingCellWrites);
                         candidate = enforceMemberSafeSyncWrite(candidate, remote);
                         let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
@@ -5776,9 +5719,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         // Intentionally no external-change revision here. If another PC
                         // made a supported global change, that PC records it when it saves.
                         candidate.updatedAt=Date.now();candidate.syncInfo={operationId:`sync-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,by:deviceId,at:Date.now()};candidate.settings.versionControl.history=[];const send=fitCandidateUnderFreeLimit(candidate);const opId=candidate.syncInfo.operationId;
-                        // Routine cells are intentionally omitted from this full-record
-                        // request. They are submitted and server-stamped independently by
-                        // /cell, while this route handles shared settings and reset metadata.
+                        // These exact edits are server-authoritative intents, not timestamps from a
+                        // member's PC. The API validates ownership and stamps them against the latest
+                        // D1 cell revision before its compare-and-swap write.
+                        const cellWriteIntents=Object.values(pendingWritesSent).slice(0,5000).map(patch=>({charName:String(patch.charName||'').slice(0,40),taskName:String(patch.taskName||'').slice(0,140),state:String(patch.state||'open'),note:String(patch.note||'').slice(0,40)}));
+                        if(cellWriteIntents.length)send.cellWriteIntents=cellWriteIntents;
                         const res=await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)},15000);if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
                         const responsePayload=await res.json();
                         const latest=normalizeData(responsePayload.record||await fetchRemoteRecord(config));
@@ -5789,13 +5734,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             const cellAck = acknowledgePendingCellWrites(latest, pendingWritesSent);
                             const cellWriteConflicts = cellAck.mismatches.length;
                             cloudData=latest;
-                            // Keep the member's intended checkbox visible locally while an unconfirmed
-                            // edit remains queued. The red/pending status makes clear that other members
-                            // have not yet received it; a later retry either confirms it or leaves it queued.
-                            if (cellAck.remaining > 0) cloudData = applyPendingCellWrites(cloudData, latest, pendingCellWrites);
+                            if (Object.keys(pendingCellWrites).length) cloudData = applyPendingCellWrites(cloudData, latest, pendingCellWrites);
                             delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();
-                            // The shared settings/record write is complete independently of
-                            // any character patches still waiting in their own queues.
+                            // Global/settings save confirmation is independent of per-character
+                            // cell saves, which have their own requests and acknowledgements.
                             unsavedCloudChanges = false;
                             const resetChangesAfterRefresh = checkAutoResets();
                             persistLocalData();
@@ -5817,14 +5759,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                                 setStatus(`🔴 ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} NOT confirmed by the shared database. Kept on this device${willRetry ? ' · retrying automatically' : ' · use Sync Changes to retry'}: ${summary}${cellAck.mismatches.length > 4 ? '; …' : ''}`);
                                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', `Could not confirm ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} · ${willRetry ? 'retrying' : 'manual retry needed'}`);
                                 schedulePendingCellRetry();
-                            } else if (Object.keys(pendingCellWrites).length > 0) {
-                                const livePendingCount = Object.keys(pendingCellWrites).length;
-                                setStatus(`🟠 ${livePendingCount} newer task edit${livePendingCount === 1 ? '' : 's'} still queued; not yet confirmed by the shared database: ${pendingCellWriteSummary()}`);
-                                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('pending', `${livePendingCount} task edit${livePendingCount === 1 ? '' : 's'} still saving…`);
+                            } else if (getPendingCellCharacterNames().length > 0) {
+                                setStatus(`🟢 Shared Tracker settings saved · character progress syncing separately (${getPendingCellCharacterNames().length} character${getPendingCellCharacterNames().length===1?'':'s'} pending)`);
                                 schedulePendingCellRetry();
                             } else {
                                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current','Your task changes are saved · checked '+trackerSyncTimeLabel());
-                                setStatus(showSuccess?'🟢 Cloud Sync Complete':(queuedEntries.length||loadRevisionQueue().length?'🟢 Tracker Changes Saved · Revision log syncing separately':'🟢 Tracker Changes Saved'));
+                                setStatus(showSuccess?'🟢 Cloud Sync Complete':(queuedEntries.length||loadRevisionQueue().length?'🟢 Tracker saved to the shared database · Revision History is queued separately':'🟢 Tracker saved to the shared database'));
                             }
                             return;
                         }
@@ -5838,7 +5778,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     setStatus(`🔴 Sync Failed: ${err.message}${pendingText}`);
                     if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', pendingCount ? `${pendingCount} task edit${pendingCount === 1 ? '' : 's'} not confirmed · retained locally` : 'Cloud sync failed · retry');
                     const transient = /(?:failed \((?:409|425|429|5\d\d)\)|fetch|network|timeout|changed repeatedly)/i.test(String(err?.message || err));
-                    if (transient && pendingCount) { markPendingCellWritesFailedAttempt(); schedulePendingCellRetry(); }
+                    if (transient && pendingCount) schedulePendingCellRetry();
                 }
                 finally{
                     syncInProgress=false;updateOverviewStatusCards();
@@ -5871,9 +5811,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         async function refreshSharedDataIfChanged({force=false}={}){
-            const hasQueuedCellEdits=Object.keys(safeObject(pendingCellWrites)).length>0;
-            if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || cellWriteInFlightCount>0){
-                if(isTrackerPageCurrentlyVisible() && (unsavedCloudChanges || hasQueuedCellEdits || syncInProgress || cellWriteInFlightCount>0)) setTrackerLiveSyncNote('pending', hasQueuedCellEdits ? `Saving edits for ${pendingCellCharacters().slice(0,3).join(', ')}…` : 'Your other tracker changes are still saving…');
+            const pendingCellSnapshot = clonePendingCellWrites(pendingCellWrites);
+            const hasQueuedCellEdits=Object.keys(pendingCellSnapshot).length>0;
+            if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges){
+                if(isTrackerPageCurrentlyVisible() && (unsavedCloudChanges || syncInProgress)) setTrackerLiveSyncNote('pending','Your shared settings are still saving…');
                 return false;
             }
             if(!hasCloudConfig()){
@@ -5881,7 +5822,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return false;
             }
             remoteRefreshBusy = true;
-            const cellEditGenerationAtStart = localCellEditGeneration;
             lastRemoteRefreshAttemptAt = Date.now();
             if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking for guild changes…');
             try{
@@ -5889,10 +5829,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const changed = !lastRemoteRevision || revision !== lastRemoteRevision;
                 if(changed){
                     const remote = await fetchRemoteRecord(getCloudConfig());
-                    if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || cellWriteInFlightCount>0 || localCellEditGeneration!==cellEditGenerationAtStart) return false;
-                    const pendingOverlay = clonePendingCellWrites(pendingCellWrites);
-                    cloudData = normalizeData(remote);
-                    if (Object.keys(pendingOverlay).length) cloudData = applyPendingCellWrites(cloudData, remote, pendingOverlay);
+                    if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return false;
+                    const latestRemote = normalizeData(remote);
+                    // A pending local cell is no reason to stop the rest of the guild view
+                    // from refreshing. Merge the current local snapshot, then overlay only
+                    // this device's unconfirmed character cells so they cannot be lost.
+                    cloudData = hasQueuedCellEdits ? mergeData(cloudData, latestRemote) : latestRemote;
+                    if (hasQueuedCellEdits) cloudData = applyPendingCellWrites(cloudData, latestRemote, pendingCellSnapshot);
                     delete cloudData.syncInfo;
                     lastSeenRemoteMarker = remoteSyncMarker(remote);
                     lastRemoteRevision = revision;
@@ -5902,8 +5845,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     updateOverviewEventNotice();
                 }
                 if(isTrackerPageCurrentlyVisible()){
-                    if (Object.keys(pendingCellWrites).length) setPendingCellProgressNote('pending');
-                    else setTrackerLiveSyncNote(changed?'updated':'current',changed?'Guild progress updated · '+trackerSyncTimeLabel():'Live · checked '+trackerSyncTimeLabel());
+                    setTrackerLiveSyncNote(changed?'updated':'current',changed?`Guild progress updated · ${getPendingCellCharacterNames().length ? getPendingCellCharacterNames().length+' of your character saves still pending · ' : ''}${trackerSyncTimeLabel()}`:'Live · checked '+trackerSyncTimeLabel());
                 }
                 return true;
             }catch(error){
@@ -6089,21 +6031,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
-        function triggerCellAutoSync() {
-            persistLocalData();
-            setPendingCellProgressNote('pending');
-            if (hasCloudConfig() && !unsavedCloudChanges && !syncInProgress) setStatus(`🟡 Saving character progress · ${pendingCellCharacters().join(', ')}`);
-            if (!hasCloudConfig()) {
-                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', 'Saved on this device only · cloud connection unavailable');
-                return;
-            }
-            scheduleCellAutoSync();
-        }
         function triggerAutoSync() {
             unsavedCloudChanges = true; persistLocalData();
             setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally');
             if (isTrackerPageCurrentlyVisible() && Object.keys(pendingCellWrites).length) setTrackerLiveSyncNote('pending', `${Object.keys(pendingCellWrites).length} task edit${Object.keys(pendingCellWrites).length === 1 ? '' : 's'} saving…`);
             clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800);
+        }
+        function triggerTrackerCellSync() {
+            persistLocalData();
+            const names = getPendingCellCharacterNames();
+            if (!names.length) return;
+            updatePendingCellStatus();
+            names.forEach(name => schedulePendingCellCharacterSave(name, 220));
         }
 
         async function pantheonCheckSessionAndBoot() {
@@ -6123,10 +6062,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 pantheonDiscordUser = state.user;
                 const currentDiscordId = String(state.user.id);
                 const previousDiscordId = localStorage.getItem(DISCORD_IDENTITY_ACCOUNT_KEY) || '';
-                switchPendingCellWriteAccount(currentDiscordId, previousDiscordId);
                 if (previousDiscordId !== currentDiscordId) {
-                    // Never carry a browser-wide identity or pending-save queue across
-                    // two different Discord accounts.
+                    // Never carry a browser-wide identity across two different Discord accounts.
                     localStorage.removeItem(IDENTITY_KEY);
                     isPersonalView = false;
                     discordIdentityMatchStatus = 'pending';
@@ -6499,7 +6436,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return;
             }
             setCellNote(charName, taskName, e.target.value);
-            triggerCellAutoSync();
+            triggerTrackerCellSync();
         }
 
         // ==========================================
@@ -6532,7 +6469,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     }
                 }
             }
-            updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerCellAutoSync();
+            updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerTrackerCellSync();
         }
 
         function handleRightClick(e) {
@@ -6573,7 +6510,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
             }
 
-            updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerCellAutoSync();
+            updateCellPresentation(c, t); updateRateForCharacter(c); renderOverviewIfVisible(); triggerTrackerCellSync();
         }
 
         function updateCellPresentation(c, t) {
@@ -6865,7 +6802,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const getText = id => document.getElementById(id)?.textContent || '';
             const syncLabel = getText('sync-status').trim();
             const failed = /failed|error|denied|not ready/i.test(syncLabel);
-            const busy = !!syncInProgress || Object.keys(pendingCellWrites || {}).length > 0 || /merging|syncing|unsaved|saving/i.test(syncLabel);
+            const busy = !!syncInProgress || /merging|syncing|unsaved/i.test(syncLabel);
             const connected = typeof hasCloudConfig === 'function' ? hasCloudConfig() : true;
             const isAdmin = isPantheonAdmin();
             const set = (id, value) => { const node = document.getElementById(id); if (node) node.textContent = value; };
@@ -11075,11 +11012,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     showUpdateNotice('Confirming your tracker changes before updating…');
     let syncResult;
     try {
-      const hasCellEdits = pendingCellCount() > 0;
-      const hasOtherEdits = !!(typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges);
-      if (hasCellEdits && typeof flushPendingCellWrites === 'function') {
-        syncResult = flushPendingCellWrites().then(() => hasOtherEdits ? forceSync(false) : true);
-      } else syncResult = forceSync(false);
+      if (pendingCellCount() > 0 && typeof flushPendingCellWrites === 'function') syncResult = flushPendingCellWrites();
+      else syncResult = forceSync(false);
     }
     catch (_) { syncNudgeInFlight = false; showUpdateNotice('Could not confirm the tracker save. Your local edits are being kept; automatic update is paused.'); return; }
     Promise.resolve(syncResult).then(() => {
