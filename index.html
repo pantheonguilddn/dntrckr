@@ -181,6 +181,9 @@
         .controls { position: relative; z-index: 30; }
         .control-actions { display: flex; align-items: center; justify-content: flex-end; flex-direction: row; gap: 10px; flex: 1; min-width: 0; }
         .topbar-player { display: flex; align-items: center; gap: 8px; }
+        .admin-view-toggle-btn { border:1px solid var(--pt-accent) !important; color:var(--pt-text) !important; font-weight:850 !important; white-space:nowrap; }
+        .admin-view-toggle-btn[aria-pressed="true"] { background:var(--pt-accent) !important; color:#fff !important; border-color:var(--pt-accent) !important; }
+        .admin-view-toggle-btn[hidden] { display:none !important; }
         .roster-filter-top {
             display: inline-block;
             min-width: 148px;
@@ -2855,6 +2858,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <option value="">👤 Your roster (auto)</option>
                 </select>
                 <button id="mode-toggle-btn" class="btn btn-view-toggle personal-active" type="button" onclick="togglePersonalView()">👤 Personal View</button>
+                <button id="admin-view-toggle-btn" class="btn admin-view-toggle-btn" type="button" onclick="toggleAdminView()" aria-pressed="false" hidden>⚙ Admin View</button>
                 <select id="roster-filter" class="btn roster-filter-top" onchange="applyRosterFilter()">
                     <option value="all">👁️ All Rosters</option>
                 </select>
@@ -4138,11 +4142,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let trackBountyBoards = false;
         const deviceId = getOrCreateDeviceId();
 
+        // Initialize before createEmptyData(): that factory calls getTargetResetTimeUTC(),
+        // which calls pantheonNow() and reads this value during first-run construction.
+        let serverClockOffsetMs = 0;
         let cloudData = createEmptyData();
         let localTeamBuilderState = null;
         let pantheonDiscordUser = null;
         let discordIdentityMatchStatus = 'pending';
         let adminViewAsMemberId = '';
+        // Admin access is separate from the current working mode. Every page load starts
+        // in the account's own Personal View; the administrator must opt in explicitly.
+        let adminModeEnabled = false;
         let adminViewOriginalTheme = '';
         let adminViewThemeChoice = '';
 
@@ -4434,7 +4444,106 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         // --- Discord-aware identity and permission helpers ---
         function isPantheonAdmin() { return pantheonDiscordUser?.role === 'admin'; }
-        function isAdminViewAsActive() { return isPantheonAdmin() && !!adminViewAsMemberId; }
+        function isAdminModeActive() { return isPantheonAdmin() && adminModeEnabled === true; }
+        function isAdminViewAsActive() { return isAdminModeActive() && !!adminViewAsMemberId; }
+        function updateAdminModeUI() {
+            const admin = isPantheonAdmin();
+            const active = isAdminModeActive();
+            const personalName = String(getAuthenticatedMemberDirectoryEntry()?.name || 'Personal');
+            const toggle = document.getElementById('admin-view-toggle-btn');
+            if (toggle) {
+                toggle.hidden = !admin;
+                toggle.textContent = active ? `↩ Return to ${personalName}` : '⚙ Admin View';
+                toggle.setAttribute('aria-pressed', String(active));
+                toggle.title = active ? `Leave Admin View and return to ${personalName}’s Personal Tracker` : 'Enable administrator tools and guild-wide editing';
+            }
+            const menuToggle = document.getElementById('menu-toggle');
+            const drawer = document.getElementById('tool-drawer');
+            const scrim = document.getElementById('drawer-scrim');
+            const adminLink = document.getElementById('overview-admin-link');
+            const drawerIds = ['drawer-admin-console','drawer-view-as','drawer-rateup-events','drawer-developer-mode'];
+            if (adminLink) adminLink.hidden = !active;
+            drawerIds.forEach(id => { const el = document.getElementById(id); if (el) el.hidden = !active; });
+            if (menuToggle) menuToggle.hidden = !active;
+            if (drawer) {
+                if (!active) { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+                drawer.hidden = !active;
+            }
+            if (scrim) { if (!active) scrim.classList.remove('open'); scrim.hidden = !active; }
+            document.body.classList.toggle('pantheon-admin-mode-active', active);
+            const identity = document.getElementById('user-identity');
+            const personalToggle = document.getElementById('mode-toggle-btn');
+            if (identity && admin && !active) identity.disabled = true;
+            else if (identity && active) identity.disabled = false;
+            if (personalToggle && admin && !active) {
+                personalToggle.textContent = `👤 ${personalName} · Personal View`;
+                personalToggle.classList.add('personal-active');
+                personalToggle.disabled = true;
+            } else if (personalToggle && active) personalToggle.disabled = false;
+            if (!active) document.body.classList.remove('drawer-open');
+        }
+        async function toggleAdminView() {
+            if (!isPantheonAdmin()) return;
+            const turningOff = isAdminModeActive();
+            // When leaving Admin View, all administrator edits must be acknowledged first.
+            // When entering it, keep any existing member-mode queue intact, switch modes, and
+            // then retry it under the explicit administrator permission.
+            try {
+                if (turningOff && Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
+                    await flushPendingCellWrites();
+                    if (Object.keys(pendingCellWrites || {}).length) {
+                        alert('Admin View remains enabled because one or more character edits are not yet confirmed by the server. Use Sync Changes and retry before returning to your personal Tracker.');
+                        return;
+                    }
+                }
+                // Commit ordinary settings using the current permission mode before changing it.
+                if (unsavedCloudChanges && typeof forceSync === 'function') {
+                    await forceSync(false);
+                    if (unsavedCloudChanges) {
+                        alert('The shared settings save is still unconfirmed. Admin View was not changed so no pending edit is stranded.');
+                        return;
+                    }
+                }
+            } catch (error) {
+                alert('The shared save could not be confirmed. Admin View was not changed: ' + String(error?.message || error));
+                return;
+            }
+            if (turningOff) {
+                if (isAdminViewAsActive()) exitAdminViewAs();
+                adminModeEnabled = false;
+                adminViewAsMemberId = '';
+                clearAdminPreviewReadOnly();
+                applyDiscordIdentityDefaults();
+                const mode = document.getElementById('mode-toggle-btn');
+                if (mode) { mode.textContent = `👤 ${getCurrentOwnerName() || 'Personal'} · Personal View`; mode.classList.add('personal-active'); }
+                setStatus(`🟢 Returned to ${getCurrentOwnerName() || 'your'} · Personal View. Other members’ trackers are read-only.`);
+            } else {
+                adminModeEnabled = true;
+                adminViewAsMemberId = '';
+                clearAdminPreviewReadOnly();
+                isPersonalView = false;
+                const mode = document.getElementById('mode-toggle-btn');
+                const filter = document.getElementById('roster-filter');
+                if (mode) { mode.textContent = '🌍 Universal View'; mode.classList.remove('personal-active'); }
+                if (filter) { filter.value = 'all'; filter.disabled = false; }
+                activeRosterFilter = 'all';
+                setStatus('🟡 Admin View enabled. Guild-wide edits are now available.');
+            }
+            updateAdminModeUI();
+            syncDataStructures();
+            refreshTrackerUI();
+            renderOverviewActivity();
+            renderAnalytics();
+            renderTeamBuilder();
+            if (typeof refreshSharedDataIfChanged === 'function') await refreshSharedDataIfChanged({force:true});
+            // A queue left by the previous mode is never discarded. Retry it only after the
+            // selected mode is active so the API applies the corresponding ownership rule.
+            if (!turningOff && Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
+                const confirmed = await flushPendingCellWrites();
+                if (!confirmed) setStatus('🟠 Admin View is active · some saved edits remain queued until the server confirms them.');
+            }
+            if (turningOff && typeof showAppPage === 'function') showAppPage('tracker');
+        }
         function ownerCandidateNames() {
             return [pantheonDiscordUser?.label, pantheonDiscordUser?.username]
                 .map(value => String(value || '').trim()).filter(Boolean);
@@ -4497,7 +4606,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function canEditCharacterProgress(charName) {
             if (isAdminViewAsActive()) return false;
-            if (isPantheonAdmin()) return true;
+            if (isAdminModeActive()) return true;
             const own = getAuthenticatedMemberDirectoryEntry();
             return !!own && memberRegisteredCharacterNames(own).has(identityMatchKey(charName));
         }
@@ -4521,7 +4630,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             cloudData.settings.memberResetMarkers = markers;
         }
         function enforceMemberSafeSyncWrite(candidate, remote) {
-            if (isPantheonAdmin()) return candidate;
+            if (isAdminModeActive()) return candidate;
             const own = getAuthenticatedMemberDirectoryEntry(candidate);
             const ownedNames = memberRegisteredCharacterNames(own);
             const safeCells = { ...safeObject(candidate.cells) };
@@ -4573,7 +4682,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function canManageMemberRecord(member) {
             if (isAdminViewAsActive()) return false;
-            if (isPantheonAdmin()) return true;
+            if (isAdminModeActive()) return true;
             if (!member) return false;
             const own = getCurrentMemberDirectoryEntry();
             if (own) return member.id === own.id;
@@ -4608,7 +4717,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             applyDeveloperTextOverrides();
         }
         function toggleDeveloperMode() {
-            if (!isPantheonAdmin()) { alert('Developer Mode is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Developer Mode is available only to Pantheon administrators.'); return; }
             if (isAdminViewAsActive()) { alert('Exit View As before editing shared interface text.'); return; }
             developerModeEnabled = !developerModeEnabled;
             document.body.classList.toggle('developer-mode-active', developerModeEnabled);
@@ -4661,7 +4770,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             });
         }
         function editDeveloperTextAtPoint(event) {
-            if (!developerModeEnabled || !isPantheonAdmin() || isAdminViewAsActive()) return;
+            if (!developerModeEnabled || !isAdminModeActive() || isAdminViewAsActive()) return;
             let node = null;
             try {
                 const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(event.clientX,event.clientY) : null;
@@ -4685,7 +4794,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const next = window.prompt('Edit this text. Formatting, font size, and wrapping stay controlled by the page styles.', current);
             if (next === null || next === current) return;
             if (String(next).length > 2000) { alert('Please keep UI text under 2,000 characters.'); return; }
-            if (!(isPantheonAdmin() && !isAdminViewAsActive())) return;
+            if (!(isAdminModeActive() && !isAdminViewAsActive())) return;
             const overrides = { ...safeObject(cloudData.settings.uiTextOverrides) };
             overrides[key] = String(next);
             cloudData.settings.uiTextOverrides = overrides;
@@ -4798,8 +4907,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function findDiscordRosterMatch(user) {
             const eligibleRosters = normalizeRosters(cloudData.settings?.rosters);
             const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
-            // Discord display name is the default. If an admin explicitly configured a different
-            // roster-match label, prefer that mapping; otherwise use the profile name first.
+            const discordId = String(user?.id || '').trim();
+            // The confirmed Discord ID is the canonical identity. Admin labels and usernames
+            // are presentation fields and may not resemble the registered owner (for example Cho).
+            if (discordId) {
+                const confirmed = members.filter(member => String(member.profileConfirmedDiscordId || '').trim() === discordId);
+                if (confirmed.length > 1) return null; // Duplicate account links fail closed.
+                if (confirmed.length === 1) {
+                    const linked = confirmed[0];
+                    return eligibleRosters.find(roster => roster.id === linked.trackerRosterId)
+                        || eligibleRosters.find(roster => identityMatchKey(roster.name) === identityMatchKey(linked.name))
+                        || null;
+                }
+            }
+            // Legacy fallback applies only when no confirmed Discord-ID link exists.
             const profileName = String(user?.username || '').trim();
             const rosterMatchLabel = String(user?.label || '').trim();
             const aliasOverridesProfile = !!rosterMatchLabel && identityMatchKey(rosterMatchLabel) !== identityMatchKey(profileName);
@@ -4850,7 +4971,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 discordIdentityMatchStatus = 'unmatched';
                 isPersonalView = true;
                 const modeButton = document.getElementById('mode-toggle-btn');
-                if (modeButton) { modeButton.textContent = '👤 Personal View'; modeButton.classList.add('personal-active'); }
+                if (modeButton) { modeButton.textContent = `👤 ${getCurrentOwnerName() || 'Personal'} · Personal View`; modeButton.classList.add('personal-active'); }
                 const filter = document.getElementById('roster-filter');
                 if (filter) { filter.value = '__unregistered__'; filter.disabled = true; }
                 activeRosterFilter = '__unregistered__';
@@ -4867,7 +4988,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // the Tracker in Universal View even when the correct member identity says Cho.
             isPersonalView = true;
             const modeButton = document.getElementById('mode-toggle-btn');
-            if (modeButton) { modeButton.textContent = '👤 Personal View'; modeButton.classList.add('personal-active'); }
+            if (modeButton) { modeButton.textContent = `👤 ${roster.name || 'Personal'} · Personal View`; modeButton.classList.add('personal-active'); }
             const filter = document.getElementById('roster-filter');
             if (filter) { filter.value = roster.id; filter.disabled = true; }
             activeRosterFilter = roster.id;
@@ -5165,7 +5286,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         const PANTHEON_MAIN_RECORD_ID = 'pantheon-main';
         function getCloudConfig() { return { binId: PANTHEON_MAIN_RECORD_ID, apiKey: '' }; }
         function hasCloudConfig() { return true; }
-        function authHeaders() { return {}; }
+        function authHeaders() { return isAdminModeActive() ? { 'X-Pantheon-Admin-Mode': '1' } : {}; }
 
         function compareCellRecords(a, b) {
             const l = normalizeCellRecord(a) || { state: 'open', note: '', updatedAt: 0, deviceId: '' };
@@ -5358,15 +5479,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function trimWeeklyArchive(data = cloudData) {
             // Members may contribute their own character snapshot to a shared week, but
             // only an administrator may prune the shared archive itself.
-            if (!isPantheonAdmin()) return;
+            if (!isAdminModeActive()) return;
             const e = Object.entries(safeObject(data.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
             const keepWeeks = data.settings?.analyticsTrackingEnabled === true ? MAX_ARCHIVE_WEEKS : 1;
             while (e.length > keepWeeks) delete data.weeklyArchive[e.shift()[0]];
         }
 
         function getTargetResetTimeUTC(isWeekly) {
-            const reset = new Date(); reset.setUTCHours(1, 0, 0, 0); 
-            if (new Date().getTime() < reset.getTime()) reset.setUTCDate(reset.getUTCDate() - 1);
+            // One guild clock: Saturday 09:00 Manila == Saturday 01:00 UTC.
+            // Use the server-calibrated epoch, never the workstation's local timezone.
+            const now = pantheonNow();
+            const reset = new Date(now); reset.setUTCHours(1, 0, 0, 0);
+            if (now < reset.getTime()) reset.setUTCDate(reset.getUTCDate() - 1);
             if (isWeekly) reset.setUTCDate(reset.getUTCDate() - ((reset.getUTCDay() + 1) % 7));
             return reset.getTime();
         }
@@ -5395,10 +5519,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const res = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/status`, { method:'GET', headers:authHeaders(config), cache:'no-store' }, 8000);
             const payload = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(payload.message || `Revision check failed (${res.status})`);
+            const serverTime = Number(payload.metadata?.serverTime) || 0;
+            if (serverTime > 0) serverClockOffsetMs = serverTime - Date.now();
             const revision = Number(payload.metadata?.updatedAt) || 0;
             if (!revision) throw new Error('The shared database did not return a valid revision.');
             return revision;
         }
+        function pantheonNow() { return Date.now() + (Number(serverClockOffsetMs) || 0); }
 
         async function loadLiveTracker() {
             cloudData = loadLocalData();
@@ -5411,8 +5538,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // only after a second refresh, or temporarily overwrite a newer shared state.
             // forceSync performs checkAutoResets only after the latest server record is
             // loaded and the merged record is confirmed by the server.
+            try { await fetchRemoteRevision(getCloudConfig()); } catch (_) { /* D1 write timestamps remain authoritative if clock calibration is temporarily unavailable. */ }
             await forceSync(false);
             refreshTrackerUI();
+            if (pantheonDiscordUser) updateOverviewProfile(pantheonDiscordUser);
             const rb = String(cloudData.settings?.versionControl?.revisionBinId || '');
             if (rb) setRevisionBinIdLocal(rb);
         }
@@ -5828,7 +5957,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking for guild changes…');
             try{
                 const revision = await fetchRemoteRevision(getCloudConfig());
-                const changed = !lastRemoteRevision || revision !== lastRemoteRevision;
+                const changed = force === true || !lastRemoteRevision || revision !== lastRemoteRevision;
                 if(changed){
                     const remote = await fetchRemoteRecord(getCloudConfig());
                     if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return false;
@@ -6031,7 +6160,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             finally{staging?.remove();}
         }
         function setBountyShareStatus(message){const el=document.getElementById('bounty-share-status');if(el)el.textContent=String(message||'');}
-        function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
+        function openVersionHistoryModal(){if(!isAdminModeActive()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
         function triggerAutoSync() {
@@ -6554,7 +6683,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function checkAutoResets() {
             let changed = false;
             const dt = getTargetResetTimeUTC(false), wt = getTargetResetTimeUTC(true);
-            if (isPantheonAdmin()) {
+            if (isAdminModeActive()) {
                 if (cloudData.lastDailyReset < dt) { executeDailyReset(); cloudData.lastDailyReset = dt; changed = true; }
                 if (cloudData.lastWeeklyReset < wt) { executeWeeklyReset(wt); cloudData.lastWeeklyReset = wt; changed = true; }
                 if (changed) setAllMemberResetMarkers(cloudData.lastDailyReset, cloudData.lastWeeklyReset);
@@ -6789,15 +6918,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const menuToggle = document.getElementById('menu-toggle');
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
-            if (adminLink) adminLink.hidden = !isAdmin;
-            if (drawerAdminLink) drawerAdminLink.hidden = !isAdmin;
-            if (viewAsLink) viewAsLink.hidden = !isAdmin;
-            if (rateUpLink) rateUpLink.hidden = !isAdmin;
-            if (developerLink) developerLink.hidden = !isAdmin;
-            if (menuToggle) menuToggle.hidden = !isAdmin;
-            if (drawer) drawer.hidden = !isAdmin;
-            if (scrim) scrim.hidden = !isAdmin;
-            if (subEl) subEl.textContent = isAdmin ? 'Discord account · Administrator' : 'Discord account · Member';
+            if (adminLink) adminLink.hidden = !isAdminModeActive();
+            if (drawerAdminLink) drawerAdminLink.hidden = !isAdminModeActive();
+            if (viewAsLink) viewAsLink.hidden = !isAdminModeActive();
+            if (rateUpLink) rateUpLink.hidden = !isAdminModeActive();
+            if (developerLink) developerLink.hidden = !isAdminModeActive();
+            if (menuToggle) menuToggle.hidden = !isAdminModeActive();
+            if (drawer) drawer.hidden = !isAdminModeActive();
+            if (scrim) scrim.hidden = !isAdminModeActive();
+            if (subEl) { const ownerLabel = String(getAuthenticatedMemberDirectoryEntry()?.name || 'Personal'); subEl.textContent = isAdmin ? (isAdminModeActive() ? 'Discord account · Admin View' : `Discord account · ${ownerLabel} Personal View · Admin access available`) : 'Discord account · Member'; }
+            updateAdminModeUI();
             refreshLedgerVisibility();
             updateOverviewEventNotice();
         }
@@ -6807,14 +6937,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const failed = /failed|error|denied|not ready/i.test(syncLabel);
             const busy = !!syncInProgress || /merging|syncing|unsaved/i.test(syncLabel);
             const connected = typeof hasCloudConfig === 'function' ? hasCloudConfig() : true;
-            const isAdmin = isPantheonAdmin();
+            const hasAdminAccess = isPantheonAdmin();
+            const adminMode = isAdminModeActive();
             const set = (id, value) => { const node = document.getElementById(id); if (node) node.textContent = value; };
             set('overview-shared-value', failed ? 'Check connection' : connected ? 'Connected' : 'Local only');
             set('overview-shared-detail', failed ? 'Latest sync needs attention' : connected ? 'Shared guild record available' : 'Saved on this device');
             set('overview-sync-value', failed ? 'Needs attention' : busy ? 'Syncing' : unsavedCloudChanges ? 'Pending' : 'Up to date');
             set('overview-sync-detail', syncLabel || 'Waiting for first sync');
-            set('overview-permissions-value', isAdmin ? 'Administrator' : 'Member');
-            set('overview-permissions-detail', isAdmin ? 'Guild management access' : 'Authenticated guild account');
+            set('overview-permissions-value', hasAdminAccess ? 'Administrator' : 'Member');
+            set('overview-permissions-detail', hasAdminAccess ? (adminMode ? 'Admin View enabled · guild-wide editing' : 'Personal View · Admin View is off') : 'Authenticated guild account');
         }
         function getWeeklyPaceContext(now = Date.now()) {
             const weekMs = 7 * 24 * 60 * 60 * 1000;
@@ -7560,7 +7691,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }).join('');
         }
         function addCustomRateUpEvent() {
-            if (!isPantheonAdmin()) return;
+            if (!isAdminModeActive()) return;
             if (rateUpCustomEventDrafts.length >= 30) { alert('You can configure up to 30 additional events.'); return; }
             rateUpCustomEventDrafts.push(createRateUpCustomEventDraft());
             renderCustomRateUpEvents();
@@ -7584,7 +7715,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         }
         function openRateUpEventsModal() {
-            if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
             const events = normalizeRateUpEvents(cloudData.settings.rateUpEvents);
             const fill = (prefix, key) => {
                 const event = events[key];
@@ -7612,7 +7743,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return { enabled:document.getElementById(`rateup-${prefix}-enabled`).checked, schedule:document.getElementById(`rateup-${prefix}-schedule`).value === 'custom' ? 'custom' : 'weekend', customStart:document.getElementById(`rateup-${prefix}-start`).value, customEnd:document.getElementById(`rateup-${prefix}-end`).value };
         }
         function saveRateUpEvents() {
-            if (!isPantheonAdmin()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Rate-Up Event settings are available only to Pantheon administrators.'); return; }
             const unnamedEnabled = rateUpCustomEventDrafts.find(event => event.enabled && !String(event.name || '').trim());
             if (unnamedEnabled) { alert('Give each enabled guild event a name before saving.'); return; }
             const next = normalizeRateUpEvents({ itemDrop:readRateUpEventForm('item'), enhancement:readRateUpEventForm('enhancement'), expBoost:readRateUpEventForm('exp'), otherEvents:rateUpCustomEventDrafts });
@@ -7632,7 +7763,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function openAdminViewAsModal() {
-            if (!isPantheonAdmin()) { alert('View As is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('View As is available only to Pantheon administrators.'); return; }
             const select = document.getElementById('admin-view-as-member-select');
             const members = normalizeMemberDirectory(cloudData.settings?.memberDirectory).slice().sort((a,b)=>a.name.localeCompare(b.name));
             select.innerHTML = '<option value="">Choose a member…</option>' + members.map(member => {
@@ -7687,7 +7818,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const banner = document.getElementById('admin-view-as-banner'); if (banner) banner.hidden = true;
         }
         function startAdminViewAs() {
-            if (!isPantheonAdmin()) { alert('View As is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('View As is available only to Pantheon administrators.'); return; }
             const memberId = document.getElementById('admin-view-as-member-select').value;
             const member = normalizeMemberDirectory(cloudData.settings?.memberDirectory).find(item => item.id === memberId);
             if (!member) { alert('Choose a registered member first.'); return; }
@@ -7709,7 +7840,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             setStatus(`👁 Read-only preview: ${member.name}`);
         }
         function exitAdminViewAs() {
-            if (!isPantheonAdmin()) return;
+            if (!isAdminModeActive()) return;
             adminViewAsMemberId = '';
             adminViewThemeChoice = '';
             clearAdminPreviewReadOnly();
@@ -8548,7 +8679,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             document.querySelectorAll('select[data-weight-task]').forEach(sel => sel.addEventListener('change', () => { const l = document.querySelector(`[data-weight-label="${CSS.escape(sel.dataset.weightTask)}"]`); if(l) l.textContent = ['Minor','Low','Medium','High','Critical'][sel.value-1]; }));
         }
         async function saveLootWeights() {
-            if (!isPantheonAdmin()) { alert('Loot Weights can only be changed by a Pantheon administrator.'); return; }
+            if (!isAdminModeActive()) { alert('Loot Weights can only be changed by a Pantheon administrator.'); return; }
             const next = { ...(cloudData.settings.lootWeights || {}) };
             document.querySelectorAll('select[data-weight-task]').forEach(sel => { next[sel.dataset.weightTask] = clampWeight(sel.value); });
             const same = weeklyTaskNames.every(t => clampWeight(next[t]) === clampWeight(cloudData.settings.lootWeights[t]));
@@ -8558,13 +8689,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             renderAnalytics(); triggerAutoSync(); closeModal('weights-modal');
         }
         async function resetLootWeights() {
-            if (!isPantheonAdmin()) { alert('Loot Weights can only be changed by a Pantheon administrator.'); return; }
+            if (!isAdminModeActive()) { alert('Loot Weights can only be changed by a Pantheon administrator.'); return; }
             if (!confirm('Reset?')) return;
             if (!(await prepareGlobalChange('Reset Loot Weights'))) return;
             const ts = Date.now(); weeklyTaskNames.forEach(t => { cloudData.settings.lootWeights[t] = clampWeight(DEFAULT_LOOT_WEIGHTS[t]||3); cloudData.settings.lootWeightUpdatedAt[t] = ts; });
             buildLootWeightEditor(); renderAnalytics(); triggerAutoSync();
         }
-        function openWeightsModal() { if (!isPantheonAdmin()) { alert('Loot Weights is available only to Pantheon administrators.'); return; } buildLootWeightEditor(); openModal('weights-modal'); }
+        function openWeightsModal() { if (!isAdminModeActive()) { alert('Loot Weights is available only to Pantheon administrators.'); return; } buildLootWeightEditor(); openModal('weights-modal'); }
 
         // --- Drag & Drop Variables ---
         let dragSrcData = null; 
@@ -8580,16 +8711,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             projectTrackerRostersFromMemberDirectory(cloudData, false);
             const allRosters = getRosters();
             const currentMember = getCurrentMemberDirectoryEntry();
-            const rosters = isPantheonAdmin() ? allRosters : allRosters.filter(roster => {
+            const rosters = isAdminModeActive() ? allRosters : allRosters.filter(roster => {
                 const owner = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === roster.id || identityMatchKey(entry.name) === identityMatchKey(roster.name));
                 return owner ? canManageMemberRecord(owner) : (!!currentMember && (currentMember.trackerRosterId === roster.id || identityMatchKey(currentMember.name) === identityMatchKey(roster.name)));
             });
             list.innerHTML = rosters.length ? rosters.map(r => {
                 const member = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === r.id || identityMatchKey(entry.name) === identityMatchKey(r.name));
-                const adminControls = isPantheonAdmin() ? `<input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button><button class="btn btn-secondary" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Unregister All</button>` : '';
-                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span>${adminControls}</div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="${isPantheonAdmin() ? 'true' : 'false'}" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}${(isPantheonAdmin() || canManageMemberRecord(member)) ? `<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')" title="Opt out of your character from Tracker while keeping it in Member Roster">×</button>` : ''}</span>`).join('') : '<div style="color:#aaa;">No characters opted in.</div>'}</div></div>`;
-            }).join('') : (isPantheonAdmin() ? '<div style="color:var(--pt-muted);">Add a member in Member Roster first.</div>' : '<div style="color:var(--pt-muted);">No roster is linked to this Discord account yet. Register your own characters in Member Roster or ask an administrator to link your account.</div>');
-            if (isPantheonAdmin()) attachDragDropListeners();
+                const adminControls = isAdminModeActive() ? `<input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button><button class="btn btn-secondary" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Unregister All</button>` : '';
+                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span>${adminControls}</div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="${isAdminModeActive() ? 'true' : 'false'}" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}${(isAdminModeActive() || canManageMemberRecord(member)) ? `<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')" title="Opt out of your character from Tracker while keeping it in Member Roster">×</button>` : ''}</span>`).join('') : '<div style="color:#aaa;">No characters opted in.</div>'}</div></div>`;
+            }).join('') : (isAdminModeActive() ? '<div style="color:var(--pt-muted);">Add a member in Member Roster first.</div>' : '<div style="color:var(--pt-muted);">No roster is linked to this Discord account yet. Register your own characters in Member Roster or ask an administrator to link your account.</div>');
+            if (isAdminModeActive()) attachDragDropListeners();
         }
 
         function handleRegistrationRosterChange(reset=true) {
@@ -8663,7 +8794,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         async function saveRosterGroup(id) {
-            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can change shared roster colors.'); return; }
+            if (!isAdminModeActive()) { alert('Only a Pantheon administrator can change shared roster colors.'); return; }
             const roster = findRoster(id); if (!roster) return;
             const colorInput = document.querySelector(`[data-roster-color="${CSS.escape(id)}"]`);
             const color = normalizeColor(colorInput?.value, roster.color);
@@ -8679,7 +8810,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         async function removeCharacterFromRoster(id, n) {
             const roster = findRoster(id); if (!roster) return;
-            if (!isPantheonAdmin()) {
+            if (!isAdminModeActive()) {
                 const owner = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.trackerRosterId === roster.id || identityMatchKey(member.name) === identityMatchKey(roster.name));
                 if (!canManageMemberRecord(owner)) { alert('You can only unregister characters in your own roster.'); return; }
             }
@@ -8722,7 +8853,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         async function removeRosterGroup(id) {
             const roster = findRoster(id); if (!roster) return;
-            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can unregister an entire roster.'); return; }
+            if (!isAdminModeActive()) { alert('Only a Pantheon administrator can unregister an entire roster.'); return; }
             const names = [...roster.characters];
             if (!names.length) return alert('This member has no opted-in characters to unregister. The member itself remains in Member Roster.');
             if (!confirm(`Remove all ${names.length} character(s) owned by ${roster.name} from Tracker? Their IGNs and classes will remain in Member Roster and they will stay available in Team Builder.`)) return;
@@ -8753,7 +8884,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function renderDungeonRegistration() {
-            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             renderPastelPalette();
             const sel = document.getElementById('reg-dungeon-cat-select'), list = document.getElementById('dungeon-management-list');
             if(!sel||!list) return;
@@ -8784,7 +8915,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         async function registerDungeonTask() {
-            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             const v = document.getElementById('reg-dungeon-task-name').value.trim(); if(!v) return alert('Enter task name.');
             if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === v.toLowerCase()))) return alert('Task exists.');
             const catChoice = document.getElementById('reg-dungeon-cat-select').value;
@@ -8807,7 +8938,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         
         async function saveCategoryGroup(id) {
-            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             const c = findCategory(id); if(!c) return;
             const name = document.querySelector(`[data-cat-name="${CSS.escape(id)}"]`).value.trim().slice(0,30) || c.name;
             const color = normalizeColor(document.querySelector(`[data-cat-color="${CSS.escape(id)}"]`).value, '#ffffff');
@@ -8817,7 +8948,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             latest.name = name; latest.color = color; latest.group = group; touchCategorySettings(); refreshTrackerUI(); triggerAutoSync();
         }
         async function removeTaskFromCategory(id, t) {
-            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             const c = findCategory(id); if(c && confirm(`Remove ${t}?`)) {
                 if (!(await prepareGlobalChange(`Remove dungeon task ${t}`))) return;
                 const latest = findCategory(id); if (!latest) return alert('Category no longer exists. Refresh and try again.');
@@ -8825,7 +8956,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         }
         async function removeCategoryGroup(id) {
-            if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
+            if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
             if(!confirm('Remove category?')) return;
             const c = findCategory(id); if (!c) return;
             if (!(await prepareGlobalChange(`Remove dungeon category ${c.name}`))) return;
@@ -10070,10 +10201,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const list = document.getElementById('member-directory-list'); if (!list) return;
             const query = (document.getElementById('member-directory-search')?.value || '').trim().toLowerCase();
             const all = getMemberDirectoryView();
-            const scoped = isAdminViewAsActive() ? all.filter(member => member.id === adminViewAsMemberId) : isPantheonAdmin() ? all : all.filter(member => canManageMemberRecord(member));
+            const scoped = isAdminViewAsActive() ? all.filter(member => member.id === adminViewAsMemberId) : isAdminModeActive() ? all : all.filter(member => canManageMemberRecord(member));
             const members = scoped.filter(member => [member.name, member.note || '', ...(member.characters || []), ...(member.characterProfiles || []).map(profile => `${profile.job} ${profile.trackerEnabled ? 'tracking' : 'directory'}`)].join(' ').toLowerCase().includes(query));
             const memberNameInput = document.getElementById('member-directory-name');
-            if (memberNameInput && !isPantheonAdmin()) { memberNameInput.readOnly = true; if (!editingMemberDirectoryId) memberNameInput.value = getCurrentOwnerName(); }
+            if (memberNameInput && !isAdminModeActive()) { memberNameInput.readOnly = true; if (!editingMemberDirectoryId) memberNameInput.value = getCurrentOwnerName(); }
             else if (memberNameInput) memberNameInput.readOnly = false;
             const memberHeading = document.getElementById('member-directory-form-title');
             const memberForm = document.getElementById('member-directory-form');
@@ -10081,10 +10212,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const memberDescription = document.getElementById('member-roster-description');
             if (memberDescription) memberDescription.textContent = isAdminViewAsActive()
                 ? 'Read-only preview of this member’s registered characters, Main designation, and Tracker opt-ins.'
-                : isPantheonAdmin()
+                : isAdminModeActive()
                 ? 'Shared guild directory. Manage member records and choose which characters appear in Tracker. All registered characters remain available in Team Builder.'
                 : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
-            if (memberHeading && !isPantheonAdmin() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
+            if (memberHeading && !isAdminModeActive() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
             const trackingCount = members.reduce((sum, member) => sum + (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length, 0);
             const count = document.getElementById('member-directory-count');
@@ -10098,10 +10229,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Not tracked; still available in Team Builder'}`;
                     return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main" title="Main character" aria-label="Main character">★</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
-                const removeMemberButton = isPantheonAdmin() && !isAdminViewAsActive() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
-                const directoryActions = isAdminViewAsActive() ? '' : `<div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isPantheonAdmin() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div>`;
+                const removeMemberButton = isAdminModeActive() && !isAdminViewAsActive() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
+                const directoryActions = isAdminViewAsActive() ? '' : `<div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isAdminModeActive() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div>`;
                 return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div>${directoryActions}</div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
-            }).join('') : `<div class="member-directory-empty">${isPantheonAdmin() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
+            }).join('') : `<div class="member-directory-empty">${isAdminModeActive() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
         }
         function resetMemberDirectoryForm() {
             editingMemberDirectoryId = null;
@@ -10112,10 +10243,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             document.getElementById('member-directory-cancel').hidden = true;
             const ownerInput = document.getElementById('member-directory-name');
             if (ownerInput) {
-                ownerInput.readOnly = !isPantheonAdmin();
-                ownerInput.value = isPantheonAdmin() ? '' : getCurrentOwnerName();
+                ownerInput.readOnly = !isAdminModeActive();
+                ownerInput.value = isAdminModeActive() ? '' : getCurrentOwnerName();
             }
-            if (!isPantheonAdmin()) document.getElementById('member-directory-form-title').textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
+            if (!isAdminModeActive()) document.getElementById('member-directory-form-title').textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             renderMemberCharacterRows([]);
         }
         function startMemberDirectoryEdit(name, recordId = '') {
@@ -10169,7 +10300,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             let name = document.getElementById('member-directory-name').value.trim().slice(0, 60);
             const profiles = collectMemberCharacterRows();
             const note = document.getElementById('member-directory-note').value.trim().slice(0, 160);
-            if (!isPantheonAdmin()) {
+            if (!isAdminModeActive()) {
                 const own = getCurrentMemberDirectoryEntry();
                 const fixedOwner = String(own?.name || getCurrentOwnerName()).trim().slice(0, 60);
                 if (!fixedOwner) return alert('Your Discord account could not be linked to an owner name. Ask an administrator to configure your account label.');
@@ -10201,7 +10332,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const previousOwnerName = editingMemberDirectoryOriginalName.trim();
             let entry;
             const currentDiscordId = String(pantheonDiscordUser?.id || '');
-            const isCurrentUserEntry = !isPantheonAdmin() || ownerCandidateNames().some(candidate => identityCompactKey(candidate) === identityCompactKey(name));
+            const isCurrentUserEntry = !isAdminModeActive() || String(getAuthenticatedMemberDirectoryEntry()?.name || '').trim().toLowerCase() === name.trim().toLowerCase() || ownerCandidateNames().some(candidate => identityCompactKey(candidate) === identityCompactKey(name));
             if (editingMemberDirectoryId) {
                 const index = entries.findIndex(item => item.id === editingMemberDirectoryId);
                 if (index < 0) return alert('That member no longer exists. Refresh the page and try again.');
@@ -10225,7 +10356,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             profiles.forEach(profile => { cloudData.settings.characterJobs[profile.name] = { job: profile.job, updatedAt: Date.now(), deviceId }; });
             const remainingProfiles = entries.flatMap(member => member.characterProfiles || []);
-            if (isPantheonAdmin()) {
+            if (isAdminModeActive()) {
                 // Only administrators may do guild-wide orphan-job cleanup.
                 Object.keys(cloudData.settings.characterJobs).forEach(characterName => {
                     const stillPresent = remainingProfiles.some(profile => profile.name.toLowerCase() === characterName.toLowerCase());
@@ -10252,7 +10383,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (isCurrentUserEntry && profiles.length && profiles.filter(profile => profile.isMain).length === 1) closeModal('profile-confirm-modal');
         }
         async function removeMemberDirectoryEntry(id) {
-            if (!isPantheonAdmin()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
+            if (!isAdminModeActive()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.id === id);
             if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any opted-in characters will also be removed from Tracker and Team Builder.`)) return;
@@ -10287,7 +10418,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r40';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r42';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10383,7 +10514,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function applySavedLandingPage() {
             let saved = '';
             try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
-            // Upgrade older Universal View startup preferences to Personal View per the current guild default.
+            // The administrator account linked to Cho opens the app in Cho's own Tracker
+            // by default. An explicit landing choice saved later still takes precedence.
+            if (!saved && isPantheonAdmin() && identityCompactKey(getAuthenticatedMemberDirectoryEntry()?.name || '') === 'cho') {
+                saved = 'tracker-personal';
+                try { localStorage.setItem(LANDING_PREFERENCE_KEY, saved); } catch (e) {}
+            }
             if (saved === 'tracker-universal') {
                 saved = 'tracker-personal';
                 try { localStorage.setItem(LANDING_PREFERENCE_KEY, saved); } catch (e) {}
@@ -10733,26 +10869,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 'member-roster': document.getElementById('member-roster-page')
             };
             if (!pages[page]) page = 'tracker';
-            // On every entry to Tracker, force the signed-in Discord account's own roster.
-            // This overrides stale local Universal View state; the toolbar toggle still lets
-            // a member switch to Universal View manually while remaining on the Tracker page.
-            if (page === 'tracker' && pantheonDiscordUser?.id && !isAdminViewAsActive()) applyDiscordIdentityDefaults();
+            // On every Tracker entry, restore the authenticated member's own roster unless
+            // the administrator explicitly enabled Admin View.
+            if (page === 'tracker' && pantheonDiscordUser?.id && !isAdminModeActive() && !isAdminViewAsActive()) applyDiscordIdentityDefaults();
             Object.entries(pages).forEach(([key, el]) => { if (el) el.classList.toggle('hidden-page', key !== page); });
             if (page === 'overview') { renderOverviewActivity(); updateOverviewStatusCards(); }
             if (page === 'tracker') {
                 syncDataStructures(); buildTrackerTable(); applyBoardState();
                 if (isAnalyticsVisible) renderAnalytics();
                 updateClassSetupSummary();
-                // A local page switch does not trigger the browser focus event. Pull the
-                // current D1 marker whenever Tracker is opened so an administrator or
-                // member does not mistake a cached view for the latest shared progress.
-                // The helper skips when a local save/sync is in flight and redraws the
-                // Tracker only when the remote revision has actually changed.
-                if (typeof refreshSharedDataIfChanged === 'function') {
-                    setTrackerLiveSyncNote('checking','Checking guild updates…');
-                    refreshSharedDataIfChanged({force:true}).catch(() => {});
-                }
             }
+            // Every in-app page transition is a freshness boundary: read the no-store D1
+            // revision/record instead of trusting a page-local snapshot. The release check
+            // also runs here, not just on focus or the background timer.
+            if (page === 'tracker') setTrackerLiveSyncNote('checking','Checking guild updates…');
+            if (typeof refreshSharedDataIfChanged === 'function') refreshSharedDataIfChanged({force:true}).catch(() => {});
+            if (typeof window.__pantheonCheckReleaseNow === 'function') window.__pantheonCheckReleaseNow();
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
@@ -10766,13 +10898,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
         function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
-        function openDungeonPage() { if (!isPantheonAdmin()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function openDungeonPage() { if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
         
         function handlePageRoute() {
             closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('weights-modal'); closeModal('version-history-modal');
             const route = location.hash || '#overview';
             const adminOnlyRoutes = new Set(['#dungeons', '#loot-weights', '#version-history', '#sync-now']);
-            if (adminOnlyRoutes.has(route) && !isPantheonAdmin()) {
+            if (adminOnlyRoutes.has(route) && !isAdminModeActive()) {
                 history.replaceState(null, '', location.pathname + location.search);
                 showAppPage('overview');
                 alert('That management tool is available only to Pantheon administrators.');
@@ -10815,7 +10947,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
             const btn = document.getElementById('menu-toggle');
-            if (!isPantheonAdmin()) {
+            if (!isAdminModeActive()) {
                 if (drawer) { drawer.classList.remove('open'); drawer.hidden = true; drawer.setAttribute('aria-hidden', 'true'); }
                 if (scrim) { scrim.classList.remove('open'); scrim.hidden = true; }
                 if (btn) { btn.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
@@ -10958,13 +11090,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r40';
+  const CURRENT_BUILD = '1.6.8-r42';
   let newestBuild = '';
   let checkBusy = false;
   let reloadQueued = false;
   let reloadStarted = false;
   let syncNudgeInFlight = false;
   let lastCheckAt = 0;
+  let lastNavigationCheckAt = 0;
   function pendingCellCount() {
     try { return typeof pendingCellWrites !== 'undefined' ? Object.keys(pendingCellWrites || {}).length : 0; }
     catch (_) { return 1; }
@@ -11052,6 +11185,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   // Release manifest checks remain light (10s); when an update is queued, save state
   // is rechecked every 1.5s so there is no needless 10–12 second wait after an ACK.
   setInterval(() => { if (reloadQueued) attemptQueuedReload(); else if (Date.now()-lastCheckAt>=10000) { lastCheckAt=Date.now(); checkRelease(); } },1500);
+  window.__pantheonCheckReleaseNow = () => {
+    if (reloadQueued) { attemptQueuedReload(); return; }
+    const now = Date.now();
+    if (now - lastNavigationCheckAt < 1500) return;
+    lastNavigationCheckAt = now;
+    lastCheckAt = now;
+    checkRelease();
+  };
   window.addEventListener('pageshow',()=>{if(reloadQueued)attemptQueuedReload();else checkRelease();});
   window.addEventListener('focus',()=>{if(reloadQueued)attemptQueuedReload();else checkRelease();});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(reloadQueued)attemptQueuedReload();else checkRelease();}});

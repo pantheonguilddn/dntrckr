@@ -1,20 +1,20 @@
-# Pantheon Tools v1.6.8-r40 — authoritative shared-cell refresh
+# Pantheon Tools v1.6.8-r42 — startup initialization hotfix
 
-## What changed
+## Critical fix
 
-- Shared character/task cells now use the latest server record as the authoritative baseline during background refresh, initial/manual sync, and whole-record retry merges.
-- The previous merge could choose a stale browser-cached cell over a newer shared value when the local cell timestamp was ahead (for example, because of client clock skew). This could hide both the dungeon bounty mark and its linked Bounty 1–6 target note even though the other member had received a successful save acknowledgement.
-- This release fixes that by replacing the merged cell map with the server's cell map before applying the current browser's explicitly pending, unconfirmed edits.
-- Pending local edits remain visible and protected until the dedicated per-character endpoint confirms them. All non-pending character cells now reflect D1.
+- Fixes the r41 login-screen lockout. The server-clock offset is now initialized **before** `createEmptyData()` runs. The data factory calls `getTargetResetTimeUTC()`, which calls `pantheonNow()`; r41 declared the offset later, triggering a JavaScript Temporal Dead Zone `ReferenceError` during initial script execution. Because that stopped the app before its DOMContentLoaded authentication boot handler, users returned from Discord authorization to the login gate.
+- This is an initialization-order fix only. It does not change Discord OAuth, session cookies, D1 schema, allowlist records, authentication middleware, tracker merge rules, or the r41 permission-mode changes.
 
-## Retained from r39
+## Deployment
 
-- Independent per-character cell batches and server acknowledgements.
-- Per-character retries and CAS-protected D1 writes.
-- Member ownership enforcement and Universal View read-only protection.
-- Polling while a local character save is pending, with revision requests bounded by timeout.
-- Bounty Share, Weekly Report, and separate Revision History queue.
+Deploy the complete ZIP contents to the existing Cloudflare Pages project. Keep `_headers`, `version.json`, and the entire `functions/` directory. Do not reset or replace the D1 database or alter Discord OAuth settings.
 
-## Validation boundary
+After deployment, verify `https://dntrckr.pages.dev/version.json` reports `1.6.8-r42`. Then test Discord login with both an ordinary member account and the administrator account before inviting the guild back in.
 
-This is a locally built package. It has not been deployed to Cloudflare or verified against the live production D1 database. Local regression tests cover the specific stale-cache scenario for both the dungeon mark and linked Bounty slot, pending-edit overlay, existing r39 per-character API behavior, JavaScript syntax, package integrity, and unchanged schema/pre-existing Pages Functions.
+## Validation
+
+- Verified the server-clock binding is initialized before `createEmptyData()` and that its only declaration is unique.
+- All inline application scripts pass `node --check`.
+- All Pages Function JavaScript files pass `node --check`.
+- Confirmed the r42 HTML build markers, `version.json`, ZIP integrity, and package file paths.
+- This is local validation only; production Cloudflare Pages/D1 and real Discord callback testing still must be confirmed after deployment.
