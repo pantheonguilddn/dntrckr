@@ -1,20 +1,21 @@
-# Pantheon Tools v1.6.8-r40 — authoritative shared-cell refresh
+# Pantheon Tools v1.6.8-r41 — personal/admin isolation and navigation freshness
 
 ## What changed
 
-- Shared character/task cells now use the latest server record as the authoritative baseline during background refresh, initial/manual sync, and whole-record retry merges.
-- The previous merge could choose a stale browser-cached cell over a newer shared value when the local cell timestamp was ahead (for example, because of client clock skew). This could hide both the dungeon bounty mark and its linked Bounty 1–6 target note even though the other member had received a successful save acknowledgement.
-- This release fixes that by replacing the merged cell map with the server's cell map before applying the current browser's explicitly pending, unconfirmed edits.
-- Pending local edits remain visible and protected until the dedicated per-character endpoint confirms them. All non-pending character cells now reflect D1.
+- The authenticated administrator starts in the confirmed Member Roster identity (Cho for the currently linked Discord account) and Personal View. The visible **Admin View** toggle explicitly enables guild-wide management and cross-character editing. Returning to Personal View first confirms pending administrator writes.
+- Admin-role sessions no longer bypass character ownership checks unless the administrator explicitly enables Admin View. This is enforced by both the per-character cell endpoint and the whole-record D1 write endpoint. A request header alone cannot grant administrator rights; the server also requires the authenticated Discord session to have the Admin role.
+- In Personal View, client-side whole-record sync preserves every non-owned character cell and weekly archive entry from the authoritative server snapshot. The D1 write guard independently rejects unauthorized changes to other members’ progress, registration, roster, class records, or reset markers.
+- Confirmed Discord account ID is the first-choice mapping to the canonical Member Roster owner and Tracker roster. Discord display-name/username differences therefore do not divert the Admin account away from its linked Cho profile. Duplicate confirmed ID links fail closed.
+- Every in-app page navigation performs a forced no-store D1 revision and record read, then triggers a `/version.json` check. Normal five-second Tracker / sixty-second non-Tracker polling, focus refresh, and pending-write-safe automatic release reload remain active.
+- D1 status responses include server time. The client calibrates reset calculations to the D1 server epoch; task cell timestamps and conflict ordering are stamped by the server. Workstation timezone differences do not govern reset windows or overwrite order.
+- If no explicit landing preference exists, an Admin account linked to Cho opens Tracker · Cho Personal View. A separately chosen landing preference is preserved, but Admin View is always off after a fresh page load.
 
-## Retained from r39
+## Deployment
 
-- Independent per-character cell batches and server acknowledgements.
-- Per-character retries and CAS-protected D1 writes.
-- Member ownership enforcement and Universal View read-only protection.
-- Polling while a local character save is pending, with revision requests bounded by timeout.
-- Bounty Share, Weekly Report, and separate Revision History queue.
+Deploy the **entire ZIP contents** to the existing Cloudflare Pages project. Keep `_headers`, `version.json`, `admin.html`, `schema.sql`, and the full `functions/` directory. Do not upload only `index.html`. No D1 schema migration is required. Preserve the existing Pages D1 binding (`PANTHEON_DB`), Discord OAuth configuration, and database.
+
+After deployment, verify `https://dntrckr.pages.dev/version.json` reports `1.6.8-r41`. Existing tabs running a release with the watcher (r37 and newer) should detect the new manifest and reload after pending edits are confirmed. Very old tabs from before the release watcher was introduced need one initial hard refresh to load that watcher.
 
 ## Validation boundary
 
-This is a locally built package. It has not been deployed to Cloudflare or verified against the live production D1 database. Local regression tests cover the specific stale-cache scenario for both the dungeon mark and linked Bounty slot, pending-edit overlay, existing r39 per-character API behavior, JavaScript syntax, package integrity, and unchanged schema/pre-existing Pages Functions.
+This package is locally validated for JavaScript/function syntax, CSS parsing, ZIP integrity/path preservation, and the server-side ownership guard. Production Cloudflare Pages, D1 data, and multiple simultaneous Discord sessions have not been tested from this workspace. Do not treat the release as live until the deployment verification steps above pass.
