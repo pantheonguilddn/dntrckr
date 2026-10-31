@@ -1,3 +1,39 @@
+# Pantheon Tools v1.6.8-r34 — authoritative task saves, automatic live checks, and bounty sharing
+
+- **Task-write integrity:** checkbox and bounty-note saves now include explicit per-cell write intents. The authenticated Cloudflare Pages API checks that the intended state/note matches the submitted, ownership-guarded candidate, then assigns a monotonically increasing server timestamp against the latest D1 cell value before the compare-and-swap write. This removes member-device clock skew from the conflict decision for new clients. Older clients remain compatible through the existing timestamp merge fallback.
+- **Automatic shared updates:** added an authenticated, lightweight `/api/cloud/b/:id/status` endpoint that reads only the D1 `updated_at` revision (it does not read `record_json` for the normal main-tracker poll). Visible Tracker pages check this revision every 5 seconds and download the full tracker record only when the revision changes; other pages retain a 60-second cadence. No manual refresh is required for normal shared updates. This is near-live polling, not WebSocket push; true instant push would require adding a Durable Object/WebSocket deployment binding.
+- **Bounty Share Builder:** added a Tracker toolbar popup that automatically collects all populated Bounty Board slots for the currently displayed characters. Every slot remains a separate entry, including duplicate dungeons. Each entry can be tagged Unique/Legendary, Basic clear/Time-limited (with minute limit), and Any party/8-man Guild Members. Requirement selections are stored locally in the browser and do not modify shared tracker data. Users can copy formatted text, open the native share sheet where supported, or export a PNG snapshot.
+- **Security:** cell intents pass through the existing server-side member ownership guard; this does not weaken view-only protections for other members' trackers. The status route uses the existing authenticated Pages middleware and revision-journal access guard.
+- **No D1 schema migration required.** One additional Pages Function route is included. Deploy the full ZIP as a unit and ask members to reload once after the update so old JavaScript is replaced.
+
+## r34 validation
+
+- Added mocked-D1 API tests for authenticated owner cell intent writes, server-side timestamp ordering under client clock skew, ownership rejection for another member's character, and monotonic row revisions.
+- Added status-endpoint tests for existing/missing records and cache-control metadata.
+- Added client tests for duplicate dungeon entries being kept distinct, per-entry requirement serialization, timer rendering, safe SVG export generation, and text export.
+- JavaScript syntax, CSS parsing, package path integrity, and ZIP integrity checked locally.
+- **Not live-verified:** this environment cannot deploy to or inspect the production Cloudflare Pages project/D1 database. Five-second automatic update checks are verified in code and mocked endpoint tests only. They are not WebSocket push and can be delayed by a suspended/background browser tab or a network outage.
+
+---
+
+# Pantheon Tools v1.6.8-r33 — Reliable weekly rollover and previous-week report
+
+- Fixed startup reset ordering: daily/weekly reset checks no longer run against the browser's cached tracker before the latest shared Cloudflare/D1 record has hydrated. The existing sync path applies resets only after the server record has been read and the merged write is confirmed. This prevents stale-cache-first loading from making week rollover appear inconsistent across refreshes.
+- Added an always-on compact previous-week report saved immediately before weekly cells are cleared. It includes per-character completion rates, completed/unfinished/N/A counts, and up to two practical recommendations for unfinished tasks. N/A and Bounty slots are excluded from the weekly completion calculation/recommendation list.
+- The previous-week report remains available when extended analytics is disabled. The optional switch now controls up to five weeks of trend history and rolling guild-run timing; when disabled, the archive is trimmed to the latest compact weekly report.
+- Updated the Analytics help text and opt-in notice to match the new separation between the always-on weekly recap and optional extended history.
+- Retains r32's confirmed-acknowledgement pending-write queue, retry behavior, Discord-ID-first ownership checks, r31 live refresh cadence, and existing Cloudflare D1 endpoints. No schema migration or new API route.
+- Important limitation: a week that was already reset without an archived snapshot by an earlier version cannot be reconstructed retroactively. The first report can only appear after a weekly reset under r33, unless a prior opt-in archive already exists.
+
+## r33 validation
+
+- Reset-order checks: initial local-cache loading no longer invokes `checkAutoResets()`; `forceSync()` remains the post-hydration reset gate.
+- Weekly snapshot tests: a snapshot is created while extended analytics is off; completed, unfinished, and N/A states are preserved before reset; active weekly cells are then reopened; archive retention is one week when extended analytics is off and five when enabled.
+- JavaScript syntax, CSS parsing, static HTML ID uniqueness, ZIP integrity, and original package path preservation were checked locally.
+- The tests use local fixtures/mocked D1 behavior. Live Cloudflare Pages/D1/Discord and multi-member reset behavior still require production verification.
+
+---
+
 # Pantheon Tools v1.6.8-r32 — Never discard an unconfirmed task save
 
 - Fixed a data-loss bug in the pending checkbox queue: previously, a pending edit was deleted even when the server response did not contain the requested state. r32 now removes a queued edit **only after the returned shared record exactly confirms that character/task state and note**.

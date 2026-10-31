@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r32</title>
+    <title>Pantheon Tools v1.6.8-r34</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1549,6 +1549,28 @@
         :root[data-pantheon-theme] .team-job.team-unknown { background:#55505f !important; border-color:#81788e !important; color:#fff !important; }
         .tracker-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:11px; width:100%; max-width:1600px; margin:0 auto 12px; padding:12px 14px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); color:var(--pt-text); box-sizing:border-box; }
         .bounty-boards-toggle { min-height:36px; font-weight:800; }
+        .bounty-share-modal { width:min(1120px, calc(100vw - 28px)); max-height:min(92vh, 980px); overflow:auto; }
+        .bounty-share-toolbar { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin:10px 0; color:var(--pt-muted); font-size:.78rem; }
+        .bounty-share-count { color:var(--pt-text); font-weight:900; }
+        .bounty-share-list { display:grid; gap:10px; max-height:42vh; overflow:auto; padding:2px; }
+        .bounty-share-row { display:grid; grid-template-columns:minmax(150px,1.15fr) minmax(150px,1.2fr) minmax(125px,.8fr) minmax(155px,1fr) minmax(150px,1fr) minmax(90px,.55fr); gap:8px; align-items:end; padding:10px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-soft); color:var(--pt-text); }
+        .bounty-share-field { display:grid; gap:4px; min-width:0; }
+        .bounty-share-field small { color:var(--pt-muted); font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+        .bounty-share-field strong { overflow-wrap:anywhere; font-size:.82rem; }
+        .bounty-share-field select,.bounty-share-field input { width:100%; min-width:0; min-height:36px; box-sizing:border-box; border:1px solid var(--pt-border); border-radius:7px; padding:6px 8px; background:var(--pt-input); color:var(--pt-text); font:inherit; }
+        .bounty-share-timer[hidden] { display:none!important; }
+        .bounty-share-preview-wrap { margin-top:14px; border:1px solid var(--pt-border); border-radius:12px; overflow:hidden; background:var(--pt-surface-soft); }
+        .bounty-share-preview-head { display:flex; justify-content:space-between; gap:10px; padding:10px 12px; border-bottom:1px solid var(--pt-border); color:var(--pt-text); font-size:.78rem; }
+        .bounty-share-preview-head span { color:var(--pt-muted); }
+        .bounty-share-preview { max-height:260px; overflow:auto; padding:12px; color:var(--pt-text); }
+        .bounty-share-preview-title { margin:0 0 4px; font-size:1rem; font-weight:950; }
+        .bounty-share-preview-subtitle { margin:0 0 12px; color:var(--pt-muted); font-size:.74rem; }
+        .bounty-share-preview-item { display:grid; grid-template-columns:minmax(120px,.8fr) minmax(140px,1.3fr) minmax(180px,1fr); gap:8px; padding:8px 0; border-top:1px solid var(--pt-border); font-size:.78rem; }
+        .bounty-share-preview-item strong { overflow-wrap:anywhere; }
+        .bounty-share-empty { padding:14px; color:var(--pt-muted); font-size:.82rem; }
+        .bounty-share-actions { flex-wrap:wrap; }
+        @media(max-width:900px) { .bounty-share-row { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+        @media(max-width:540px) { .bounty-share-row { grid-template-columns:1fr 1fr; } .bounty-share-preview-item { grid-template-columns:1fr; gap:3px; } }
         :root[data-pantheon-theme] #track-bounty-boards-btn[aria-pressed="true"] { background:var(--pt-accent) !important; border-color:var(--pt-accent) !important; color:#fff !important; }
         .tracker-toolbar-hint { color:var(--pt-muted); font-size:.67rem; line-height:1.5; }
         :root[data-pantheon-theme] #dn-tracker { color:var(--pt-text) !important; background:var(--pt-surface) !important; border-color:var(--pt-border) !important; }
@@ -2684,7 +2706,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:640px){.deadline-strategy-banner{padding:10px}.deadline-strategy-banner p{font-size:.68rem}}
 </style>
 
-<style id="pantheon-r32-live-tracker-sync">
+<style id="pantheon-r34-weekly-recap">
 .tracker-live-sync-note{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:4px 8px;border:1px solid var(--pt-border);border-radius:999px;background:var(--pt-surface-raised);color:var(--pt-muted);font-size:.62rem;font-weight:750;line-height:1.3;white-space:nowrap}
 .tracker-live-sync-note:before{content:"";width:6px;height:6px;border-radius:50%;background:#6caa7a;flex:0 0 6px}
 .tracker-live-sync-note[data-state="checking"]:before{background:#c28b35}
@@ -2692,6 +2714,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .tracker-live-sync-note[data-state="error"]:before{background:#c65343}
 .tracker-live-sync-note[data-state="pending"]:before{background:#c28b35}
 @media(max-width:640px){.tracker-live-sync-note{margin-left:0;white-space:normal}}
+</style>
+
+
+<style id="pantheon-r34-weekly-report-styles">
+.weekly-report-card{grid-column:1/-1;min-width:0;padding:15px;border:1px solid var(--pt-border);border-radius:12px;background:var(--pt-surface);color:var(--pt-text);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.weekly-report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--pt-border);margin-bottom:10px}
+.weekly-report-head h3{margin:0;color:var(--pt-text);font-size:.9rem}.weekly-report-period{margin-top:4px;color:var(--pt-muted);font-size:.67rem}
+.weekly-report-kpis{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px}.weekly-report-kpi{padding:6px 9px;border:1px solid var(--pt-border);border-radius:8px;background:var(--pt-surface-raised);color:var(--pt-muted);font-size:.66rem}.weekly-report-kpi strong{color:var(--pt-text);font-size:.78rem;margin-right:3px}
+.weekly-report-characters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.weekly-report-character{min-width:0;padding:11px;border:1px solid var(--pt-border);border-radius:10px;background:var(--pt-surface-raised)}
+.weekly-report-character-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.weekly-report-character-head strong{min-width:0;color:var(--pt-text);font-size:.75rem;overflow-wrap:anywhere}.weekly-report-rate{flex:0 0 auto;color:var(--pt-accent);font-weight:900;font-size:.8rem}
+.weekly-report-meta{color:var(--pt-muted);font-size:.64rem;line-height:1.5}.weekly-report-missed{margin:8px 0 4px;color:var(--pt-text);font-weight:850;font-size:.66rem}.weekly-report-task-list{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 8px}.weekly-report-task-list span{padding:3px 6px;border:1px solid var(--pt-border);border-radius:6px;background:var(--pt-surface);color:var(--pt-muted);font-size:.61rem}.weekly-report-recs{display:grid;gap:7px;margin:7px 0 0;padding:0;list-style:none}.weekly-report-recs li{padding-top:7px;border-top:1px solid var(--pt-border)}.weekly-report-recs strong{display:block;color:var(--pt-text);font-size:.68rem}.weekly-report-recs p{margin:3px 0 0;color:var(--pt-muted);font-size:.64rem;line-height:1.5}
+.weekly-report-empty{padding:11px;border:1px dashed var(--pt-border);border-radius:9px;color:var(--pt-muted);font-size:.7rem;line-height:1.55}.weekly-report-foot{margin:10px 0 0;color:var(--pt-muted);font-size:.62rem;line-height:1.5}
+@media(max-width:700px){.weekly-report-characters{grid-template-columns:1fr}.weekly-report-card{padding:12px}}
 </style>
 
 </head>
@@ -2863,6 +2898,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <main id="tracker-page" class="app-page hidden-page">
     <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
         <button id="track-bounty-boards-btn" class="btn btn-secondary bounty-boards-toggle" type="button" aria-pressed="false" onclick="toggleBountyBoards()">Track Bounty Boards</button>
+        <button id="share-bounties-btn" class="btn btn-secondary" type="button" onclick="openBountyShareModal()">↗ Share Bounties</button>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
         <span id="tracker-live-sync-note" class="tracker-live-sync-note" role="status" aria-live="polite" data-state="checking">Checking shared progress…</span>
         <button id="tracker-add-characters-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()" hidden>＋ Add More Characters</button>
@@ -2899,7 +2935,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div id="tracker-analytics-header" style="width: 100%; max-width: 1600px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 20px;">
         <h2 style="margin: 0;">📊 Roster Analytics <button class="mini-help" type="button" title="Analytics Guide" onclick="openHelpModal('analytics')">?</button></h2>
         <div style="display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:10px;">
-            <label style="display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:#c7cad1;cursor:pointer;"><input id="analytics-tracking-enabled" type="checkbox" onchange="setAnalyticsTrackingEnabled(this.checked)" style="margin:0;"> Track weekly analytics (opt-in)</label>
+            <label style="display:inline-flex;align-items:center;gap:6px;font-size:.82rem;color:#c7cad1;cursor:pointer;"><input id="analytics-tracking-enabled" type="checkbox" onchange="setAnalyticsTrackingEnabled(this.checked)" style="margin:0;"> Track extended weekly analytics (opt-in)</label>
             <button id="clear-analytics-history-btn" class="btn btn-secondary" type="button" onclick="clearAnalyticsHistory()">Clear Stored History</button>
             <button id="toggle-analytics-btn" class="btn btn-secondary" onclick="toggleAnalytics()">👁️ Hide Analytics</button>
         </div>
@@ -3135,9 +3171,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r32</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r34</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r32 update:</strong> Tracker saves now keep unconfirmed checkbox edits queued and retry them instead of silently discarding them. Member ownership checks also prioritize the confirmed Discord account link.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r34 update:</strong> Task saves are now server-ordered to protect legitimate edits from device-clock conflicts, Tracker views auto-check for shared changes every few seconds, and the Bounty Share Builder creates a shareable list or image with per-bounty requirements.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3388,8 +3424,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     </section>
                     <section class="help-topic" data-help-topic="analytics">
                         <h4>Roster Analytics</h4>
-                        <p>Weekly analytics is <b>opt-in</b>. When <b>Track weekly analytics</b> is checked, the tool saves weekly snapshots and rolling timestamps for group-task completions so it can learn when guild runs usually happen. Weekend group-run timing is kept separate from a character’s personal clear history. When unchecked, normal resets still run, but no new analytics or group-timing history is collected. This switch is shared across connected clients.</p>
-                        <p>When enabled, the tracker retains up to five weekly snapshots to support the visible trend and priority calculations. Use <b>Clear Stored History</b> to remove old snapshots and reduce the shared cloud record size.</p>
+                        <p>A compact <b>previous-week completion report</b> is saved automatically at each Saturday reset. It shows each tracked character’s completion rate, tasks left unfinished, and practical next-week recommendations. N/A tasks are ignored and a missed task is not treated as proof that a character cannot clear it.</p>
+                        <p><b>Track extended weekly analytics</b> is still opt-in. When enabled, the tracker retains up to five weekly snapshots for longer trends and collects rolling timestamps for group-task completions to learn guild-run timing. When unchecked, only the latest compact weekly report is retained; longer trends and group-run timing are not collected. This switch is shared across connected clients. Use <b>Clear Stored History</b> to remove the report and any extended history.</p>
                         <h5>5-Week Trend</h5>
                         <p>Shows the most recent weekly completion percentages available for that character.</p>
                         <h5>Personalized Task Recommendations</h5>
@@ -3505,6 +3541,24 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             <div class="modal-note">If shared data has not been migrated yet, ask a Pantheon administrator to open the Admin Console and import the existing guild record.</div>
             <div class="modal-actions"><button class="btn btn-secondary" type="button" onclick="closeModal('cloud-modal')">Close</button></div>
             <div id="cloud-modal-message" class="modal-note" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Bounty Share Builder -->
+    <div class="modal-overlay hidden" id="bounty-share-modal" role="dialog" aria-modal="true" aria-labelledby="bounty-share-title">
+        <div class="modal-card wide-modal bounty-share-modal">
+            <h3 id="bounty-share-title">↗ Bounty Share Builder</h3>
+            <p class="modal-note">Every populated bounty slot in the current Tracker view is listed separately. Duplicate dungeons remain separate entries, so one dungeon can show a Unique basic-clear bounty and a separate Legendary timed bounty.</p>
+            <div class="bounty-share-toolbar"><span id="bounty-share-count" class="bounty-share-count">0 bounty entries</span><span class="bounty-share-scope">Uses the characters currently shown in Tracker.</span></div>
+            <div id="bounty-share-list" class="bounty-share-list"><div class="bounty-share-empty">Loading listed bounties…</div></div>
+            <div class="bounty-share-preview-wrap"><div class="bounty-share-preview-head"><strong>Share preview</strong><span>PNG export uses this exact list</span></div><div id="bounty-share-preview" class="bounty-share-preview"><div class="bounty-share-empty">Add bounty targets to the Tracker to populate this preview.</div></div></div>
+            <div class="modal-actions bounty-share-actions">
+                <button class="btn btn-secondary" type="button" onclick="copyBountyShareText()">Copy Text</button>
+                <button class="btn btn-cloud" type="button" onclick="downloadBountySharePng()">Download PNG</button>
+                <button class="btn btn-sync" type="button" onclick="shareBountyShare()">Share</button>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('bounty-share-modal')">Close</button>
+            </div>
+            <div id="bounty-share-status" class="version-status" role="status" aria-live="polite"></div>
         </div>
     </div>
 
@@ -3855,6 +3909,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let unsavedCloudChanges = false;
         let lastSeenRemoteMarker = '';
         let lastRemoteRefreshAttemptAt = 0;
+        let lastRemoteRevision = 0;
         let activeRosterFilter = 'all'; 
         let isAnalyticsVisible = true;
         let isPersonalView = true;
@@ -5084,7 +5139,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // only an administrator may prune the shared archive itself.
             if (!isPantheonAdmin()) return;
             const e = Object.entries(safeObject(data.weeklyArchive)).sort((a, b) => Number(a[0]) - Number(b[0]));
-            while (e.length > MAX_ARCHIVE_WEEKS) delete data.weeklyArchive[e.shift()[0]];
+            const keepWeeks = data.settings?.analyticsTrackingEnabled === true ? MAX_ARCHIVE_WEEKS : 1;
+            while (e.length > keepWeeks) delete data.weeklyArchive[e.shift()[0]];
         }
 
         function getTargetResetTimeUTC(isWeekly) {
@@ -5101,16 +5157,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return p.record || p;
         }
 
+        // Poll a tiny D1 row revision first. A full shared tracker record is downloaded only
+        // when the server revision changes, rather than transferring the whole payload every poll.
+        async function fetchRemoteRevision(config = getCloudConfig()) {
+            const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/status`, { method:'GET', headers:authHeaders(config), cache:'no-store' });
+            const payload = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(payload.message || `Revision check failed (${res.status})`);
+            const revision = Number(payload.metadata?.updatedAt) || 0;
+            if (!revision) throw new Error('The shared database did not return a valid revision.');
+            return revision;
+        }
+
         async function loadLiveTracker() {
             cloudData = loadLocalData();
             syncDataStructures();
-            checkAutoResets();
             getLocalTeamBuilderState();
             refreshTrackerUI();
             if (!hasCloudConfig()) return setStatus('⚪ Local mode — click Cloud Setup');
-            // Wait for the actual cloud hydration before the app finishes routing.
-            // This prevents the Tracker from briefly showing stale cached checkboxes
-            // and only correcting them after the user leaves and re-enters the page.
+            // Do not apply daily/weekly resets to a browser cache before the shared record
+            // has hydrated. A stale cache can otherwise make the reset appear to happen
+            // only after a second refresh, or temporarily overwrite a newer shared state.
+            // forceSync performs checkAutoResets only after the latest server record is
+            // loaded and the merged record is confirmed by the server.
             await forceSync(false);
             refreshTrackerUI();
             const rb = String(cloudData.settings?.versionControl?.revisionBinId || '');
@@ -5418,8 +5486,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         // Intentionally no external-change revision here. If another PC
                         // made a supported global change, that PC records it when it saves.
                         candidate.updatedAt=Date.now();candidate.syncInfo={operationId:`sync-${deviceId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,by:deviceId,at:Date.now()};candidate.settings.versionControl.history=[];const send=fitCandidateUnderFreeLimit(candidate);const opId=candidate.syncInfo.operationId;
+                        // These exact edits are server-authoritative intents, not timestamps from a
+                        // member's PC. The API validates ownership and stamps them against the latest
+                        // D1 cell revision before its compare-and-swap write.
+                        const cellWriteIntents=Object.values(pendingWritesSent).slice(0,5000).map(patch=>({charName:String(patch.charName||'').slice(0,40),taskName:String(patch.taskName||'').slice(0,140),state:String(patch.state||'open'),note:String(patch.note||'').slice(0,40)}));
+                        if(cellWriteIntents.length)send.cellWriteIntents=cellWriteIntents;
                         const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
-                        const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
+                        const responsePayload=await res.json();
+                        const latest=normalizeData(responsePayload.record||await fetchRemoteRecord(config));
+                        lastRemoteRevision=Number(responsePayload.metadata?.updatedAt)||lastRemoteRevision;
+                        const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
                             lastSeenRemoteMarker=remoteSyncMarker(latest);lastRemoteRefreshAttemptAt=Date.now();unsavedCloudChanges=false;
                             const cellAck = acknowledgePendingCellWrites(latest, pendingWritesSent);
@@ -5501,7 +5577,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             try{return new Date(timestamp).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}catch(_){return 'just now';}
         }
 
-        async function refreshSharedDataIfChanged(){
+        async function refreshSharedDataIfChanged({force=false}={}){
             const hasQueuedCellEdits=Object.keys(safeObject(pendingCellWrites)).length>0;
             if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || hasQueuedCellEdits){
                 if(isTrackerPageCurrentlyVisible() && (unsavedCloudChanges || hasQueuedCellEdits || syncInProgress)) setTrackerLiveSyncNote('pending','Your changes are still saving…');
@@ -5513,28 +5589,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             remoteRefreshBusy = true;
             lastRemoteRefreshAttemptAt = Date.now();
-            if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking guild updates…');
+            if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking for guild changes…');
             try{
-                const remote = await fetchRemoteRecord(getCloudConfig());
-                if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || Object.keys(safeObject(pendingCellWrites)).length) return false;
-                const marker = remoteSyncMarker(remote);
-                if(!marker)throw new Error('The shared record did not include an update marker.');
-                const changed = marker !== lastSeenRemoteMarker;
+                const revision = await fetchRemoteRevision(getCloudConfig());
+                const changed = !lastRemoteRevision || revision !== lastRemoteRevision;
                 if(changed){
+                    const remote = await fetchRemoteRecord(getCloudConfig());
+                    if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges || Object.keys(safeObject(pendingCellWrites)).length) return false;
                     cloudData = normalizeData(remote);
                     delete cloudData.syncInfo;
-                    lastSeenRemoteMarker = marker;
+                    lastSeenRemoteMarker = remoteSyncMarker(remote);
+                    lastRemoteRevision = revision;
                     setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
                     persistLocalData();
                     refreshTrackerUI();
                     updateOverviewEventNotice();
                 }
                 if(isTrackerPageCurrentlyVisible()){
-                    setTrackerLiveSyncNote(changed?'updated':'current',changed?'Guild progress updated · '+trackerSyncTimeLabel():'Up to date · checked '+trackerSyncTimeLabel());
+                    setTrackerLiveSyncNote(changed?'updated':'current',changed?'Guild progress updated · '+trackerSyncTimeLabel():'Live · checked '+trackerSyncTimeLabel());
                 }
                 return true;
             }catch(error){
-                if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('error','Could not check · retrying');
+                if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('error','Could not check · retrying automatically');
                 return false;
             }finally{
                 remoteRefreshBusy = false;
@@ -5548,11 +5624,125 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // The 5-second scheduler lets us switch cadence immediately after navigation.
             remoteRefreshTimer = setInterval(()=>{
                 if(document.visibilityState !== 'visible')return;
-                const cadence=isTrackerPageCurrentlyVisible()?15000:60000;
+                const cadence=isTrackerPageCurrentlyVisible()?5000:60000;
                 if(Date.now()-lastRemoteRefreshAttemptAt>=cadence)refreshSharedDataIfChanged();
             },5000);
             window.addEventListener('focus', () => refreshSharedDataIfChanged({force:true}));
             document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged({force:true}); });
+        }
+
+        // ----------------------------------------------------------
+        // Bounty Share Builder
+        // The tracker note remains the source of truth for the dungeon name.
+        // Requirement labels are browser-local presentation settings and do not
+        // change or overwrite shared character progress.
+        // ----------------------------------------------------------
+        const BOUNTY_SHARE_PREFS_KEY = 'pantheon-bounty-share-prefs-v1';
+        let bountyShareItems = [];
+        function loadBountySharePrefs(){try{return JSON.parse(localStorage.getItem(BOUNTY_SHARE_PREFS_KEY)||'{}')||{};}catch(_){return {};}}
+        function saveBountySharePrefs(prefs){try{localStorage.setItem(BOUNTY_SHARE_PREFS_KEY,JSON.stringify(prefs||{}));}catch(_){}}
+        function bountyShareKey(charName,slot,dungeon){return JSON.stringify([String(charName||''),String(slot||''),String(dungeon||'').trim().toLowerCase()]);}
+        function collectBountyShareItems(){
+            const category=getBountyCategory();
+            if(!category)return [];
+            const prefs=loadBountySharePrefs(),items=[];
+            (Array.isArray(characters)?characters:[]).forEach(char=>{
+                (category.tasks||[]).forEach(slot=>{
+                    const record=getCellRecord(char.name,slot),dungeon=String(record.note||'').trim();
+                    if(!dungeon)return;
+                    const key=bountyShareKey(char.name,slot,dungeon),saved=safeObject(prefs[key]);
+                    items.push({id:key,charName:String(char.name),slot:String(slot),dungeon,state:getCellState(char.name,slot),tier:['unique','legendary'].includes(saved.tier)?saved.tier:'',clearMode:saved.clearMode==='timed'?'timed':'basic',partyMode:saved.partyMode==='guild8'?'guild8':'any',minutes:Math.max(0,Math.min(999,Number(saved.minutes)||0))});
+                });
+            });
+            return items;
+        }
+        function bountyShareRequirement(item){
+            const parts=[];
+            parts.push(item.clearMode==='timed'?(item.minutes>0?`Under ${item.minutes} minutes`:'Time-limited · set time'):'Basic clear');
+            if(item.partyMode==='guild8')parts.push('8-man Guild Members');
+            return parts.join(' · ');
+        }
+        function updateBountyShareField(index,field,value){
+            const item=bountyShareItems[index];if(!item)return;
+            if(field==='tier')item.tier=['unique','legendary'].includes(value)?value:'';
+            if(field==='clearMode')item.clearMode=value==='timed'?'timed':'basic';
+            if(field==='partyMode')item.partyMode=value==='guild8'?'guild8':'any';
+            if(field==='minutes')item.minutes=Math.max(0,Math.min(999,Number(value)||0));
+            const prefs=loadBountySharePrefs();prefs[item.id]={tier:item.tier,clearMode:item.clearMode,partyMode:item.partyMode,minutes:item.minutes};saveBountySharePrefs(prefs);
+            renderBountySharePreview();
+            const timer=document.querySelector(`[data-bounty-share-timer="${index}"]`);if(timer)timer.hidden=item.clearMode!=='timed';
+        }
+        function renderBountySharePreview(){
+            const preview=document.getElementById('bounty-share-preview');if(!preview)return;
+            const title='PANTHEON · GUILD BOUNTIES';
+            if(!bountyShareItems.length){preview.innerHTML='<div class="bounty-share-empty">No bounty targets are currently listed in this Tracker view.</div>';return;}
+            const rows=bountyShareItems.map(item=>`<div class="bounty-share-preview-item"><strong>${escapeHTML(item.charName)} · ${escapeHTML(item.slot)}</strong><span>${escapeHTML(item.dungeon)}${item.tier?` · ${escapeHTML(item.tier[0].toUpperCase()+item.tier.slice(1))}`:' · Tier not set'}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div>`).join('');
+            preview.innerHTML=`<h4 class="bounty-share-preview-title">${title}</h4><p class="bounty-share-preview-subtitle">${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'} · duplicate dungeon entries are intentionally kept separate</p>${rows}`;
+        }
+        function renderBountyShareList(){
+            const list=document.getElementById('bounty-share-list');if(!list)return;
+            const count=document.getElementById('bounty-share-count');if(count)count.textContent=`${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'}`;
+            if(!bountyShareItems.length){list.innerHTML='<div class="bounty-share-empty">No bounty targets are filled in the currently displayed Tracker columns. Add targets in the Bounty Board rows, then reopen this builder.</div>';renderBountySharePreview();return;}
+            list.innerHTML=bountyShareItems.map((item,index)=>`<div class="bounty-share-row" data-bounty-share-index="${index}">
+                <div class="bounty-share-field"><small>Character · ${escapeHTML(item.slot)}</small><strong>${escapeHTML(item.charName)}</strong></div>
+                <div class="bounty-share-field"><small>Dungeon</small><strong>${escapeHTML(item.dungeon)}${item.state==='done'?' · Completed':''}</strong></div>
+                <label class="bounty-share-field"><small>Bounty rank</small><select aria-label="Bounty rank for ${escapeHTML(item.charName)} ${escapeHTML(item.slot)}" onchange="updateBountyShareField(${index},'tier',this.value)"><option value="" ${!item.tier?'selected':''}>Select rank</option><option value="unique" ${item.tier==='unique'?'selected':''}>Unique</option><option value="legendary" ${item.tier==='legendary'?'selected':''}>Legendary</option></select></label>
+                <label class="bounty-share-field"><small>Clear condition</small><select aria-label="Clear condition" onchange="updateBountyShareField(${index},'clearMode',this.value)"><option value="basic" ${item.clearMode==='basic'?'selected':''}>Basic clear</option><option value="timed" ${item.clearMode==='timed'?'selected':''}>Time-limited</option></select></label>
+                <label class="bounty-share-field"><small>Party requirement</small><select aria-label="Party requirement" onchange="updateBountyShareField(${index},'partyMode',this.value)"><option value="any" ${item.partyMode==='any'?'selected':''}>Any party</option><option value="guild8" ${item.partyMode==='guild8'?'selected':''}>8-man Guild Members</option></select></label>
+                <label class="bounty-share-field bounty-share-timer" data-bounty-share-timer="${index}" ${item.clearMode!=='timed'?'hidden':''}><small>Time limit · minutes</small><input type="number" inputmode="numeric" min="1" max="999" step="1" value="${item.minutes||''}" placeholder="e.g. 15" aria-label="Time limit in minutes" onchange="updateBountyShareField(${index},'minutes',this.value)"></label>
+            </div>`).join('');
+            renderBountySharePreview();
+        }
+        function openBountyShareModal(){
+            bountyShareItems=collectBountyShareItems();
+            renderBountyShareList();
+            const status=document.getElementById('bounty-share-status');if(status)status.textContent='Selections are saved on this device and do not alter shared Tracker checkmarks.';
+            openModal('bounty-share-modal');
+        }
+        function buildBountyShareText(){
+            const lines=['PANTHEON · GUILD BOUNTIES',`${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'}`,''];
+            bountyShareItems.forEach(item=>lines.push(`${item.charName} — ${item.dungeon} — ${item.tier?item.tier[0].toUpperCase()+item.tier.slice(1):'Tier not set'} — ${bountyShareRequirement(item)}${item.state==='done'?' — Completed':''} [${item.slot}]`));
+            return lines.join('\n');
+        }
+        async function copyBountyShareText(){
+            if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to copy.');return;}
+            const value=buildBountyShareText();
+            try{await navigator.clipboard.writeText(value);setBountyShareStatus('Bounty list copied.');}
+            catch(_){const box=document.createElement('textarea');box.value=value;document.body.appendChild(box);box.select();const ok=document.execCommand('copy');box.remove();setBountyShareStatus(ok?'Bounty list copied.':'Clipboard access was blocked. Select the preview text and copy it manually.');}
+        }
+        function setBountyShareStatus(message){const el=document.getElementById('bounty-share-status');if(el)el.textContent=String(message||'');}
+        function bountyShareSvg(){
+            const width=1200,rowH=82,pad=54,headerH=190,height=headerH+Math.max(1,bountyShareItems.length)*rowH+pad;
+            const safe=txt=>String(txt||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+            let rows='';
+            bountyShareItems.forEach((item,index)=>{
+                const y=headerH+index*rowH;
+                const tier=item.tier?item.tier[0].toUpperCase()+item.tier.slice(1):'Tier not set';
+                const condition=bountyShareRequirement(item)+(item.state==='done'?' · Completed':'');
+                rows+=`<rect x="42" y="${y}" width="1116" height="68" rx="12" fill="${index%2?'#eef2f7':'#f7f9fc'}"/>`+
+                    `<text x="66" y="${y+27}" font-size="19" font-weight="700" fill="#203047">${safe(item.charName)} · ${safe(item.slot)}</text>`+
+                    `<text x="66" y="${y+51}" font-size="16" fill="#506078">${safe(item.dungeon)}</text>`+
+                    `<text x="690" y="${y+28}" font-size="18" font-weight="800" fill="#203047">${safe(tier)}</text>`+
+                    `<text x="690" y="${y+52}" font-size="16" fill="#506078">${safe(condition)}</text>`;
+            });
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ffffff"/><rect x="0" y="0" width="1200" height="164" fill="#1e2d45"/><text x="54" y="74" font-family="Arial,sans-serif" font-size="34" font-weight="900" fill="#ffffff">PANTHEON · GUILD BOUNTIES</text><text x="54" y="118" font-family="Arial,sans-serif" font-size="19" fill="#d8e2f1">${bountyShareItems.length} bounty entr${bountyShareItems.length===1?'y':'ies'} · duplicate dungeons listed separately</text><text x="54" y="151" font-family="Arial,sans-serif" font-size="13" fill="#d8e2f1">Generated from the current Tracker view</text>${rows}<text x="54" y="${height-18}" font-family="Arial,sans-serif" font-size="12" fill="#78879c">Pantheon Tools · Dragon Nest Classic SEA</text></svg>`;
+        }
+        async function downloadBountySharePng(){
+            if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to export.');return;}
+            try{
+                const svg=bountyShareSvg(),blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob),img=new Image();
+                await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});
+                const canvas=document.createElement('canvas');canvas.width=img.width*2;canvas.height=img.height*2;
+                const context=canvas.getContext('2d');context.scale(2,2);context.drawImage(img,0,0);URL.revokeObjectURL(url);
+                const png=await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('PNG encoding failed.')),'image/png'));
+                const downloadUrl=URL.createObjectURL(png),link=document.createElement('a');link.href=downloadUrl;link.download=`Pantheon_Bounties_${new Date().toISOString().slice(0,10)}.png`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(downloadUrl),1500);setBountyShareStatus('Bounty screenshot exported as PNG.');
+            }catch(error){setBountyShareStatus(`PNG export failed: ${String(error?.message||error)}`);}
+        }
+        async function shareBountyShare(){
+            if(!bountyShareItems.length){setBountyShareStatus('There are no listed bounties to share.');return;}
+            const textValue=buildBountyShareText();
+            if(navigator.share){try{await navigator.share({title:'Pantheon Guild Bounties',text:textValue});setBountyShareStatus('Share sheet opened.');return;}catch(error){if(error?.name==='AbortError')return;}}
+            await copyBountyShareText();
         }
 
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
@@ -6117,24 +6307,25 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function executeWeeklyReset(rk = getTargetResetTimeUTC(true), characterNames = null) {
             const k = String(rk);
             const targets = Array.isArray(characterNames) ? characterNames : getAllKnownCharacterNames();
-            if (cloudData.settings.analyticsTrackingEnabled) {
-                const existing = safeObject(cloudData.weeklyArchive[k]);
-                const rates = { ...safeObject(existing.rates) }, states = { ...safeObject(existing.states) };
-                targets.forEach(name => {
-                    let ct = 0, dn = 0;
-                    getCompletionTaskNames().forEach(task => {
-                        const state = getCellState(name, task);
-                        if (state !== 'excluded') { ct++; if (state === 'done') dn++; }
-                    });
-                    rates[name] = ct ? Math.round((dn / ct) * 100) : 0;
-                    states[name] = weeklyTaskNames.map(task => { const state = getCellState(name, task); return state === 'done' ? 'd' : state === 'excluded' ? 'x' : 'm'; }).join('');
+            // Always preserve one compact snapshot before clearing the active week. This
+            // makes the previous-week report independent of the optional extended-analytics
+            // switch. When extended analytics is enabled, trimWeeklyArchive retains five weeks.
+            const existing = safeObject(cloudData.weeklyArchive[k]);
+            const rates = { ...safeObject(existing.rates) }, states = { ...safeObject(existing.states) };
+            targets.forEach(name => {
+                let ct = 0, dn = 0;
+                getCompletionTaskNames().forEach(task => {
+                    const state = getCellState(name, task);
+                    if (state !== 'excluded') { ct++; if (state === 'done') dn++; }
                 });
-                cloudData.weeklyArchive[k] = {
-                    ...existing, createdAt: Number(existing.createdAt) || Date.now(),
-                    taskOrder: [...weeklyTaskNames], rates, states
-                };
-                trimWeeklyArchive();
-            }
+                rates[name] = ct ? Math.round((dn / ct) * 100) : 0;
+                states[name] = weeklyTaskNames.map(task => { const state = getCellState(name, task); return state === 'done' ? 'd' : state === 'excluded' ? 'x' : 'm'; }).join('');
+            });
+            cloudData.weeklyArchive[k] = {
+                ...existing, createdAt: Number(existing.createdAt) || Date.now(),
+                taskOrder: [...weeklyTaskNames], rates, states
+            };
+            trimWeeklyArchive();
             const ts = Date.now();
             const bountyCategory = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
             const bountyTasks = new Set(bountyCategory?.tasks || []);
@@ -7847,6 +8038,81 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return { evidence, profileLabel, profileDetail, fitReason, scoreLine, guildReason };
         }
 
+        function formatWeeklyReportPeriod(weekResetKey) {
+            const end = Number(weekResetKey) || 0;
+            if (!end) return 'Previous weekly cycle';
+            const startDate = new Date(end - 7 * 24 * 60 * 60 * 1000);
+            const endDate = new Date(end);
+            const fmt = value => new Intl.DateTimeFormat('en', { timeZone:'Asia/Manila', month:'short', day:'numeric', year:'numeric' }).format(value);
+            return `${fmt(startDate)} – ${fmt(endDate)} · Manila time`;
+        }
+
+        function renderPreviousWeekReport(container) {
+            if (!container) return;
+            const archives = Object.entries(safeObject(cloudData?.weeklyArchive))
+                .filter(([key, value]) => Number.isFinite(Number(key)) && value && typeof value === 'object')
+                .sort((a,b) => Number(a[0]) - Number(b[0]));
+            const latest = archives[archives.length - 1];
+            const card = document.createElement('section');
+            card.className = 'weekly-report-card';
+            if (!latest) {
+                card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">No saved snapshot is available yet</div></div></div><div class="weekly-report-empty">The week that just ended was not archived by the previous build, so its completion cannot be reconstructed after the checkboxes have reset. This version will save a compact report automatically at the next Saturday reset, even when extended analytics is off.</div>`;
+                container.appendChild(card);
+                return;
+            }
+
+            const [weekKey, archive] = latest;
+            const taskOrder = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+            const stateMap = safeObject(archive.states);
+            // Use the same visible roster set as the Tracker table. This respects Personal,
+            // Universal, and admin View As filters instead of accidentally showing guild-wide
+            // history while an admin is viewing one member's experience.
+            const profiles = (Array.isArray(characters) ? characters : []).filter(profile =>
+                profile && String(profile.name || '').trim() && profile.trackerEnabled === true
+            );
+            const reportProfiles = profiles.filter(profile => typeof stateMap[profile.name] === 'string' && stateMap[profile.name].length > 0);
+            if (!reportProfiles.length) {
+                card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div></div><div class="weekly-report-empty">A weekly snapshot exists, but it does not contain a saved result for the characters currently in this view. Newly registered or newly opted-in characters will appear after their first completed weekly cycle.</div>`;
+                container.appendChild(card);
+                return;
+            }
+
+            const rows = reportProfiles.map(profile => {
+                const name = String(profile.name).trim();
+                const codes = String(stateMap[name] || '');
+                let done = 0, missed = 0, excluded = 0;
+                const missedTasks = [];
+                taskOrder.forEach((task, index) => {
+                    if (!task || isBountyTask(task)) return;
+                    const code = codes[index] || '';
+                    if (code === 'd') done++;
+                    else if (code === 'x') excluded++;
+                    else if (code === 'm') { missed++; missedTasks.push(task); }
+                });
+                const eligible = done + missed;
+                const rate = eligible ? Math.round(done / eligible * 100) : 0;
+                const recs = missedTasks.map(task => {
+                    const stats = getArchivedTaskRecommendationStats(name, task, archives);
+                    return buildPersonalizedTaskRecommendation(profile, task, stats, archives, archives.slice(-3));
+                }).filter(item => !item.suppress)
+                    .sort((a,b) => b.sc - a.sc || b.w - a.w || b.c - a.c || a.t.localeCompare(b.t))
+                    .slice(0, 2);
+                return { name, isMain:profile.isMain === true, done, missed, excluded, eligible, rate, missedTasks, recs };
+            });
+            const totalDone = rows.reduce((sum,row)=>sum+row.done,0);
+            const totalMissed = rows.reduce((sum,row)=>sum+row.missed,0);
+            const totalEligible = totalDone + totalMissed;
+            const average = totalEligible ? Math.round(totalDone / totalEligible * 100) : 0;
+            const rowsHtml = rows.map(row => {
+                const main = row.isMain ? ' <span aria-label="Main character">★</span>' : '';
+                const missedHtml = row.missedTasks.length ? `<div class="weekly-report-missed">Left unfinished</div><div class="weekly-report-task-list">${row.missedTasks.map(task => `<span>${escapeHTML(task)}</span>`).join('')}</div>` : `<div class="weekly-report-missed">No eligible weekly tasks were left unfinished.</div>`;
+                const recHtml = row.recs.length ? `<div class="weekly-report-missed">Recommended priorities next week</div><ul class="weekly-report-recs">${row.recs.map(item => `<li><strong>${escapeHTML(item.t)}</strong><p>${escapeHTML(getRecommendationPlainReason(item))}</p></li>`).join('')}</ul>` : '';
+                return `<article class="weekly-report-character"><div class="weekly-report-character-head"><strong>${escapeHTML(row.name)}${main}</strong><span class="weekly-report-rate">${row.eligible ? `${row.rate}%` : '—'}</span></div><div class="weekly-report-meta">${row.done}/${row.eligible} eligible tasks completed · ${row.missed} unfinished · ${row.excluded} N/A ignored</div>${missedHtml}${recHtml}</article>`;
+            }).join('');
+            card.innerHTML = `<div class="weekly-report-head"><div><h3>Previous Week Report</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} character${rows.length === 1 ? '' : 's'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible ? `${average}%` : '—'}</strong>combined completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>unfinished</span><span class="weekly-report-kpi"><strong>${rows.reduce((sum,row)=>sum+row.excluded,0)}</strong>N/A ignored</span></div><div class="weekly-report-characters">${rowsHtml}</div><p class="weekly-report-foot">Unfinished means the task was not marked complete before reset; it does not prove the character is unable to clear it. Recommendations use the shared task priority, activity details, and the saved history available for that character.</p>`;
+            container.appendChild(card);
+        }
+
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
@@ -7854,6 +8120,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const deadlineBanner = document.createElement('div');
             deadlineBanner.innerHTML = buildDeadlineStrategyBannerHtml('tracker');
             cont.appendChild(deadlineBanner.firstElementChild);
+            renderPreviousWeekReport(cont);
             const trackingToggle = document.getElementById('analytics-tracking-enabled');
             const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true;
             if (trackingToggle) trackingToggle.checked = analyticsEnabled;
@@ -7861,7 +8128,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
                 const disabled = document.createElement('div');
                 disabled.className = 'analytics-disabled';
-                disabled.innerHTML = `<strong>Stored weekly analytics tracking is off.</strong><br>Live planning and today’s completion highlights still work. No new weekly snapshots or group-run timing will be recorded. ${savedWeeks ? `${savedWeeks} older week${savedWeeks === 1 ? '' : 's'} are still stored. Use <b>Clear Stored History</b> to remove them and reduce cloud data size.` : 'Enable the checkbox above to start collecting weekly outcomes and learning guild-run timing.'}`;
+                disabled.innerHTML = `<strong>Extended weekly analytics tracking is off.</strong><br>The compact previous-week report above is still saved automatically. Rolling multi-week trends and group-run timing are not collected. ${savedWeeks ? `${savedWeeks} weekly snapshot${savedWeeks === 1 ? '' : 's'} are currently stored. Use <b>Clear Stored History</b> to remove them.` : 'Enable the checkbox above to collect up to five weeks of trends and learn guild-run timing.'}`;
                 cont.appendChild(disabled);
                 return;
             }
@@ -9717,7 +9984,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r32';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r34';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {

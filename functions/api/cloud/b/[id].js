@@ -125,7 +125,7 @@ export async function onRequestPut(context) {
   // latest D1 value, then use a compare-and-swap UPDATE. Retry if another writer wins.
   // This keeps the existing API contract and does not require a schema migration.
   for (let attempt = 1; attempt <= 5; attempt++) {
-    const current = await env.PANTHEON_DB.prepare('SELECT id, name, record_json FROM data_records WHERE id = ? LIMIT 1').bind(targetId).first();
+    const current = await env.PANTHEON_DB.prepare('SELECT id, name, record_json, updated_at FROM data_records WHERE id = ? LIMIT 1').bind(targetId).first();
     if (!current) return jsonResponse({ message: 'Record not found.' }, 404);
 
     let recordToStore = incomingRecord;
@@ -138,7 +138,22 @@ export async function onRequestPut(context) {
         if (!next || typeof next !== 'object') return jsonResponse({ message: 'Invalid tracker record.' }, 400);
         // A stale tab may submit an old value for tasks it never edited. Keep the newer
         // per-cell record from D1 instead of allowing a routine sync to undo it.
-        next.cells = mergeCellRecords(previous?.cells, next.cells);
+        const incomingCells = obj(next.cells);
+        const cellWriteIntents = Array.isArray(incomingRecord?.cellWriteIntents) ? incomingRecord.cellWriteIntents.slice(0, 5000) : [];
+        next.cells = mergeCellRecords(previous?.cells, incomingCells);
+        for (const rawIntent of cellWriteIntents) {
+          const intent = obj(rawIntent);
+          const charName = String(intent.charName || '').trim().slice(0, 40);
+          const taskName = String(intent.taskName || '').trim().slice(0, 140);
+          const state = String(intent.state || 'open');
+          const note = String(intent.note || '').slice(0, 40);
+          const submittedCell = normalizedCell(incomingCells?.[charName]?.[taskName]);
+          if (!charName || !taskName || !CELL_STATES.has(state) || !submittedCell || submittedCell.state !== state || submittedCell.note !== note) continue;
+          if (!next.cells[charName]) next.cells[charName] = {};
+          // Preserve the submitted edit so the registration guard can validate ownership
+          // before the authoritative server timestamp is assigned.
+          next.cells[charName][taskName] = { ...submittedCell, state, note };
+        }
         // Group-run timing is shared learning data. Merge it independently so members' whole-record
         // syncs cannot erase another member's timestamps. A newer history-clear marker always wins.
         next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};
@@ -169,8 +184,34 @@ export async function onRequestPut(context) {
           next.settings.uiTextOverridesUpdatedBy = String(previous.settings?.uiTextOverridesUpdatedBy || '');
         }
 
-        recordToStore = encodePantheonCompactRecord(next);
-        responseRecord = recordToStore;
+      // Explicit cell-write intents are stamped by the server, not by the member's
+      // workstation clock. This prevents a clock-skewed client from losing a valid
+      // checkbox/note edit to a newer timestamp generated on another device. Intents
+      // are transient request metadata and are never stored in the shared record.
+      for (const rawIntent of cellWriteIntents) {
+        const intent = obj(rawIntent);
+        const charName = String(intent.charName || '').trim().slice(0, 40);
+        const taskName = String(intent.taskName || '').trim().slice(0, 140);
+        const state = String(intent.state || 'open');
+        const note = String(intent.note || '').slice(0, 40);
+        if (!charName || !taskName || !CELL_STATES.has(state)) continue;
+        const candidateCell = normalizedCell(next.cells?.[charName]?.[taskName]);
+        // Do not let an intent become an alternate write channel; it must exactly
+        // describe the cell already present in the guarded candidate record.
+        if (!candidateCell || candidateCell.state !== state || candidateCell.note !== note) continue;
+        const priorCell = normalizedCell(previous?.cells?.[charName]?.[taskName]);
+        const serverStamp = Math.max(Date.now(), (Number(priorCell?.updatedAt) || 0) + 1);
+        if (!next.cells[charName]) next.cells[charName] = {};
+        next.cells[charName][taskName] = {
+          state,
+          note,
+          updatedAt: serverStamp,
+          deviceId: String(candidateCell.deviceId || context.data?.session?.discordId || '').slice(0, 120)
+        };
+      }
+
+      recordToStore = encodePantheonCompactRecord(next);
+      responseRecord = recordToStore;
         const previousDecoded = previous;
         if (!hasLedgerAccess(context.data?.session, previousDecoded)) {
           // Preserve ledger contents for every non-allowlisted account, including admins.
@@ -184,16 +225,17 @@ export async function onRequestPut(context) {
     }
 
     let writeResult;
+    const savedAt = Math.max(Date.now(), (Number(current.updated_at) || 0) + 1);
     try {
       writeResult = await env.PANTHEON_DB.prepare(`
         UPDATE data_records SET name = ?, record_json = ?, updated_at = ?
         WHERE id = ? AND record_json = ?
-      `).bind(current.name || 'Pantheon record', JSON.stringify(recordToStore), Date.now(), targetId, current.record_json).run();
+      `).bind(current.name || 'Pantheon record', JSON.stringify(recordToStore), savedAt, targetId, current.record_json).run();
     } catch (error) {
       return jsonResponse({ message: String(error?.message || error) }, 413);
     }
     if (Number(writeResult?.meta?.changes) > 0) {
-      return jsonResponse({ metadata: { id: requestedId, name: current.name, private: true }, record: responseRecord });
+      return jsonResponse({ metadata: { id: requestedId, name: current.name, private: true, updatedAt: savedAt }, record: responseRecord });
     }
     // Another writer changed the row between SELECT and UPDATE. Re-read and merge again.
   }
