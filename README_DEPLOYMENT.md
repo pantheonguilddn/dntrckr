@@ -1,23 +1,27 @@
-# Pantheon Tools v1.6.8-r43 — one Discord identity, personal Cho view, optional Admin View
+# Pantheon Tools v1.6.8-r45 — release-loop hotfix
 
-## What changed
+## Critical fix
 
-- The bootstrap administrator is represented as one authenticated Discord account with a separate permission role and working mode. The account opens in Cho Personal View; Admin View remains an explicit toggle.
-- Added `BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME` as an optional Pages environment variable. It defaults to `Cho`, per the requested personal default. It is derived server-side and is not accepted from browser input.
-- Owner resolution now selects the configured personal owner even when the same Discord ID was accidentally attached to multiple Member Roster entries. It no longer treats the Admin role as a second roster identity.
-- On the first successful Personal View write, the server repairs the duplicate account links: it keeps the verified Discord ID on the canonical personal owner and clears only that duplicate ID from other entries. It does not delete member records, characters, classes, tracker rosters, or progress.
-- Client identity selection, server registration validation, cell-save analytics attribution, and Ledger identity checks use the same canonical owner resolver.
-- Ordinary members still resolve by their unique confirmed Discord link (or unique label/username fallback). A preferred personal owner already confirmed to a different Discord ID is rejected rather than taken over.
-- Retains r42's startup initialization fix, r41's Admin View permission toggle, per-character acknowledged saves, server timestamping, CAS writes, cache-bypassing refresh, and existing Pages routes/database schema.
+- Fixes r44's auto-update loop. The r44 application still identified itself as r43 in its release watcher, so it repeatedly interpreted its own deployed r44 manifest as a newer build and reloaded. The r45 application, What's New label, document title, and `version.json` now all identify the build as `1.6.8-r45`.
+- Hardens release detection to reload only when the manifest announces a *genuinely newer* recognized semantic build. Equal, older, or unrecognized version strings are ignored, preventing downgrade loops and reload storms when the manifest is stale or malformed.
+- Keeps the r44 compact Admin switch and independent Personal/Universal viewing scope. Universal View remains read-only for other members unless Admin View is explicitly enabled.
+
+## Preserved
+
+- r44 UI, header layout, Admin toggle, Personal/Universal mode behavior, and view persistence.
+- r43 one-Discord-identity / canonical personal owner behavior and duplicate-link repair.
+- r42 startup initialization order fix.
+- Existing Discord OAuth callback, session handling, authentication helper, API middleware, all other Pages Functions, D1 schema, and bindings. No changes are made to server functions or database schema in this hotfix.
+- Pending cell-write queue, per-character acknowledged saves, retry behavior, server-side ownership checks, cache-bypassing refresh, and polling.
 
 ## Deployment
 
 1. Deploy the complete ZIP contents to the existing Cloudflare Pages project. Do not upload only `index.html`.
-2. Preserve the existing D1 database and bindings, Discord OAuth credentials, and `BOOTSTRAP_ADMIN_DISCORD_ID` secret.
-3. No D1 schema migration is required. If desired, set `BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME=Cho`; the application defaults to Cho when this optional variable is absent.
-4. Verify `/version.json` reports `1.6.8-r43`.
-5. Test the bootstrap administrator in Cho Personal View first, including the retained `Vaelyth → Theme Park (Jelly x5)` edit. Confirm it saves and the duplicate Discord-ID link is repaired. Then enable Admin View and verify the separate administrator controls appear. Finally test an ordinary member account to confirm it remains limited to its own roster.
+2. Preserve the existing D1 database/binding, Discord OAuth configuration, and Pages environment variables.
+3. Verify `https://dntrckr.pages.dev/version.json` reports `1.6.8-r45`.
+4. Open the site and confirm that it remains stable for at least 60 seconds, navigating between Overview and Tracker. The release checker should not reload r45 when the manifest also reports r45.
+5. Test Discord login, Cho Personal View, read-only Universal View, and Admin toggle separately. Confirm pending cell edits before switching or reloading.
 
 ## Validation boundary
 
-Local checks cover JavaScript syntax for every Pages Function and inline app script, CSS parsing, HTML ID uniqueness, package integrity and path preservation, deterministic canonical-owner selection, duplicate-link repair, and rejection when Cho is already confirmed to a different Discord ID. Live Cloudflare/D1/Discord multi-account testing is still required after deployment.
+Built locally from the complete r44 Cloudflare Pages archive. ZIP entry names and order are preserved. Local checks cover inline JavaScript syntax, CSS parsing, manifest/runtime version parity, release-comparison behavior, archive integrity, and unchanged Pages Functions/schema. No production deployment or live multi-account D1 test is claimed.
