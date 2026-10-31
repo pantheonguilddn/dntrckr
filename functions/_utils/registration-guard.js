@@ -70,6 +70,15 @@ function memberMatchesOwner(member, candidates) {
   return false;
 }
 function resolveOwnerCandidates(session, existingMembers) {
+  const discordId = String(session?.discordId || '').trim();
+  if (discordId) {
+    const confirmed = arr(existingMembers).filter(member => String(member?.profileConfirmedDiscordId || '').trim() === discordId);
+    if (confirmed.length === 1) {
+      const ownerName = String(confirmed[0]?.name || '').trim();
+      return ownerName ? [ownerName] : [];
+    }
+    if (confirmed.length > 1) return [];
+  }
   const candidates = candidatesFor(session);
   // Use exactly one name as the authenticated owner identity. Prefer the explicit
   // admin-configured roster label when it maps to a record; otherwise use the first
@@ -104,9 +113,11 @@ function registrationNames(member) {
 export function registrationWriteViolation(previousRecord, nextRecord, session) {
   if (session?.role === 'admin') return '';
   const initialCandidates = candidatesFor(session);
-  if (!initialCandidates.length) return 'Your Discord identity could not be linked to a member name. Ask an administrator to configure your roster match.';
   const before = obj(previousRecord?.settings);
   const after = obj(nextRecord?.settings);
+  const sessionDiscordId = String(session?.discordId || '').trim();
+  const confirmedDiscordOwners = sessionDiscordId ? arr(before.memberDirectory).filter(member => String(member?.profileConfirmedDiscordId || '').trim() === sessionDiscordId) : [];
+  if (!initialCandidates.length && confirmedDiscordOwners.length !== 1) return 'Your Discord identity could not be linked to a member name. Ask an administrator to configure your roster match.';
 
   // Reset markers are administrator-owned globally. Regular members use a separate
   // per-roster marker so automatic resets cannot advance the whole guild's reset state.

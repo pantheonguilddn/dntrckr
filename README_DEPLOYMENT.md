@@ -1,3 +1,20 @@
+# Pantheon Tools v1.6.8-r32 — Never discard an unconfirmed task save
+
+- Fixed a data-loss bug in the pending checkbox queue: previously, a pending edit was deleted even when the server response did not contain the requested state. r32 now removes a queued edit **only after the returned shared record exactly confirms that character/task state and note**.
+- Unconfirmed edits remain in local storage, are shown as not confirmed, and receive up to three bounded automatic retries for transient write conflicts/network failures. After retry limits, the pending edit is still retained locally and can be retried with Sync Changes. The app no longer reports a clean saved status while task edits remain unacknowledged.
+- The Tracker live-sync note now reports local task edits as saving, confirmed, or unconfirmed. Failure messages identify the affected IGN and task so the member/admin can see exactly what did not reach the shared record.
+- Client and server member ownership resolution now prefer the Member Roster's confirmed Discord account ID, falling back to display-name/username matching only where no confirmed link exists. Ambiguous confirmed links fail closed. This avoids rejecting a legitimate owner because a Discord display name changed.
+- Retains r31's 15-second Tracker polling, immediate refresh on focus/page entry, conflict-safe D1 compare-and-swap writes, member-safe cell merging, and all existing features. No database schema migration or API route change.
+- Built directly from the r31 Cloudflare package. Live Cloudflare Pages/D1/Discord testing remains necessary.
+
+## r32 validation
+
+- Pending-queue acknowledgement tests: matched server value clears; mismatched value remains queued; a newer local edit is not cleared by an older acknowledgement.
+- Server authorization tests: a profile-confirmed Discord ID can update its registered characters even when session label/username differs; another member's character remains denied; duplicate confirmed Discord links fail closed.
+- JavaScript syntax, CSS parsing, duplicate ID checks, package integrity, and original package path preservation passed. Automated retries are capped at three per pending edit; edits remain locally queued after the cap or a non-transient authorization error, and Sync Changes can be used to retry manually.
+
+---
+
 # Pantheon Tools v1.6.8-r31 — Keep open Tracker views current
 
 - Shared progress now refreshes about every **15 seconds while Tracker is visible**, replacing the previous two-minute background polling interval. Other pages use a lighter 60-second cadence.

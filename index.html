@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r31</title>
+    <title>Pantheon Tools v1.6.8-r32</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2684,7 +2684,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 @media(max-width:640px){.deadline-strategy-banner{padding:10px}.deadline-strategy-banner p{font-size:.68rem}}
 </style>
 
-<style id="pantheon-r31-live-tracker-sync">
+<style id="pantheon-r32-live-tracker-sync">
 .tracker-live-sync-note{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:4px 8px;border:1px solid var(--pt-border);border-radius:999px;background:var(--pt-surface-raised);color:var(--pt-muted);font-size:.62rem;font-weight:750;line-height:1.3;white-space:nowrap}
 .tracker-live-sync-note:before{content:"";width:6px;height:6px;border-radius:50%;background:#6caa7a;flex:0 0 6px}
 .tracker-live-sync-note[data-state="checking"]:before{background:#c28b35}
@@ -3135,9 +3135,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r31</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r32</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r31 update:</strong> Tracker now checks for guild updates about every 15 seconds while open, refreshes immediately when you return to the tab, and shows when shared progress was last checked.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r32 update:</strong> Tracker saves now keep unconfirmed checkbox edits queued and retry them instead of silently discarding them. Member ownership checks also prioritize the confirmed Discord account link.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3598,12 +3598,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const charName = String(item.charName || '').trim(), taskName = String(item.taskName || '').trim();
                     if (!charName || !taskName) return;
                     const state = ['open','done','excluded','marked','reset'].includes(item.state) ? item.state : 'open';
-                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || '') };
+                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), retryCount: Math.max(0, Math.min(5, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0 };
                 });
                 return cleaned;
             } catch (_) { return {}; }
         }
         let pendingCellWrites = loadPendingCellWrites();
+        let pendingCellRetryTimer = null;
         function persistPendingCellWrites() {
             try { localStorage.setItem(PENDING_CELL_WRITES_KEY, JSON.stringify(pendingCellWrites)); } catch (_) {}
         }
@@ -3614,7 +3615,52 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const cell = cloudData?.cells?.[charName]?.[taskName];
             if (!cell) return;
             const key = JSON.stringify([String(charName), String(taskName)]);
-            pendingCellWrites[key] = { charName: String(charName), taskName: String(taskName), state: String(cell.state || 'open'), note: String(cell.note || '').slice(0,40), updatedAt: Number(cell.updatedAt) || 0, deviceId: String(cell.deviceId || deviceId || '') };
+            pendingCellWrites[key] = { charName: String(charName), taskName: String(taskName), state: String(cell.state || 'open'), note: String(cell.note || '').slice(0,40), updatedAt: Number(cell.updatedAt) || 0, deviceId: String(cell.deviceId || deviceId || ''), retryCount: 0, lastAttemptAt: 0 };
+            persistPendingCellWrites();
+        }
+        function acknowledgePendingCellWrites(latest, pendingSnapshot) {
+            const mismatches = [];
+            const acknowledged = [];
+            Object.entries(pendingSnapshot || {}).forEach(([key, patch]) => {
+                const latestCell = normalizeCellRecord(latest?.cells?.[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
+                const savedAsRequested = latestCell.state === patch.state && latestCell.note === patch.note;
+                const current = pendingCellWrites[key];
+                const stillCurrent = current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note;
+                if (!stillCurrent) return; // A newer local edit replaced this snapshot; keep it queued.
+                if (savedAsRequested) {
+                    delete pendingCellWrites[key];
+                    acknowledged.push({ charName:patch.charName, taskName:patch.taskName });
+                } else {
+                    // Never discard an edit merely because the server returned a different value.
+                    // Retain it locally for bounded automatic retries or an explicit manual retry.
+                    pendingCellWrites[key] = { ...current, retryCount:Math.min(5, (Number(current.retryCount)||0)+1), lastAttemptAt:Date.now() };
+                    mismatches.push({ charName:patch.charName, taskName:patch.taskName, requestedState:patch.state, actualState:latestCell.state, retryCount:pendingCellWrites[key].retryCount });
+                }
+            });
+            persistPendingCellWrites();
+            return { acknowledged, mismatches, remaining:Object.keys(pendingCellWrites).length };
+        }
+        function schedulePendingCellRetry() {
+            if (pendingCellRetryTimer || !Object.keys(pendingCellWrites).length) return;
+            const pending = Object.values(pendingCellWrites);
+            if (!pending.some(item => (Number(item.retryCount)||0) < 3)) return;
+            const maxAttempts = Math.max(0, ...pending.map(item => Number(item.retryCount)||0));
+            const delay = Math.min(8000, 1200 * Math.pow(2, maxAttempts));
+            pendingCellRetryTimer = setTimeout(() => {
+                pendingCellRetryTimer = null;
+                if (!Object.keys(pendingCellWrites).length) return;
+                if (syncInProgress || window.__pantheonVersionWriteBusy) { schedulePendingCellRetry(); return; }
+                forceSync(false);
+            }, delay);
+        }
+        function pendingCellWriteSummary(items = Object.values(pendingCellWrites)) {
+            return (items || []).slice(0,4).map(item => `${item.charName} · ${item.taskName}`).join('; ');
+        }
+        function markPendingCellWritesFailedAttempt() {
+            Object.values(pendingCellWrites).forEach(item => {
+                item.retryCount = Math.min(5, (Number(item.retryCount) || 0) + 1);
+                item.lastAttemptAt = Date.now();
+            });
             persistPendingCellWrites();
         }
         function applyPendingCellWrites(candidate, remote, pendingSnapshot) {
@@ -4118,9 +4164,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 .map(value => String(value || '').trim()).filter(Boolean);
         }
         function getAuthenticatedMemberDirectoryEntry(data = cloudData) {
-            // Resolve against the supplied record (usually cloudData, sometimes the merge
-            // candidate being synced) and never infer ownership from a stale roster selector.
+            // Prefer the explicitly confirmed Discord account link. Display names/usernames can
+            // change or differ from the canonical Member Roster label; identity should not.
             const entries = normalizeMemberDirectory(data?.settings?.memberDirectory);
+            const discordId = String(pantheonDiscordUser?.id || '');
+            if (discordId) {
+                const linked = entries.filter(member => String(member.profileConfirmedDiscordId || '') === discordId);
+                if (linked.length === 1) return linked[0];
+                if (linked.length > 1) return null; // Ambiguous account link: fail closed.
+            }
             const candidates = ownerCandidateNames();
             for (const candidate of candidates) {
                 const exact = entries.filter(member => identityMatchKey(member.name) === identityMatchKey(candidate));
@@ -5329,6 +5381,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // Normal sync. The revision journal is a separate best-effort service.
         // The main tracker sync succeeds independently of journal availability.
         function forceSync(showSuccess = false){
+            if (showSuccess) {
+                Object.values(pendingCellWrites).forEach(item => { item.retryCount = 0; item.lastAttemptAt = 0; });
+                persistPendingCellWrites();
+                if (pendingCellRetryTimer) { clearTimeout(pendingCellRetryTimer); pendingCellRetryTimer = null; }
+            }
             if(!hasCloudConfig()){persistLocalData();setStatus('⚪ Saved locally');if(showSuccess)openCloudModal();return Promise.resolve(false);}
             if(syncInProgress||window.__pantheonVersionWriteBusy){syncRequestedWhileBusy=true;return Promise.resolve(false);}
             syncInProgress=true;setStatus('🟡 Merging Cloud Data...');const config=getCloudConfig();
@@ -5365,18 +5422,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         const latest=normalizeData((await res.json()).record||await fetchRemoteRecord(config));const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
                             lastSeenRemoteMarker=remoteSyncMarker(latest);lastRemoteRefreshAttemptAt=Date.now();unsavedCloudChanges=false;
-                            let cellWriteConflicts = 0;
-                            Object.entries(pendingWritesSent).forEach(([key, patch]) => {
-                                const latestCell = normalizeCellRecord(latest.cells?.[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
-                                const savedAsRequested = latestCell.state === patch.state && latestCell.note === patch.note;
-                                const stillCurrent = pendingCellWrites[key] && Number(pendingCellWrites[key].updatedAt) === Number(patch.updatedAt) && pendingCellWrites[key].state === patch.state && pendingCellWrites[key].note === patch.note;
-                                if (stillCurrent) {
-                                    delete pendingCellWrites[key];
-                                    if (!savedAsRequested) cellWriteConflicts++;
-                                }
-                            });
-                            persistPendingCellWrites();
-                            cloudData=latest;delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();
+                            const cellAck = acknowledgePendingCellWrites(latest, pendingWritesSent);
+                            const cellWriteConflicts = cellAck.mismatches.length;
+                            cloudData=latest;
+                            // Keep the member's intended checkbox visible locally while an unconfirmed
+                            // edit remains queued. The red/pending status makes clear that other members
+                            // have not yet received it; a later retry either confirms it or leaves it queued.
+                            if (cellAck.remaining > 0) cloudData = applyPendingCellWrites(cloudData, latest, pendingCellWrites);
+                            delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();
+                            // A successful whole-record PUT is not enough: keep the sync dirty
+                            // until every queued character/task state is present in the response.
+                            unsavedCloudChanges = cellAck.remaining > 0;
                             const resetChangesAfterRefresh = checkAutoResets();
                             persistLocalData();
                             if(remoteChangedSinceUI || resetChangesAfterRefresh || cellWriteConflicts) refreshTrackerUI(); else updateOverviewStatusCards();
@@ -5387,8 +5443,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
                             const flushed=await flushRevisionQueue();
                             if (cellWriteConflicts) {
-                                setStatus(`🟠 ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} conflicted with a newer save. The latest shared state is shown; please try the task again if needed.`);
+                                const summary = pendingCellWriteSummary();
+                                const willRetry = Object.values(pendingCellWrites).some(item => (Number(item.retryCount)||0) < 3);
+                                setStatus(`🔴 ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} NOT confirmed by the shared database. Kept on this device${willRetry ? ' · retrying automatically' : ' · use Sync Changes to retry'}: ${summary}${cellAck.mismatches.length > 4 ? '; …' : ''}`);
+                                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', `Could not confirm ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} · ${willRetry ? 'retrying' : 'manual retry needed'}`);
+                                schedulePendingCellRetry();
+                            } else if (Object.keys(pendingCellWrites).length > 0) {
+                                const livePendingCount = Object.keys(pendingCellWrites).length;
+                                setStatus(`🟠 ${livePendingCount} newer task edit${livePendingCount === 1 ? '' : 's'} still queued; not yet confirmed by the shared database: ${pendingCellWriteSummary()}`);
+                                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('pending', `${livePendingCount} task edit${livePendingCount === 1 ? '' : 's'} still saving…`);
+                                schedulePendingCellRetry();
                             } else {
+                                if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current','Your task changes are saved · checked '+trackerSyncTimeLabel());
                                 setStatus(showSuccess?'🟢 Cloud Sync Complete':(flushed||!queuedEntries.length?'🟢 Tracker Changes Saved':'🟢 Tracker Changes Saved · Revision log pending'));
                             }
                             return;
@@ -5396,8 +5462,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         cloudData=mergeData(cloudData,latest);delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
                     }
                     throw new Error('Cloud changed during sync. Please press Sync Now again.');
-                }catch(err){unsavedCloudChanges=true;persistLocalData();setStatus(`🔴 Sync Failed: ${err.message}`);}
-                finally{syncInProgress=false;updateOverviewStatusCards();if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}}
+                }catch(err){
+                    unsavedCloudChanges=true;persistLocalData();
+                    const pendingCount = Object.keys(pendingCellWrites).length;
+                    const pendingText = pendingCount ? ` · ${pendingCount} task edit${pendingCount === 1 ? '' : 's'} retained locally: ${pendingCellWriteSummary()}` : '';
+                    setStatus(`🔴 Sync Failed: ${err.message}${pendingText}`);
+                    if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', pendingCount ? `${pendingCount} task edit${pendingCount === 1 ? '' : 's'} not confirmed · retained locally` : 'Cloud sync failed · retry');
+                    const transient = /(?:failed \((?:409|425|429|5\d\d)\)|fetch|network|timeout|changed repeatedly)/i.test(String(err?.message || err));
+                    if (transient && pendingCount) { markPendingCellWritesFailedAttempt(); schedulePendingCellRetry(); }
+                }
+                finally{
+                    syncInProgress=false;updateOverviewStatusCards();
+                    if(syncRequestedWhileBusy){syncRequestedWhileBusy=false;setTimeout(()=>forceSync(false),150);}
+                    else if(Object.keys(pendingCellWrites).length) schedulePendingCellRetry();
+                }
             })();
         }
 
@@ -5480,7 +5558,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function openVersionHistoryModal(){if(!isPantheonAdmin()){alert('Version History is available only to Pantheon administrators.');return;}toggleSideMenu(false);if(!hasCloudConfig()){alert('Connect to the shared Cloud database first.');openCloudModal();return;}openModal('version-history-modal');loadVersionHistory(true);}
 
         function setStatus(msg) { const el = document.getElementById('sync-status'); if (el) el.textContent = msg; updateOverviewStatusCards(); }
-        function triggerAutoSync() { unsavedCloudChanges = true; persistLocalData(); setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally'); clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800); }
+        function triggerAutoSync() {
+            unsavedCloudChanges = true; persistLocalData();
+            setStatus(hasCloudConfig() ? '🟡 Unsaved Cloud Changes...' : '⚪ Saved locally');
+            if (isTrackerPageCurrentlyVisible() && Object.keys(pendingCellWrites).length) setTrackerLiveSyncNote('pending', `${Object.keys(pendingCellWrites).length} task edit${Object.keys(pendingCellWrites).length === 1 ? '' : 's'} saving…`);
+            clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 800);
+        }
 
         async function pantheonCheckSessionAndBoot() {
             const gate = document.getElementById('pantheon-auth-gate');
@@ -9634,7 +9717,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r31';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r32';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
