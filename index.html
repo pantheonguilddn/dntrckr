@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r37</title>
+    <title>Pantheon Tools v1.6.8-r38</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2752,7 +2752,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r37-report-and-bounty-layout">
+<style id="pantheon-r38-report-and-bounty-layout">
 .modal-card.weekly-report-modal{width:min(1040px,calc(100vw - 30px));max-height:92vh;overflow:auto}
 .weekly-report-modal-head,.bounty-share-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:12px}
 .weekly-report-modal-head>div,.bounty-share-modal-head>div{min-width:0;flex:1}
@@ -3257,9 +3257,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r37</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r38</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r37 update:</strong> Bounty Share now has a wide editor and a receipt-style screenshot that can be copied as an image for Discord. The Weekly Report has moved out of the Tracker and opens once after weekly reset, with a toolbar button to reopen it. Active pages now check for releases and update automatically after pending tracker edits are safely saved.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r38 update:</strong> Bounty Share now has a wide editor and a receipt-style screenshot that can be copied as an image for Discord. The Weekly Report has moved out of the Tracker and opens once after weekly reset, with a toolbar button to reopen it. The update checker now confirms core tracker saves immediately; the secondary revision-history journal no longer blocks an update.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5249,8 +5249,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return reset.getTime();
         }
 
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                return await fetch(url, { ...options, signal: controller.signal });
+            } catch (error) {
+                if (error?.name === 'AbortError') throw new Error(`Cloud request timed out after ${Math.round(timeoutMs/1000)} seconds.`);
+                throw error;
+            } finally { clearTimeout(timer); }
+        }
+
         async function fetchRemoteRecord(config = getCloudConfig()) {
-            const res = await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, { method: 'GET', headers: authHeaders(config), cache: 'no-store' });
+            const res = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, { method: 'GET', headers: authHeaders(config), cache: 'no-store' }, 15000);
             const p = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(p.message || `Read failed (${res.status})`);
             return p.record || p;
@@ -5590,7 +5601,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         // D1 cell revision before its compare-and-swap write.
                         const cellWriteIntents=Object.values(pendingWritesSent).slice(0,5000).map(patch=>({charName:String(patch.charName||'').slice(0,40),taskName:String(patch.taskName||'').slice(0,140),state:String(patch.state||'open'),note:String(patch.note||'').slice(0,40)}));
                         if(cellWriteIntents.length)send.cellWriteIntents=cellWriteIntents;
-                        const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                        const res=await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)},15000);if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
                         const responsePayload=await res.json();
                         const latest=normalizeData(responsePayload.record||await fetchRemoteRecord(config));
                         lastRemoteRevision=Number(responsePayload.metadata?.updatedAt)||lastRemoteRevision;
@@ -5614,9 +5625,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             applyDeveloperTextOverrides();
                             updateOverviewEventNotice();
                             if(resetChangesAfterRefresh){unsavedCloudChanges=true;setTimeout(()=>forceSync(false),180);}
-                            // Revision logging happens after the core sync and can fail safely.
-                            if(queuedEntries.length){for(const e of queuedEntries)await appendRevisionEntryToJournal(e);}
-                            const flushed=await flushRevisionQueue();
+                            // Queue revision-history entries after the core tracker write is
+                            // confirmed, but flush that separate journal without holding the
+                            // tracker sync lock. A slow or unavailable history journal must not
+                            // keep checkbox saves or an app release waiting.
+                            if(queuedEntries.length){for(const e of queuedEntries)queueRevisionEntry(e);}
+                            // Start best-effort journal delivery; the durable local queue remains
+                            // available for the next sync if this secondary request fails.
+                            try { Promise.resolve(flushRevisionQueue()).catch(()=>false); } catch (_) {}
                             if (cellWriteConflicts) {
                                 const summary = pendingCellWriteSummary();
                                 const willRetry = Object.values(pendingCellWrites).some(item => (Number(item.retryCount)||0) < 3);
@@ -5630,7 +5646,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                                 schedulePendingCellRetry();
                             } else {
                                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current','Your task changes are saved · checked '+trackerSyncTimeLabel());
-                                setStatus(showSuccess?'🟢 Cloud Sync Complete':(flushed||!queuedEntries.length?'🟢 Tracker Changes Saved':'🟢 Tracker Changes Saved · Revision log pending'));
+                                setStatus(showSuccess?'🟢 Cloud Sync Complete':(queuedEntries.length||loadRevisionQueue().length?'🟢 Tracker Changes Saved · Revision log syncing separately':'🟢 Tracker Changes Saved'));
                             }
                             return;
                         }
@@ -10137,7 +10153,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r37';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r38';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10808,17 +10824,23 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r37';
+  const CURRENT_BUILD = '1.6.8-r38';
   let newestBuild = '';
   let checkBusy = false;
   let reloadQueued = false;
-  let lastSyncNudgeAt = 0;
   let reloadStarted = false;
+  let syncNudgeInFlight = false;
+  let lastCheckAt = 0;
+  function pendingCellCount() {
+    try { return typeof pendingCellWrites !== 'undefined' ? Object.keys(pendingCellWrites || {}).length : 0; }
+    catch (_) { return 1; }
+  }
+  function isCoreSyncBusy() {
+    return !!((typeof syncInProgress !== 'undefined' && syncInProgress) || window.__pantheonVersionWriteBusy);
+  }
   function hasUnsentEdits() {
     try {
-      return !!((typeof syncInProgress !== 'undefined' && syncInProgress) || window.__pantheonVersionWriteBusy ||
-        (typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) ||
-        (typeof pendingCellWrites !== 'undefined' && Object.keys(pendingCellWrites).length));
+      return isCoreSyncBusy() || !!(typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) || pendingCellCount() > 0;
     } catch (_) { return true; }
   }
   function showUpdateNotice(message) {
@@ -10838,8 +10860,39 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     target.searchParams.set('__pt_reload', String(Date.now()));
     location.replace(target.toString());
   }
+  function scheduleReload() {
+    if (reloadStarted || hasUnsentEdits()) return;
+    showUpdateNotice('Tracker changes are confirmed. Updating Pantheon '+newestBuild+'…');
+    setTimeout(() => { if (!hasUnsentEdits()) reloadToNewestBuild(); }, 250);
+  }
+  function attemptQueuedReload() {
+    if (!reloadQueued || reloadStarted || document.visibilityState !== 'visible') return;
+    if (!hasUnsentEdits()) { scheduleReload(); return; }
+    if (isCoreSyncBusy()) {
+      showUpdateNotice('Finishing the current tracker save before updating…');
+      return;
+    }
+    if (typeof hasCloudConfig !== 'function' || !hasCloudConfig() || typeof forceSync !== 'function') {
+      showUpdateNotice('A tracker change is not confirmed. Connect to the shared database and use Sync Changes before updating; your local edits are being kept.');
+      return;
+    }
+    if (syncNudgeInFlight) return;
+    syncNudgeInFlight = true;
+    showUpdateNotice('Confirming your tracker changes before updating…');
+    let syncResult;
+    try { syncResult = forceSync(false); }
+    catch (_) { syncNudgeInFlight = false; showUpdateNotice('Could not confirm the tracker save. Your local edits are being kept; automatic update is paused.'); return; }
+    Promise.resolve(syncResult).then(() => {
+      syncNudgeInFlight = false;
+      if (!hasUnsentEdits()) scheduleReload();
+      else showUpdateNotice('The shared database has not confirmed every tracker edit yet. Your edits are being kept; retrying the save before updating.');
+    }).catch(() => {
+      syncNudgeInFlight = false;
+      showUpdateNotice('Could not confirm the tracker save. Your local edits are being kept; retrying before updating.');
+    });
+  }
   async function checkRelease() {
-    if (checkBusy || document.visibilityState !== 'visible' || reloadStarted) return;
+    if (checkBusy || document.visibilityState !== 'visible' || reloadStarted || reloadQueued) return;
     checkBusy=true;
     try {
       const response=await fetch('/version.json?pt_check='+Date.now(),{
@@ -10852,32 +10905,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
       newestBuild=remote;
       reloadQueued=true;
       if (hasUnsentEdits()) {
-        showUpdateNotice('Pantheon '+remote+' is ready. The page will update automatically after your tracker edits are safely saved.');
-        return;
-      }
-      showUpdateNotice('Pantheon '+remote+' is ready. Updating this page…');
-      setTimeout(attemptQueuedReload,900);
-    } catch (_) { /* Offline or deployment incomplete; retry on the next interval. */ }
+        showUpdateNotice('Pantheon '+remote+' is ready. Confirming tracker changes before the automatic update…');
+        setTimeout(attemptQueuedReload,100);
+      } else scheduleReload();
+    } catch (_) { /* Offline or deployment incomplete; retry on the next check. */ }
     finally { checkBusy=false; }
   }
-  function attemptQueuedReload() {
-    if (!reloadQueued || reloadStarted || document.visibilityState !== 'visible') return;
-    if (hasUnsentEdits()) {
-      showUpdateNotice('Pantheon '+newestBuild+' is ready. Saving your pending tracker changes before the automatic update…');
-      const now=Date.now();
-      if (typeof forceSync==='function' && typeof hasCloudConfig==='function' && hasCloudConfig() && now-lastSyncNudgeAt>12000 && !syncInProgress && !window.__pantheonVersionWriteBusy) {
-        lastSyncNudgeAt=now;
-        try { Promise.resolve(forceSync(false)).catch(()=>{}); } catch (_) {}
-      }
-      return;
-    }
-    showUpdateNotice('Update saved. Reloading Pantheon '+newestBuild+'…');
-    setTimeout(()=>{ if(!hasUnsentEdits()) reloadToNewestBuild(); },350);
-  }
-  // The current document now polls the release manifest itself. Cache headers in
-  // _headers ensure the next navigation/reload fetches the current HTML as well.
-  setTimeout(checkRelease,1200);
-  setInterval(()=>{ if(reloadQueued)attemptQueuedReload(); else checkRelease(); },10000);
+  setTimeout(checkRelease,800);
+  // Release manifest checks remain light (10s); when an update is queued, save state
+  // is rechecked every 1.5s so there is no needless 10–12 second wait after an ACK.
+  setInterval(() => { if (reloadQueued) attemptQueuedReload(); else if (Date.now()-lastCheckAt>=10000) { lastCheckAt=Date.now(); checkRelease(); } },1500);
   window.addEventListener('pageshow',()=>{if(reloadQueued)attemptQueuedReload();else checkRelease();});
   window.addEventListener('focus',()=>{if(reloadQueued)attemptQueuedReload();else checkRelease();});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(reloadQueued)attemptQueuedReload();else checkRelease();}});
