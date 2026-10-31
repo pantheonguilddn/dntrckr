@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r46</title>
+    <title>Pantheon Tools v1.6.8-r47</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3313,9 +3313,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r46</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r47</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r46 hotfix:</strong> Corrects the release-check version mismatch that caused r44 to reload continuously. Existing authentication, tracker permissions, and shared-data behavior are preserved.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r47 hotfix:</strong> Corrects the release-check version mismatch that caused r44 to reload continuously. Existing authentication, tracker permissions, and shared-data behavior are preserved.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -10503,7 +10503,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r46';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r47';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10612,15 +10612,53 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
         }
         const RELEASE_DISMISSAL_KEY = 'pantheon-release-popup-dismissed-version-v1';
-        function persistWelcomeReleasePreference() {
-            const checkbox = document.getElementById('welcome-hide-until-update');
+        const RELEASE_DISMISSAL_COOKIE = 'pantheon_release_popup_dismissed_v1';
+        let welcomeReleaseDismissedInRuntime = false;
+        let welcomeReleaseInitializedForVersion = '';
+        function readWelcomeReleaseDismissal() {
+            let saved = '';
+            try { saved = localStorage.getItem(RELEASE_DISMISSAL_KEY) || ''; } catch (e) {}
+            if (saved === PANTHEON_TOOLS_VERSION) return saved;
+            // Cookie fallback survives ordinary navigation/reloads if browser storage is
+            // unavailable or blocked for this origin. Keep the same release-scoped value.
             try {
-                if (checkbox && checkbox.checked) localStorage.setItem(RELEASE_DISMISSAL_KEY, PANTHEON_TOOLS_VERSION);
-                else localStorage.removeItem(RELEASE_DISMISSAL_KEY);
+                const prefix = RELEASE_DISMISSAL_COOKIE + '=';
+                const item = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith(prefix));
+                const cookieValue = item ? decodeURIComponent(item.slice(prefix.length)) : '';
+                if (cookieValue === PANTHEON_TOOLS_VERSION) {
+                    try { localStorage.setItem(RELEASE_DISMISSAL_KEY, cookieValue); } catch (e) {}
+                    return cookieValue;
+                }
+            } catch (e) {}
+            return saved;
+        }
+        function writeWelcomeReleaseDismissal() {
+            welcomeReleaseDismissedInRuntime = true;
+            welcomeReleaseInitializedForVersion = PANTHEON_TOOLS_VERSION;
+            try { localStorage.setItem(RELEASE_DISMISSAL_KEY, PANTHEON_TOOLS_VERSION); } catch (e) {}
+            try {
+                const secure = location.protocol === 'https:' ? '; Secure' : '';
+                document.cookie = RELEASE_DISMISSAL_COOKIE + '=' + encodeURIComponent(PANTHEON_TOOLS_VERSION) + '; Max-Age=31536000; Path=/; SameSite=Lax' + secure;
             } catch (e) {}
         }
-        // Save immediately when checked, not only when the Welcome modal closes. This
-        // prevents secondary modal close handlers from reopening release notes.
+        function clearWelcomeReleaseDismissal() {
+            welcomeReleaseDismissedInRuntime = false;
+            try { localStorage.removeItem(RELEASE_DISMISSAL_KEY); } catch (e) {}
+            try {
+                const secure = location.protocol === 'https:' ? '; Secure' : '';
+                document.cookie = RELEASE_DISMISSAL_COOKIE + '=; Max-Age=0; Path=/; SameSite=Lax' + secure;
+            } catch (e) {}
+        }
+        function isWelcomeReleaseDismissed() {
+            return welcomeReleaseDismissedInRuntime || readWelcomeReleaseDismissal() === PANTHEON_TOOLS_VERSION;
+        }
+        function persistWelcomeReleasePreference() {
+            const checkbox = document.getElementById('welcome-hide-until-update');
+            if (checkbox && checkbox.checked) writeWelcomeReleaseDismissal();
+            else clearWelcomeReleaseDismissal();
+        }
+        // Persist as soon as the box is checked and again when Continue is clicked.
+        // The second storage mechanism prevents a refresh from reopening the same release.
         document.getElementById('welcome-hide-until-update')?.addEventListener('change', persistWelcomeReleasePreference);
         function closeWelcomeReleaseNotes() {
             persistWelcomeReleasePreference();
@@ -10861,19 +10899,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function initializeWelcomeModal() {
-            let saved = '', dismissedVersion = '';
-            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; dismissedVersion = localStorage.getItem(RELEASE_DISMISSAL_KEY) || ''; } catch (e) {}
+            let saved = '';
+            try { saved = localStorage.getItem(LANDING_PREFERENCE_KEY) || ''; } catch (e) {}
             if (saved === 'tracker-universal') {
                 saved = 'tracker-personal';
                 try { localStorage.setItem(LANDING_PREFERENCE_KEY, saved); } catch (e) {}
             }
             applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
             configurePantheonDiscordLinks();
-            const dismissed = dismissedVersion === PANTHEON_TOOLS_VERSION;
+            const dismissed = isWelcomeReleaseDismissed();
             const checkbox = document.getElementById('welcome-hide-until-update');
             if (checkbox) checkbox.checked = dismissed;
-            if (dismissed) closeModal('welcome-modal');
-            else openModal('welcome-modal');
+            // The welcome flow is a once-per-build initialization, not a navigation
+            // prompt. Do not reopen it if boot runs twice in the same document.
+            if (dismissed) {
+                welcomeReleaseInitializedForVersion = PANTHEON_TOOLS_VERSION;
+                if (!document.getElementById('welcome-modal')?.classList.contains('hidden')) closeModal('welcome-modal');
+                else document.body.classList.remove('welcome-modal-open');
+                return;
+            }
+            if (welcomeReleaseInitializedForVersion === PANTHEON_TOOLS_VERSION) return;
+            welcomeReleaseInitializedForVersion = PANTHEON_TOOLS_VERSION;
+            openModal('welcome-modal');
         }
         function saveWelcomeDefault(save) {
             const choice = document.getElementById('welcome-default-landing')?.value || 'overview';
@@ -11063,11 +11110,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (id === 'welcome-modal') document.body.classList.remove('welcome-modal-open');
             if (returnToWelcome) {
                 returnToWelcomeAfterShortcutModal = false;
-                let dismissedVersion = '';
-                try { dismissedVersion = localStorage.getItem(RELEASE_DISMISSAL_KEY) || ''; } catch (_) {}
                 const checkbox = document.getElementById('welcome-hide-until-update');
-                if (dismissedVersion !== PANTHEON_TOOLS_VERSION && !checkbox?.checked) {
+                if (!isWelcomeReleaseDismissed() && !checkbox?.checked) {
                     showAppPage('overview');
+                    welcomeReleaseInitializedForVersion = PANTHEON_TOOLS_VERSION;
                     openModal('welcome-modal');
                 }
             }
@@ -11175,7 +11221,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r46';
+  const CURRENT_BUILD = '1.6.8-r47';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

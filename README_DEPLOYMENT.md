@@ -1,18 +1,18 @@
-# Pantheon Tools v1.6.8-r46 — compact top navigation
+# Pantheon Tools v1.6.8-r47 — persistent What's New dismissal
 
 ## What changed
 
-- Shortened the Tracker roster dropdown from 148px to 124px on desktop, reducing the horizontal pressure in the top navigation.
-- Reduced the dropdown height to 34px and tightened its internal padding.
-- Removed the extra left margin from the adjacent `?` help control and fixed its flex basis/vertical alignment so it stays centered beside the dropdown.
-- Kept responsive wrapping on narrower viewports; on mobile the dropdown can flex naturally instead of forcing overflow.
-- No authentication, synchronization, ownership, Admin View, D1 schema, or server-function behavior changed.
-- Version markers and `version.json` are synchronized to `1.6.8-r46`.
+- The What's New dismissal is now stored in both localStorage and a release-scoped cookie, so a normal navigation/reload does not repeatedly reopen the same release popup if localStorage is unavailable.
+- The dismissal value remains tied to the installed build; a genuinely newer release can still show its own What's New popup.
+- The Continue button and checkbox both persist the preference. Unchecking the option clears the saved dismissal so the next full app opening can show the release note again.
+- Welcome-modal initialization is idempotent within a page runtime, preventing duplicate boot paths from reopening the same popup.
+- The Help/Salary return-to-welcome path now uses the same shared dismissal check rather than reading localStorage alone.
+- No authentication, D1 schema, API endpoint, tracker ownership, sync, Admin View, or other permission behavior changed.
 
 ## Deployment
 
-Deploy the complete ZIP contents to the existing Cloudflare Pages project. Preserve the existing D1 binding and environment configuration. Verify `/version.json` reports `1.6.8-r46` after deployment.
+Deploy the complete ZIP contents to the existing Cloudflare Pages project. Preserve the existing D1 binding and environment configuration. Verify `/version.json` reports `1.6.8-r47` after deployment.
 
 ## Validation boundary
 
-The package structure is preserved and the frontend syntax, CSS parsing, archive integrity, and version-marker consistency are checked locally. This package has not been deployed to production or verified against live guild accounts.
+Frontend JavaScript syntax, CSS parsing, package integrity, package-path preservation, release-marker consistency, and targeted dismissal behavior tests pass locally. This package has not been deployed to production or tested against live guild accounts.
