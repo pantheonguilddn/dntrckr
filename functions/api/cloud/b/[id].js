@@ -166,9 +166,8 @@ export async function onRequestPut(context) {
         }
         next.completionTiming = mergeCompletionTimingRecords(previous?.completionTiming, next.completionTiming, timingClearAt);
 
-        const adminOverride = context.data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
-        if (!adminOverride) {
-          const violation = registrationWriteViolation(previous, next, context.data?.session, { enforceForAdmin:true });
+        if (context.data?.session?.role !== 'admin') {
+          const violation = registrationWriteViolation(previous, next, context.data?.session);
           if (violation) return jsonResponse({ error: violation, message: violation }, 403);
           // Rate-Up scheduling is a shared admin-owned setting. A member's ordinary tracker sync
           // must never alter or erase this schedule, even if their cached record predates the field.

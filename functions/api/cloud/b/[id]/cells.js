@@ -98,8 +98,7 @@ export async function onRequestPost(context) {
       next.completionTiming = Object.fromEntries(kept.map(key=>[key,next.completionTiming[key]]));
     }
 
-    const adminOverride = data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
-    const violation = registrationWriteViolation(previous,next,data?.session,{ enforceForAdmin:!adminOverride });
+    const violation = registrationWriteViolation(previous,next,data?.session);
     if (violation) return jsonResponse({ error:violation, message:violation },403);
 
     const savedAt = Math.max(Date.now(), (Number(row.updated_at) || 0) + 1);

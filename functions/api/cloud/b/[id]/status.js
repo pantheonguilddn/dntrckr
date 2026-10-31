@@ -17,5 +17,5 @@ export async function onRequestGet(context) {
   }
   const row = await env.PANTHEON_DB.prepare('SELECT updated_at FROM data_records WHERE id = ? LIMIT 1').bind(targetId).first();
   if (!row) return jsonResponse({ message: 'Record not found.' }, 404);
-  return jsonResponse({ metadata: { id: requestedId, updatedAt: Number(row.updated_at) || 0, serverTime: Date.now() } });
+  return jsonResponse({ metadata: { id: requestedId, updatedAt: Number(row.updated_at) || 0 } });
 }

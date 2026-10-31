@@ -110,8 +110,8 @@ function registrationNames(member) {
  * remain unrestricted; registration metadata is limited to the signed-in owner's entry.
  * Returns a user-facing violation string or an empty string when permitted.
  */
-export function registrationWriteViolation(previousRecord, nextRecord, session, options = {}) {
-  if (session?.role === 'admin' && options?.enforceForAdmin !== true) return '';
+export function registrationWriteViolation(previousRecord, nextRecord, session) {
+  if (session?.role === 'admin') return '';
   const initialCandidates = candidatesFor(session);
   const before = obj(previousRecord?.settings);
   const after = obj(nextRecord?.settings);
