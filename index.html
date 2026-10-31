@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r39</title>
+    <title>Pantheon Tools v1.6.8-r40</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3257,9 +3257,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r39</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r40</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r39 update:</strong> Character progress now saves in independent character batches instead of waiting for one whole-roster checkbox queue. Other members’ updates continue loading while your own cell save is pending, and each character reports its own save result.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r40 update:</strong> Shared Tracker cells now refresh from the server as the source of truth. A stale or clock-skewed browser cache can no longer hide another member’s newly saved bounty mark or target slot; only your own unconfirmed edits remain overlaid locally.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3930,13 +3930,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             persistPendingCellWrites();
         }
         function restoreRemoteCellsForPendingWrites(candidate, remote, pendingSnapshot = pendingCellWrites) {
-            Object.values(pendingSnapshot || {}).forEach(patch => {
-                if (!patch?.charName || !patch?.taskName) return;
-                const remoteCell = remote?.cells?.[patch.charName]?.[patch.taskName];
-                ensureCellMap(candidate, patch.charName);
-                if (remoteCell) candidate.cells[patch.charName][patch.taskName] = cloneDataObject(remoteCell);
-                else delete candidate.cells[patch.charName][patch.taskName];
-            });
+            // D1 is the authoritative shared source for every non-pending cell. Do not
+            // merge cached cells by client timestamps: a clock-skewed or stale local
+            // timestamp can otherwise outrank a newer server-saved bounty mark/slot.
+            // Local edits are preserved separately below, but only while they remain
+            // explicitly queued and unconfirmed on this device.
+            candidate.cells = cloneDataObject(safeObject(remote?.cells));
             return candidate;
         }
         function applyPendingCellWrites(candidate, remote, pendingSnapshot) {
@@ -5768,7 +5767,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             }
                             return;
                         }
-                        cloudData=mergeData(cloudData,latest);delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
+                        cloudData=mergeData(cloudData,latest);
+                        cloudData=restoreRemoteCellsForPendingWrites(cloudData,latest,{});
+                        if(Object.keys(pendingCellWrites).length) cloudData=applyPendingCellWrites(cloudData,latest,pendingCellWrites);
+                        delete cloudData.syncInfo;setStatus(`🟠 Another device changed the database. Re-merging (attempt ${attempt}/3)...`);
                     }
                     throw new Error('Cloud changed during sync. Please press Sync Now again.');
                 }catch(err){
@@ -5835,6 +5837,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     // from refreshing. Merge the current local snapshot, then overlay only
                     // this device's unconfirmed character cells so they cannot be lost.
                     cloudData = hasQueuedCellEdits ? mergeData(cloudData, latestRemote) : latestRemote;
+                    cloudData = restoreRemoteCellsForPendingWrites(cloudData, latestRemote, pendingCellSnapshot);
                     if (hasQueuedCellEdits) cloudData = applyPendingCellWrites(cloudData, latestRemote, pendingCellSnapshot);
                     delete cloudData.syncInfo;
                     lastSeenRemoteMarker = remoteSyncMarker(remote);
@@ -10284,7 +10287,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r39';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r40';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -10955,7 +10958,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r39';
+  const CURRENT_BUILD = '1.6.8-r40';
   let newestBuild = '';
   let checkBusy = false;
   let reloadQueued = false;
