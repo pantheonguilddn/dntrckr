@@ -1,123 +1,156 @@
 import { jsonResponse, resolveRecordId } from '../../../../_utils/auth.js';
-import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../../_utils/compact.js';
-import { registrationWriteViolation, repairBootstrapAdminOwnerLinks, resolveDiscordOwnerMember } from '../../../../_utils/registration-guard.js';
+import { characterKey, getCharacterStorageState, taskKey } from '../../../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const CELL_STATES = new Set(['open','done','excluded','marked','reset']);
-function obj(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+const obj = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 
-// Save a single character's task cells independently from other roster characters
-// and independently from whole-record settings/history synchronization.
+// Character progress writes no longer read or rewrite pantheon-main. Each task cell is
+// one independently addressed D1 row; unrelated players/characters cannot invalidate it.
 export async function onRequestPost(context) {
   const { params, request, env, data } = context;
   const requestedId = String(params.id || '');
   const targetId = await resolveRecordId(env, requestedId);
   if (!targetId) return jsonResponse({ message:'Invalid record ID.' },400);
-  if (targetId !== MAIN_ID) return jsonResponse({ message:'Character progress can only be saved to the main Tracker record.' },400);
+  if (targetId !== MAIN_ID) return jsonResponse({ message:'Character progress can only be saved to the main Tracker.' },400);
 
   let body;
   try { body = await request.json(); } catch (_) { return jsonResponse({ message:'Invalid JSON body.' },400); }
   const character = String(body?.character || '').trim().slice(0,40);
-  const edits = Array.isArray(body?.edits) ? body.edits.slice(0,100) : [];
-  if (!character || !edits.length) return jsonResponse({ message:'A character and at least one task edit are required.' },400);
+  const charKey = characterKey(character);
+  const edits = Array.isArray(body?.edits) ? body.edits.slice(0,40) : [];
+  if (!character || !charKey || !edits.length) return jsonResponse({ message:'A character and at least one task edit are required.' },400);
   const cleanEdits = [];
   const seenTasks = new Set();
   for (const raw of edits) {
     const item = obj(raw);
     const taskName = String(item.taskName || '').trim().slice(0,140);
+    const key = taskKey(taskName);
     const state = String(item.state || 'open');
     const note = String(item.note || '').slice(0,40);
-    if (!taskName || !CELL_STATES.has(state)) return jsonResponse({ message:'One or more task edits are invalid.' },400);
-    if (seenTasks.has(taskName)) return jsonResponse({ message:'Duplicate task edits were submitted for the same character.' },400);
-    seenTasks.add(taskName);
-    cleanEdits.push({ taskName, state, note });
+    if (!taskName || !key || !CELL_STATES.has(state)) return jsonResponse({ code:'INVALID_TASK_EDIT', retryable:false, message:'One or more task edits are invalid.' },400);
+    if (seenTasks.has(key)) return jsonResponse({ code:'DUPLICATE_TASK_EDIT', retryable:false, message:'Duplicate task edits were submitted for the same character.' },400);
+    seenTasks.add(key);
+    cleanEdits.push({ taskName, taskKey:key, state, note });
   }
-  const timingInput = Array.isArray(body?.timing) ? body.timing.slice(0,100) : [];
 
-  for (let attempt=1; attempt<=5; attempt++) {
-    const row = await env.PANTHEON_DB.prepare('SELECT id, name, record_json, updated_at FROM data_records WHERE id = ? LIMIT 1').bind(targetId).first();
-    if (!row) return jsonResponse({ message:'Main Tracker record was not found.' },404);
-    let previous;
-    try { previous = decodePantheonCompactRecord(JSON.parse(row.record_json)); }
-    catch (_) { return jsonResponse({ message:'Stored Tracker record is corrupt.' },500); }
-    if (!previous || typeof previous !== 'object') return jsonResponse({ message:'Stored Tracker record is invalid.' },500);
+  let storageState;
+  try { storageState = await getCharacterStorageState(env); }
+  catch (_) { return jsonResponse({ code:'CHARACTER_STORAGE_SCHEMA_MISSING', retryable:true, message:'Player storage is being prepared by the administrator. Your edit is retained and will retry after setup completes.' },503); }
+  if (Number(storageState?.migration_complete) !== 1) {
+    return jsonResponse({ code:'CHARACTER_STORAGE_NOT_MIGRATED', retryable:true, message:'Player storage is being prepared. Your edit is retained and will retry automatically when setup completes.' },503);
+  }
 
-    const configuredTasks = new Set((Array.isArray(previous.settings?.categories) ? previous.settings.categories : []).flatMap(category => Array.isArray(category?.tasks) ? category.tasks.map(String) : []));
-    for (const edit of cleanEdits) if (!configuredTasks.has(edit.taskName)) return jsonResponse({ message:`Task "${edit.taskName}" is not in the current Tracker categories.` },400);
+  const session = data?.session;
+  if (!session?.discordId) return jsonResponse({ code:'AUTH_REQUIRED', retryable:false, message:'Your Discord session has expired. Sign in again; your edits remain on this device.' },401);
+  const adminOverride = session.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
 
-    const next = JSON.parse(JSON.stringify(previous));
-    if (!next.cells || typeof next.cells !== 'object') next.cells = {};
-    if (!next.cells[character] || typeof next.cells[character] !== 'object') next.cells[character] = {};
-    const savedEdits = [];
-    const serverTimes = new Map();
-    for (const edit of cleanEdits) {
-      const oldCell = obj(previous.cells?.[character]?.[edit.taskName]);
-      const serverStamp = Math.max(Date.now(), (Number(oldCell.updatedAt) || 0) + 1);
-      const saved = {
-        state:edit.state,
-        note:edit.note,
-        updatedAt:serverStamp,
-        deviceId:String(data?.session?.discordId || 'admin').slice(0,120)
-      };
-      next.cells[character][edit.taskName] = saved;
-      serverTimes.set(edit.taskName,serverStamp);
-      savedEdits.push({ taskName:edit.taskName, ...saved });
+  let owner;
+  try {
+    owner = await env.PANTHEON_DB.prepare(`
+      SELECT character_key, character_name, member_id, owner_name, owner_discord_id, tracker_enabled, active
+      FROM character_owners WHERE character_key = ? LIMIT 1
+    `).bind(charKey).first();
+  } catch (_) {
+    return jsonResponse({ code:'CHARACTER_OWNER_INDEX_UNAVAILABLE', retryable:false, message:'The character ownership index is unavailable. Ask an administrator to check player storage migration.' },503);
+  }
+  if (!owner || Number(owner.active) !== 1) {
+    return jsonResponse({ code:'CHARACTER_NOT_REGISTERED', retryable:false, message:`${character} is not currently registered to an active Member Roster owner. Ask an administrator to verify the roster.` },403);
+  }
+  if (!adminOverride && (!owner.owner_discord_id || String(owner.owner_discord_id) !== String(session.discordId))) {
+    return jsonResponse({ code:'CHARACTER_OWNER_MISMATCH', retryable:false, message:`You can view ${character}'s progress, but only its registered Discord owner or an administrator in Admin Mode can change it.` },403);
+  }
+  if (!adminOverride && Number(owner.tracker_enabled) !== 1) {
+    return jsonResponse({ code:'TRACKER_NOT_ENABLED', retryable:false, message:`${character} is registered but is not enabled for Tracker participation. Ask an administrator to enable its Tracker registration.` },403);
+  }
+
+  const taskPlaceholders = cleanEdits.map(() => '?').join(',');
+  let configured;
+  try {
+    configured = await env.PANTHEON_DB.prepare(`
+      SELECT task_key FROM tracker_task_definitions
+      WHERE active = 1 AND task_key IN (${taskPlaceholders})
+    `).bind(...cleanEdits.map(item => item.taskKey)).all();
+  } catch (_) {
+    return jsonResponse({ code:'TASK_INDEX_UNAVAILABLE', retryable:false, message:'The Tracker task index is unavailable. Ask an administrator to refresh the shared task definitions.' },503);
+  }
+  const configuredKeys = new Set((configured.results || []).map(row => String(row.task_key)));
+  const invalid = cleanEdits.find(item => !configuredKeys.has(item.taskKey));
+  if (invalid) return jsonResponse({ code:'TASK_NOT_CONFIGURED', retryable:false, message:`Task "${invalid.taskName}" is no longer in the current Tracker categories. Refresh the Tracker before editing it.` },400);
+
+  const now = Date.now();
+  const statements = cleanEdits.map((edit, index) => {
+    const stamp = now + index;
+    return env.PANTHEON_DB.prepare(`
+      INSERT INTO character_task_cells (character_key, task_key, task_name, state, note, updated_at, device_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(character_key, task_key) DO UPDATE SET
+        task_name = excluded.task_name,
+        state = excluded.state,
+        note = excluded.note,
+        updated_at = CASE WHEN excluded.updated_at > character_task_cells.updated_at THEN excluded.updated_at ELSE character_task_cells.updated_at + 1 END,
+        device_id = excluded.device_id
+    `).bind(charKey, edit.taskKey, edit.taskName, edit.state, edit.note, stamp, String(session.discordId).slice(0,120));
+  });
+
+  // Preserve the existing per-character timing evidence, but store it separately as well.
+  const timingInput = Array.isArray(body?.timing) ? body.timing.slice(0,40) : [];
+  if (timingInput.length && owner.member_id && Number(storageState?.analytics_tracking_enabled) === 1) {
+    const allowedTiming = [];
+    const nowCutoff = now - 42 * 24 * 60 * 60 * 1000;
+    const clearedAt = Number(storageState?.analytics_history_cleared_at) || 0;
+    for (const raw of timingInput) {
+      const item = obj(raw);
+      const key = taskKey(item.taskName);
+      const edit = cleanEdits.find(value => value.taskKey === key);
+      const weekKey = String(item.weekKey || '');
+      const weekAt = Number(weekKey);
+      if (!edit || !['done','open'].includes(item.state) || edit.state !== item.state || !Number.isFinite(weekAt) || weekAt < nowCutoff || weekAt > now + 24 * 60 * 60 * 1000 || now < clearedAt) continue;
+      allowedTiming.push({ edit, weekKey, state:item.state });
     }
-
-    // Preserve the optional group-run timing evidence in the same character transaction.
-    // Timing is accepted only for a task whose cell is included in this request and whose
-    // saved state agrees with the timing state; the owner key is derived from the session.
-    if (next.settings?.analyticsTrackingEnabled === true && data?.session?.discordId) {
-      const owner = resolveDiscordOwnerMember(data.session, previous.settings?.memberDirectory);
-      const ownerKey = String(owner?.id || owner?.name || '').slice(0,120);
-      const now = Date.now();
-      const cutoff = now - 42 * 24 * 60 * 60 * 1000;
-      const clearAt = Number(previous.settings?.analyticsHistoryClearedAt) || 0;
-      if (!next.completionTiming || typeof next.completionTiming !== 'object') next.completionTiming = {};
-      if (ownerKey) for (const rawTiming of timingInput) {
-        const item = obj(rawTiming);
-        const taskName = String(item.taskName || '').trim();
-        const edit = cleanEdits.find(value => value.taskName === taskName);
-        const weekKey = String(item.weekKey || '');
-        const weekAt = Number(weekKey);
-        if (!edit || !['done','open'].includes(item.state) || edit.state !== item.state || !Number.isFinite(weekAt) || weekAt < cutoff || weekAt > now + 24*60*60*1000) continue;
-        const at = serverTimes.get(taskName) || now;
-        if (at < clearAt) continue;
-        if (!next.completionTiming[weekKey]) next.completionTiming[weekKey] = {};
-        if (!next.completionTiming[weekKey][character]) next.completionTiming[weekKey][character] = {};
-        const old = obj(next.completionTiming[weekKey][character][taskName]);
-        if ((Number(old.at) || 0) > at) continue;
-        next.completionTiming[weekKey][character][taskName] = { state:item.state, at, ownerKey };
-      }
-      const weeks = Object.keys(next.completionTiming).sort((a,b)=>Number(a)-Number(b));
-      for (const week of weeks) {
-        if (!Number.isFinite(Number(week)) || Number(week) < cutoff) delete next.completionTiming[week];
-      }
-      const kept = Object.keys(next.completionTiming).sort((a,b)=>Number(a)-Number(b)).slice(-6);
-      next.completionTiming = Object.fromEntries(kept.map(key=>[key,next.completionTiming[key]]));
-    }
-
-    const adminOverride = data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
-    const violation = registrationWriteViolation(previous,next,data?.session,{ enforceForAdmin:!adminOverride });
-    if (violation) return jsonResponse({ error:violation, message:violation },403);
-    if (!adminOverride) repairBootstrapAdminOwnerLinks(next, data?.session);
-
-    const savedAt = Math.max(Date.now(), (Number(row.updated_at) || 0) + 1);
-    next.updatedAt = savedAt;
-    next.syncInfo = { operationId:`cell-${String(data?.session?.discordId || 'admin')}-${savedAt}`, by:String(data?.session?.discordId || 'admin'), at:savedAt };
-    const packed = encodePantheonCompactRecord(next);
-    let result;
-    try {
-      result = await env.PANTHEON_DB.prepare(`
-        UPDATE data_records SET record_json = ?, updated_at = ?
-        WHERE id = ? AND record_json = ?
-      `).bind(JSON.stringify(packed),savedAt,targetId,row.record_json).run();
-    } catch (error) {
-      return jsonResponse({ message:String(error?.message || error).slice(0,300) },500);
-    }
-    if (Number(result?.meta?.changes) > 0) {
-      return jsonResponse({ metadata:{ id:requestedId, updatedAt:savedAt, character }, character, edits:savedEdits });
+    for (let i = 0; i < allowedTiming.length; i++) {
+      const item = allowedTiming[i];
+      statements.push(env.PANTHEON_DB.prepare(`
+        INSERT INTO character_completion_timing (character_key, week_key, task_key, task_name, state, at, owner_key)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(character_key, week_key, task_key) DO UPDATE SET
+          task_name = excluded.task_name,
+          state = excluded.state,
+          at = CASE WHEN excluded.at > character_completion_timing.at THEN excluded.at ELSE character_completion_timing.at + 1 END,
+          owner_key = excluded.owner_key
+      `).bind(charKey, item.weekKey, item.edit.taskKey, item.edit.taskName, item.state, now + cleanEdits.length + i, String(owner.member_id || owner.owner_name || '').slice(0,120)));
     }
   }
-  return jsonResponse({ message:'This character changed repeatedly while saving. The edits remain queued on this device; they will retry.' },409);
+  // Keep each character's own timing history bounded without scanning the guild table.
+  statements.push(env.PANTHEON_DB.prepare('DELETE FROM character_completion_timing WHERE character_key = ? AND at < ?').bind(charKey, now - 90 * 24 * 60 * 60 * 1000));
+  statements.push(env.PANTHEON_DB.prepare(`
+    UPDATE tracker_storage_meta
+    SET revision = revision + 1,
+        updated_at = CASE WHEN ? > updated_at THEN ? ELSE updated_at + 1 END
+    WHERE id = 1 AND migration_complete = 1
+  `).bind(now + cleanEdits.length + timingInput.length, now + cleanEdits.length + timingInput.length));
+
+  try {
+    // D1 batches execute as a transaction. The affected rows are limited to this character.
+    await env.PANTHEON_DB.batch(statements);
+    const savedRows = await env.PANTHEON_DB.prepare(`
+      SELECT task_key, task_name, state, note, updated_at, device_id
+      FROM character_task_cells
+      WHERE character_key = ? AND task_key IN (${taskPlaceholders})
+    `).bind(charKey, ...cleanEdits.map(item => item.taskKey)).all();
+    const savedByTask = new Map((savedRows.results || []).map(row => [String(row.task_key), row]));
+    const savedEdits = cleanEdits.map(edit => {
+      const row = savedByTask.get(edit.taskKey);
+      return row ? { taskName:String(row.task_name || edit.taskName), state:String(row.state), note:String(row.note || ''), updatedAt:Number(row.updated_at) || 0, deviceId:String(row.device_id || '') } : null;
+    }).filter(Boolean);
+    if (savedEdits.length !== cleanEdits.length) {
+      return jsonResponse({ code:'SAVE_ACK_INCOMPLETE', retryable:true, message:'The save completed but the server could not confirm every affected task. Your edits remain queued for verification.' },503);
+    }
+    const revision = await getCharacterStorageState(env);
+    return jsonResponse({ metadata:{ id:requestedId, updatedAt:Number(revision?.updated_at) || now, revision:Number(revision?.revision) || 0, character:owner.character_name }, character:owner.character_name, edits:savedEdits });
+  } catch (error) {
+    const message = String(error?.message || error).slice(0,300);
+    const retryable = /busy|locked|timeout|temporar|network|overload|unavailable/i.test(message);
+    return jsonResponse({ code: retryable ? 'DATABASE_TEMPORARY_FAILURE' : 'DATABASE_WRITE_FAILURE', retryable, message:`Character progress could not be written: ${message}` }, retryable ? 503 : 500);
+  }
 }

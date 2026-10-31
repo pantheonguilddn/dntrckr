@@ -1,5 +1,6 @@
 import { jsonResponse, requireAdmin, storeRecord } from '../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../_utils/compact.js';
+import { isCharacterStorageMigrationBusy } from '../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const MAX_ACTIVITIES = 100;
@@ -54,6 +55,7 @@ export async function onRequestGet(context) {
 export async function onRequestPut(context) {
   const denied = await requireAdmin(context);
   if (denied) return denied;
+  if (await isCharacterStorageMigrationBusy(context.env)) return jsonResponse({ code:'CHARACTER_STORAGE_MIGRATION_BUSY', retryable:true, error:'Guild settings are temporarily read-only while player storage is being migrated.' }, 503);
   let body;
   try { body = await context.request.json(); } catch (_) { return jsonResponse({ error: 'Expected a JSON request body.' }, 400); }
   if (!Array.isArray(body.activities) || body.activities.length < 1 || body.activities.length > MAX_ACTIVITIES) {
