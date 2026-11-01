@@ -25,6 +25,8 @@ function memberProjection(member) {
     color: /^#[0-9a-f]{6}$/i.test(String(member.color || '')) ? String(member.color).toLowerCase() : '#7aa2f7',
     profileConfirmedDiscordId: String(member.profileConfirmedDiscordId || ''),
     profileConfirmedAt: Number(member.profileConfirmedAt) || 0,
+    ledgerAccess: member.ledgerAccess === true,
+    isBootstrapPersonalOwner: member.isBootstrapPersonalOwner === true,
     characters: names.map(name => {
       const profile = byName.get(key(name)) || {};
       return {
@@ -91,27 +93,30 @@ export function resolveDiscordOwnerMember(session, existingMembers) {
   const discordId = String(session?.discordId || '').trim();
   const personalOwnerName = session?.isBootstrapAdmin === true ? String(session?.personalOwnerName || '').trim() : '';
 
-  if (personalOwnerName) {
-    const preferred = uniqueMemberForCandidate(members, personalOwnerName);
-    if (!preferred) return null;
-    const linkedDiscordId = String(preferred?.profileConfirmedDiscordId || '').trim();
-    // Never take over a roster explicitly confirmed to a different Discord account.
-    if (linkedDiscordId && linkedDiscordId !== discordId) return null;
-    return preferred;
-  }
-
+  // A confirmed Discord ID is the durable owner link. Resolve it before the bootstrap
+  // personal-owner name because members are now allowed to change their Pantheon name.
   if (discordId) {
     const confirmed = members.filter(member => String(member?.profileConfirmedDiscordId || '').trim() === discordId);
     if (confirmed.length === 1) return confirmed[0];
     if (confirmed.length > 1) {
-      // Legacy duplicate links are disambiguated by a unique allowlist label/username.
-      // Do not treat the administrator role itself as another owner identity.
-      for (const candidate of candidatesFor(session)) {
+      // A duplicate legacy link can be disambiguated only while one old identity label
+      // still points to exactly one linked record; otherwise fail closed.
+      for (const candidate of [personalOwnerName, ...candidatesFor(session)].filter(Boolean)) {
         const preferred = uniqueMemberForCandidate(confirmed, candidate);
         if (preferred) return preferred;
       }
       return null;
     }
+  }
+
+  // Before a first confirmed link exists, the configured bootstrap roster name is
+  // still the safe fallback. The first successful self-service rename confirms the ID.
+  if (personalOwnerName) {
+    const preferred = uniqueMemberForCandidate(members, personalOwnerName);
+    if (!preferred) return null;
+    const linkedDiscordId = String(preferred?.profileConfirmedDiscordId || '').trim();
+    if (linkedDiscordId && linkedDiscordId !== discordId) return null;
+    return preferred;
   }
 
   for (const candidate of candidatesFor(session)) {
@@ -147,6 +152,10 @@ export function repairBootstrapAdminOwnerLinks(record, session) {
   let changed = false;
   for (const member of members) {
     if (member === owner) {
+      if (member.isBootstrapPersonalOwner !== true) {
+        member.isBootstrapPersonalOwner = true;
+        changed = true;
+      }
       if (String(member.profileConfirmedDiscordId || '').trim() !== discordId) {
         member.profileConfirmedDiscordId = discordId;
         member.profileConfirmedAt = now;
@@ -283,6 +292,12 @@ export function registrationWriteViolation(previousRecord, nextRecord, session, 
     }
     if (change.oldMember && change.newMember && key(change.oldMember.name) !== key(change.newMember.name)) {
       return 'The owner name for a registered member is administrator-managed.';
+    }
+    if (change.oldMember && change.newMember && (change.oldMember.ledgerAccess === true) !== (change.newMember.ledgerAccess === true)) {
+      return 'Shared Ledger access is administrator-managed.';
+    }
+    if (change.oldMember && change.newMember && (change.oldMember.isBootstrapPersonalOwner === true) !== (change.newMember.isBootstrapPersonalOwner === true)) {
+      return 'The bootstrap personal-owner link is administrator-managed.';
     }
     if (change.oldMember && change.newMember && String(change.oldMember.trackerRosterId || '') !== String(change.newMember.trackerRosterId || '')) {
       return 'Tracker roster links are administrator-managed. Ask an administrator to repair your roster link if it is incorrect.';

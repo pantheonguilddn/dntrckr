@@ -12,7 +12,7 @@ function hasLedgerAccess(session, record) {
   const candidates = [session.label, session.username].map(normalizeOwner).filter(Boolean);
   const members = Array.isArray(record?.settings?.memberDirectory) ? record.settings.memberDirectory : [];
   const confirmedOwner = resolveDiscordOwnerMember(session, members);
-  if (confirmedOwner && LEDGER_OWNER_NAMES.has(normalizeOwner(confirmedOwner.name))) return true;
+  if (confirmedOwner && (confirmedOwner.ledgerAccess === true || LEDGER_OWNER_NAMES.has(normalizeOwner(confirmedOwner.name)))) return true;
   for (const candidate of candidates) {
     if (!LEDGER_OWNER_NAMES.has(candidate)) continue;
     const matchingMember = members.find(member => normalizeOwner(member?.name) === candidate);

@@ -1,6 +1,6 @@
 import { jsonResponse, requireAdmin } from '../../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../_utils/compact.js';
-import { repairBootstrapAdminOwnerLinks } from '../../../_utils/registration-guard.js';
+import { repairBootstrapAdminOwnerLinks, resolveDiscordOwnerMember } from '../../../_utils/registration-guard.js';
 import {
   bumpCharacterStorageRevision,
   characterKey,
@@ -92,7 +92,10 @@ async function buildAudit(env, record, session) {
       if (!characterOwners.has(character.characterKey)) characterOwners.set(character.characterKey, []);
       characterOwners.get(character.characterKey).push({ memberId, name, characterName: character.name });
     }
-    return { memberId, name, discordId, characters };
+    return { memberId, name, discordId, characters,
+      isBootstrapPersonalOwner: member?.isBootstrapPersonalOwner === true,
+      ledgerAccess: member?.ledgerAccess === true
+    };
   }).filter(member => member.memberId && member.name);
 
   const members = parsedMembers.map(member => {
@@ -124,10 +127,12 @@ async function buildAudit(env, record, session) {
     } else if (String(env?.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim() &&
                member.discordId &&
                member.discordId === String(env.BOOTSTRAP_ADMIN_DISCORD_ID).trim() &&
+               !member.isBootstrapPersonalOwner &&
                labelKey(member.name) !== labelKey(String(env?.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho'))) {
       issueCode = 'bootstrap-admin-id-on-wrong-owner';
       issueLabel = `Administrator identity is linked to the wrong owner (expected ${String(env?.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho').trim()})`;
-    } else if (labelKey(member.name) === labelKey(String(env?.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho')) &&
+    } else if (!member.isBootstrapPersonalOwner &&
+               labelKey(member.name) === labelKey(String(env?.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho')) &&
                String(env?.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim() &&
                member.discordId &&
                member.discordId !== String(env.BOOTSTRAP_ADMIN_DISCORD_ID).trim()) {
@@ -150,7 +155,7 @@ async function buildAudit(env, record, session) {
     const linkOptions = enabledAccounts.filter(account => {
       const linkedElsewhere = (idOwners.get(account.discordId) || []).some(owner => owner.memberId !== member.memberId);
       if (linkedElsewhere) return false;
-      if (bootstrapAdminId && account.discordId === bootstrapAdminId && labelKey(member.name) !== labelKey(personalOwnerName)) return false;
+      if (bootstrapAdminId && account.discordId === bootstrapAdminId && !member.isBootstrapPersonalOwner && member.discordId !== bootstrapAdminId && labelKey(member.name) !== labelKey(personalOwnerName)) return false;
       return true;
     });
 
@@ -306,12 +311,21 @@ export async function onRequestPost(context) {
       if (session.isBootstrapAdmin !== true) return jsonResponse({ error:'Only the configured bootstrap administrator can repair its personal-owner identity link.' }, 403);
       const result = await commitMemberDirectoryChange(context.env, session, (record, _member, members) => {
         const personalName = String(context.env.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || session.personalOwnerName || 'Cho').trim();
-        const matches = members.filter(member => labelKey(member.name) === labelKey(personalName));
-        if (matches.length !== 1) throw new Error(`The configured personal owner (${personalName}) does not match exactly one Member Roster entry.`);
-        const currentId = String(matches[0].profileConfirmedDiscordId || '').trim();
-        if (currentId && currentId !== String(session.discordId)) throw new Error(`The configured personal owner (${personalName}) is already linked to a different Discord account. No identity was changed.`);
+        const marked = members.filter(member => member.isBootstrapPersonalOwner === true);
+        const byConfiguredName = members.filter(member => labelKey(member.name) === labelKey(personalName));
+        const resolvedById = resolveDiscordOwnerMember(session, members);
+        const owner = marked.length === 1
+          ? marked[0]
+          : marked.length > 1
+            ? null
+            : byConfiguredName.length === 1 && (!resolvedById || ownerIdOf(resolvedById) === ownerIdOf(byConfiguredName[0]))
+              ? byConfiguredName[0]
+              : null;
+        if (!owner) throw new Error(`The bootstrap personal owner could not be resolved uniquely. Check the configured first-link name (${personalName}) and ownership audit.`);
+        const currentId = String(owner.profileConfirmedDiscordId || '').trim();
+        if (currentId && currentId !== String(session.discordId)) throw new Error('The bootstrap personal owner is already linked to a different Discord account. No identity was changed.');
         const changed = repairBootstrapAdminOwnerLinks(record, session);
-        if (String(matches[0].profileConfirmedDiscordId || '').trim() !== String(session.discordId)) throw new Error('The bootstrap Discord identity could not be safely assigned to the configured personal owner.');
+        if (String(owner.profileConfirmedDiscordId || '').trim() !== String(session.discordId) || owner.isBootstrapPersonalOwner !== true) throw new Error('The bootstrap Discord identity could not be safely assigned to the personal owner.');
         return changed;
       }, 'repair-bootstrap-admin-owner-links', { personalOwnerName:String(context.env.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || session.personalOwnerName || 'Cho') });
       return jsonResponse({ ok:true, action, changed:result.changed });
@@ -326,7 +340,7 @@ export async function onRequestPost(context) {
         const bootstrapId = String(context.env.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim();
         const bootstrapPersonalOwner = String(context.env.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho').trim();
         const isBootstrapIdentity = !!bootstrapId && currentId === bootstrapId;
-        const isConfiguredPersonalOwner = labelKey(member.name) === labelKey(bootstrapPersonalOwner);
+        const isConfiguredPersonalOwner = member.isBootstrapPersonalOwner === true || labelKey(member.name) === labelKey(bootstrapPersonalOwner);
         if (isBootstrapIdentity && isConfiguredPersonalOwner) {
           throw new Error('The bootstrap administrator personal-owner link cannot be cleared. Keep it on the configured personal roster.');
         }
@@ -353,9 +367,13 @@ export async function onRequestPost(context) {
       if (bootstrapId && discordId === bootstrapId) {
         const { record } = await readMainRecord(context.env);
         const owner = arr(record.settings.memberDirectory).find(item => ownerIdOf(item) === memberId);
-        if (!owner || labelKey(owner.name) !== labelKey(personalOwner)) return jsonResponse({ error:`The bootstrap administrator Discord account must remain linked to its configured personal owner (${personalOwner}).` }, 403);
+        if (!owner || !(owner.isBootstrapPersonalOwner === true || labelKey(owner.name) === labelKey(personalOwner))) return jsonResponse({ error:`The bootstrap administrator Discord account must remain linked to its configured personal owner (${personalOwner}).` }, 403);
       }
       const result = await commitMemberDirectoryChange(context.env, session, (record, member, members) => {
+        const bootstrapIdForLink = String(context.env.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim();
+        if (member.isBootstrapPersonalOwner === true && discordId !== bootstrapIdForLink) {
+          throw new Error('The configured bootstrap personal owner must remain linked to the bootstrap administrator Discord account.');
+        }
         const existing = members.filter(other => ownerIdOf(other) !== memberId && String(other.profileConfirmedDiscordId || '').trim() === discordId);
         if (existing.length) {
           throw new Error(`That Discord account is already linked to ${existing.map(item => cleanName(item.name)).join(', ')}. Clear the duplicate link on the incorrect roster entry first.`);
@@ -363,6 +381,7 @@ export async function onRequestPost(context) {
         if (String(member.profileConfirmedDiscordId || '').trim() === discordId) return false;
         member.profileConfirmedDiscordId = discordId;
         member.profileConfirmedAt = Date.now();
+        if (discordId === String(context.env.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim()) member.isBootstrapPersonalOwner = true;
         return true;
       }, 'link-member-roster-owner-discord-id', { memberId, discordId, accountLabel:String(allowed.label || '') });
       return jsonResponse({ ok:true, action, changed:result.changed, memberId, discordId });

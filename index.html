@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r51</title>
+    <title>Pantheon Tools v1.6.8-r53</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1649,7 +1649,7 @@
             background:var(--pt-surface-soft); color:var(--pt-text); font:inherit; font-size:.62rem;
             font-weight:850; line-height:1.2; text-decoration:none; white-space:nowrap; cursor:pointer;
         }
-        .overview-profile-actions a[hidden] { display:none !important; }
+        .overview-profile-actions a[hidden], .overview-profile-actions button[hidden] { display:none !important; }
         .overview-profile-actions button:hover, .overview-profile-actions a:hover { border-color:var(--pt-accent); background:var(--pt-hover); }
         @media(max-width:760px) { .overview-profile-chip { align-items:center; } .overview-profile-actions { margin-left:auto; } }
         @media(max-width:520px) { .overview-profile-chip { gap:8px; } .overview-profile-actions { flex-basis:100%; justify-content:flex-end; } }
@@ -2869,6 +2869,98 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   .controls .roster-filter-top { width:auto !important; min-width:0 !important; max-width:none !important; flex:1 1 130px !important; }
 }
 </style>
+
+
+<style id="pantheon-r53-stable-topbar">
+/* Keep the player/navigation controls together. When the available width is too
+   small, scroll the complete row horizontally instead of wrapping individual
+   selects or dropping the help control below them. */
+.controls .topbar-player {
+  display:flex !important;
+  flex-flow:row nowrap !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:clamp(4px, .55vw, 8px) !important;
+  flex:1 1 560px !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:var(--pt-border) transparent;
+  padding:2px 1px 5px !important;
+}
+.controls .topbar-player > * {
+  flex-shrink:0 !important;
+  align-self:center !important;
+  white-space:nowrap !important;
+  margin-block:0 !important;
+}
+.controls .topbar-player #user-identity {
+  flex:0 0 168px !important;
+  width:168px !important;
+  min-width:168px !important;
+  max-width:168px !important;
+  height:36px !important;
+  min-height:36px !important;
+  box-sizing:border-box !important;
+}
+.controls .topbar-player #mode-toggle-btn {
+  flex:0 0 auto !important;
+  min-height:36px !important;
+  height:36px !important;
+}
+.controls .topbar-player #admin-view-toggle-btn {
+  flex:0 0 62px !important;
+  width:62px !important;
+  min-width:62px !important;
+  height:31px !important;
+  min-height:31px !important;
+  justify-content:space-between !important;
+  box-sizing:border-box !important;
+}
+.controls .topbar-player #roster-filter {
+  flex:0 0 148px !important;
+  width:148px !important;
+  min-width:148px !important;
+  max-width:148px !important;
+  height:36px !important;
+  min-height:36px !important;
+  box-sizing:border-box !important;
+}
+.controls .topbar-player > .mini-help {
+  position:sticky !important;
+  right:0 !important;
+  z-index:4 !important;
+  flex:0 0 24px !important;
+  width:24px !important;
+  min-width:24px !important;
+  max-width:24px !important;
+  height:24px !important;
+  min-height:24px !important;
+  margin-left:0 !important;
+  align-self:center !important;
+  background:var(--pt-surface-soft, #24242d) !important;
+  box-shadow:-7px 0 9px -7px rgba(0,0,0,.45);
+}
+.controls .topbar-player::-webkit-scrollbar { height:4px; }
+.controls .topbar-player::-webkit-scrollbar-track { background:transparent; }
+.controls .topbar-player::-webkit-scrollbar-thumb { background:var(--pt-border); border-radius:99px; }
+@media (max-width:760px) {
+  .controls .topbar-player {
+    flex:1 1 100% !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    justify-content:flex-start !important;
+  }
+}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2994,6 +3086,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <div class="overview-avatar" id="overview-avatar" aria-hidden="true">P</div>
                     <div class="overview-profile-copy"><div class="overview-profile-name" id="overview-profile-name">Pantheon Member</div><div class="overview-profile-sub" id="overview-profile-sub">Discord account · Member</div></div>
                     <div class="overview-profile-actions">
+                        <button type="button" id="overview-edit-name" onclick="editOwnDisplayName()" title="Change the name shown for your Pantheon roster" hidden>Change Name</button>
                         <a href="/admin.html" id="overview-admin-link" hidden>Admin</a>
                         <button type="button" id="overview-signout" class="overview-signout">Log out</button>
                     </div>
@@ -3313,9 +3406,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r51</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r53</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r51:</strong> Adds an administrator-only Player Ownership Audit to identify missing Discord confirmations, duplicate account links, duplicate character IGNs, and stale ownership indexes. Administrators can explicitly repair verified account links without moving or deleting character progress. The existing player-storage migration is not rerun.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r53:</strong> Admin View now changes permissions without changing your current page or Personal/Universal selection. Members can also choose their own Pantheon display name from the Overview account card. Their Discord link, roster, characters, and tracker progress stay attached.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4228,6 +4321,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let pantheonDiscordUser = null;
         let discordIdentityMatchStatus = 'pending';
         let adminViewAsMemberId = '';
+        let adminViewAsReturnState = null;
         // Admin access is separate from the current working mode. Every page load starts
         // in the account's own Personal View; the administrator must opt in explicitly.
         let adminModeEnabled = false;
@@ -4415,7 +4509,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     color: normalizeColor(member?.color),
                     note: String(member?.note || '').trim().slice(0, 160),
                     profileConfirmedDiscordId: String(member?.profileConfirmedDiscordId || ''),
-                    profileConfirmedAt: Number(member?.profileConfirmedAt) || 0
+                    profileConfirmedAt: Number(member?.profileConfirmedAt) || 0,
+                    ledgerAccess: member?.ledgerAccess === true,
+                    isBootstrapPersonalOwner: member?.isBootstrapPersonalOwner === true
                 };
             }).filter(Boolean);
         }
@@ -4534,7 +4630,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 toggle.setAttribute('aria-pressed', String(active));
                 toggle.setAttribute('aria-checked', String(active));
                 toggle.title = active
-                    ? `Admin View is on. Switch off to return to ${personalName}’s Personal View.`
+                    ? `Admin View is on. Switch off to restore regular member permissions. Your current page and tracker view will stay selected.`
                     : 'Admin View is off. Switch on to enable administrator tools and guild-wide editing.';
             }
             const menuToggle = document.getElementById('menu-toggle');
@@ -4561,6 +4657,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 personalToggle.classList.toggle('personal-active', !!isPersonalView);
                 personalToggle.disabled = isAdminViewAsActive();
             }
+            const editNameButton = document.getElementById('overview-edit-name');
+            if (editNameButton) editNameButton.hidden = !getAuthenticatedMemberDirectoryEntry() || isAdminViewAsActive();
             if (!active) document.body.classList.remove('drawer-open');
         }
         async function toggleAdminView() {
@@ -4573,7 +4671,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (turningOff && Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
                     await flushPendingCellWrites();
                     if (Object.keys(pendingCellWrites || {}).length) {
-                        alert('Admin View remains enabled because one or more character edits are not yet confirmed by the server. Use Sync Changes and retry before returning to your personal Tracker.');
+                        alert('Admin View remains enabled because one or more character edits are not yet confirmed by the server. Use Sync Changes and retry before turning Admin View off. Your current page and tracker view will be preserved.');
                         return;
                     }
                 }
@@ -4594,21 +4692,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 adminModeEnabled = false;
                 adminViewAsMemberId = '';
                 clearAdminPreviewReadOnly();
-                applyDiscordIdentityDefaults();
-                const mode = document.getElementById('mode-toggle-btn');
-                if (mode) { mode.textContent = '👤 Personal View'; mode.classList.add('personal-active'); }
-                setStatus(`🟢 Returned to ${getCurrentOwnerName() || 'your'} · Personal View. Other members’ trackers are read-only.`);
+                // Turning off administrator permissions must not change the selected
+                // Personal/Universal filter or navigate away from the current page.
+                const viewLabel = isPersonalView ? 'Personal View' : 'Universal View';
+                setStatus(`🟢 Admin View disabled · ${viewLabel} remains selected. Other members’ trackers are read-only.`);
             } else {
                 adminModeEnabled = true;
                 adminViewAsMemberId = '';
                 clearAdminPreviewReadOnly();
-                isPersonalView = false;
-                const mode = document.getElementById('mode-toggle-btn');
-                const filter = document.getElementById('roster-filter');
-                if (mode) { mode.textContent = '🌍 Universal View'; mode.classList.remove('personal-active'); }
-                if (filter) { filter.value = 'all'; filter.disabled = false; }
-                activeRosterFilter = 'all';
-                setStatus('🟡 Admin View enabled. Guild-wide edits are now available.');
+                // Permission mode and tracker view are independent. Preserve the current
+                // filter exactly as the member selected it before enabling Admin View.
+                setStatus('🟡 Admin View enabled. Current page and tracker view are unchanged.');
             }
             updateAdminModeUI();
             syncDataStructures();
@@ -4623,7 +4717,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const confirmed = await flushPendingCellWrites();
                 if (!confirmed) setStatus('🟠 Admin View is active · some saved edits remain queued until the server confirms them.');
             }
-            if (turningOff && typeof showAppPage === 'function') showAppPage('tracker');
         }
         function ownerCandidateNames() {
             return [pantheonDiscordUser?.personalOwnerName, pantheonDiscordUser?.label, pantheonDiscordUser?.username]
@@ -4639,27 +4732,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return close.length === 1 ? close[0] : null;
         }
         function getAuthenticatedMemberDirectoryEntry(data = cloudData) {
-            // One Discord account owns one personal roster. The bootstrap admin's personal
-            // roster (Cho by default) is separate from the Admin permission toggle.
+            // The confirmed Discord ID is the durable link. Display names are editable
+            // and must never be required to keep a member attached to their roster.
             const entries = normalizeMemberDirectory(data?.settings?.memberDirectory);
             const discordId = String(pantheonDiscordUser?.id || '');
             const personalOwnerName = String(pantheonDiscordUser?.personalOwnerName || '').trim();
-            if (personalOwnerName) {
-                const preferred = uniqueMemberForIdentityCandidate(entries, personalOwnerName);
-                if (!preferred) return null;
-                const linkedId = String(preferred.profileConfirmedDiscordId || '');
-                return !linkedId || linkedId === discordId ? preferred : null;
-            }
             if (discordId) {
                 const linked = entries.filter(member => String(member.profileConfirmedDiscordId || '') === discordId);
                 if (linked.length === 1) return linked[0];
                 if (linked.length > 1) {
-                    for (const candidate of ownerCandidateNames()) {
+                    for (const candidate of [personalOwnerName, ...ownerCandidateNames()].filter(Boolean)) {
                         const preferred = uniqueMemberForIdentityCandidate(linked, candidate);
                         if (preferred) return preferred;
                     }
                     return null;
                 }
+            }
+            // Bootstrap name and Discord label are migration/first-link fallbacks only.
+            if (personalOwnerName) {
+                const preferred = uniqueMemberForIdentityCandidate(entries, personalOwnerName);
+                if (!preferred) return null;
+                const linkedId = String(preferred.profileConfirmedDiscordId || '');
+                return !linkedId || linkedId === discordId ? preferred : null;
             }
             for (const candidate of ownerCandidateNames()) {
                 const preferred = uniqueMemberForIdentityCandidate(entries, candidate);
@@ -4799,7 +4893,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const confirmed = entries.filter(member => String(member.profileConfirmedDiscordId || '') === discordId);
             const linked = confirmed.length === 1 ? confirmed[0] : getAuthenticatedMemberDirectoryEntry();
             const linkedId = String(linked?.profileConfirmedDiscordId || '');
-            const canSee = !!linked && allowed.has(identityCompactKey(linked.name || '')) && (!linkedId || linkedId === discordId);
+            const canSee = !!linked && (linked.ledgerAccess === true || allowed.has(identityCompactKey(linked.name || ''))) && (!linkedId || linkedId === discordId);
             const button = document.getElementById('btn-ledger');
             const overviewWidget = document.getElementById('overview-ledger-widget');
             const modal = document.getElementById('scholar-modal');
@@ -5013,26 +5107,26 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const personalOwnerName = String(user?.personalOwnerName || '').trim();
             const rosterForMember = member => eligibleRosters.find(roster => roster.id === member.trackerRosterId)
                 || eligibleRosters.find(roster => identityMatchKey(roster.name) === identityMatchKey(member.name));
-            // The bootstrap admin is still one Discord identity: Cho is the canonical
-            // personal owner, while Admin View is enabled only through its explicit toggle.
+            // A confirmed Discord ID survives a user's custom Pantheon display-name change.
+            if (discordId) {
+                const confirmed = members.filter(member => String(member.profileConfirmedDiscordId || '').trim() === discordId);
+                if (confirmed.length === 1) return rosterForMember(confirmed[0]) || null;
+                if (confirmed.length > 1) {
+                    for (const candidate of [personalOwnerName, user?.label, user?.username].map(value => String(value || '').trim()).filter(Boolean)) {
+                        const preferred = uniqueMemberForIdentityCandidate(confirmed, candidate);
+                        if (preferred) return rosterForMember(preferred) || null;
+                    }
+                    return null;
+                }
+            }
+            // The bootstrap owner name is only a first-link fallback; after the stable
+            // Discord ID is confirmed, the user may freely choose a different display name.
             if (personalOwnerName) {
                 const personal = uniqueMemberForIdentityCandidate(members, personalOwnerName);
                 if (!personal) return null;
                 const linkedId = String(personal.profileConfirmedDiscordId || '').trim();
                 if (linkedId && linkedId !== discordId) return null;
                 return rosterForMember(personal) || null;
-            }
-            // The confirmed Discord ID is the canonical identity for ordinary accounts.
-            if (discordId) {
-                const confirmed = members.filter(member => String(member.profileConfirmedDiscordId || '').trim() === discordId);
-                if (confirmed.length === 1) return rosterForMember(confirmed[0]) || null;
-                if (confirmed.length > 1) {
-                    for (const candidate of [user?.label, user?.username].map(value => String(value || '').trim()).filter(Boolean)) {
-                        const preferred = uniqueMemberForIdentityCandidate(confirmed, candidate);
-                        if (preferred) return rosterForMember(preferred) || null;
-                    }
-                    return null;
-                }
             }
             // Legacy fallback applies only when no confirmed Discord-ID link exists.
             const profileName = String(user?.username || '').trim();
@@ -7110,11 +7204,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function updateOverviewProfile(user) {
-            const name = String(user?.label || user?.username || user?.global_name || 'Pantheon Member').trim() || 'Pantheon Member';
+            const discordName = String(user?.label || user?.username || user?.global_name || 'Discord member').trim() || 'Discord member';
+            const linkedMember = getAuthenticatedMemberDirectoryEntry();
+            const name = String(linkedMember?.name || discordName || 'Pantheon Member').trim() || 'Pantheon Member';
             const nameEl = document.getElementById('overview-profile-name');
             const avatarEl = document.getElementById('overview-avatar');
             const subEl = document.getElementById('overview-profile-sub');
+            const editNameButton = document.getElementById('overview-edit-name');
             if (nameEl) nameEl.textContent = name;
+            if (editNameButton) editNameButton.hidden = !linkedMember || isAdminViewAsActive();
             if (avatarEl) {
                 const url = discordAvatarUrl(user, 96);
                 if (url) avatarEl.innerHTML = `<img class="overview-avatar-image" src="${escapeHTML(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent='${escapeHTML((name.match(/[A-Za-z0-9]/)?.[0] || 'P').toUpperCase())}'">`;
@@ -7139,11 +7237,72 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (menuToggle) menuToggle.hidden = !isAdminModeActive();
             if (drawer) drawer.hidden = !isAdminModeActive();
             if (scrim) scrim.hidden = !isAdminModeActive();
-            if (subEl) { const ownerLabel = String(getAuthenticatedMemberDirectoryEntry()?.name || 'Personal'); subEl.textContent = isAdmin ? (isAdminModeActive() ? 'Discord account · Admin View' : `Discord account · ${ownerLabel} Personal View · Admin access available`) : 'Discord account · Member'; }
+            if (subEl) {
+                const ownerLabel = String(linkedMember?.name || 'Personal');
+                subEl.textContent = isAdmin
+                    ? (isAdminModeActive() ? `Discord · ${discordName} · Admin View` : `Discord · ${discordName} · ${ownerLabel} Personal View · Admin access available`)
+                    : `Discord · ${discordName} · Member`;
+            }
             updateAdminModeUI();
             refreshLedgerVisibility();
             updateOverviewEventNotice();
         }
+        async function editOwnDisplayName() {
+            const member = getAuthenticatedMemberDirectoryEntry();
+            if (!member || !pantheonDiscordUser?.id) {
+                alert('Your Discord account is not linked to one unique Pantheon roster. Ask an administrator to resolve the link first.');
+                return;
+            }
+            if (isAdminViewAsActive()) return;
+            const entered = prompt('Choose the name shown for your Pantheon roster. This does not change your Discord username. Use 1 to 30 characters.', member.name);
+            if (entered === null) return;
+            const displayName = String(entered).normalize('NFKC').replace(/[\u0000-\u001f\u007f]/g, '').trim();
+            if (!displayName) { alert('Your Pantheon display name cannot be empty.'); return; }
+            if ([...displayName].length > 30) { alert('Your Pantheon display name must be 30 characters or fewer.'); return; }
+            if (displayName.toLocaleLowerCase() === String(member.name || '').normalize('NFKC').trim().toLocaleLowerCase()) return;
+
+            const button = document.getElementById('overview-edit-name');
+            const previousLabel = button?.textContent || 'Change Name';
+            if (button) { button.disabled = true; button.textContent = 'Saving…'; }
+            try {
+                const response = await fetch('/api/profile/name', {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ displayName })
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || result.ok !== true) throw new Error(result.error || `Name update failed (${response.status}).`);
+
+                const updatedDirectory = normalizeMemberDirectory(cloudData.settings?.memberDirectory);
+                const storedMember = updatedDirectory.find(item => item.id === result.memberId);
+                if (!storedMember) throw new Error('The server saved the name, but this page could not match the updated roster. Refresh the page to load it.');
+                storedMember.name = result.displayName;
+                cloudData.settings.memberDirectory = updatedDirectory;
+                const storedRoster = (cloudData.settings.rosters || []).find(item => item.id === result.trackerRosterId);
+                if (storedRoster) storedRoster.name = result.displayName;
+                cloudData.settings.memberDirectoryUpdatedAt = Number(result.updatedAt) || Date.now();
+                cloudData.settings.rosterUpdatedAt = Number(result.updatedAt) || Date.now();
+                cloudData.settings.memberDirectoryUpdatedBy = String(pantheonDiscordUser.id);
+                cloudData.settings.rosterUpdatedBy = String(pantheonDiscordUser.id);
+                if (Number.isFinite(Number(result.memberRosterMasterVersion))) cloudData.settings.memberRosterMasterVersion = Number(result.memberRosterMasterVersion);
+                persistLocalData();
+                updateFilterDropdown();
+                syncDataStructures();
+                refreshTrackerUI();
+                renderOverviewActivity();
+                renderAnalytics();
+                renderTeamBuilder();
+                updateOverviewProfile(pantheonDiscordUser);
+                setStatus(result.indexWarning ? `🟠 Name updated. Player index refresh needs attention: ${result.indexWarning}` : `🟢 Your Pantheon name is now ${result.displayName}. Your Discord link and characters are unchanged.`);
+            } catch (error) {
+                alert(String(error?.message || error));
+            } finally {
+                if (button) { button.disabled = false; button.textContent = previousLabel; }
+                updateOverviewProfile(pantheonDiscordUser);
+            }
+        }
+
         function updateOverviewStatusCards() {
             const getText = id => document.getElementById(id)?.textContent || '';
             const syncLabel = getText('sync-status').trim();
@@ -8038,6 +8197,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             closeModal('admin-view-as-modal');
             ['weights-modal','class-setup-modal','role-config-modal','roster-modal','dungeon-modal','rateup-events-modal','version-history-modal'].forEach(closeModal);
             adminViewOriginalTheme = localStorage.getItem('pantheon-theme-choice-v1') || document.documentElement.getAttribute('data-pantheon-theme') || 'dark';
+            adminViewAsReturnState = {
+                isPersonalView: !!isPersonalView,
+                filterValue: String(document.getElementById('roster-filter')?.value || activeRosterFilter || 'all'),
+                activeRosterFilter: String(activeRosterFilter || 'all')
+            };
             adminViewAsMemberId = member.id;
             adminViewThemeChoice = document.getElementById('admin-view-as-theme-select').value;
             setPreviewTheme(adminViewThemeChoice === 'current' ? adminViewOriginalTheme : adminViewThemeChoice);
@@ -8054,17 +8218,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function exitAdminViewAs() {
             if (!isAdminModeActive()) return;
+            const returnState = adminViewAsReturnState;
+            adminViewAsReturnState = null;
             adminViewAsMemberId = '';
             adminViewThemeChoice = '';
             clearAdminPreviewReadOnly();
             setPreviewTheme(localStorage.getItem('pantheon-theme-choice-v1') || adminViewOriginalTheme || 'dark');
+            if (returnState) {
+                isPersonalView = returnState.isPersonalView === true;
+                const filter = document.getElementById('roster-filter');
+                if (filter) {
+                    filter.value = returnState.filterValue || (isPersonalView ? (localStorage.getItem(IDENTITY_KEY) || 'all') : 'all');
+                    filter.disabled = isPersonalView;
+                }
+                activeRosterFilter = returnState.activeRosterFilter || returnState.filterValue || 'all';
+            }
             updateFilterDropdown();
             syncDataStructures();
             refreshTrackerUI();
             renderOverviewActivity();
             renderAnalytics();
             renderTeamBuilder();
-            setStatus('🟢 Returned to administrator view.');
+            setStatus('🟢 Returned to the administrator’s previous page and tracker view.');
         }
         document.addEventListener('click', event => {
             if (!isAdminViewAsActive()) return;
@@ -10631,7 +10806,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r51';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r53';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -11349,7 +11524,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r51';
+  const CURRENT_BUILD = '1.6.8-r53';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
