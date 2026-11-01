@@ -118,14 +118,14 @@ export function buildCharacterIndex(record) {
   return { characters: [...charOwners.values()], tasks: [...tasks.entries()].map(([key, name]) => ({ taskKey: key, taskName: name })), duplicateCharacters: [...new Set(duplicateCharacters)], unlinkedCharacters: [...new Set(unlinkedCharacters)] };
 }
 
-export async function syncCharacterIndexes(env, record, now = Date.now()) {
+export async function syncCharacterIndexes(env, record, now = Date.now(), force = false) {
   const { characters, tasks, duplicateCharacters, unlinkedCharacters } = buildCharacterIndex(record);
   const directorySignature = JSON.stringify({
     characters: characters.map(item => [item.characterKey,item.characterName,item.memberId,item.ownerName,item.ownerDiscordId,item.trackerEnabled,item.active]).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))),
     tasks: tasks.map(item => [item.taskKey,item.taskName]).sort((a,b)=>String(a[0]).localeCompare(String(b[0])))
   });
   const meta = await env.PANTHEON_DB.prepare('SELECT directory_signature FROM tracker_storage_meta WHERE id = 1 LIMIT 1').first();
-  if (String(meta?.directory_signature || '') === directorySignature) {
+  if (!force && String(meta?.directory_signature || '') === directorySignature) {
     return { characterCount: characters.length, taskCount: tasks.length, duplicateCharacters, unlinkedCharacters, unchanged:true };
   }
 

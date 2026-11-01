@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Tools · Admin Console · r49</title>
+<title>Pantheon Tools · Admin Console · r51</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1020;--surface:#111a2d;--surface2:#1b2742;--border:#2a3857;--text:#eef2ff;--muted:#a7b4d0;--accent:#8d9aff;--good:#57d6a4;--danger:#ff8796}
 :root[data-pantheon-theme="light"]{color-scheme:light;--bg:#f4f6fb;--surface:#fff;--surface2:#e9eef7;--border:#cfd7e5;--text:#1a2230;--muted:#4d5a70;--accent:#465acb;--good:#087e65;--danger:#b93852}
@@ -139,6 +139,27 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
 @media(max-width:480px){.activity-reference-summary{padding:10px}.activity-reference-card-body{padding:0 10px 10px}.activity-reference-card-head{grid-template-columns:minmax(0,1fr) auto}.activity-reference-fields{grid-template-columns:1fr}.activity-reference-fields .wide,.activity-reference-fields .full{grid-column:1/-1}}
 </style>
 
+
+<style>
+.owner-audit-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin:12px 0}
+.owner-audit-stat{padding:11px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)}
+.owner-audit-stat strong{display:block;font-size:19px;line-height:1.25;color:var(--text)}
+.owner-audit-stat small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.owner-audit-card{display:grid;gap:10px;border:1px solid var(--border);border-radius:11px;padding:13px;background:var(--surface2)}
+.owner-audit-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.owner-audit-name{font-size:12px;font-weight:850;color:var(--text)}
+.owner-audit-meta,.owner-audit-detail{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.owner-audit-badge{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:4px 8px;font-size:9px;font-weight:850;max-width:100%}
+.owner-audit-badge.good{color:var(--good)}.owner-audit-badge.warn{color:#e6b85c}.owner-audit-badge.bad{color:var(--danger)}
+.owner-audit-characters{display:flex;gap:6px;flex-wrap:wrap}
+.owner-audit-character{border:1px solid var(--border);border-radius:7px;padding:4px 7px;font-size:10px;color:var(--text);background:var(--surface)}
+.owner-audit-character small{display:block;color:var(--muted);font-size:9px}
+.owner-audit-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.owner-audit-controls select{min-width:min(360px,100%);max-width:100%;min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:11px}
+.owner-audit-issues{padding:9px 11px;border-radius:8px;border:1px solid var(--border);font-size:10px;color:var(--muted);line-height:1.55}
+@media(max-width:640px){.owner-audit-controls{align-items:stretch}.owner-audit-controls select,.owner-audit-controls button{width:100%}}
+</style>
+
 </head>
 <body>
 <main>
@@ -179,8 +200,17 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
     <div id="character-admin-status" class="character-admin-status hidden"></div>
     <div id="character-admin-list" class="list"></div>
   </section>
+  <section class="card" id="owner-audit-panel">
+    <h2>4. Player ownership audit</h2>
+    <p>Review which enabled Discord account owns each Member Roster entry. Characters and their progress are never moved by this audit. Linking an account only connects that Discord identity to the existing owner entry; duplicate links must be cleared deliberately.</p>
+    <div class="actions"><button class="btn" type="button" id="refresh-owner-audit">Refresh ownership audit</button><button class="btn" type="button" id="repair-bootstrap-owner-links" hidden>Repair my Admin / Personal identity link</button><button class="btn" type="button" id="refresh-owner-index">Rebuild ownership index</button></div>
+    <div id="owner-audit-status" class="status hidden"></div>
+    <div id="owner-audit-summary" class="owner-audit-summary"></div>
+    <div id="owner-audit-list" class="list"></div>
+    <p class="hint">A suggested account is based only on an exact allowlist-label match. It is never assigned automatically. For each unresolved owner, verify the person before linking their Discord account. If someone has not been added to the allowlist, add or enable their account above first.</p>
+  </section>
   <section class="card" id="activity-reference-panel">
-    <h2>4. Activity Reference &amp; Recommendation Data</h2>
+    <h2>5. Activity Reference &amp; Recommendation Data</h2>
     <p>Maintain the facts Activity Insights should use: weekly entries, milestone goals, party size, typical run time, service availability, materials, rewards, and practical advice. These profiles are stored in the shared Pantheon record and can be updated as the game changes. Keep the player-facing recommendation short and actionable.</p>
     <div class="activity-reference-meta">Save changes to publish them to the app. Import/export JSON to back up the reference or prepare a bulk update. A starter list based on the current guild notes is shown if no reference has been saved yet.</div>
     <div class="activity-reference-toolbar"><button class="btn primary" type="button" id="save-activity-reference">Save Activity Reference</button><button class="btn" type="button" id="refresh-activity-reference">Reload saved data</button><button class="btn" type="button" id="add-activity-reference">＋ Add activity</button><button class="btn" type="button" id="load-activity-reference-starter">Load starter list</button><button class="btn" type="button" id="export-activity-reference">Export JSON</button><button class="btn" type="button" id="import-activity-reference">Import JSON</button><input class="hidden" type="file" id="activity-reference-import-file" accept="application/json,.json"></div>
@@ -190,17 +220,19 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
     <div class="activity-reference-toolbar"><button class="btn primary" type="button" id="save-activity-reference-bottom">Save Activity Reference</button></div>
   </section>
   <section class="card">
-    <h2>5. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
+    <h2>6. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
     <form id="migration-form"><div class="grid"><label class="field">Existing main JSONBin ID<input id="old-bin-id" autocomplete="off" placeholder="Existing tracker Bin ID" required></label><label class="field">Existing JSONBin Master Key<input id="old-bin-key" type="password" autocomplete="off" placeholder="Used for this import only" required></label></div><label class="checkbox-line"><input type="checkbox" id="confirm-migration" required><span>I understand this imports the selected main record into Pantheon D1 and overwrites the new Pantheon main record if it already exists.</span></label><div class="actions"><button class="btn primary" type="submit">Import main record and revision journal</button></div></form>
     <div id="migration-status" class="status hidden"></div>
   </section>
   <section class="card">
-    <h2>6. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
+    <h2>7. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
   </section>
 </div>
 </main>
 <script>
 const $ = id => document.getElementById(id);
+let adminSessionState = null;
+let ownerAuditSnapshot = null;
 const ADMIN_JOBS = ["Adept", "Physician", "Gear Master", "Shooting Star", "Sniper", "Artillery", "Wind Walker", "Tempest", "Light Fury", "Abyss Walker", "Raven", "Ripper", "Saint", "Inquisitor", "Crusader", "Guardian", "Spirit Dancer", "Blade Dancer", "Dark Summoner", "Soul Eater", "Saleana", "Elestra", "Majesty", "Smasher", "Gladiator", "Moonlord", "Barbarian", "Destroyer", "Dark Avenger"];
 let adminCharacterMembers = [];
 
@@ -315,6 +347,121 @@ async function refreshCharacterAdmin(){
   try{const data=await api('/api/admin/characters');adminCharacterMembers=Array.isArray(data.members)?data.members:[];renderCharacterAdmin();setStatus('character-admin-status','Character registrations loaded. Changes are saved directly to the shared guild record.','ok');}
   catch(error){setStatus('character-admin-status',error.message,'error');}
 }
+
+function ownerAuditBadgeClass(code){
+  if(code==='linked'||code==='no-characters')return 'good';
+  if(code==='owner-index-out-of-date')return 'warn';
+  return 'bad';
+}
+function renderOwnerAudit(data){
+  ownerAuditSnapshot=data;
+  const counts=data.counts||{};
+  const summary=$('owner-audit-summary');
+  const stats=[
+    ['Members',counts.memberCount||0],
+    ['Registered characters',counts.characterCount||0],
+    ['Verified owner links',counts.linkedCharacters||0],
+    ['Unlinked characters',counts.unlinkedCharacterCount||0],
+    ['Owners without Discord confirmation',counts.ownersMissingDiscord||0],
+    ['Accounts not enabled',counts.ownersWithUnapprovedDiscord||0],
+    ['Duplicate Discord IDs',counts.duplicateDiscordIdCount||0],
+    ['Duplicate character IGNs',counts.duplicateCharacterNameCount||0],
+    ['Admin identity on wrong owner',counts.bootstrapIdentityOnWrongOwner||0],
+    ['Personal-owner ID mismatch',counts.bootstrapPersonalOwnerMismatch||0],
+    ['Stale ownership index',counts.ownersWithStaleIndex||0],
+    ['Legacy orphan characters',counts.legacyOrphanCharacterCount||0]
+  ];
+  summary.innerHTML=stats.map(([label,value])=>`<div class="owner-audit-stat"><strong>${Number(value)||0}</strong><small>${escapeHtml(label)}</small></div>`).join('');
+  const repairButton=$('repair-bootstrap-owner-links');
+  const personalName=String(data.bootstrapPersonalOwnerName||adminSessionState?.personalOwnerName||'Cho').trim().toLocaleLowerCase();
+  const personalMember=(data.members||[]).find(item=>String(item.memberName||'').trim().toLocaleLowerCase()===personalName);
+  const bootstrapId=String(data.bootstrapDiscordId||adminSessionState?.discordId||'');
+  const bootstrapLinkedElsewhere=(data.members||[]).some(item=>String(item.discordId||'')===bootstrapId&&String(item.memberId||'')!==String(personalMember?.memberId||''));
+  const personalOwnerHasDifferentId=!!String(personalMember?.discordId||'') && String(personalMember.discordId)!==bootstrapId;
+  const ownIdentityNeedsRepair=adminSessionState?.isBootstrapAdmin===true && !!personalMember && !personalOwnerHasDifferentId && String(personalMember.discordId||'')!==bootstrapId && (bootstrapLinkedElsewhere || !personalMember.discordId);
+  if(repairButton)repairButton.hidden=!ownIdentityNeedsRepair;
+  const list=$('owner-audit-list');
+  const members=[...(data.members||[])].sort((a,b)=>{
+    const rank=member=>member.issueCode==='linked'?3:member.issueCode==='owner-index-out-of-date'?2:0;
+    return rank(a)-rank(b)||String(a.memberName).localeCompare(String(b.memberName));
+  });
+  if(!members.length){list.innerHTML='<div class="owner-audit-issues">No Member Roster owners were found.</div>';return;}
+  list.innerHTML=members.map(member=>{
+    const discordText=member.discordId?`${escapeHtml(member.discordId)}${member.discordLabel?` · ${escapeHtml(member.discordLabel)}`:''}`:'No confirmed Discord ID';
+    const chars=(member.characters||[]).map(character=>`<span class="owner-audit-character">${escapeHtml(character.name)}<small>${escapeHtml(character.job||'Class not set')} · ${character.trackerEnabled?'Tracker enabled':'Team Builder only'}</small></span>`).join('')||'<span class="owner-audit-detail">No characters registered</span>';
+    const duplicateNames=(member.duplicateCharacterNames||[]).map(item=>`${escapeHtml(item.name)} also appears under ${(item.owners||[]).filter(owner=>owner.memberId!==member.memberId).map(owner=>escapeHtml(owner.name)).join(', ')}`).join('; ');
+    const indexDetail=(member.indexProblems||[]).length?`Index mismatch: ${member.indexProblems.map(escapeHtml).join(', ')}`:'';
+    let action='';
+    if(member.issueCode==='duplicate-discord-link'||member.issueCode==='bootstrap-admin-id-on-wrong-owner'){
+      const isPersonalOwner=String(member.memberName).trim().toLocaleLowerCase()===String(ownerAuditSnapshot?.bootstrapPersonalOwnerName||adminSessionState?.personalOwnerName||'Cho').trim().toLocaleLowerCase() && String(member.discordId||'')===String(ownerAuditSnapshot?.bootstrapDiscordId||'');
+      const clearLabel=member.issueCode==='bootstrap-admin-id-on-wrong-owner'?'Clear misplaced Admin ID from this entry':'Clear duplicate Discord link on this entry';
+      action=isPersonalOwner?'<div class="owner-audit-detail">Keep this identity linked to the configured personal owner. Clear the duplicate link from the other roster entry.</div>':`<div class="owner-audit-controls"><button class="btn danger" type="button" data-owner-clear="${escapeHtml(member.memberId)}" data-owner-name="${escapeHtml(member.memberName)}">${clearLabel}</button></div><div class="owner-audit-detail">Only clear this link if this Discord account does not belong to ${escapeHtml(member.memberName)}. Its character registrations and progress will remain intact.</div>`;
+    }else if(member.issueCode==='missing-discord-confirmation'||member.issueCode==='discord-account-not-enabled'||member.issueCode==='bootstrap-personal-owner-mismatch'){
+      const options=(member.linkOptions||[]).map(account=>`<option value="${escapeHtml(account.discordId)}" ${member.suggestedDiscordId===account.discordId?'selected':''}>${escapeHtml(account.label||account.discordId)} · ${escapeHtml(account.discordId)}${account.role==='admin'?' · ADMIN':''}</option>`).join('');
+      const bootstrapNote=member.issueCode==='bootstrap-personal-owner-mismatch'?'<div class="owner-audit-detail">This is the configured personal-owner entry, but it currently has a different Discord ID. Choose the bootstrap Admin Discord account only after clearing any misplaced bootstrap link from the incorrect roster entry.</div>':'';
+      action=`<div class="owner-audit-controls"><select data-owner-discord-select="${escapeHtml(member.memberId)}"><option value="">Choose the correct enabled Discord account…</option>${options}</select><button class="btn primary" type="button" data-owner-link="${escapeHtml(member.memberId)}" data-owner-name="${escapeHtml(member.memberName)}" ${options?'':'disabled'}>Link account</button></div>${options?'':`<div class="owner-audit-detail">No unassigned enabled Discord account is available. Add or enable the correct account in section 1, then refresh this audit.</div>`}${bootstrapNote}`;
+    }else if(member.issueCode==='owner-index-out-of-date'){
+      action='<div class="owner-audit-detail">The roster identity is present, but the player index does not match it. Use “Rebuild ownership index” above; this does not change character progress.</div>';
+    }
+    const duplicateIgnGuidance=duplicateNames?'<div class="owner-audit-detail">Keep each duplicated IGN only under its actual owner. In section 3, remove the duplicate registration from the incorrect owner, then rebuild the ownership index. Existing task cells remain attached to the retained IGN; do not rename the character as a shortcut.</div>':'';
+    return `<article class="owner-audit-card"><div class="owner-audit-head"><div><div class="owner-audit-name">${escapeHtml(member.memberName)}</div><div class="owner-audit-meta">Member ID: ${escapeHtml(member.memberId)} · ${member.characterCount} registered · ${member.trackerCharacterCount} opted into Tracker</div><div class="owner-audit-meta">${discordText}</div></div><span class="owner-audit-badge ${ownerAuditBadgeClass(member.issueCode)}">${escapeHtml(member.issueLabel)}</span></div><div class="owner-audit-characters">${chars}</div>${duplicateNames?`<div class="owner-audit-issues">Duplicate IGN: ${duplicateNames}</div>`:''}${duplicateIgnGuidance}${indexDetail?`<div class="owner-audit-issues">${indexDetail}</div>`:''}${action}</article>`;
+  }).join('');
+}
+async function refreshOwnerAudit(){
+  try{
+    const data=await api('/api/admin/character-storage/owners');
+    renderOwnerAudit(data);
+    const counts=data.counts||{};
+    const unresolved=Number(counts.unlinkedCharacterCount)||0;
+    setStatus('owner-audit-status',unresolved?`Audit complete: ${unresolved} active character record(s) do not yet have a verified, unique, enabled Discord owner. No character progress was changed.`:'Audit complete: every active character has a verified, unique, enabled Discord owner link.',unresolved?'':'ok');
+  }catch(error){setStatus('owner-audit-status',error.message,'error');}
+}
+async function postOwnerAuditAction(body){
+  return api('/api/admin/character-storage/owners',{method:'POST',headers:{'Content-Type':'application/json','X-Pantheon-Admin-Mode':'1'},body:JSON.stringify({...body,confirm:true})});
+}
+$('owner-audit-list')?.addEventListener('click',async event=>{
+  const linkButton=event.target.closest('[data-owner-link]');
+  const clearButton=event.target.closest('[data-owner-clear]');
+  if(linkButton){
+    const memberId=linkButton.dataset.ownerLink,memberName=linkButton.dataset.ownerName;
+    const select=$(`owner-audit-list`).querySelector(`[data-owner-discord-select="${CSS.escape(memberId)}"]`);
+    const discordId=select?.value||'';
+    if(!discordId)return setStatus('owner-audit-status','Choose an enabled Discord account first.','error');
+    const account=ownerAuditSnapshot?.enabledAccounts?.find(item=>item.discordId===discordId);
+    const existingDiscordId=String(ownerAuditSnapshot?.members?.find(item=>item.memberId===memberId)?.discordId||'');
+    const replaces=existingDiscordId && existingDiscordId!==discordId?` This replaces the currently linked Discord ID ${existingDiscordId}; verify that the old link is incorrect before proceeding.`:'';
+    if(!confirm(`Link ${account?.label||discordId} (${discordId}) to Member Roster owner ${memberName}? This allows that Discord account to edit only this owner's Tracker-enabled characters.${replaces} Existing character names and progress are not moved or deleted.`))return;
+    linkButton.disabled=true;
+    try{await postOwnerAuditAction({action:'link',memberId,discordId});setStatus('owner-audit-status',`Discord account linked to ${memberName}. Character progress was preserved.`,'ok');await refreshOwnerAudit();await refreshCharacterAdmin();}
+    catch(error){setStatus('owner-audit-status',error.message,'error');}
+    finally{linkButton.disabled=false;}
+    return;
+  }
+  if(clearButton){
+    const memberId=clearButton.dataset.ownerClear,memberName=clearButton.dataset.ownerName;
+    if(!confirm(`Clear the duplicated Discord ID from ${memberName}'s Member Roster entry? This does not delete the member, characters, or any task progress. The correct owner can be linked afterward.`))return;
+    clearButton.disabled=true;
+    try{await postOwnerAuditAction({action:'clear-link',memberId});setStatus('owner-audit-status',`Duplicate link cleared from ${memberName}. Its character data remains intact.`,'ok');await refreshOwnerAudit();await refreshCharacterAdmin();}
+    catch(error){setStatus('owner-audit-status',error.message,'error');}
+    finally{clearButton.disabled=false;}
+  }
+});
+$('refresh-owner-audit')?.addEventListener('click',refreshOwnerAudit);
+$('refresh-owner-index')?.addEventListener('click',async event=>{
+  const button=event.currentTarget;
+  if(!confirm('Rebuild the player ownership index from the current Member Roster? This does not change or delete character progress.'))return;
+  button.disabled=true;
+  try{const result=await postOwnerAuditAction({action:'refresh-index'});setStatus('owner-audit-status',`Ownership index rebuilt: ${result.characterCount||0} characters checked.`, 'ok');await refreshOwnerAudit();}
+  catch(error){setStatus('owner-audit-status',error.message,'error');}
+  finally{button.disabled=false;}
+});
+$('repair-bootstrap-owner-links')?.addEventListener('click',async event=>{
+  if(!confirm(`Keep your Discord Admin identity linked only to ${adminSessionState?.personalOwnerName||'Cho'} and remove duplicate links from other roster entries? Their characters and progress will remain intact.`))return;
+  const button=event.currentTarget;button.disabled=true;
+  try{const result=await postOwnerAuditAction({action:'repair-bootstrap-admin-links'});setStatus('owner-audit-status',result.changed?'Your Admin / Personal identity link has been normalized.':'Your Admin / Personal identity link is already correct.','ok');await refreshOwnerAudit();}
+  catch(error){setStatus('owner-audit-status',error.message,'error');}
+  finally{button.disabled=false;}
+});
 function collectAdminCharacters(card){
   const rows=[...card.querySelectorAll('[data-admin-character-row]')];
   return rows.map(row=>({name:row.querySelector('[data-admin-ign]')?.value.trim()||'',job:row.querySelector('[data-admin-job]')?.value||'',isMain:!!row.querySelector('[data-admin-main]')?.checked,trackerEnabled:!!row.querySelector('[data-admin-tracking]')?.checked})).filter(profile=>profile.name);
@@ -331,16 +478,16 @@ $('character-admin-list')?.addEventListener('click',async event=>{
       if(profiles.length&&profiles.filter(profile=>profile.isMain).length!==1)throw new Error('Choose exactly one Main character for this member.');
       const duplicate=profiles.find((p,i)=>profiles.findIndex(q=>q.name.toLocaleLowerCase()===p.name.toLocaleLowerCase())!==i);if(duplicate)throw new Error(`Duplicate IGN: ${duplicate.name}.`);
       const data=await api('/api/admin/characters',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({memberId:card.dataset.adminOwnerCard,characterProfiles:profiles})});
-      adminCharacterMembers=Array.isArray(data.members)?data.members:adminCharacterMembers;renderCharacterAdmin();setStatus('character-admin-status',`Saved ${data.memberName}'s character registration. If the Main designation or character details changed, the member will be asked to confirm them at the next login.`,'ok');
+      adminCharacterMembers=Array.isArray(data.members)?data.members:adminCharacterMembers;renderCharacterAdmin();setStatus('character-admin-status',`Saved ${data.memberName}'s character registration. If the Main designation or character details changed, the member will be asked to confirm them at the next login.`,'ok');await refreshOwnerAudit();
     }catch(error){setStatus('character-admin-status',error.message,'error');}finally{button.disabled=false;}
   }
 });
 $('refresh-character-list')?.addEventListener('click',refreshCharacterAdmin);
 function setStatus(id, text, kind=''){const el=$(id);el.textContent=text;el.className='status'+(kind?' '+kind:'');el.classList.remove('hidden');}
 async function api(url, options={}){const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||data.message||`Request failed (${response.status})`);return data;}
-async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();await refreshActivityReference();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
-async function refreshAllowlist(){try{const data=await api('/api/admin/allowlist');const list=$('allowlist-list');list.replaceChildren();if(!data.users?.length){list.textContent='No approved accounts yet.';return;}for(const user of data.users){const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=user.label||user.discord_id;const meta=document.createElement('small');meta.textContent=`${user.discord_id} · ${user.enabled?'Enabled':'Disabled'} · added by ${user.created_by||'system'}`;info.append(name,meta);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='7px';const badge=document.createElement('span');badge.className='badge';badge.textContent=user.role==='admin'?'ADMIN':'MEMBER';right.append(badge);if(user.enabled && user.role!=='admin'){const button=document.createElement('button');button.className='btn danger';button.type='button';button.textContent='Revoke';button.addEventListener('click',async()=>{if(!confirm(`Revoke access for ${user.label||user.discord_id}?`))return;try{await api('/api/admin/allowlist?discordId='+encodeURIComponent(user.discord_id),{method:'DELETE'});setStatus('allowlist-status',`Access revoked for ${user.discord_id}.`,'ok');await refreshAllowlist();}catch(error){setStatus('allowlist-status',error.message,'error');}});right.append(button);}row.append(info,right);list.append(row);}}catch(error){setStatus('allowlist-status',error.message,'error');}}
-$('allowlist-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;try{const data=await api('/api/admin/allowlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discordId:$('discord-id').value.trim(),label:$('discord-label').value.trim()})});setStatus('allowlist-status',`Approved Discord account ${data.discordId}.`,'ok');$('allowlist-form').reset();await refreshAllowlist();}catch(error){setStatus('allowlist-status',error.message,'error');}finally{button.disabled=false;}});
+async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}adminSessionState=state.user;setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();await refreshOwnerAudit();await refreshActivityReference();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
+async function refreshAllowlist(){try{const data=await api('/api/admin/allowlist');const list=$('allowlist-list');list.replaceChildren();if(!data.users?.length){list.textContent='No approved accounts yet.';return;}for(const user of data.users){const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=user.label||user.discord_id;const meta=document.createElement('small');meta.textContent=`${user.discord_id} · ${user.enabled?'Enabled':'Disabled'} · added by ${user.created_by||'system'}`;info.append(name,meta);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='7px';const badge=document.createElement('span');badge.className='badge';badge.textContent=user.role==='admin'?'ADMIN':'MEMBER';right.append(badge);if(user.enabled && user.role!=='admin'){const button=document.createElement('button');button.className='btn danger';button.type='button';button.textContent='Revoke';button.addEventListener('click',async()=>{if(!confirm(`Revoke access for ${user.label||user.discord_id}?`))return;try{await api('/api/admin/allowlist?discordId='+encodeURIComponent(user.discord_id),{method:'DELETE'});setStatus('allowlist-status',`Access revoked for ${user.discord_id}.`,'ok');await refreshAllowlist();await refreshOwnerAudit();}catch(error){setStatus('allowlist-status',error.message,'error');}});right.append(button);}row.append(info,right);list.append(row);}}catch(error){setStatus('allowlist-status',error.message,'error');}}
+$('allowlist-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;try{const data=await api('/api/admin/allowlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discordId:$('discord-id').value.trim(),label:$('discord-label').value.trim()})});setStatus('allowlist-status',`Approved Discord account ${data.discordId}.`,'ok');$('allowlist-form').reset();await refreshAllowlist();await refreshOwnerAudit();}catch(error){setStatus('allowlist-status',error.message,'error');}finally{button.disabled=false;}});
 $('refresh-list').addEventListener('click',refreshAllowlist);
 function revisionIdFromRecord(record){return String(record?.settings?.versionControl?.revisionBinId||record?.payload?.['~j']?.['~A']?.['~I']||'').trim();}
 $('migration-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;setStatus('migration-status','Reading the source main record from JSONBin…');const sourceMainBinId=$('old-bin-id').value.trim();const key=$('old-bin-key').value.trim();try{const base='https://api.jsonbin.io/v3/b/';const response=await fetch(base+encodeURIComponent(sourceMainBinId)+'/latest',{headers:{'X-Master-Key':key},cache:'no-store'});const payload=await response.json().catch(()=>({}));if(!response.ok)throw new Error(payload.message||`JSONBin main record read failed (${response.status})`);const mainRecord=payload.record;if(!mainRecord||typeof mainRecord!=='object')throw new Error('The main record did not contain a valid record object.');const sourceRevisionBinId=revisionIdFromRecord(mainRecord);let revisionRecord=null;if(sourceRevisionBinId){setStatus('migration-status','Reading the separate revision journal from JSONBin…');const revisionResponse=await fetch(base+encodeURIComponent(sourceRevisionBinId)+'/latest',{headers:{'X-Master-Key':key},cache:'no-store'});const revisionPayload=await revisionResponse.json().catch(()=>({}));if(!revisionResponse.ok)throw new Error(`Revision journal read failed (${revisionResponse.status}). No data was imported. ${revisionPayload.message||''}`);revisionRecord=revisionPayload.record;if(!revisionRecord||typeof revisionRecord!=='object')throw new Error('The revision journal response was invalid; no data was imported.');}setStatus('migration-status','Importing records into D1…');const result=await api('/api/admin/migrate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sourceMainBinId,sourceRevisionBinId,mainRecord,revisionRecord})});$('old-bin-key').value='';setStatus('migration-status',`Migration complete. Main record copied to ${result.mainRecordId}.${result.revisionRecordId?` Revision journal copied to ${result.revisionRecordId}.`:''} The original JSONBin records were not changed. Go back to Pantheon and reload to sync from D1.`,'ok');}catch(error){setStatus('migration-status',`Import failed: ${error.message}`,'error');}finally{button.disabled=false;}});
