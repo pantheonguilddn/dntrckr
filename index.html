@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r53</title>
+    <title>Pantheon Tools v1.6.8-r54</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -120,12 +120,6 @@
             height: 28px;
             background: #3a3a45;
             margin: 0 2px;
-        }
-        .identity-select {
-            min-width: 168px;
-            background: #1d1d25 !important;
-            color: #d6f4df !important;
-            border-color: #39634a !important;
         }
         .btn-sync { background-color: #3d9b66; color: white; }
         .btn-sync:hover { background-color: #348859; }
@@ -1172,7 +1166,6 @@
         :root[data-pantheon-theme] .class-setup-select,
         :root[data-pantheon-theme] .role-config-select,
         :root[data-pantheon-theme] .builder-check,
-        :root[data-pantheon-theme] .identity-select,
         :root[data-pantheon-theme] .roster-filter-top {
             background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important;
         }
@@ -1271,7 +1264,6 @@
         .topbar-player { gap: 7px !important; flex-wrap: wrap; }
         .toolbar-group { border-color: var(--pt-border) !important; border-radius: 11px !important; background: var(--pt-surface-soft) !important; box-shadow: none !important; }
         .toolbar-divider { background: var(--pt-border) !important; }
-        .identity-select { background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
         .roster-filter-top { background: var(--pt-input) !important; color: var(--pt-text) !important; border-color: var(--pt-border) !important; }
         .pantheon-theme-control { color: var(--pt-muted) !important; font-size: .68rem !important; letter-spacing: .05em !important; }
         .pantheon-theme-select { min-height: 36px !important; border-radius: 9px !important; padding: 7px 10px !important; }
@@ -2646,7 +2638,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   .controls .toolbar-row { width:100% !important; justify-content:flex-start !important; flex-wrap:wrap !important; gap:6px !important; }
   .controls .toolbar-group { max-width:100% !important; flex-wrap:wrap !important; gap:5px !important; }
   .controls .topbar-player { max-width:100% !important; flex-wrap:wrap !important; }
-  .controls .identity-select, .controls .roster-filter-top { min-width:0 !important; max-width:100% !important; }
+  .controls .roster-filter-top { min-width:0 !important; max-width:100% !important; }
 
   .overview-dashboard-head-r2 { grid-template-columns:minmax(0,1fr) !important; gap:10px !important; }
   .overview-dashboard-head-r2 > * { min-width:0 !important; width:100% !important; max-width:100% !important; }
@@ -2871,7 +2863,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r53-stable-topbar">
+<style id="pantheon-r54-stable-topbar">
 /* Keep the player/navigation controls together. When the available width is too
    small, scroll the complete row horizontally instead of wrapping individual
    selects or dropping the help control below them. */
@@ -2899,15 +2891,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   align-self:center !important;
   white-space:nowrap !important;
   margin-block:0 !important;
-}
-.controls .topbar-player #user-identity {
-  flex:0 0 168px !important;
-  width:168px !important;
-  min-width:168px !important;
-  max-width:168px !important;
-  height:36px !important;
-  min-height:36px !important;
-  box-sizing:border-box !important;
 }
 .controls .topbar-player #mode-toggle-btn {
   flex:0 0 auto !important;
@@ -2961,6 +2944,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 }
 </style>
 
+<style id="pantheon-r54-admin-tools-visibility">
+/* Custom display rules on the drawer/menu override the browser default for
+   [hidden]. Re-assert it so regular member mode never exposes Admin Tools. */
+#menu-toggle[hidden],
+#tool-drawer[hidden],
+#drawer-scrim[hidden] { display:none !important; }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -2998,9 +2989,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         <div class="control-actions">
             <div class="topbar-player">
-                <select id="user-identity" class="btn identity-select" onchange="saveIdentity()">
-                    <option value="">👤 Your roster (auto)</option>
-                </select>
                 <button id="mode-toggle-btn" class="btn btn-view-toggle personal-active" type="button" onclick="togglePersonalView()">👤 Personal View</button>
                 <button id="admin-view-toggle-btn" class="admin-mode-switch" type="button" onclick="toggleAdminView()" role="switch" aria-label="Admin View" aria-checked="false" aria-pressed="false" title="Enable administrator tools and guild-wide editing" hidden><span class="admin-mode-switch-text">Admin</span><span class="admin-mode-switch-track" aria-hidden="true"><span class="admin-mode-switch-thumb"></span></span></button>
                 <select id="roster-filter" class="btn roster-filter-top" onchange="applyRosterFilter()">
@@ -3406,9 +3394,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r53</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r54</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r53:</strong> Admin View now changes permissions without changing your current page or Personal/Universal selection. Members can also choose their own Pantheon display name from the Overview account card. Their Discord link, roster, characters, and tracker progress stay attached.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r54:</strong> The redundant account dropdown has been removed. Discord now selects your linked roster automatically, while the single “Only [member]” dropdown remains for filtering a specific person in Universal View. The Tools hamburger is now hidden outside Admin View, including when an administrator previews the member experience.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4623,6 +4611,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function updateAdminModeUI() {
             const admin = isPantheonAdmin();
             const active = isAdminModeActive();
+            const adminToolsVisible = active && !isAdminViewAsActive();
             const personalName = String(getAuthenticatedMemberDirectoryEntry()?.name || 'Personal');
             const toggle = document.getElementById('admin-view-toggle-btn');
             if (toggle) {
@@ -4638,20 +4627,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const scrim = document.getElementById('drawer-scrim');
             const adminLink = document.getElementById('overview-admin-link');
             const drawerIds = ['drawer-admin-console','drawer-view-as','drawer-rateup-events','drawer-developer-mode'];
-            if (adminLink) adminLink.hidden = !active;
-            drawerIds.forEach(id => { const el = document.getElementById(id); if (el) el.hidden = !active; });
-            if (menuToggle) menuToggle.hidden = !active;
+            if (adminLink) adminLink.hidden = !adminToolsVisible;
+            drawerIds.forEach(id => { const el = document.getElementById(id); if (el) el.hidden = !adminToolsVisible; });
+            if (menuToggle) menuToggle.hidden = !adminToolsVisible;
             if (drawer) {
-                if (!active) { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
-                drawer.hidden = !active;
+                if (!adminToolsVisible) { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+                drawer.hidden = !adminToolsVisible;
             }
-            if (scrim) { if (!active) scrim.classList.remove('open'); scrim.hidden = !active; }
+            if (scrim) { if (!adminToolsVisible) scrim.classList.remove('open'); scrim.hidden = !adminToolsVisible; }
             document.body.classList.toggle('pantheon-admin-mode-active', active);
-            const identity = document.getElementById('user-identity');
             const personalToggle = document.getElementById('mode-toggle-btn');
             // Admin permission and view mode are independent. With Admin View off,
             // this account may still select Universal View; only owned characters edit.
-            if (identity) identity.disabled = admin && !active ? true : false;
             if (personalToggle) {
                 personalToggle.textContent = isPersonalView ? '👤 Personal View' : '🌍 Universal View';
                 personalToggle.classList.toggle('personal-active', !!isPersonalView);
@@ -4659,7 +4646,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             const editNameButton = document.getElementById('overview-edit-name');
             if (editNameButton) editNameButton.hidden = !getAuthenticatedMemberDirectoryEntry() || isAdminViewAsActive();
-            if (!active) document.body.classList.remove('drawer-open');
+            if (!adminToolsVisible) document.body.classList.remove('drawer-open');
         }
         async function toggleAdminView() {
             if (!isPantheonAdmin()) return;
@@ -5033,16 +5020,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function togglePersonalView() {
             if (isAdminViewAsActive()) return;
             const identity = localStorage.getItem(IDENTITY_KEY);
-            if (!identity) {
-                alert('No personal roster is linked yet. Check that your Discord profile name matches your Member Roster owner name, or select your roster once.');
-                document.getElementById('user-identity').focus();
+            if (!identity || identity === '__unregistered__') {
+                alert('Your Discord account is not linked to a Pantheon roster yet. Ask an administrator to link your account in Member Roster.');
                 return;
             }
-            
+
             isPersonalView = !isPersonalView;
             const btn = document.getElementById('mode-toggle-btn');
             const filterDropdown = document.getElementById('roster-filter');
-            
+            if (!btn || !filterDropdown) return;
+
             if (isPersonalView) {
                 btn.textContent = '👤 Personal View';
                 btn.classList.add('personal-active');
@@ -5055,41 +5042,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 filterDropdown.disabled = false;
             }
             applyRosterFilter();
-        }
-
-        function saveIdentity() {
-            const val = document.getElementById('user-identity').value;
-            const wasUnmatched = discordIdentityMatchStatus === 'unmatched';
-            localStorage.setItem(IDENTITY_KEY, val);
-            if (pantheonDiscordUser?.id) {
-                const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(pantheonDiscordUser.id)}`;
-                if (val) localStorage.setItem(accountIdentityKey, val);
-                else localStorage.removeItem(accountIdentityKey);
-                discordIdentityMatchStatus = val ? 'manual' : 'unmatched';
-            }
-
-            refreshLedgerVisibility();
-
-            if (val && wasUnmatched && !isPersonalView) {
-                // A one-time fallback identity choice should immediately become the Personal View.
-                const btn = document.getElementById('mode-toggle-btn');
-                const filter = document.getElementById('roster-filter');
-                isPersonalView = true;
-                if (btn) { btn.textContent = '👤 Personal View'; btn.classList.add('personal-active'); }
-                if (filter) { filter.value = val; filter.disabled = true; }
-                applyRosterFilter();
-            } else if (isPersonalView && val) {
-                const filter = document.getElementById('roster-filter');
-                if (filter) { filter.value = val; filter.disabled = true; }
-                applyRosterFilter();
-            } else if (isPersonalView && !val) {
-                isPersonalView = false;
-                const btn = document.getElementById('mode-toggle-btn');
-                if (btn) { btn.textContent = '🌍 Universal View'; btn.classList.remove('personal-active'); }
-                const filter = document.getElementById('roster-filter');
-                if (filter) { filter.value = 'all'; filter.disabled = false; }
-                applyRosterFilter();
-            }
         }
 
         function identityMatchKey(value) {
@@ -5162,7 +5114,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function applyDiscordIdentityDefaults() {
             const user = pantheonDiscordUser;
             if (!user?.id) return null;
-            const identitySelect = document.getElementById('user-identity');
             const accountIdentityKey = `${DISCORD_IDENTITY_STORAGE_PREFIX}${String(user.id)}`;
             // Never infer a member's identity from a previously selected browser roster. Only
             // a roster linked to the current authenticated Discord name / allowlisted label is
@@ -5172,7 +5123,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!roster) {
                 localStorage.setItem(IDENTITY_KEY, '__unregistered__');
                 localStorage.setItem(accountIdentityKey, '__unregistered__');
-                if (identitySelect) identitySelect.value = '__unregistered__';
                 discordIdentityMatchStatus = 'unmatched';
                 isPersonalView = true;
                 const modeButton = document.getElementById('mode-toggle-btn');
@@ -5186,7 +5136,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
             localStorage.setItem(IDENTITY_KEY, roster.id);
             localStorage.setItem(accountIdentityKey, roster.id);
-            if (identitySelect) identitySelect.value = roster.id;
             discordIdentityMatchStatus = 'matched';
 
             // Set state directly instead of toggling. This prevents stale UI state from leaving
@@ -5203,18 +5152,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function updateFilterDropdown() {
             const filter = document.getElementById('roster-filter');
-            const identitySel = document.getElementById('user-identity');
+            if (!filter) return;
             const currentVal = filter.value;
-            const savedIdentity = localStorage.getItem(IDENTITY_KEY) || '';
 
             let options = `<option value="all">👁️ Show All Rosters</option><option value="__unregistered__">👤 My registration (not set up)</option>`;
-            const identityPrompt = discordIdentityMatchStatus === 'unmatched' ? '👤 No matching roster' : '👤 Your roster (auto)';
-            let idOptions = `<option value="">${identityPrompt}</option><option value="__unregistered__">My registration (not set up)</option>`;
-
             cloudData.settings.rosters.forEach(r => {
                 const emptyHint = r.characters.length ? '' : ' · not tracking yet';
                 options += `<option value="${escapeHTML(r.id)}">👁️ Only ${escapeHTML(r.name)}${emptyHint}</option>`;
-                idOptions += `<option value="${escapeHTML(r.id)}">${escapeHTML(r.name)}${emptyHint}</option>`;
             });
 
             filter.innerHTML = options;
@@ -5229,10 +5173,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 filter.disabled = !!isPersonalView;
             }
             activeRosterFilter = filter.value;
-
-            identitySel.innerHTML = idOptions;
-            identitySel.value = savedIdentity === '__unregistered__' || cloudData.settings.rosters.some(r => r.id === savedIdentity) ? savedIdentity : '';
-
             refreshLedgerVisibility();
         }
 
@@ -5891,7 +5831,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function mergeRevisionJournal(localHistory,remoteHistory){return trimRevisionJournal([...(Array.isArray(localHistory)?localHistory:[]),...(Array.isArray(remoteHistory)?remoteHistory:[])]);}
 
-        function versionIdentityLabel(){const identity=document.getElementById('user-identity')?.value||localStorage.getItem(IDENTITY_KEY)||'';if(!identity)return deviceId;const roster=cloudData.settings?.rosters?.find(r=>r.id===identity);return roster?.name||identity;}
+        function versionIdentityLabel(){const identity=localStorage.getItem(IDENTITY_KEY)||'';if(!identity)return deviceId;const roster=cloudData.settings?.rosters?.find(r=>r.id===identity);return roster?.name||identity;}
         function versionTimestamp(ms){if(!ms)return 'Timestamp unavailable';try{return new Date(Number(ms)).toLocaleString();}catch(e){return 'Timestamp unavailable';}}
         function makeRevisionEntry(label,kind,patch,signature){
             return {id:`rev-${Date.now()}-${deviceId}-${Math.random().toString(36).slice(2,8)}`,at:Date.now(),by:versionIdentityLabel(),label:String(label||'Global change').slice(0,140),kind:String(kind||'global-change'),signature:String(signature||''),...(patch?{patch}: {})};
@@ -7229,14 +7169,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const menuToggle = document.getElementById('menu-toggle');
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
-            if (adminLink) adminLink.hidden = !isAdminModeActive();
-            if (drawerAdminLink) drawerAdminLink.hidden = !isAdminModeActive();
-            if (viewAsLink) viewAsLink.hidden = !isAdminModeActive();
-            if (rateUpLink) rateUpLink.hidden = !isAdminModeActive();
-            if (developerLink) developerLink.hidden = !isAdminModeActive();
-            if (menuToggle) menuToggle.hidden = !isAdminModeActive();
-            if (drawer) drawer.hidden = !isAdminModeActive();
-            if (scrim) scrim.hidden = !isAdminModeActive();
+            const adminToolsVisible = isAdminModeActive() && !isAdminViewAsActive();
+            if (adminLink) adminLink.hidden = !adminToolsVisible;
+            if (drawerAdminLink) drawerAdminLink.hidden = !adminToolsVisible;
+            if (viewAsLink) viewAsLink.hidden = !adminToolsVisible;
+            if (rateUpLink) rateUpLink.hidden = !adminToolsVisible;
+            if (developerLink) developerLink.hidden = !adminToolsVisible;
+            if (menuToggle) menuToggle.hidden = !adminToolsVisible;
+            if (drawer) drawer.hidden = !adminToolsVisible;
+            if (scrim) scrim.hidden = !adminToolsVisible;
             if (subEl) {
                 const ownerLabel = String(linkedMember?.name || 'Personal');
                 subEl.textContent = isAdmin
@@ -8203,6 +8144,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 activeRosterFilter: String(activeRosterFilter || 'all')
             };
             adminViewAsMemberId = member.id;
+            updateAdminModeUI(); // Hide administrator-only navigation while presenting the member experience.
             adminViewThemeChoice = document.getElementById('admin-view-as-theme-select').value;
             setPreviewTheme(adminViewThemeChoice === 'current' ? adminViewOriginalTheme : adminViewThemeChoice);
             document.body.classList.add('admin-view-as-active');
@@ -8222,6 +8164,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             adminViewAsReturnState = null;
             adminViewAsMemberId = '';
             adminViewThemeChoice = '';
+            updateAdminModeUI(); // Restore the administrator tools after leaving the member preview.
             clearAdminPreviewReadOnly();
             setPreviewTheme(localStorage.getItem('pantheon-theme-choice-v1') || adminViewOriginalTheme || 'dark');
             if (returnState) {
@@ -10027,7 +9970,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function getShareIdentity() {
-            return localStorage.getItem(IDENTITY_KEY) || document.getElementById('user-identity')?.value || 'Unknown';
+            return localStorage.getItem(IDENTITY_KEY) || 'Unknown';
         }
 
         function getShareTimestamp() {
@@ -10806,7 +10749,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r53';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r54';
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -11382,7 +11325,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const drawer = document.getElementById('tool-drawer');
             const scrim = document.getElementById('drawer-scrim');
             const btn = document.getElementById('menu-toggle');
-            if (!isAdminModeActive()) {
+            if (!isAdminModeActive() || isAdminViewAsActive()) {
                 if (drawer) { drawer.classList.remove('open'); drawer.hidden = true; drawer.setAttribute('aria-hidden', 'true'); }
                 if (scrim) { scrim.classList.remove('open'); scrim.hidden = true; }
                 if (btn) { btn.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
@@ -11524,7 +11467,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r53';
+  const CURRENT_BUILD = '1.6.8-r54';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
