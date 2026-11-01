@@ -173,6 +173,11 @@ async function buildAudit(env, record, session) {
       linkOptions,
       duplicateCharacterNames,
       indexProblems,
+      isBootstrapPersonalOwner: member.isBootstrapPersonalOwner === true || (
+        !!String(env?.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim() &&
+        member.discordId === String(env.BOOTSTRAP_ADMIN_DISCORD_ID).trim() &&
+        labelKey(member.name) === labelKey(String(env?.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho'))
+      ),
       characters: member.characters,
       characterCount: member.characters.length,
       trackerCharacterCount: member.characters.filter(character => character.trackerEnabled).length
@@ -333,28 +338,26 @@ export async function onRequestPost(context) {
 
     if (!memberId) return jsonResponse({ error:'A Member Roster owner is required.' }, 400);
     if (action === 'clear-link') {
-      const result = await commitMemberDirectoryChange(context.env, session, (record, member, members) => {
+      const expectedDiscordId = String(body.expectedDiscordId || '').trim();
+      const result = await commitMemberDirectoryChange(context.env, session, (record, member) => {
         const currentId = String(member.profileConfirmedDiscordId || '').trim();
         if (!currentId) return false;
-        const otherLinks = members.filter(other => ownerIdOf(other) !== memberId && String(other.profileConfirmedDiscordId || '').trim() === currentId);
+        if (expectedDiscordId && currentId !== expectedDiscordId) {
+          throw new Error('This member’s Discord link changed since the audit was loaded. Refresh the ownership audit before making another change.');
+        }
         const bootstrapId = String(context.env.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim();
         const bootstrapPersonalOwner = String(context.env.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho').trim();
         const isBootstrapIdentity = !!bootstrapId && currentId === bootstrapId;
         const isConfiguredPersonalOwner = member.isBootstrapPersonalOwner === true || labelKey(member.name) === labelKey(bootstrapPersonalOwner);
-        if (isBootstrapIdentity && isConfiguredPersonalOwner) {
+        if (member.isBootstrapPersonalOwner === true || (isBootstrapIdentity && isConfiguredPersonalOwner)) {
           throw new Error('The bootstrap administrator personal-owner link cannot be cleared. Keep it on the configured personal roster.');
         }
-        const bootstrapMisplaced = isBootstrapIdentity && !isConfiguredPersonalOwner;
-        if (!otherLinks.length && !bootstrapMisplaced) {
-          throw new Error('This Discord ID is not duplicated or misplaced. Use Link approved account to replace an outdated identity, rather than clearing a valid unique link.');
-        }
-        // A misplaced bootstrap link can be cleared even if it is currently unique.
-        // The Admin can then link that identity to the configured personal-owner entry.
-        // Only the profile link changes; registrations and all progress remain intact.
+        // An administrator may deliberately unlink any other member, not only duplicates.
+        // Character records and progress remain attached to their stable Member Roster ID.
         member.profileConfirmedDiscordId = '';
         member.profileConfirmedAt = 0;
         return true;
-      }, 'clear-duplicate-owner-discord-link', { memberId });
+      }, 'clear-member-roster-owner-discord-link', { memberId, expectedDiscordId });
       return jsonResponse({ ok:true, action, changed:result.changed });
     }
 
@@ -371,7 +374,9 @@ export async function onRequestPost(context) {
       }
       const result = await commitMemberDirectoryChange(context.env, session, (record, member, members) => {
         const bootstrapIdForLink = String(context.env.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim();
-        if (member.isBootstrapPersonalOwner === true && discordId !== bootstrapIdForLink) {
+        const configuredPersonalOwnerName = String(context.env.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || session.personalOwnerName || 'Cho').trim();
+        const isConfiguredPersonalOwner = member.isBootstrapPersonalOwner === true || labelKey(member.name) === labelKey(configuredPersonalOwnerName);
+        if (isConfiguredPersonalOwner && bootstrapIdForLink && discordId !== bootstrapIdForLink) {
           throw new Error('The configured bootstrap personal owner must remain linked to the bootstrap administrator Discord account.');
         }
         const existing = members.filter(other => ownerIdOf(other) !== memberId && String(other.profileConfirmedDiscordId || '').trim() === discordId);

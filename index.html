@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r54</title>
+    <title>Pantheon Tools v1.6.8-r55</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3394,9 +3394,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r54</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r55</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r54:</strong> The redundant account dropdown has been removed. Discord now selects your linked roster automatically, while the single “Only [member]” dropdown remains for filtering a specific person in Universal View. The Tools hamburger is now hidden outside Admin View, including when an administrator previews the member experience.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r55:</strong> The redundant account dropdown has been removed. Discord now selects your linked roster automatically, while the single “Only [member]” dropdown remains for filtering a specific person in Universal View. The Tools hamburger is now hidden outside Admin View, including when an administrator previews the member experience.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3888,7 +3888,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const charName = String(item.charName || '').trim(), taskName = String(item.taskName || '').trim();
                     if (!charName || !taskName) return;
                     const state = ['open','done','excluded','marked','reset'].includes(item.state) ? item.state : 'open';
-                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), retryCount: Math.max(0, Math.min(5, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0, lastError: String(item.lastError || '').slice(0,260), lastCode: String(item.lastCode || '').slice(0,60), lastStatus: Number(item.lastStatus) || 0, retryable: item.lastCode ? item.retryable !== false : true };
+                    cleaned[JSON.stringify([charName, taskName])] = { charName, taskName, state, note: String(item.note || '').slice(0,40), updatedAt: Number(item.updatedAt) || 0, deviceId: String(item.deviceId || ''), retryCount: Math.max(0, Math.min(8, Number(item.retryCount) || 0)), lastAttemptAt: Number(item.lastAttemptAt) || 0, lastError: String(item.lastError || '').slice(0,260), lastCode: String(item.lastCode || '').slice(0,60), lastStatus: Number(item.lastStatus) || 0, retryable: item.lastCode ? item.retryable !== false : true };
                 });
                 return cleaned;
             } catch (_) { return {}; }
@@ -3898,11 +3898,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         // This prevents members' queued edits from repeatedly hitting an uninitialized table.
         let characterStorageReady = false;
         let characterStorageSetupError = '';
+        let pendingCellQueueRecovered = false;
+        let pendingCellPersistenceHealthy = true;
         const pendingCellRetryTimers = new Map();
         const pendingCellSyncBusy = new Set();
         const pendingCellDebounceTimers = new Map();
         function persistPendingCellWrites() {
-            try { localStorage.setItem(PENDING_CELL_WRITES_KEY, JSON.stringify(pendingCellWrites)); } catch (_) {}
+            try {
+                // localStorage.setItem is synchronous: when this returns successfully, the
+                // pending outbox has been committed before any network request is started.
+                localStorage.setItem(PENDING_CELL_WRITES_KEY, JSON.stringify(pendingCellWrites));
+                pendingCellPersistenceHealthy = true;
+                return true;
+            } catch (_) {
+                pendingCellPersistenceHealthy = false;
+                return false;
+            }
         }
         function clonePendingCellWrites(source = pendingCellWrites) {
             try { return JSON.parse(JSON.stringify(source || {})); } catch (_) { return {}; }
@@ -3928,8 +3939,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     acknowledged.push({ charName:patch.charName, taskName:patch.taskName });
                 } else {
                     // Never discard an edit merely because the server returned a different value.
-                    // Retain it locally for bounded automatic retries or an explicit manual retry.
-                    pendingCellWrites[key] = { ...current, retryCount:Math.min(5, (Number(current.retryCount)||0)+1), lastAttemptAt:Date.now(), lastError:'Server acknowledgement did not match the requested task state.', lastCode:'ACK_MISMATCH', lastStatus:200, retryable:false };
+                    // Retain it locally for explicit review or manual retry; do not overwrite a possible concurrent edit automatically.
+                    pendingCellWrites[key] = { ...current, retryCount:Math.min(8, (Number(current.retryCount)||0)+1), lastAttemptAt:Date.now(), lastError:'Server acknowledgement did not match the requested task state.', lastCode:'ACK_MISMATCH', lastStatus:200, retryable:false };
                     mismatches.push({ charName:patch.charName, taskName:patch.taskName, requestedState:patch.state, actualState:latestCell.state, retryCount:pendingCellWrites[key].retryCount });
                 }
             });
@@ -3940,14 +3951,37 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return [...new Set(Object.values(pendingCellWrites).map(item => String(item.charName || '').trim()).filter(Boolean))];
         }
         function resumePendingCellWritesAfterMigration() {
+            if (!characterStorageReady) return;
             let changed = false;
+            // Each authenticated page launch gets a fresh recovery attempt for every
+            // persisted, unacknowledged checkbox/note edit. A previous tab may have been
+            // closed mid-request, or its finite retry window may have elapsed while offline.
+            // Reset this only once per runtime, never on the five-second revision poll.
+            if (!pendingCellQueueRecovered) {
+                pendingCellQueueRecovered = true;
+                for (const item of Object.values(pendingCellWrites)) {
+                    // A read-after-write mismatch is a possible same-cell conflict, not a
+                    // transport outage. Keep it parked for explicit review/manual Sync.
+                    if (item.lastCode === 'ACK_MISMATCH') continue;
+                    item.retryable = true;
+                    item.retryCount = 0;
+                    item.lastAttemptAt = 0;
+                    item.lastError = '';
+                    item.lastCode = '';
+                    item.lastStatus = 0;
+                    changed = true;
+                }
+            }
+            // Migration-specific failures can become valid without a full page reload.
             for (const item of Object.values(pendingCellWrites)) {
-                if (['CHARACTER_STORAGE_NOT_MIGRATED','CHARACTER_STORAGE_SCHEMA_MISSING','OWNER_INDEX_REFRESH_FAILED'].includes(item.lastCode) || !item.lastCode) {
-                    if (item.retryable === false || Number(item.retryCount) >= 5) { item.retryable = true; item.retryCount = 0; changed = true; }
+                if (['CHARACTER_STORAGE_NOT_MIGRATED','CHARACTER_STORAGE_SCHEMA_MISSING','OWNER_INDEX_REFRESH_FAILED'].includes(item.lastCode)) {
+                    if (item.retryable === false || Number(item.retryCount) >= 8) {
+                        item.retryable = true; item.retryCount = 0; item.lastError = ''; item.lastCode = ''; item.lastStatus = 0; changed = true;
+                    }
                 }
             }
             if (changed) persistPendingCellWrites();
-            schedulePendingCellRetry();
+            schedulePendingCellRetry('', pendingCellQueueRecovered ? 250 : null);
         }
         function pendingCellEntriesForCharacter(charName) {
             return Object.entries(pendingCellWrites).filter(([,item]) => String(item.charName || '') === String(charName));
@@ -3965,15 +3999,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current', 'Your character changes are saved · live guild updates active');
             }
         }
-        function schedulePendingCellRetry(charName = '') {
+        function schedulePendingCellRetry(charName = '', delayOverride = null) {
             if (!characterStorageReady) return;
             const targets = charName ? [String(charName)] : getPendingCellCharacterNames();
             targets.forEach(name => {
                 if (!name || pendingCellRetryTimers.has(name) || pendingCellSyncBusy.has(name)) return;
                 const entries = pendingCellEntriesForCharacter(name);
-                if (!entries.length || !entries.some(([,item]) => item.retryable !== false && (Number(item.retryCount)||0) < 5)) return;
+                if (!entries.length || !entries.some(([,item]) => item.retryable !== false)) return;
                 const maxAttempts = Math.max(0, ...entries.map(([,item]) => Number(item.retryCount)||0));
-                const delay = Math.min(8000, 900 * Math.pow(2, maxAttempts));
+                // Keep retrying transient failures while the app is open. The ceiling avoids
+                // hammering Cloudflare during an outage, without permanently parking an edit.
+                const hasDelayOverride = delayOverride !== null && delayOverride !== undefined && Number.isFinite(Number(delayOverride));
+                const delay = hasDelayOverride ? Math.max(0, Number(delayOverride)) : Math.min(60000, 900 * Math.pow(2, Math.min(maxAttempts, 6)));
                 const timer = setTimeout(() => {
                     pendingCellRetryTimers.delete(name);
                     flushPendingCellWritesForCharacter(name);
@@ -3992,7 +4029,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }, delay);
             pendingCellDebounceTimers.set(name, timer);
         }
-        async function flushPendingCellWritesForCharacter(charName) {
+        async function flushPendingCellWritesForCharacter(charName, options = {}) {
             const name = String(charName || '').trim();
             if (!name || pendingCellSyncBusy.has(name)) return false;
             const snapshotEntries = pendingCellEntriesForCharacter(name);
@@ -4019,7 +4056,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     : [];
                 const response = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/cells`, {
                     method:'POST', headers:{'Content-Type':'application/json',...authHeaders(config)},
-                    body:JSON.stringify({ character:name, edits, timing })
+                    body:JSON.stringify({ character:name, edits, timing }),
+                    keepalive: options.keepalive === true
                 }, 10000);
                 const payload = await response.json().catch(() => ({}));
                 if (!response.ok) { const error = new Error(payload.message || payload.error || `Character save failed (${response.status})`); error.status=response.status; error.code=String(payload.code || ''); error.retryable=typeof payload.retryable === 'boolean' ? payload.retryable : ([409,425,429].includes(response.status) || response.status >= 500); throw error; }
@@ -4057,12 +4095,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     if (current && Number(current.updatedAt) === Number(patch.updatedAt) && current.state === patch.state && current.note === patch.note) {
                         const status = Number(error?.status) || 0;
                         const retryableError = typeof error?.retryable === 'boolean' ? error.retryable : (status === 409 || status === 425 || status === 429 || status >= 500 || /timeout|network|fetch failed|temporar/i.test(String(error?.message || '')));
-                        pendingCellWrites[key] = { ...current, retryCount:retryableError ? Math.min(5,(Number(current.retryCount)||0)+1) : Number(current.retryCount)||0, lastAttemptAt:Date.now(), lastError:String(error?.message || 'Unknown save error').slice(0,260), lastCode:String(error?.code || '').slice(0,60), lastStatus:status, retryable:retryableError };
+                        pendingCellWrites[key] = { ...current, retryCount:retryableError ? Math.min(8,(Number(current.retryCount)||0)+1) : Number(current.retryCount)||0, lastAttemptAt:Date.now(), lastError:String(error?.message || 'Unknown save error').slice(0,260), lastCode:String(error?.code || '').slice(0,60), lastStatus:status, retryable:retryableError };
                     }
                 });
                 persistPendingCellWrites();
                 const entries = pendingCellEntriesForCharacter(name);
-                const retryable = entries.some(([,item]) => item.retryable !== false && (Number(item.retryCount)||0) < 5);
+                const retryable = entries.some(([,item]) => item.retryable !== false);
                 const permanent = entries.find(([,item]) => item.retryable === false)?.[1];
                 const detail = permanent?.lastError || error.message;
                 const statusText = error?.status ? `HTTP ${error.status}: ` : '';
@@ -4076,10 +4114,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (newer.length && !pendingCellRetryTimers.has(name) && !pendingCellDebounceTimers.has(name)) schedulePendingCellRetry(name);
             }
         }
-        async function flushPendingCellWrites() {
+        async function flushPendingCellWrites(options = {}) {
             const names = getPendingCellCharacterNames();
             if (!names.length) return true;
-            const outcomes = await Promise.all(names.map(name => flushPendingCellWritesForCharacter(name)));
+            const outcomes = await Promise.all(names.map(name => flushPendingCellWritesForCharacter(name, options)));
             return outcomes.every(Boolean) && getPendingCellCharacterNames().length === 0;
         }
         function pendingCellWriteSummary(items = Object.values(pendingCellWrites)) {
@@ -4087,7 +4125,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function markPendingCellWritesFailedAttempt() {
             Object.values(pendingCellWrites).forEach(item => {
-                item.retryCount = Math.min(5, (Number(item.retryCount) || 0) + 1);
+                item.retryCount = Math.min(8, (Number(item.retryCount) || 0) + 1);
                 item.lastAttemptAt = Date.now();
             });
             persistPendingCellWrites();
@@ -6086,7 +6124,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             try { Promise.resolve(flushRevisionQueue()).catch(()=>false); } catch (_) {}
                             if (cellWriteConflicts) {
                                 const summary = pendingCellWriteSummary();
-                                const willRetry = Object.values(pendingCellWrites).some(item => (Number(item.retryCount)||0) < 3);
+                                const willRetry = Object.values(pendingCellWrites).some(item => item.retryable !== false);
                                 setStatus(`🔴 ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} NOT confirmed by the shared database. Kept on this device${willRetry ? ' · retrying automatically' : ' · use Sync Changes to retry'}: ${summary}${cellAck.mismatches.length > 4 ? '; …' : ''}`);
                                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', `Could not confirm ${cellWriteConflicts} task update${cellWriteConflicts === 1 ? '' : 's'} · ${willRetry ? 'retrying' : 'manual retry needed'}`);
                                 schedulePendingCellRetry();
@@ -6194,6 +6232,23 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         }
 
+        function resumeQueuedCellWritesNow() {
+            if (!characterStorageReady || !getPendingCellCharacterNames().length) return;
+            // Immediate wake-up on reconnect or when returning to this tab. Permanent
+            // authorization/validation failures are left visible for correction; only
+            // retryable entries are scheduled here.
+            pendingCellRetryTimers.forEach(timer => clearTimeout(timer));
+            pendingCellRetryTimers.clear();
+            schedulePendingCellRetry('', 50);
+        }
+        function flushQueuedCellWritesOnExit() {
+            if (!characterStorageReady || !getPendingCellCharacterNames().length) return;
+            pendingCellDebounceTimers.forEach(timer => clearTimeout(timer));
+            pendingCellDebounceTimers.clear();
+            // Best effort only. The synchronous local outbox is the recovery guarantee;
+            // keepalive gives an already queued request one final chance during navigation.
+            flushPendingCellWrites({ keepalive:true }).catch(() => false);
+        }
         function startRemoteRefresh(){
             if(remoteRefreshTimer) clearInterval(remoteRefreshTimer);
             // Read more frequently while someone is actively looking at the Tracker,
@@ -6204,8 +6259,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const cadence=isTrackerPageCurrentlyVisible()?5000:60000;
                 if(Date.now()-lastRemoteRefreshAttemptAt>=cadence)refreshSharedDataIfChanged();
             },5000);
-            window.addEventListener('focus', () => refreshSharedDataIfChanged({force:true}));
-            document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSharedDataIfChanged({force:true}); });
+            window.addEventListener('online', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); });
+            window.addEventListener('focus', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); }
+                else flushQueuedCellWritesOnExit();
+            });
+            window.addEventListener('pagehide', flushQueuedCellWritesOnExit);
         }
 
         // ----------------------------------------------------------
@@ -6420,7 +6480,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             persistLocalData();
             const names = getPendingCellCharacterNames();
             if (!names.length) return;
-            updatePendingCellStatus();
+            if (!pendingCellPersistenceHealthy) {
+                setStatus('🔴 Your browser blocked saving the pending-edit queue. Keep Pantheon open until the server confirms the changes; check browser storage permissions.');
+            } else {
+                updatePendingCellStatus();
+            }
             names.forEach(name => schedulePendingCellCharacterSave(name, 220));
         }
 
@@ -6439,6 +6503,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
                 if (!state.user?.id) throw new Error('The authenticated Discord profile ID is missing.');
                 pantheonDiscordUser = state.user;
+                try { if (navigator.storage?.persist) navigator.storage.persist().catch(() => false); } catch (_) {}
                 const currentDiscordId = String(state.user.id);
                 const previousDiscordId = localStorage.getItem(DISCORD_IDENTITY_ACCOUNT_KEY) || '';
                 if (previousDiscordId !== currentDiscordId) {
@@ -10749,7 +10814,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r54';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r55';
+        // Recent patch releases are intentionally silent. Keep the welcome/release modal
+        // disabled for this build; profile and weekly-report prompts remain independent.
+        const WELCOME_RELEASE_MODAL_ENABLED = false;
         const PANTHEON_DISCORD_URL = 'https://discord.gg/pYFdSG6CX';
         let returnToWelcomeAfterShortcutModal = false;
         function configurePantheonDiscordLinks() {
@@ -11153,6 +11221,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             applyLandingChoice(LANDING_OPTIONS.includes(saved) ? saved : 'overview');
             configurePantheonDiscordLinks();
+            if (!WELCOME_RELEASE_MODAL_ENABLED) {
+                welcomeReleaseInitializedForVersion = PANTHEON_TOOLS_VERSION;
+                const modal = document.getElementById('welcome-modal');
+                if (modal) modal.classList.add('hidden');
+                document.body.classList.remove('welcome-modal-open');
+                return;
+            }
             const dismissed = isWelcomeReleaseDismissed();
             const checkbox = document.getElementById('welcome-hide-until-update');
             if (checkbox) checkbox.checked = dismissed;
@@ -11343,6 +11418,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function openModal(id) {
+            if (id === 'welcome-modal' && !WELCOME_RELEASE_MODAL_ENABLED) return;
             if (id === 'scholar-modal' && !refreshLedgerVisibility()) return;
             document.getElementById(id)?.classList.remove('hidden');
             if (id === 'welcome-modal') document.body.classList.add('welcome-modal-open');
@@ -11354,7 +11430,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const returnToWelcome = wasOpen && (id === 'help-modal' || id === 'salary-modal') && returnToWelcomeAfterShortcutModal;
             modal?.classList.add('hidden');
             if (id === 'welcome-modal') document.body.classList.remove('welcome-modal-open');
-            if (returnToWelcome) {
+            if (returnToWelcome && WELCOME_RELEASE_MODAL_ENABLED) {
                 returnToWelcomeAfterShortcutModal = false;
                 const checkbox = document.getElementById('welcome-hide-until-update');
                 if (!isWelcomeReleaseDismissed() && !checkbox?.checked) {
@@ -11467,7 +11543,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r54';
+  const CURRENT_BUILD = '1.6.8-r55';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

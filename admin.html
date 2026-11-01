@@ -202,7 +202,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
   </section>
   <section class="card" id="owner-audit-panel">
     <h2>4. Player ownership audit</h2>
-    <p>Review which enabled Discord account owns each Member Roster entry. Characters and their progress are never moved by this audit. Linking an account only connects that Discord identity to the existing owner entry; duplicate links must be cleared deliberately.</p>
+    <p>Manage which enabled Discord account is linked to every Member Roster entry. You can assign, replace, or clear a link. These actions only change account ownership; character registrations and saved progress are preserved.</p>
     <div class="actions"><button class="btn" type="button" id="refresh-owner-audit">Refresh ownership audit</button><button class="btn" type="button" id="repair-bootstrap-owner-links" hidden>Repair my Admin / Personal identity link</button><button class="btn" type="button" id="refresh-owner-index">Rebuild ownership index</button></div>
     <div id="owner-audit-status" class="status hidden"></div>
     <div id="owner-audit-summary" class="owner-audit-summary"></div>
@@ -392,17 +392,19 @@ function renderOwnerAudit(data){
     const duplicateNames=(member.duplicateCharacterNames||[]).map(item=>`${escapeHtml(item.name)} also appears under ${(item.owners||[]).filter(owner=>owner.memberId!==member.memberId).map(owner=>escapeHtml(owner.name)).join(', ')}`).join('; ');
     const indexDetail=(member.indexProblems||[]).length?`Index mismatch: ${member.indexProblems.map(escapeHtml).join(', ')}`:'';
     let action='';
-    if(member.issueCode==='duplicate-discord-link'||member.issueCode==='bootstrap-admin-id-on-wrong-owner'){
-      const isPersonalOwner=String(member.memberName).trim().toLocaleLowerCase()===String(ownerAuditSnapshot?.bootstrapPersonalOwnerName||adminSessionState?.personalOwnerName||'Cho').trim().toLocaleLowerCase() && String(member.discordId||'')===String(ownerAuditSnapshot?.bootstrapDiscordId||'');
-      const clearLabel=member.issueCode==='bootstrap-admin-id-on-wrong-owner'?'Clear misplaced Admin ID from this entry':'Clear duplicate Discord link on this entry';
-      action=isPersonalOwner?'<div class="owner-audit-detail">Keep this identity linked to the configured personal owner. Clear the duplicate link from the other roster entry.</div>':`<div class="owner-audit-controls"><button class="btn danger" type="button" data-owner-clear="${escapeHtml(member.memberId)}" data-owner-name="${escapeHtml(member.memberName)}">${clearLabel}</button></div><div class="owner-audit-detail">Only clear this link if this Discord account does not belong to ${escapeHtml(member.memberName)}. Its character registrations and progress will remain intact.</div>`;
-    }else if(member.issueCode==='missing-discord-confirmation'||member.issueCode==='discord-account-not-enabled'||member.issueCode==='bootstrap-personal-owner-mismatch'){
-      const options=(member.linkOptions||[]).map(account=>`<option value="${escapeHtml(account.discordId)}" ${member.suggestedDiscordId===account.discordId?'selected':''}>${escapeHtml(account.label||account.discordId)} · ${escapeHtml(account.discordId)}${account.role==='admin'?' · ADMIN':''}</option>`).join('');
-      const bootstrapNote=member.issueCode==='bootstrap-personal-owner-mismatch'?'<div class="owner-audit-detail">This is the configured personal-owner entry, but it currently has a different Discord ID. Choose the bootstrap Admin Discord account only after clearing any misplaced bootstrap link from the incorrect roster entry.</div>':'';
-      action=`<div class="owner-audit-controls"><select data-owner-discord-select="${escapeHtml(member.memberId)}"><option value="">Choose the correct enabled Discord account…</option>${options}</select><button class="btn primary" type="button" data-owner-link="${escapeHtml(member.memberId)}" data-owner-name="${escapeHtml(member.memberName)}" ${options?'':'disabled'}>Link account</button></div>${options?'':`<div class="owner-audit-detail">No unassigned enabled Discord account is available. Add or enable the correct account in section 1, then refresh this audit.</div>`}${bootstrapNote}`;
-    }else if(member.issueCode==='owner-index-out-of-date'){
-      action='<div class="owner-audit-detail">The roster identity is present, but the player index does not match it. Use “Rebuild ownership index” above; this does not change character progress.</div>';
+    if(member.characterCount>0){
+      const options=(member.linkOptions||[]).map(account=>`<option value="${escapeHtml(account.discordId)}" ${(member.suggestedDiscordId===account.discordId || member.discordId===account.discordId)?'selected':''}>${escapeHtml(account.label||account.discordId)} · ${escapeHtml(account.discordId)}${account.role==='admin'?' · ADMIN':''}</option>`).join('');
+      const bootstrapNote=member.isBootstrapPersonalOwner?'<div class="owner-audit-detail">This is the protected Admin personal-owner identity. Keep it linked to the configured bootstrap Discord account.</div>':'';
+      const linkLabel=member.discordId?'Change linked account':'Link approved account';
+      const clearButton=member.discordId && !member.isBootstrapPersonalOwner
+        ? `<button class="btn danger" type="button" data-owner-clear="${escapeHtml(member.memberId)}" data-owner-name="${escapeHtml(member.memberName)}" data-owner-discord="${escapeHtml(member.discordId)}">Clear link</button>`
+        : '';
+      const emptyOptions=options?'':`<div class="owner-audit-detail">No unassigned enabled Discord account is available. Add or enable the correct account above, or clear its duplicate link from the incorrect roster entry first.</div>`;
+      action=`<div class="owner-audit-controls"><select data-owner-discord-select="${escapeHtml(member.memberId)}"><option value="">Choose an enabled Discord account…</option>${options}</select><button class="btn primary" type="button" data-owner-link="${escapeHtml(member.memberId)}" data-owner-name="${escapeHtml(member.memberName)}" ${options?'':'disabled'}>${linkLabel}</button>${clearButton}</div>${emptyOptions}${bootstrapNote}`;
     }
+    if(member.issueCode==='owner-index-out-of-date') action+='<div class="owner-audit-detail">The Discord link is saved, but the player ownership index is out of date. Use “Rebuild ownership index” above; no character progress is changed.</div>';
+    if(member.issueCode==='duplicate-discord-link') action+='<div class="owner-audit-detail">This Discord ID is attached to more than one roster owner. Assign the correct unique account to each person, then refresh the audit.</div>';
+    if(member.issueCode==='duplicate-character-ign') action+='<div class="owner-audit-detail">Resolve the duplicated IGN in the Character Registrations section. Do not use account linking to move a character between owners.</div>';
     const duplicateIgnGuidance=duplicateNames?'<div class="owner-audit-detail">Keep each duplicated IGN only under its actual owner. In section 3, remove the duplicate registration from the incorrect owner, then rebuild the ownership index. Existing task cells remain attached to the retained IGN; do not rename the character as a shortcut.</div>':'';
     return `<article class="owner-audit-card"><div class="owner-audit-head"><div><div class="owner-audit-name">${escapeHtml(member.memberName)}</div><div class="owner-audit-meta">Member ID: ${escapeHtml(member.memberId)} · ${member.characterCount} registered · ${member.trackerCharacterCount} opted into Tracker</div><div class="owner-audit-meta">${discordText}</div></div><span class="owner-audit-badge ${ownerAuditBadgeClass(member.issueCode)}">${escapeHtml(member.issueLabel)}</span></div><div class="owner-audit-characters">${chars}</div>${duplicateNames?`<div class="owner-audit-issues">Duplicate IGN: ${duplicateNames}</div>`:''}${duplicateIgnGuidance}${indexDetail?`<div class="owner-audit-issues">${indexDetail}</div>`:''}${action}</article>`;
   }).join('');
@@ -429,8 +431,8 @@ $('owner-audit-list')?.addEventListener('click',async event=>{
     if(!discordId)return setStatus('owner-audit-status','Choose an enabled Discord account first.','error');
     const account=ownerAuditSnapshot?.enabledAccounts?.find(item=>item.discordId===discordId);
     const existingDiscordId=String(ownerAuditSnapshot?.members?.find(item=>item.memberId===memberId)?.discordId||'');
-    const replaces=existingDiscordId && existingDiscordId!==discordId?` This replaces the currently linked Discord ID ${existingDiscordId}; verify that the old link is incorrect before proceeding.`:'';
-    if(!confirm(`Link ${account?.label||discordId} (${discordId}) to Member Roster owner ${memberName}? This allows that Discord account to edit only this owner's Tracker-enabled characters.${replaces} Existing character names and progress are not moved or deleted.`))return;
+    const replaces=existingDiscordId && existingDiscordId!==discordId?` This replaces the current Discord ID ${existingDiscordId} for this member.`:'';
+    if(!confirm(`Assign ${account?.label||discordId} (${discordId}) to Member Roster owner ${memberName}? This account will be able to edit only this owner's Tracker-enabled characters.${replaces} Character registrations and saved progress will not be moved or deleted.`))return;
     linkButton.disabled=true;
     try{await postOwnerAuditAction({action:'link',memberId,discordId});setStatus('owner-audit-status',`Discord account linked to ${memberName}. Character progress was preserved.`,'ok');await refreshOwnerAudit();await refreshCharacterAdmin();}
     catch(error){setStatus('owner-audit-status',error.message,'error');}
@@ -439,9 +441,10 @@ $('owner-audit-list')?.addEventListener('click',async event=>{
   }
   if(clearButton){
     const memberId=clearButton.dataset.ownerClear,memberName=clearButton.dataset.ownerName;
-    if(!confirm(`Clear the duplicated Discord ID from ${memberName}'s Member Roster entry? This does not delete the member, characters, or any task progress. The correct owner can be linked afterward.`))return;
+    const currentDiscordId=String(clearButton.dataset.ownerDiscord||'');
+    if(!confirm(`Remove the Discord account link from ${memberName}? That account will no longer be able to edit this member's characters. The member, registered characters, and all saved task progress will remain. You can link another approved account at any time.`))return;
     clearButton.disabled=true;
-    try{await postOwnerAuditAction({action:'clear-link',memberId});setStatus('owner-audit-status',`Duplicate link cleared from ${memberName}. Its character data remains intact.`,'ok');await refreshOwnerAudit();await refreshCharacterAdmin();}
+    try{await postOwnerAuditAction({action:'clear-link',memberId,expectedDiscordId:currentDiscordId});setStatus('owner-audit-status',`Discord link cleared for ${memberName}. Its character data and progress remain intact.`,'ok');await refreshOwnerAudit();await refreshCharacterAdmin();}
     catch(error){setStatus('owner-audit-status',error.message,'error');}
     finally{clearButton.disabled=false;}
   }
