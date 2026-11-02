@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r01</title>
+    <title>Pantheon Tools v1.6.9-r02</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r01</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r02</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r01:</strong> Tracker responsiveness is improved, and Bounty-labeled dungeon names are no longer mistaken for Bounty Board claim rows when they are registered under a dungeon category. Claim rows remain protected from default N/A exclusion.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r02:</strong> Browser focus and page navigation now reuse revision checks instead of reloading unchanged character data. This reduces unnecessary database reads while preserving automatic sync and the r01 dungeon-registration correction.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5324,7 +5324,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             renderOverviewActivity();
             renderAnalytics();
             renderTeamBuilder();
-            if (typeof refreshSharedDataIfChanged === 'function') await refreshSharedDataIfChanged({force:true});
+            if (typeof refreshSharedDataIfChanged === 'function') await refreshSharedDataIfChanged();
             // A queue left by the previous mode is never discarded. Retry it only after the
             // selected mode is active so the API applies the corresponding ownership rule.
             if (!turningOff && Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
@@ -6805,13 +6805,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             try{return new Date(timestamp).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}catch(_){return 'just now';}
         }
 
-        async function refreshSharedDataIfChanged({force=false}={}){
+        async function refreshSharedDataIfChanged(){
             const pendingCellSnapshot = clonePendingCellWrites(pendingCellWrites);
             const hasQueuedCellEdits=Object.keys(pendingCellSnapshot).length>0;
             if(remoteRefreshBusy || document.visibilityState !== 'visible' || syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges){
                 if(isTrackerPageCurrentlyVisible() && (unsavedCloudChanges || syncInProgress)) setTrackerLiveSyncNote('pending','Your shared settings are still saving…');
                 return false;
             }
+            // Focus, visibility, and in-app navigation can fire back-to-back. A recent
+            // revision check already covers all of them; avoid issuing duplicate D1 reads.
+            if(Date.now() - lastRemoteRefreshAttemptAt < 5000) return false;
             if(!hasCloudConfig()){
                 if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('error','Local mode · cloud sync unavailable');
                 return false;
@@ -6821,7 +6824,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking for guild changes…');
             try{
                 const revision = await fetchRemoteRevision(getCloudConfig());
-                const changed = force === true || !lastRemoteRevision || revision !== lastRemoteRevision;
+                const changed = !lastRemoteRevision || revision !== lastRemoteRevision;
                 if(changed){
                     const remote = await fetchRemoteRecord(getCloudConfig());
                     if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return false;
@@ -6882,10 +6885,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const cadence=isTrackerPageCurrentlyVisible()?15000:120000;
                 if(Date.now()-lastRemoteRefreshAttemptAt>=cadence)refreshSharedDataIfChanged();
             },5000);
-            window.addEventListener('online', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); });
-            window.addEventListener('focus', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); });
+            window.addEventListener('online', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged(); });
+            window.addEventListener('focus', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged(); });
             document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); }
+                if (document.visibilityState === 'visible') { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged(); }
                 else flushQueuedCellWritesOnExit();
             });
             window.addEventListener('pagehide', flushQueuedCellWritesOnExit);
@@ -7966,9 +7969,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function refreshPresenceAfterResume() {
             // Heartbeat and roster refresh are independent; a slow heartbeat must never
-            // prevent the left member list from loading.
+            // prevent the left member list from loading. Respect the list cache on focus:
+            // startOnlinePresence already refreshes on a 90-second cadence, and stale data
+            // after a long-hidden tab still passes the normal 30-second freshness check.
             refreshOnlinePresence(true, false);
-            return refreshOnlinePresence(false, true);
+            return refreshOnlinePresence(false, false);
         }
         function startOnlinePresence() {
             const pane = document.getElementById('online-presence-pane');
@@ -12266,7 +12271,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r01';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r02';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12788,7 +12793,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // revision/record instead of trusting a page-local snapshot. The release check
             // also runs here, not just on focus or the background timer.
             if (page === 'tracker') setTrackerLiveSyncNote('checking','Checking guild updates…');
-            if (typeof refreshSharedDataIfChanged === 'function') refreshSharedDataIfChanged({force:true}).catch(() => {});
+            if (typeof refreshSharedDataIfChanged === 'function') refreshSharedDataIfChanged().catch(() => {});
             if (typeof window.__pantheonCheckReleaseNow === 'function') window.__pantheonCheckReleaseNow();
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
@@ -12995,7 +13000,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r01';
+  const CURRENT_BUILD = '1.6.9-r02';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
