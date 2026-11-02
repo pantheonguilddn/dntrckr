@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r64</title>
+    <title>Pantheon Tools v1.6.8-r65</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3416,6 +3416,25 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .online-presence-retry { border:1px solid var(--pt-border); border-radius:7px; padding:6px 10px; background:var(--pt-surface-soft); color:var(--pt-text); font:inherit; font-size:.63rem; cursor:pointer; }
 .online-presence-retry:hover { border-color:var(--pt-accent); }
 </style>
+
+<style id="pantheon-r65-weekly-profile-insights">
+.guild-social-weekly-summary { display:grid; gap:8px; min-width:0; }
+.guild-social-weekly-summary-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; min-width:0; }
+.guild-social-weekly-summary-head strong { color:var(--pt-text); font-size:1.45rem; line-height:1; font-weight:850; font-variant-numeric:tabular-nums; }
+.guild-social-weekly-summary-head span,.guild-social-weekly-summary > small { color:var(--pt-muted); font-size:.6rem; line-height:1.4; text-align:right; }
+.guild-social-weekly-meter { height:8px; overflow:hidden; border-radius:999px; background:var(--pt-surface-soft); border:1px solid var(--pt-border); }
+.guild-social-weekly-meter > span { display:block; height:100%; border-radius:inherit; background:var(--pt-accent); transition:width .25s ease; }
+.guild-social-next-focus-wrap { margin-top:13px; padding-top:11px; border-top:1px solid var(--pt-border); min-width:0; }
+.guild-social-next-focus-wrap h6 { margin:0 0 8px; color:var(--pt-muted); font-size:.62rem; font-weight:850; letter-spacing:.07em; text-transform:uppercase; }
+.guild-social-next-focus { display:grid; gap:7px; min-width:0; }
+.guild-social-next-focus-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px; min-width:0; }
+.guild-social-next-focus-head strong { color:var(--pt-text); font-size:.72rem; overflow-wrap:anywhere; }
+.guild-social-next-focus-head small { color:var(--pt-muted); font-size:.57rem; text-align:right; }
+.guild-social-next-focus-tasks { display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
+.guild-social-next-focus-tasks span { max-width:100%; padding:5px 8px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-surface-soft); color:var(--pt-text); font-size:.62rem; line-height:1.35; overflow-wrap:anywhere; }
+.guild-social-next-focus p,.guild-social-next-focus-complete { margin:0; color:var(--pt-muted); font-size:.59rem; line-height:1.45; overflow-wrap:anywhere; }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3898,9 +3917,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r64</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r65</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r64:</strong> Simplified social controls and made profile pictures use each member’s Discord avatar.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r65:</strong> Simplified social controls and made profile pictures use each member’s Discord avatar.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -7854,7 +7873,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const online = profile?.online === true || profile?.online === 1;
             const main = profile?.mainCharacter;
             const other = Array.isArray(profile?.otherCharacters) ? profile.otherCharacters : [];
-            const activities = Array.isArray(profile?.recentActivity) ? profile.recentActivity : [];
+            const activity = profile?.activitySnapshot && typeof profile.activitySnapshot === 'object' ? profile.activitySnapshot : null;
+            const focus = profile?.nextFocus && typeof profile.nextFocus === 'object' ? profile.nextFocus : null;
             const mainHtml = main
                 ? `<div class="guild-social-main-char"><strong>${escapeHTML(main.name || 'Main character')}</strong><span>${escapeHTML(main.job || 'Class not set')}</span></div>`
                 : '<div class="guild-social-empty guild-social-empty-inline">Main character not selected yet.</div>';
@@ -7865,10 +7885,19 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const bioPreview = bio
                 ? `<p class="guild-social-hero-bio">${escapeHTML(bio)}</p>`
                 : `<p class="guild-social-hero-bio is-empty">${own ? 'Add a short bio so guildmates know what you are working on.' : 'No profile bio added yet.'}</p>`;
-            const activityHtml = activities.length ? activities.slice(0,8).map(item => {
-                const when = Number(item.at) ? new Date(Number(item.at)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
-                return `<div class="guild-social-activity-item"><span class="guild-social-activity-mark">✓</span><div><strong>${escapeHTML(item.taskName || 'Completed activity')}</strong><small>${escapeHTML(item.characterName || 'Character')} · ${escapeHTML(when)}</small></div></div>`;
-            }).join('') : '<div class="guild-social-empty guild-social-empty-inline">No recent completions recorded yet. Their next clear will show up here.</div>';
+            const activityRate = activity && activity.rate !== null && activity.rate !== undefined && Number.isFinite(Number(activity.rate)) ? Math.max(0, Math.min(100, Number(activity.rate))) : null;
+            const activityHtml = activityRate !== null
+                ? `<div class="guild-social-weekly-summary"><div class="guild-social-weekly-summary-head"><strong>${activityRate}%</strong><span>${Number(activity.completed) || 0} of ${Number(activity.eligible) || 0} eligible checks</span></div><div class="guild-social-weekly-meter" role="img" aria-label="${activityRate}% weekly activity"><span style="width:${activityRate}%"></span></div><small>Across ${Number(activity.trackedCharacters) || 0} tracked character${Number(activity.trackedCharacters) === 1 ? '' : 's'} · current weekly reset</small></div>`
+                : (Number(activity?.trackedCharacters) > 0 && Number(activity?.eligible) === 0
+                    ? '<div class="guild-social-empty guild-social-empty-inline">No eligible weekly checks remain in this reset period.</div>'
+                    : '<div class="guild-social-empty guild-social-empty-inline">Weekly activity will appear once this member has tracked characters and eligible tasks.</div>');
+            const focusHtml = focus?.unavailable
+                ? '<div class="guild-social-empty guild-social-empty-inline">No eligible weekly tasks to prioritize right now.</div>'
+                : focus?.complete
+                    ? '<div class="guild-social-next-focus-complete">All eligible weekly checks are complete across tracked characters.</div>'
+                    : focus?.tasks?.length
+                    ? `<div class="guild-social-next-focus"><div class="guild-social-next-focus-head"><strong>${escapeHTML(focus.characterName || 'Next character')}</strong><small>${focus.isMain ? 'Main character' : 'Next tracked character'}</small></div><div class="guild-social-next-focus-tasks">${focus.tasks.map(task => `<span>${escapeHTML(task.name || '')}</span>`).join('')}</div><p>${escapeHTML(focus.note || 'Suggested from unfinished weekly tasks and shared task priorities.')}</p></div>`
+                    : '<div class="guild-social-empty guild-social-empty-inline">No next focus is available yet.</div>';
             host.innerHTML = `
                 <div class="guild-social-profile-hero">
                     ${guildProfileAvatarMarkup(profile)}
@@ -7883,7 +7912,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <section class="guild-social-info-card guild-social-bio-card"><div class="guild-social-card-head"><h5>About this member</h5>${own ? '<span>Only you can edit this</span>' : ''}</div>
                         ${own ? `<textarea id="guild-social-bio-input" maxlength="240" rows="3" placeholder="Write a little about yourself, your goals, or what you enjoy in Dragon Nest…">${escapeHTML(bio)}</textarea><div class="guild-social-bio-foot"><small id="guild-social-bio-count">${[...bio].length}/240</small><button type="button" class="btn btn-secondary" onclick="saveGuildMemberBio()">Save bio</button></div>` : `<p class="guild-social-bio-text">${bio ? escapeHTML(bio) : 'This member has not added a bio yet.'}</p>`}
                     </section>
-                    <section class="guild-social-info-card guild-social-activity-card"><div class="guild-social-card-head"><h5>Recent activity</h5><span>Latest recorded clears</span></div><div class="guild-social-activity-list">${activityHtml}</div></section>
+                    <section class="guild-social-info-card guild-social-activity-card"><div class="guild-social-card-head"><h5>Weekly activity</h5><span>Current reset period</span></div>${activityHtml}<div class="guild-social-next-focus-wrap"><h6>Next focus</h6>${focusHtml}</div></section>
                 </div>
                 <div class="guild-social-profile-actions"><button class="btn btn-cloud" type="button" onclick="openGuildForum()">Open Guild Forum</button>${own ? '<span class="modal-note">This is your Pantheon profile.</span>' : ''}</div>`;
             if (own) {
@@ -7900,7 +7929,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (!response.ok) throw new Error(data.error || 'Member details unavailable.');
                 if (guildSocialActiveProfile !== profile) return;
                 profile.bio = String(data.bio || '');
-                profile.recentActivity = Array.isArray(data.recentActivity) ? data.recentActivity : [];
+                profile.activitySnapshot = data.activitySnapshot && typeof data.activitySnapshot === 'object' ? data.activitySnapshot : null;
+                profile.nextFocus = data.nextFocus && typeof data.nextFocus === 'object' ? data.nextFocus : null;
                 profile.isOwnProfile = data.isOwn === true;
                 renderGuildSocialProfile(profile);
             } catch (error) {
@@ -11947,7 +11977,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r64';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r65';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12676,7 +12706,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r64';
+  const CURRENT_BUILD = '1.6.8-r65';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

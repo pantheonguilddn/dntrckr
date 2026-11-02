@@ -1,13 +1,11 @@
-# Deploy Pantheon Tools r64
+# Deploy Pantheon Tools r65
 
-1. Download `Pantheon_Cloudflare_Pages_v1.6.8-r64.zip`.
+1. Download `Pantheon_Cloudflare_Pages_v1.6.8-r65.zip`.
 2. Upload the ZIP contents to the existing Cloudflare Pages project, preserving the `functions/` directory structure.
-3. Keep the existing `PANTHEON_DB` D1 binding and environment variables unchanged.
-4. Do not run SQL, reset D1, clear browser data, or remove existing tracker, member, forum, or message records.
-5. After deployment, refresh Pantheon. The Guild Members list now requests its list independently from the heartbeat and shows a Retry control if the service does not answer within 15 seconds.
+3. Keep the existing `PANTHEON_DB` D1 binding, Discord OAuth settings, and environment variables unchanged.
+4. Do not run SQL, reset D1, clear browser data, or remove the old tracker record. This release adds no database tables or columns.
+5. After deployment, open a member profile. The former Recent activity list is replaced by Weekly activity and Next focus.
 
-The Tracker no longer displays the separate Weeklies/Dailies group column. The category column is now leftmost; internal reset grouping and calculations are unchanged.
+Activity ratio is computed from the current D1 character cells for that member's Tracker-enabled characters. It excludes Bounty tasks, Admin-selected Extra Dungeons, and cells marked N/A. Next focus is a suggestion based on the shared Loot Weight order, prioritizing the main character first. It is advisory only; members can still choose any task.
 
-No manual SQL migration is required. The What's New popup remains disabled.
-
-Note: no live Cloudflare deployment or end-to-end D1 validation is performed by this package build.
+The What's New popup remains disabled. No new polling loop or tracker save behavior is added.
