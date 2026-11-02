@@ -104,7 +104,11 @@ export async function onRequestPost(context) {
       const alreadyRegistered = !!duplicateCategory;
       if (!alreadyRegistered) category.tasks.push(taskName);
       const registrationCategory = duplicateCategory || category;
-      const isBountyTask = /bounty(?:\s+board|\s+claim)?/i.test(taskName) || /bounty/i.test(String(registrationCategory?.name || ''));
+      // Match the Tracker's isBountyListTask() rule: a claim row is identified by
+      // belonging to a Bounty-named category, not by the word "Bounty" appearing
+      // anywhere in a dungeon's display name. A real dungeon such as
+      // "Desert Dragon Memoria [Bounty]" may still use the default-N/A policy.
+      const isBountyTask = /bounty/i.test(String(registrationCategory?.name || ''));
       if (excludeByDefault && isBountyTask) return jsonResponse({ error: 'Bounty Board claim rows cannot be excluded by default. Apply the default N/A policy to the dungeon task instead.' }, 400);
 
       const profileResult = ensureActivityProfile(settings, taskName);

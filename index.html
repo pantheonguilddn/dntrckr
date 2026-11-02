@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r71</title>
+    <title>Pantheon Tools v1.6.9-r01</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r71</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r01</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r71:</strong> Admin Console #5 Extra Dungeons is now the shared exclusion control. Checked tasks default to muted N/A per character; right-click opts in only that character. Dungeon Registration can add a task directly to the same list.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r01:</strong> Tracker responsiveness is improved, and Bounty-labeled dungeon names are no longer mistaken for Bounty Board claim rows when they are registered under a dungeon category. Claim rows remain protected from default N/A exclusion.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4698,7 +4698,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             } finally {
                 pendingCellSyncBusy.delete(name);
                 const newer = pendingCellEntriesForCharacter(name);
-                if (newer.length && !pendingCellRetryTimers.has(name) && !pendingCellDebounceTimers.has(name)) schedulePendingCellRetry(name);
+                if (newer.length && !pendingCellRetryTimers.has(name) && !pendingCellDebounceTimers.has(name)) {
+                    schedulePendingCellCharacterSave(name, 35);
+                }
             }
         }
         async function flushPendingCellWrites(options = {}) {
@@ -7119,7 +7121,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             } else {
                 updatePendingCellStatus();
             }
-            names.forEach(name => schedulePendingCellCharacterSave(name, 220));
+            names.forEach(name => schedulePendingCellCharacterSave(name, 80));
         }
 
         async function pantheonCheckSessionAndBoot() {
@@ -7276,6 +7278,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const footerRow = document.getElementById('footer-row');
             const tbody = document.getElementById('tracker-body');
             if (!table) return;
+            // A tracker can contain thousands of cells. Delegate interactions once on the
+            // tbody instead of allocating change/contextmenu closures for every cell/input.
+            if (tbody && tbody.dataset.pantheonDelegated !== '1') {
+                tbody.dataset.pantheonDelegated = '1';
+                tbody.addEventListener('change', event => {
+                    const target = event.target;
+                    if (!target || !target.matches('input[data-char][data-task]')) return;
+                    if (target.classList.contains('bounty-input')) handleNoteChange(event);
+                    else if (target.type === 'checkbox') handleCheck(event);
+                });
+                tbody.addEventListener('contextmenu', event => {
+                    if (event.target.closest('.bounty-input')) return;
+                    const cell = event.target.closest('td.interactive-cell[data-char][data-task]');
+                    if (cell) handleRightClick(event);
+                });
+            }
 
             const empty = characters.length === 0;
             const toolbar = document.getElementById('tracker-toolbar');
@@ -7340,6 +7358,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             headerRow.innerHTML = '';
             footerRow.innerHTML = '<th colspan="2" class="bg-dark">Weekly Completion Rate</th>';
             tbody.innerHTML = '';
+            const trackerRowsFragment = document.createDocumentFragment();
 
             const visibleRosters = activeRosterFilter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
             visibleRosters.forEach(roster => {
@@ -7404,7 +7423,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                                     : defaultExcluded
                                         ? 'N/A by default for this character. Right-click to include only this character in completion calculations and Share Bounties. A free Bounty Board slot is linked automatically when available.'
                                         : 'Right-click to mark a bounty target or set N/A. Reset Bounty is available only on bounty-list lines; removing a target mark clears its linked text.';
-                                td.addEventListener('contextmenu', handleRightClick);
                             } else {
                                 td.classList.add('read-only-cell');
                                 td.title = `View-only progress · ${owner?.name || 'Registered owner'} controls this character`;
@@ -7414,7 +7432,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             const cb = document.createElement('input'); cb.type = 'checkbox';
                             cb.dataset.char = char.name; cb.dataset.task = taskName; cb.disabled = !canEdit;
                             cb.title = canEdit ? 'Mark this task complete' : 'View only: only the character owner or an administrator can edit progress.';
-                            cb.addEventListener('change', handleCheck);
                             td.appendChild(cb);
                             
                             if (isBounty) {
@@ -7423,16 +7440,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                                 input.value = getCellRecord(char.name, taskName).note || '';
                                 input.readOnly = !canEdit;
                                 if (!canEdit) input.title = 'View only: only the character owner or an administrator can edit bounty notes.';
-                                input.addEventListener('contextmenu', e => e.stopPropagation());
-                                input.addEventListener('change', handleNoteChange);
                                 td.appendChild(input);
                             }
                             tr.appendChild(td);
                         });
-                        tbody.appendChild(tr);
+                        trackerRowsFragment.appendChild(tr);
                     });
                 });
             }
+            // Commit the complete row set in one DOM insertion to avoid repeated layout work.
+            tbody.appendChild(trackerRowsFragment);
         }
 
         function isDefaultExcludedTask(taskName) {
@@ -7586,7 +7603,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function handleRightClick(e) {
-            const c = e.currentTarget.dataset.char, t = e.currentTarget.dataset.task;
+            const cell = e.target?.closest?.('td.interactive-cell[data-char][data-task]');
+            const c = cell?.dataset.char, t = cell?.dataset.task;
+            if (!cell || !c || !t) return;
             if (!canEditCharacterProgress(c)) { e.preventDefault(); return; }
             e.preventDefault();
 
@@ -12247,7 +12266,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r71';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r01';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12976,7 +12995,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r71';
+  const CURRENT_BUILD = '1.6.9-r01';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
