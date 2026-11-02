@@ -85,7 +85,10 @@ const KEY_MAP = Object.freeze({
   "characterProfiles": "~ah",
   "trackerEnabled": "~ai",
   "job": "~aj",
-  "memberResetMarkers": "~ak"
+  "memberResetMarkers": "~ak",
+  "extraDungeonTasks": "~al",
+  "extraDungeonTasksUpdatedAt": "~am",
+  "extraDungeonTasksUpdatedBy": "~an"
 });
 const REVERSE = Object.freeze(Object.fromEntries(Object.entries(KEY_MAP).map(([key, alias]) => [alias, key])));
 const CELL_STATES = ['open', 'done', 'excluded', 'marked', 'reset'];

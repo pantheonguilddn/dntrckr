@@ -1,4 +1,5 @@
 import { jsonResponse } from '../_utils/auth.js';
+import { loadCommunityDirectory, findConfirmedMemberByDiscordId, publicMemberProfile } from '../_utils/community.js';
 
 const ONLINE_WINDOW_MS = 90_000;
 async function ensurePresenceTable(env) {
@@ -9,14 +10,14 @@ async function ensurePresenceTable(env) {
   )`).run();
 }
 
-// Return every currently enabled Pantheon account so the UI can distinguish online and offline.
-// Online requires both a recent heartbeat and a valid, unexpired session.
 async function listAuthorizedUsers(env, now = Date.now()) {
   const cutoff = now - ONLINE_WINDOW_MS;
   const result = await env.PANTHEON_DB.prepare(`
     SELECT a.discord_id AS id,
            COALESCE(NULLIF(a.label, ''), NULLIF(p.username, ''), 'Discord member') AS label,
            COALESCE(NULLIF(p.username, ''), '') AS username,
+           COALESCE((SELECT s.username FROM sessions s WHERE s.discord_id = a.discord_id ORDER BY s.created_at DESC LIMIT 1), '') AS discordName,
+           COALESCE((SELECT s.avatar FROM sessions s WHERE s.discord_id = a.discord_id ORDER BY s.created_at DESC LIMIT 1), '') AS avatar,
            a.role AS role,
            COALESCE(p.last_seen_at, 0) AS lastSeenAt,
            CASE WHEN p.last_seen_at >= ?
@@ -28,14 +29,27 @@ async function listAuthorizedUsers(env, now = Date.now()) {
     ORDER BY online DESC, label COLLATE NOCASE ASC
     LIMIT 100
   `).bind(cutoff, now).all();
-  return (result.results || []).map(row => ({
-    id: String(row.id || ''),
-    label: String(row.label || row.username || 'Discord member'),
-    username: String(row.username || ''),
-    role: row.role === 'admin' ? 'admin' : 'member',
-    lastSeenAt: Number(row.lastSeenAt) || 0,
-    online: Number(row.online) === 1
-  }));
+
+  let members = [];
+  try { members = (await loadCommunityDirectory(env)).members; } catch (_) {}
+  return (result.results || []).map(row => {
+    const discordId = String(row.id || '');
+    const member = findConfirmedMemberByDiscordId(members, discordId);
+    const profile = publicMemberProfile(member, String(row.label || row.discordName || row.username || 'Discord member'));
+    const label = String(profile?.pantheonName || row.label || row.discordName || row.username || 'Discord member');
+    return {
+      id: discordId,
+      label,
+      username: String(row.username || row.discordName || ''),
+      discordName: String(row.discordName || row.label || row.username || 'Discord member'),
+      avatar: String(row.avatar || ''),
+      role: row.role === 'admin' ? 'admin' : 'member',
+      lastSeenAt: Number(row.lastSeenAt) || 0,
+      online: Number(row.online) === 1,
+      ...(profile || {}),
+      canMessage: !!(member && String(member.profileConfirmedDiscordId || '') === discordId)
+    };
+  });
 }
 
 export async function onRequestGet({ env, data }) {
@@ -58,7 +72,6 @@ export async function onRequestPost({ env, data }) {
       INSERT INTO user_presence (discord_id, username, last_seen_at) VALUES (?, ?, ?)
       ON CONFLICT(discord_id) DO UPDATE SET username = excluded.username, last_seen_at = excluded.last_seen_at
     `).bind(String(session.discordId), String(session.username || session.label || '').slice(0,100), now).run();
-    // Keep recent history only; enabled accounts without a recent heartbeat remain visible as offline.
     await env.PANTHEON_DB.prepare('DELETE FROM user_presence WHERE last_seen_at < ?').bind(now - 7 * 24 * 60 * 60 * 1000).run();
     return jsonResponse({ ok: true, users: await listAuthorizedUsers(env, now) });
   } catch (_) {

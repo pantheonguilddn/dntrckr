@@ -1,4 +1,4 @@
-import { jsonResponse, requireAdmin } from '../../_utils/auth.js';
+import { getRecord, jsonResponse, requireAdmin } from '../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../_utils/compact.js';
 import { isCharacterStorageMigrationBusy } from '../../_utils/character-storage.js';
 
@@ -6,21 +6,27 @@ const MAIN_ID = 'pantheon-main';
 const MAX_EXTRA_DUNGEONS = 200;
 const text = value => String(value ?? '').trim().slice(0, 140);
 
+function isBountyBoardSlot(value) {
+  return /^bounty(?:\s+board)?\s*[1-6]$/i.test(String(value || '').trim());
+}
+
 function registeredDungeonCategories(record) {
   const categories = Array.isArray(record?.settings?.categories) ? record.settings.categories : [];
   return categories
-    .filter(category => category && !String(category.name || '').toLocaleLowerCase().includes('bounty'))
+    .filter(Boolean)
     .map(category => ({
       id: String(category.id || ''),
       name: String(category.name || 'Registered dungeons').slice(0, 60),
       group: category.group === 'Dailies' ? 'Dailies' : 'Weeklies',
-      tasks: [...new Set((Array.isArray(category.tasks) ? category.tasks : []).map(text).filter(task => task && !/\bbounty\b/i.test(task)))]
+      tasks: [...new Set((Array.isArray(category.tasks) ? category.tasks : []).map(text).filter(task => task && !isBountyBoardSlot(task)))]
     }))
     .filter(category => category.tasks.length);
 }
 
 async function readMainRecord(env) {
-  const row = await env.PANTHEON_DB.prepare('SELECT id, name, record_json, updated_at FROM data_records WHERE id = ? LIMIT 1').bind(MAIN_ID).first();
+  // Resolve the canonical ID through the same alias map as the Tracker API. A direct
+  // SELECT on the literal ID can otherwise read a different row (or no row) after migration.
+  const row = await getRecord(env, MAIN_ID);
   if (!row) return null;
   let packed;
   try { packed = JSON.parse(row.record_json); }
@@ -52,7 +58,12 @@ export async function onRequestGet(context) {
       categories: registeredDungeonCategories(result.record),
       extraDungeonTasks: canonicalExtraTasks(result.record),
       updatedAt: Number(settings.extraDungeonTasksUpdatedAt) || 0,
-      updatedBy: String(settings.extraDungeonTasksUpdatedBy || '')
+      updatedBy: String(settings.extraDungeonTasksUpdatedBy || ''),
+      sourceRecordId: result.row.id,
+      recordUpdatedAt: Number(result.row.updated_at) || Number(result.record.updatedAt) || 0,
+      categoriesUpdatedAt: Number(settings.categoriesUpdatedAt) || 0,
+      categoryCount: registeredDungeonCategories(result.record).length,
+      taskCount: registeredDungeonCategories(result.record).reduce((sum, category) => sum + category.tasks.length, 0)
     });
   } catch (error) {
     return jsonResponse({ error: String(error?.message || error).slice(0, 300) }, 500);
@@ -93,7 +104,7 @@ export async function onRequestPut(context) {
       if (recordJson.length > 2_000_000) return jsonResponse({ error: 'The shared Pantheon record is too large to update.' }, 413);
       const update = await context.env.PANTHEON_DB.prepare(
         'UPDATE data_records SET record_json = ?, updated_at = ? WHERE id = ? AND record_json = ?'
-      ).bind(recordJson, now, MAIN_ID, result.row.record_json).run();
+      ).bind(recordJson, now, result.row.id, result.row.record_json).run();
       const changes = Number(update?.meta?.changes ?? update?.changes ?? 0);
       if (changes < 1) continue;
       await context.env.PANTHEON_DB.prepare(

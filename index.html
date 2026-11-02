@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r55</title>
+    <title>Pantheon Tools v1.6.8-r60</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2952,6 +2952,208 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 #drawer-scrim[hidden] { display:none !important; }
 </style>
 
+
+<style id="pantheon-r59-dungeon-details-ui">
+.dungeon-details-panel{margin-top:18px;border:1px solid #555566;border-radius:10px;padding:16px;background:rgba(255,255,255,.025)}
+.dungeon-details-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.dungeon-details-head h4{margin:0 0 5px}.dungeon-details-head p{margin:0;color:#aaa;font-size:.82rem;line-height:1.5;max-width:780px}
+.dungeon-details-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.dungeon-details-grid label{display:grid;gap:5px;color:#c9c9d4;font-size:.82rem;min-width:0}
+.dungeon-details-grid input,.dungeon-details-grid select,.dungeon-details-grid textarea{box-sizing:border-box;width:100%;min-width:0;padding:9px 10px;border:1px solid #666;border-radius:6px;background:#17171d;color:#fff;font:inherit}
+.dungeon-details-grid .wide{grid-column:span 2}.dungeon-details-grid .full{grid-column:1/-1}
+.dungeon-details-help{font-size:.76rem;color:#a8a8b5;line-height:1.5;margin-top:8px}
+@media(max-width:760px){.dungeon-details-grid{grid-template-columns:1fr}.dungeon-details-grid .wide{grid-column:auto}}
+:root[data-pantheon-theme] .dungeon-details-panel{background:var(--surface2);border-color:var(--border)}
+:root[data-pantheon-theme] .dungeon-details-grid label{color:var(--text)}
+:root[data-pantheon-theme] .dungeon-details-grid input,:root[data-pantheon-theme] .dungeon-details-grid select,:root[data-pantheon-theme] .dungeon-details-grid textarea{background:var(--surface);color:var(--text);border-color:var(--border)}
+</style>
+<style id="pantheon-r59-unified-dungeon-details">
+/* Discord-style guild member rail: full-height on desktop, in-flow on smaller screens. */
+@media (min-width:1200px) {
+  body.pantheon-discord-sidebar {
+    box-sizing:border-box !important;
+    padding:22px clamp(12px,2.5vw,36px) 48px calc(264px + clamp(12px,2.5vw,36px)) !important;
+    align-items:center !important;
+  }
+  #online-presence-pane {
+    position:fixed !important; inset:0 auto 0 0 !important;
+    display:flex !important; flex-direction:column !important;
+    width:264px !important; min-width:264px !important; max-width:264px !important;
+    height:100vh !important; height:100dvh !important; max-height:none !important;
+    margin:0 !important; padding:0 !important; z-index:1100 !important;
+    border:0 !important; border-right:1px solid var(--pt-border) !important;
+    border-radius:0 !important; box-shadow:6px 0 26px rgba(0,0,0,.10) !important;
+    overflow:hidden !important; background:var(--pt-surface) !important;
+  }
+  #online-presence-pane .online-event-notice { flex:0 0 auto; margin:0 !important; border-radius:0 !important; }
+  #online-presence-pane .online-presence-head {
+    flex:0 0 auto; min-height:54px; box-sizing:border-box;
+    padding:13px 14px !important; border:0 !important; border-bottom:1px solid var(--pt-border) !important;
+    border-radius:0 !important; background:var(--pt-surface-raised) !important;
+  }
+  #online-presence-pane .online-presence-head strong { font-size:.74rem !important; letter-spacing:.06em; text-transform:uppercase; }
+  #online-presence-pane .online-presence-count { font-size:.61rem !important; }
+  #online-presence-pane .online-presence-list {
+    display:flex !important; flex:1 1 auto !important; flex-direction:column !important;
+    min-height:0 !important; max-height:none !important; overflow-y:auto !important; overflow-x:hidden !important;
+    grid-template-columns:1fr !important; gap:10px !important; padding:12px 10px 16px !important;
+    overscroll-behavior:contain;
+  }
+  #online-presence-pane .online-presence-group { flex:0 0 auto; padding:0 5px !important; }
+  #online-presence-pane .online-presence-group + .online-presence-group {
+    border:0 !important; border-top:1px solid var(--pt-border) !important;
+    margin:3px 0 0 !important; padding:12px 5px 0 !important;
+  }
+  #online-presence-pane .online-presence-group-title { padding:3px 4px 9px !important; font-size:.65rem !important; letter-spacing:.08em; text-transform:uppercase; }
+  #online-presence-pane .online-presence-user { min-height:37px; align-items:center !important; gap:9px !important; padding:7px 5px !important; border:0 !important; border-radius:7px; }
+  #online-presence-pane .online-presence-user:hover { background:var(--pt-hover); }
+  #online-presence-pane .online-presence-user-name { font-size:.72rem !important; line-height:1.35 !important; }
+  #online-presence-pane .online-presence-foot { flex:0 0 auto; border-top:1px solid var(--pt-border) !important; padding:11px 13px !important; text-align:left !important; }
+  body.pantheon-discord-sidebar.pantheon-presence-collapsed {
+    padding-left:calc(68px + clamp(12px,2.5vw,36px)) !important;
+  }
+  #online-presence-pane.is-collapsed { width:56px !important; min-width:56px !important; max-width:56px !important; }
+  #online-presence-pane.is-collapsed .online-presence-head { justify-content:center !important; padding:10px 5px !important; }
+  #online-presence-pane.is-collapsed .online-presence-head > div,
+  #online-presence-pane.is-collapsed .online-event-notice { display:none !important; }
+  #online-presence-pane.is-collapsed #online-presence-collapse { width:34px !important; height:34px !important; }
+  #online-presence-pane.is-collapsed .online-presence-list,
+  #online-presence-pane.is-collapsed .online-presence-foot { display:none !important; }
+}
+/* At laptop/tablet widths keep the list accessible without stealing the main work area. */
+@media (max-width:1199px) {
+  body.pantheon-discord-sidebar,
+  body.pantheon-discord-sidebar.pantheon-presence-collapsed {
+    padding:18px clamp(12px,2.5vw,24px) 36px !important;
+    align-items:stretch !important;
+  }
+  #online-presence-pane {
+    position:relative !important; inset:auto !important; transform:none !important;
+    width:min(100%,1600px) !important; min-width:0 !important; max-width:1600px !important;
+    height:auto !important; max-height:260px !important; margin:0 auto 14px !important;
+    border:1px solid var(--pt-border) !important; border-radius:12px !important;
+  }
+  #online-presence-pane .online-presence-list { display:grid !important; flex:1 1 auto !important; max-height:190px !important; grid-template-columns:minmax(0,1fr) !important; }
+  #online-presence-pane .online-presence-group + .online-presence-group { border:0 !important; border-top:1px solid var(--pt-border) !important; margin-top:8px !important; padding-top:8px !important; }
+  #online-presence-pane.is-collapsed { max-height:none !important; }
+  #online-presence-pane.is-collapsed .online-presence-list,
+  #online-presence-pane.is-collapsed .online-presence-foot { display:none !important; }
+}
+/* Registered task labels wrap and receive enough width for their text instead of ending in ellipses. */
+#dn-tracker td.task-name {
+  box-sizing:border-box !important; white-space:normal !important;
+  overflow:visible !important; text-overflow:clip !important;
+  overflow-wrap:anywhere !important; word-break:normal !important;
+  line-height:1.35 !important; min-width:0;
+}
+#dn-tracker { table-layout:fixed !important; }
+#tracker-table-wrap { width:100% !important; max-width:100% !important; overflow-x:auto !important; }
+</style>
+
+
+<style id="pantheon-r60-social-community">
+/* Let the member rail blend into the workspace; its scrollbar appears only during interaction. */
+@media (min-width:1200px) {
+  #online-presence-pane { background:transparent !important; border-right:1px solid color-mix(in srgb,var(--pt-border) 55%,transparent) !important; box-shadow:none !important; }
+  #online-presence-pane .online-presence-head,#online-presence-pane .online-presence-foot { background:transparent !important; border-color:color-mix(in srgb,var(--pt-border) 55%,transparent) !important; }
+  #online-presence-pane .online-presence-list { scrollbar-width:thin; scrollbar-color:transparent transparent; }
+  #online-presence-pane .online-presence-list:focus-within,#online-presence-pane .online-presence-list.is-scrolling { scrollbar-color:var(--pt-border) transparent; }
+  #online-presence-pane .online-presence-list::-webkit-scrollbar { width:6px; }
+  #online-presence-pane .online-presence-list::-webkit-scrollbar-track { background:transparent; }
+  #online-presence-pane .online-presence-list::-webkit-scrollbar-thumb { background:transparent; border-radius:20px; }
+  #online-presence-pane .online-presence-list:focus-within::-webkit-scrollbar-thumb,#online-presence-pane .online-presence-list.is-scrolling::-webkit-scrollbar-thumb { background:var(--pt-border); }
+  #online-presence-pane .online-presence-user { background:transparent !important; }
+  #online-presence-pane .online-presence-user:hover,#online-presence-pane .online-presence-user:focus-visible { background:var(--pt-hover) !important; outline:none; }
+}
+.online-presence-head-actions { display:flex; align-items:center; gap:6px; }
+.guild-inbox-open { display:inline-flex; align-items:center; gap:5px; min-height:27px; padding:4px 8px; border:1px solid var(--pt-border); border-radius:8px; background:transparent; color:var(--pt-text); font:700 .62rem/1 system-ui,sans-serif; cursor:pointer; }
+.guild-inbox-open:hover { background:var(--pt-hover); border-color:var(--pt-accent); }
+.guild-inbox-open b { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:var(--pt-accent); color:#fff; font-size:.55rem; }
+.guild-inbox-open b[hidden] { display:none !important; }
+.online-presence-user { width:100%; box-sizing:border-box; border:0; color:inherit; background:transparent; text-align:left; font:inherit; cursor:pointer; }
+.online-presence-user:focus-visible { outline:2px solid var(--pt-accent); outline-offset:1px; }
+.guild-social-modal-card { width:min(960px,calc(100vw - 28px)); max-height:min(820px,calc(100vh - 28px)); display:flex; flex-direction:column; overflow:hidden; gap:12px; }
+.guild-social-modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex:0 0 auto; }
+.guild-social-modal-head h3 { margin:3px 0 2px; }
+.guild-social-kicker { color:var(--pt-muted); font-size:.59rem; font-weight:900; letter-spacing:.12em; }
+.guild-social-modal-head .modal-note { margin:0; }
+.guild-social-profile-panel { min-height:0; overflow:auto; }
+.guild-social-profile-hero { display:flex; align-items:center; gap:14px; padding:14px; border:1px solid var(--pt-border); border-radius:14px; background:var(--pt-surface-soft); }
+.guild-social-avatar { width:76px; height:76px; flex:0 0 76px; border-radius:22px; object-fit:cover; background:var(--pt-accent-soft); display:grid; place-items:center; color:var(--pt-accent); font-size:1.7rem; font-weight:900; overflow:hidden; }
+.guild-social-avatar img { width:100%; height:100%; object-fit:cover; }
+.guild-social-identity { min-width:0; flex:1; }
+.guild-social-identity h4 { margin:0; color:var(--pt-text); font-size:1.15rem; overflow-wrap:anywhere; }
+.guild-social-registered { display:block; margin-top:4px; color:var(--pt-muted); font-size:.68rem; overflow-wrap:anywhere; }
+.guild-social-presence { display:inline-flex; align-items:center; gap:6px; margin-top:7px; color:var(--pt-muted); font-size:.63rem; }
+.guild-social-presence::before { content:""; width:7px; height:7px; border-radius:50%; background:#8b929e; }
+.guild-social-presence.is-online::before { background:#47c981; box-shadow:0 0 0 3px rgba(71,201,129,.13); }
+.guild-social-profile-grid { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:10px; margin-top:11px; }
+.guild-social-info-card { min-width:0; padding:13px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface); }
+.guild-social-info-card h5 { margin:0 0 9px; color:var(--pt-muted); font-size:.64rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.guild-social-main-char { display:grid; gap:5px; }
+.guild-social-main-char strong { font-size:1rem; color:var(--pt-text); overflow-wrap:anywhere; }
+.guild-social-main-char span { color:var(--pt-muted); font-size:.75rem; }
+.guild-social-character-list { display:flex; flex-wrap:wrap; gap:7px; }
+.guild-social-character-chip { display:inline-flex; flex-direction:column; gap:3px; max-width:100%; padding:7px 9px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface-soft); }
+.guild-social-character-chip strong { font-size:.72rem; overflow-wrap:anywhere; }
+.guild-social-character-chip small { color:var(--pt-muted); font-size:.61rem; }
+.guild-social-profile-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+.guild-social-profile-actions button { min-height:38px; }
+.guild-social-inbox-panel { min-height:0; height:min(590px,65vh); display:grid; grid-template-columns:minmax(190px,.72fr) minmax(0,1.5fr); border:1px solid var(--pt-border); border-radius:12px; overflow:hidden; }
+.guild-social-inbox-panel[hidden] { display:none !important; }
+.guild-social-conversations { min-width:0; overflow:auto; border-right:1px solid var(--pt-border); background:var(--pt-surface-soft); }
+.guild-social-section-title { padding:11px 12px; color:var(--pt-muted); font-size:.64rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid var(--pt-border); }
+.guild-social-conversation { display:flex; width:100%; align-items:center; gap:9px; padding:10px; border:0; border-bottom:1px solid var(--pt-border); background:transparent; color:var(--pt-text); text-align:left; cursor:pointer; }
+.guild-social-conversation:hover,.guild-social-conversation.is-active { background:var(--pt-hover); }
+.guild-social-conversation-avatar { width:34px; height:34px; flex:0 0 34px; display:grid; place-items:center; border-radius:11px; background:var(--pt-accent-soft); font-weight:900; overflow:hidden; }
+.guild-social-conversation-avatar img { width:100%; height:100%; object-fit:cover; }
+.guild-social-conversation-copy { min-width:0; flex:1; display:grid; gap:3px; }
+.guild-social-conversation-copy strong { font-size:.7rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.guild-social-conversation-copy small { color:var(--pt-muted); font-size:.61rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.guild-social-unread { min-width:17px; height:17px; display:grid; place-items:center; padding:0 4px; border-radius:999px; background:var(--pt-accent); color:#fff; font-size:.55rem; font-weight:900; }
+.guild-social-chat { min-width:0; min-height:0; display:flex; flex-direction:column; background:var(--pt-surface); }
+.guild-social-chat-head { display:flex; align-items:center; gap:9px; min-height:44px; padding:7px 11px; border-bottom:1px solid var(--pt-border); font-size:.75rem; font-weight:850; }
+.guild-social-chat-head button { border:0; background:transparent; color:var(--pt-accent); font:700 .65rem system-ui; cursor:pointer; }
+.guild-social-message-thread { flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column; gap:9px; padding:12px; }
+.guild-social-empty,.guild-social-loading { padding:18px 12px; color:var(--pt-muted); font-size:.7rem; text-align:center; line-height:1.5; }
+.guild-social-message { max-width:min(82%,540px); align-self:flex-start; padding:9px 11px 7px; border:1px solid var(--pt-border); border-radius:13px 13px 13px 4px; background:var(--pt-surface-soft); color:var(--pt-text); }
+.guild-social-message.is-mine { align-self:flex-end; border-color:color-mix(in srgb,var(--pt-accent) 42%,var(--pt-border)); border-radius:13px 13px 4px 13px; background:var(--pt-accent-soft); }
+.guild-social-message-body { white-space:pre-wrap; overflow-wrap:anywhere; font-size:.75rem; line-height:1.45; }
+.guild-social-message-quote { margin-bottom:6px; padding:5px 7px; border-left:3px solid var(--pt-accent); border-radius:4px; background:rgba(127,127,127,.09); color:var(--pt-muted); font-size:.62rem; line-height:1.35; white-space:pre-wrap; overflow-wrap:anywhere; }
+.guild-social-message-meta { display:flex; align-items:center; justify-content:flex-end; gap:9px; margin-top:6px; color:var(--pt-muted); font-size:.54rem; }
+.guild-social-message-meta button { border:0; padding:0; background:transparent; color:var(--pt-accent); font:700 .56rem system-ui; cursor:pointer; }
+.guild-social-composer { flex:0 0 auto; padding:8px 10px 9px; border-top:1px solid var(--pt-border); background:var(--pt-surface-soft); }
+.guild-social-emoji-row { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px; }
+.guild-social-emoji-row button { width:28px; height:25px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-surface); cursor:pointer; }
+.guild-social-emoji-row button:hover { background:var(--pt-hover); }
+#guild-social-message-form { display:flex; align-items:flex-end; gap:8px; }
+#guild-social-message-input { flex:1; min-width:0; max-height:110px; resize:vertical; box-sizing:border-box; padding:9px 10px; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface); color:var(--pt-text); font:inherit; font-size:.73rem; }
+#guild-social-send { min-height:38px; padding:8px 13px; }
+.guild-social-message-status { min-height:15px; padding-top:3px; color:var(--pt-muted); font-size:.58rem; }
+.guild-social-reply-strip { padding:6px 10px; border-top:1px solid var(--pt-border); background:var(--pt-accent-soft); color:var(--pt-text); font-size:.63rem; }
+.guild-social-reply-strip button { float:right; border:0; background:transparent; color:var(--pt-accent); cursor:pointer; }
+@media(max-width:700px) {
+  .guild-social-modal-card { padding:14px; }
+  .guild-social-profile-grid { grid-template-columns:1fr; }
+  .guild-social-inbox-panel { grid-template-columns:minmax(0,1fr); height:min(640px,72vh); }
+  .guild-social-conversations { max-height:155px; border-right:0; border-bottom:1px solid var(--pt-border); }
+  .guild-social-chat { min-height:310px; }
+  .guild-social-profile-hero { align-items:flex-start; }
+  .guild-social-avatar { width:60px; height:60px; flex-basis:60px; border-radius:18px; }
+  .guild-inbox-open span { display:none; }
+}
+</style>
+
+
+<style id="pantheon-r60-collapsed-sidebar-actions">
+@media(min-width:1200px) {
+  #online-presence-pane.is-collapsed .online-presence-head > div:first-child,
+  #online-presence-pane.is-collapsed .online-event-notice { display:none !important; }
+  #online-presence-pane.is-collapsed .online-presence-head > div.online-presence-head-actions { display:flex !important; align-items:center !important; justify-content:center !important; }
+  #online-presence-pane.is-collapsed .guild-inbox-open { display:none !important; }
+}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3058,10 +3260,35 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="developer-mode-banner" id="developer-mode-banner" hidden><strong>Developer Mode</strong><span>Click static text to edit · format and font sizes stay intact</span><button type="button" onclick="toggleDeveloperMode()">Turn off</button></div>
     <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Guild event notice and member presence">
         <div class="overview-event-notice online-event-notice" id="overview-event-notice" hidden>Guild events · Check the Tracker for current priorities</div>
-        <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Guild activity</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div>
+        <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Guild activity</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><div class="online-presence-head-actions"><button type="button" id="guild-inbox-open" class="guild-inbox-open" aria-label="Open guild messages" onclick="openGuildInbox()">✉ <span>Messages</span><b id="guild-inbox-unread" hidden>0</b></button><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div></div>
         <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading member activity…</div></div>
         <div class="online-presence-foot">Approved Pantheon accounts · status updates live</div>
     </aside>
+
+    <div class="modal-overlay hidden" id="guild-social-modal" role="dialog" aria-modal="true" aria-labelledby="guild-social-title">
+        <div class="modal-card wide-modal guild-social-modal-card">
+            <div class="guild-social-modal-head">
+                <div><div class="guild-social-kicker">PANTHEON · GUILD COMMUNITY</div><h3 id="guild-social-title">👥 Member Profile</h3><p id="guild-social-subtitle" class="modal-note">A little space to say hello.</p></div>
+                <button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild social popup">✕</button>
+            </div>
+            <section id="guild-social-profile-panel" class="guild-social-profile-panel">
+                <div id="guild-social-profile-content"><div class="guild-social-loading">Loading member profile…</div></div>
+            </section>
+            <section id="guild-social-inbox-panel" class="guild-social-inbox-panel" hidden>
+                <aside class="guild-social-conversations"><div class="guild-social-section-title">💌 Conversations</div><div id="guild-social-conversation-list"><div class="guild-social-loading">Loading messages…</div></div></aside>
+                <section class="guild-social-chat">
+                    <div class="guild-social-chat-head"><button id="guild-social-back-profile" type="button" onclick="showGuildSocialProfile()">← Profile</button><div id="guild-social-chat-title">Choose a conversation</div></div>
+                    <div id="guild-social-message-thread" class="guild-social-message-thread"><div class="guild-social-empty">Choose a conversation or open a member profile to send a message. 💬</div></div>
+                    <div id="guild-social-reply-strip" class="guild-social-reply-strip" hidden></div>
+                    <div class="guild-social-composer">
+                        <div class="guild-social-emoji-row" aria-label="Quick emojis"><button type="button" data-social-emoji="😊">😊</button><button type="button" data-social-emoji="😂">😂</button><button type="button" data-social-emoji="❤️">❤️</button><button type="button" data-social-emoji="🔥">🔥</button><button type="button" data-social-emoji="🎉">🎉</button><button type="button" data-social-emoji="👏">👏</button><button type="button" data-social-emoji="🙏">🙏</button><button type="button" data-social-emoji="💪">💪</button></div>
+                        <form id="guild-social-message-form"><textarea id="guild-social-message-input" rows="2" maxlength="2000" placeholder="Write a message… (Enter to send, Shift+Enter for a new line)" aria-label="Write a guild message"></textarea><button id="guild-social-send" class="btn btn-cloud" type="submit" disabled>Send ✉</button></form>
+                        <div id="guild-social-message-status" class="guild-social-message-status" role="status" aria-live="polite"></div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </div>
 
     <main id="overview-page" class="app-page overview-page">
         <section class="overview-dashboard-head overview-dashboard-head-r2">
@@ -3393,10 +3620,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
-            <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r55</span></div>
+            <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r60</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r55:</strong> The redundant account dropdown has been removed. Discord now selects your linked roster automatically, while the single “Only [member]” dropdown remains for filtering a specific person in Universal View. The Tools hamburger is now hidden outside Admin View, including when an administrator previews the member experience.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r60:</strong> Added member profile cards and private guild messages with replies, emojis, and unread counts.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -3839,7 +4066,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="dungeon-modal" role="dialog">
         <div class="modal-card wide-modal">
             <h3>🏰 Dungeon Registration</h3>
-            <div class="modal-note">Organize tasks and assign faded pastel colors. Drag and drop tasks within a category to reorder them.</div>
+            <div class="modal-note">Register daily and weekly tasks, organize categories and colors, and maintain each dungeon’s entries, drops, rewards, and recommendation details in the same place. Drag and drop tasks within a category to reorder them.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
                     <h4>Add a Task</h4>
@@ -3861,6 +4088,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <div id="dungeon-management-list" class="roster-management-list"></div>
                 </section>
             </div>
+            <section class="dungeon-details-panel" id="dungeon-details-panel">
+                <div class="dungeon-details-head"><div><h4>Entries, Drops &amp; Dungeon Details</h4><p>Choose a task already registered above to maintain its entry count, milestone, party size, run time, service availability, notable drops, weekly rewards, and Activity Insights recommendation. New tasks are added here automatically when registered.</p></div><button class="btn btn-secondary" type="button" id="refresh-dungeon-details" onclick="refreshDungeonActivityDetails({force:true})">Reload details</button></div>
+                <div class="registration-form"><label>Registered dungeon / task</label><select id="reg-dungeon-details-task" onchange="loadSelectedDungeonActivityDetails()"><option value="">Loading registered tasks…</option></select></div>
+                <div class="dungeon-details-grid">
+                    <label>Aliases (comma-separated)<input id="reg-dungeon-details-aliases" maxlength="500" placeholder="Optional task-name variants"></label>
+                    <label>Number of entries<input id="reg-dungeon-details-entries" maxlength="80" placeholder="e.g. 1, 2 or -"></label>
+                    <label>Milestone goal<input id="reg-dungeon-details-milestone" maxlength="180" placeholder="- or target goal"></label>
+                    <label>Party size<input id="reg-dungeon-details-party" maxlength="50" placeholder="e.g. 4 or 8"></label>
+                    <label>Average run time<input id="reg-dungeon-details-time" maxlength="80" placeholder="e.g. 15 min"></label>
+                    <label>Serviceable?<select id="reg-dungeon-details-serviceable"><option value="unknown">Unknown / not confirmed</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+                    <label class="wide">Weekly rewards<textarea id="reg-dungeon-details-rewards" maxlength="1200" rows="2" placeholder="Rewards and quantities"></textarea></label>
+                    <label class="wide">Materials / notable drops<textarea id="reg-dungeon-details-materials" maxlength="1800" rows="2" placeholder="Materials, codes, accessories, fragments, etc."></textarea></label>
+                    <label class="full">Practical recommendation shown to players<textarea id="reg-dungeon-details-recommendation" maxlength="1500" rows="2" placeholder="What to run, how long to allow, and why it is useful."></textarea></label>
+                </div>
+                <div class="modal-actions" style="margin-top:12px"><button class="btn btn-dungeon" type="button" id="save-dungeon-details" onclick="saveSelectedDungeonActivityDetails()">Save Dungeon Details</button><span id="dungeon-details-status" class="dungeon-details-help">Details are linked to the registered task name. Existing checkmarks and historical records are not changed.</span></div>
+            </section>
             <div class="modal-actions">
                 <button class="btn btn-sync" type="button" onclick="forceSync(true)">Sync Tasks Now</button>
                 <button class="btn btn-secondary" type="button" onclick="closeDungeonPage()">Close</button>
@@ -4449,7 +4692,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function normalizeActivityReferenceProfiles(value) {
-            return (Array.isArray(value) ? value : []).slice(0, 100).map((item, index) => {
+            return (Array.isArray(value) ? value : []).slice(0, 200).map((item, index) => {
                 const profile = safeObject(item);
                 const serviceable = ['yes', 'no', 'unknown'].includes(String(profile.serviceable || '').toLowerCase()) ? String(profile.serviceable).toLowerCase() : 'unknown';
                 const aliases = Array.isArray(profile.aliases) ? profile.aliases : String(profile.aliases || '').split(',');
@@ -4477,7 +4720,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 weeklyArchive: {},
                 completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -5262,7 +5505,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
             updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
-            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak'
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -5382,6 +5625,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             norm.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(sets.activityReferenceProfiles);
             norm.settings.activityReferenceProfilesUpdatedAt = Number(sets.activityReferenceProfilesUpdatedAt) || 0;
             norm.settings.activityReferenceProfilesUpdatedBy = String(sets.activityReferenceProfilesUpdatedBy || '');
+            norm.settings.extraDungeonTasks = [...new Map((Array.isArray(sets.extraDungeonTasks) ? sets.extraDungeonTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, 300);
+            norm.settings.extraDungeonTasksUpdatedAt = Number(sets.extraDungeonTasksUpdatedAt) || 0;
+            norm.settings.extraDungeonTasksUpdatedBy = String(sets.extraDungeonTasksUpdatedBy || '');
             norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
             ensureMemberRosterMaster(norm);
             const historyClearAt = Number(norm.settings.analyticsHistoryClearedAt) || 0;
@@ -5535,6 +5781,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             merged.settings.rateUpEvents = normalizeRateUpEvents(rateSource.rateUpEvents);
             merged.settings.rateUpEventsUpdatedAt = Math.max(localRateAt, remoteRateAt);
             merged.settings.rateUpEventsUpdatedBy = String(rateSource.rateUpEventsUpdatedBy || '');
+            // Extra Dungeon classification is edited only through the authenticated Admin Console.
+            // Always take this field from the latest server record, never from a stale local cache.
+            merged.settings.extraDungeonTasks = [...(remote.settings.extraDungeonTasks || [])];
+            merged.settings.extraDungeonTasksUpdatedAt = Number(remote.settings.extraDungeonTasksUpdatedAt) || 0;
+            merged.settings.extraDungeonTasksUpdatedBy = String(remote.settings.extraDungeonTasksUpdatedBy || '');
             const localTextAt = Number(local.settings.uiTextOverridesUpdatedAt) || 0;
             const remoteTextAt = Number(remote.settings.uiTextOverridesUpdatedAt) || 0;
             const localTexts = safeObject(local.settings.uiTextOverrides), remoteTexts = safeObject(remote.settings.uiTextOverrides);
@@ -6135,7 +6386,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current','Your task changes are saved · checked '+trackerSyncTimeLabel());
                                 setStatus(showSuccess?'🟢 Cloud Sync Complete':(queuedEntries.length||loadRevisionQueue().length?'🟢 Tracker saved to the shared database · Revision History is queued separately':'🟢 Tracker saved to the shared database'));
                             }
-                            return;
+                            return true;
                         }
                         cloudData=mergeData(cloudData,latest);
                         cloudData=restoreRemoteCellsForPendingWrites(cloudData,latest,{});
@@ -6151,6 +6402,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', pendingCount ? `${pendingCount} task edit${pendingCount === 1 ? '' : 's'} not confirmed · retained locally` : 'Cloud sync failed · retry');
                     const transient = /(?:failed \((?:409|425|429|5\d\d)\)|fetch|network|timeout|changed repeatedly)/i.test(String(err?.message || err));
                     if (transient && pendingCount) schedulePendingCellRetry();
+                    return false;
                 }
                 finally{
                     syncInProgress=false;updateOverviewStatusCards();
@@ -6685,14 +6937,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
             const isUniversal = activeRosterFilter === 'all';
 
-            // Increase min-width for table and explicitly define char column width when in Universal View
+            // Size the task-name column from the actual registered dungeon labels.
+            // The name wraps within this measured column instead of being clipped with an ellipsis.
+            const visibleTaskNames = cloudData.settings.categories.flatMap(category => (category.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(category, taskName)));
+            const longestTaskName = visibleTaskNames.reduce((longest, taskName) => Math.max(longest, [...String(taskName || '')].length), 0);
+            const taskColWidth = Math.max(230, Math.min(460, Math.ceil(longestTaskName * 7.6 + 38)));
+            const groupColWidth = 82;
+            const categoryColWidth = 158;
+            const fixedLabelWidth = groupColWidth + categoryColWidth + taskColWidth;
             if (isUniversal) {
                 const charColWidth = 110;
-                table.style.minWidth = `${440 + (characters.length * charColWidth)}px`;
-                colgroup.innerHTML = `<col style="width: 80px;"><col style="width: 150px;"><col style="width: 210px;">` + characters.map(() => `<col style="width: ${charColWidth}px;">`).join('');
+                table.style.minWidth = `${fixedLabelWidth + (characters.length * charColWidth)}px`;
+                colgroup.innerHTML = `<col style="width: ${groupColWidth}px;"><col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col style="width: ${charColWidth}px;">`).join('');
             } else {
-                table.style.minWidth = '100%';
-                colgroup.innerHTML = `<col style="width: 80px;"><col style="width: 150px;"><col style="width: 210px;">` + characters.map(() => `<col>`).join('');
+                const personalCharMinimum = 86;
+                table.style.minWidth = `${Math.max(0, fixedLabelWidth + (characters.length * personalCharMinimum))}px`;
+                colgroup.innerHTML = `<col style="width: ${groupColWidth}px;"><col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col>`).join('');
             }
             
             rosterRow.innerHTML = `<th rowspan="2" colspan="3" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker &amp; Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>`;
@@ -6979,7 +7239,25 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function isBountyTask(taskName) {
             return !!cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'))?.tasks.includes(taskName);
         }
-        function getCompletionTaskNames() { return weeklyTaskNames.filter(t => !isBountyTask(t)); }
+        function isExtraDungeonTask(taskName) {
+            const key = String(taskName || '').trim().toLocaleLowerCase();
+            return !!key && (cloudData.settings?.extraDungeonTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === key);
+        }
+        function getCompletionTaskNames(taskNames = weeklyTaskNames) {
+            return (Array.isArray(taskNames) ? taskNames : []).filter(task => !isBountyTask(task) && !isExtraDungeonTask(task));
+        }
+        function getArchivedCompletionRate(archive, characterName) {
+            const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+            const codes = String(archive?.states?.[characterName] || '');
+            let done = 0, eligible = 0;
+            order.forEach((task, index) => {
+                if (isBountyTask(task) || isExtraDungeonTask(task)) return;
+                const code = codes[index] || '';
+                if (code === 'd') { done++; eligible++; }
+                else if (code === 'm') eligible++;
+            });
+            return eligible ? Math.round(done / eligible * 100) : null;
+        }
 
         function updateRateForCharacter(charName) {
             let ct = 0, dn = 0;
@@ -7124,13 +7402,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const pane = document.getElementById('online-presence-pane');
             const button = document.getElementById('online-presence-collapse');
             if (pane) pane.classList.toggle('is-collapsed', onlinePresenceCollapsed);
-            if (button) { button.textContent = onlinePresenceCollapsed ? '+' : '−'; button.setAttribute('aria-expanded', String(!onlinePresenceCollapsed)); button.setAttribute('aria-label', onlinePresenceCollapsed ? 'Expand online list' : 'Collapse online list'); }
+            document.body.classList.toggle('pantheon-presence-collapsed', onlinePresenceCollapsed);
+            if (button) { button.textContent = onlinePresenceCollapsed ? '+' : '−'; button.setAttribute('aria-expanded', String(!onlinePresenceCollapsed)); button.setAttribute('aria-label', onlinePresenceCollapsed ? 'Expand guild member list' : 'Collapse guild member list'); }
         }
+        let guildPresenceUsers = [];
+        let guildPresenceByDiscordId = new Map();
+        let guildMessageInboxTimer = null;
+        let guildMessageInboxBusy = false;
+        let guildSocialActiveProfile = null;
+        let guildSocialView = 'profile';
+        let guildSocialMessages = [];
+        let guildSocialReplyTarget = null;
+        let guildSocialSending = false;
+        let guildSocialLastUnread = 0;
+
         function renderOnlinePresence(users, status = '') {
             const list = document.getElementById('online-presence-list');
             const count = document.getElementById('online-presence-count');
             if (!list || !count) return;
             const clean = (Array.isArray(users) ? users : []).filter(user => user && (user.id || user.label || user.username));
+            guildPresenceUsers = clean;
+            guildPresenceByDiscordId = new Map(clean.map(user => [String(user.id || ''), user]));
+            if (guildSocialView !== 'profile' && !document.getElementById('guild-social-modal')?.classList.contains('hidden')) refreshGuildMessageInbox(true);
             const hasStatus = clean.some(user => Object.prototype.hasOwnProperty.call(user, 'online'));
             const isOnline = user => user.online === true || user.online === 1 || user.online === '1';
             const onlineUsers = hasStatus ? clean.filter(isOnline) : clean;
@@ -7138,13 +7431,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const selfId = String(pantheonDiscordUser?.id || '');
             const row = (user, online) => {
                 const own = String(user.id || '') === selfId;
-                const label = String(user.label || user.username || 'Discord member');
-                return `<div class="online-presence-user ${online ? '' : 'is-offline'}"><span class="online-presence-user-dot"></span><span class="online-presence-user-name" title="${escapeHTML(label)}">${escapeHTML(label)}${own ? ' <em>You</em>' : ''}</span>${online && user.role === 'admin' ? '<span class="online-presence-admin">ADMIN</span>' : `<span class="online-presence-state">${online ? 'Online' : 'Offline'}</span>`}</div>`;
+                const label = String(user.pantheonName || user.label || user.discordName || user.username || 'Discord member');
+                const statusLabel = online ? 'Online' : 'Offline';
+                return `<button type="button" class="online-presence-user ${online ? '' : 'is-offline'}" data-social-discord-id="${escapeHTML(String(user.id || ''))}" aria-label="Open ${escapeHTML(label)} profile · ${statusLabel}"><span class="online-presence-user-dot"></span><span class="online-presence-user-name" title="${escapeHTML(label)}">${escapeHTML(label)}${own ? ' <em>You</em>' : ''}</span>${online && user.role === 'admin' ? '<span class="online-presence-admin">ADMIN</span>' : `<span class="online-presence-state">${statusLabel}</span>`}</button>`;
             };
             const onlineHtml = status ? '<div class="online-presence-empty">Presence data is unavailable.</div>' : (onlineUsers.length ? onlineUsers.map(user => row(user, true)).join('') : '<div class="online-presence-empty">No active tabs detected</div>');
             const offlineHtml = status ? '<div class="online-presence-empty">Account status is currently unknown.</div>' : (hasStatus ? (offlineUsers.length ? offlineUsers.map(user => row(user, false)).join('') : '<div class="online-presence-empty">No offline accounts.</div>') : '<div class="online-presence-empty">Offline status needs the updated presence API.</div>');
             count.textContent = status ? 'Presence unavailable' : hasStatus ? `${onlineUsers.length} online · ${offlineUsers.length} offline` : `${onlineUsers.length} online · offline list unavailable`;
             list.innerHTML = `<section class="online-presence-group"><div class="online-presence-group-title"><span>Online</span><b>${status ? '—' : onlineUsers.length}</b></div>${onlineHtml}</section><section class="online-presence-group"><div class="online-presence-group-title"><span>Offline</span><b>${status || !hasStatus ? '—' : offlineUsers.length}</b></div>${offlineHtml}</section>`;
+            if (!list.dataset.socialClickBound) {
+                list.dataset.socialClickBound = 'true';
+                list.addEventListener('click', event => {
+                    const button = event.target.closest('[data-social-discord-id]');
+                    if (!button) return;
+                    openMemberProfile(button.dataset.socialDiscordId || '');
+                });
+                let scrollTimer = null;
+                list.addEventListener('scroll', () => {
+                    list.classList.add('is-scrolling');
+                    clearTimeout(scrollTimer);
+                    scrollTimer = setTimeout(() => list.classList.remove('is-scrolling'), 900);
+                }, { passive:true });
+            }
         }
 
         async function refreshOnlinePresence(heartbeat=false) {
@@ -7166,11 +7474,265 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function startOnlinePresence() {
             const pane = document.getElementById('online-presence-pane');
             if (pane) pane.hidden = false;
+            initializeGuildSocialUi();
+            document.body.classList.add('pantheon-discord-sidebar');
             if (onlinePresenceTimer) clearInterval(onlinePresenceTimer);
             refreshOnlinePresence(true);
             onlinePresenceTimer = setInterval(() => refreshOnlinePresence(true), 30000);
-            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshOnlinePresence(true); });
-            window.addEventListener('focus', () => refreshOnlinePresence(true));
+            refreshGuildMessageInbox(true);
+            if (guildMessageInboxTimer) clearInterval(guildMessageInboxTimer);
+            guildMessageInboxTimer = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    refreshGuildMessageInbox(true);
+                    if (guildSocialView === 'conversation' && guildSocialActiveProfile && !document.getElementById('guild-social-modal')?.classList.contains('hidden')) loadGuildConversation(guildSocialActiveProfile, true);
+                }
+            }, 20000);
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { refreshOnlinePresence(true); refreshGuildMessageInbox(true); } });
+            window.addEventListener('focus', () => { refreshOnlinePresence(true); refreshGuildMessageInbox(true); });
+        }
+
+
+        function guildProfileAvatarMarkup(profile, sizeClass = 'guild-social-avatar') {
+            const url = discordAvatarUrl({ id:profile?.id, avatar:profile?.avatar }, 128);
+            const initial = String(profile?.pantheonName || profile?.label || 'P').trim().charAt(0).toUpperCase() || 'P';
+            return url ? `<div class="${sizeClass}"><img src="${escapeHTML(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent='${escapeHTML(initial)}'"></div>` : `<div class="${sizeClass}">${escapeHTML(initial)}</div>`;
+        }
+        function openMemberProfile(discordId) {
+            const profile = guildPresenceByDiscordId.get(String(discordId || ''));
+            if (!profile) return;
+            guildSocialActiveProfile = profile;
+            guildSocialView = 'profile';
+            guildSocialReplyTarget = null;
+            const profilePanel = document.getElementById('guild-social-profile-panel');
+            const inboxPanel = document.getElementById('guild-social-inbox-panel');
+            if (profilePanel) profilePanel.hidden = false;
+            if (inboxPanel) inboxPanel.hidden = true;
+            renderGuildSocialProfile(profile);
+            const title = document.getElementById('guild-social-title');
+            const subtitle = document.getElementById('guild-social-subtitle');
+            if (title) title.textContent = '👤 Member Profile';
+            if (subtitle) subtitle.textContent = 'A little about your guildmate. Say hello! 💬';
+            openModal('guild-social-modal');
+        }
+        function renderGuildSocialProfile(profile) {
+            const host = document.getElementById('guild-social-profile-content');
+            if (!host) return;
+            const own = String(profile?.id || '') === String(pantheonDiscordUser?.id || '');
+            const online = profile?.online === true || profile?.online === 1;
+            const main = profile?.mainCharacter;
+            const other = Array.isArray(profile?.otherCharacters) ? profile.otherCharacters : [];
+            const mainHtml = main
+                ? `<div class="guild-social-main-char"><strong>⭐ ${escapeHTML(main.name || 'Main character')}</strong><span>⚔️ ${escapeHTML(main.job || 'Class not set')}</span></div>`
+                : '<div class="guild-social-empty" style="padding:4px 0;text-align:left">Main character not selected yet.</div>';
+            const otherHtml = other.length
+                ? other.map(character => `<span class="guild-social-character-chip"><strong>🎮 ${escapeHTML(character.name || '')}</strong><small>${escapeHTML(character.job || 'Class not set')}</small></span>`).join('')
+                : '<span class="guild-social-empty" style="padding:4px 0">No other characters listed.</span>';
+            const canMessage = !own && profile?.canMessage === true && !!profile?.memberId;
+            host.innerHTML = `
+                <div class="guild-social-profile-hero">
+                    ${guildProfileAvatarMarkup(profile)}
+                    <div class="guild-social-identity"><h4>${escapeHTML(profile?.pantheonName || profile?.label || 'Pantheon Member')}</h4><small class="guild-social-registered">Registered as ${escapeHTML(profile?.registeredName || profile?.discordName || 'Discord member')}</small><span class="guild-social-presence ${online ? 'is-online' : ''}">${online ? 'Online now' : 'Offline'}</span></div>
+                </div>
+                <div class="guild-social-profile-grid">
+                    <section class="guild-social-info-card"><h5>⭐ Main character</h5>${mainHtml}</section>
+                    <section class="guild-social-info-card"><h5>🎭 Other characters · ${other.length}</h5><div class="guild-social-character-list">${otherHtml}</div></section>
+                </div>
+                <div class="guild-social-profile-actions">${own ? '<span class="modal-note">This is your profile! 👋</span>' : canMessage ? '<button class="btn btn-cloud" type="button" onclick="startGuildMessageFromProfile()">💌 Message</button>' : '<span class="modal-note">Messaging is available after this member links their Discord account.</span>'}</div>`;
+        }
+        function showGuildSocialProfile() {
+            guildSocialView = 'profile'; guildSocialReplyTarget = null;
+            const profile = document.getElementById('guild-social-profile-panel');
+            const inbox = document.getElementById('guild-social-inbox-panel');
+            if (profile) profile.hidden = false;
+            if (inbox) inbox.hidden = true;
+            if (guildSocialActiveProfile) renderGuildSocialProfile(guildSocialActiveProfile);
+            const title = document.getElementById('guild-social-title');
+            const subtitle = document.getElementById('guild-social-subtitle');
+            if (title) title.textContent = '👤 Member Profile';
+            if (subtitle) subtitle.textContent = 'A little about your guildmate. Say hello! 💬';
+        }
+        function setGuildSocialInboxMode() {
+            guildSocialView = 'inbox';
+            const profile = document.getElementById('guild-social-profile-panel');
+            const inbox = document.getElementById('guild-social-inbox-panel');
+            if (profile) profile.hidden = true;
+            if (inbox) inbox.hidden = false;
+            const title = document.getElementById('guild-social-title');
+            const subtitle = document.getElementById('guild-social-subtitle');
+            if (title) title.textContent = '💌 Guild Messages';
+            if (subtitle) subtitle.textContent = 'Private one-to-one conversations with your guildmates.';
+        }
+        async function openGuildInbox() {
+            setGuildSocialInboxMode();
+            openModal('guild-social-modal');
+            if (!guildPresenceByDiscordId.size) {
+                try { const response = await fetch('/api/presence', { credentials:'same-origin', cache:'no-store' }); const data = await response.json().catch(() => ({})); if (response.ok) renderOnlinePresence(data.users || []); } catch (_) {}
+            }
+            await refreshGuildMessageInbox(false);
+            const thread = document.getElementById('guild-social-message-thread');
+            const title = document.getElementById('guild-social-chat-title');
+            const send = document.getElementById('guild-social-send');
+            if (send) send.disabled = true;
+            if (title) title.textContent = 'Choose a conversation';
+            if (thread && guildSocialView === 'inbox') thread.innerHTML = '<div class="guild-social-empty">Choose a conversation or open a member profile to send a message. 💬</div>';
+        }
+        async function refreshGuildMessageInbox(silent = false) {
+            if (!pantheonDiscordUser?.id || guildMessageInboxBusy) return;
+            guildMessageInboxBusy = true;
+            try {
+                const response = await fetch('/api/messages', { credentials:'same-origin', cache:'no-store' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || 'Messages are unavailable.');
+                const conversations = Array.isArray(data.conversations) ? data.conversations : [];
+                const unread = conversations.reduce((sum, item) => sum + (Number(item.unreadCount) || 0), 0);
+                const badge = document.getElementById('guild-inbox-unread');
+                if (badge) { badge.textContent = unread > 99 ? '99+' : String(unread); badge.hidden = unread < 1; }
+                if (!silent && unread > guildSocialLastUnread) {
+                    const status = document.getElementById('guild-social-message-status');
+                    if (status) status.textContent = '✉ You have new guild messages.';
+                }
+                guildSocialLastUnread = unread;
+                const host = document.getElementById('guild-social-conversation-list');
+                if (host && guildSocialView !== 'profile') {
+                    if (!conversations.length) host.innerHTML = '<div class="guild-social-empty">No conversations yet. Open a member profile and send a hello! 👋</div>';
+                    else host.innerHTML = conversations.map(item => {
+                        const profile = guildPresenceByDiscordId.get(String(item.otherDiscordId || '')) || { id:item.otherDiscordId, memberId:item.otherMemberId, pantheonName:'Guild member', label:'Guild member' };
+                        const name = profile.pantheonName || profile.label || 'Guild member';
+                        const selected = guildSocialActiveProfile && String(guildSocialActiveProfile.id) === String(item.otherDiscordId) && guildSocialView === 'conversation';
+                        return `<button type="button" class="guild-social-conversation ${selected ? 'is-active' : ''}" data-social-conversation="${escapeHTML(String(item.otherDiscordId || ''))}">${guildProfileAvatarMarkup(profile,'guild-social-conversation-avatar')}<span class="guild-social-conversation-copy"><strong>${escapeHTML(name)}</strong><small>${item.lastMessageFromMe ? 'You: ' : ''}${escapeHTML(item.lastMessage || '')}</small></span>${Number(item.unreadCount) > 0 ? `<span class="guild-social-unread">${Number(item.unreadCount) > 99 ? '99+' : Number(item.unreadCount)}</span>` : ''}</button>`;
+                    }).join('');
+                    if (!host.dataset.socialClickBound) {
+                        host.dataset.socialClickBound = 'true';
+                        host.addEventListener('click', event => {
+                            const button = event.target.closest('[data-social-conversation]');
+                            if (!button) return;
+                            const peer = guildPresenceByDiscordId.get(button.dataset.socialConversation);
+                            if (peer) loadGuildConversation(peer, false);
+                        });
+                    }
+                }
+                return conversations;
+            } catch (error) {
+                const message = error.message || 'Messages are unavailable.';
+                const status = document.getElementById('guild-social-message-status');
+                const host = document.getElementById('guild-social-conversation-list');
+                if (status && !silent) status.textContent = message;
+                if (host && guildSocialView !== 'profile') host.innerHTML = `<div class="guild-social-empty">${escapeHTML(message)}</div>`;
+                return [];
+            } finally { guildMessageInboxBusy = false; }
+        }
+        async function startGuildMessageFromProfile() {
+            if (!guildSocialActiveProfile?.canMessage || !guildSocialActiveProfile?.memberId) return;
+            setGuildSocialInboxMode();
+            await refreshGuildMessageInbox(true);
+            await loadGuildConversation(guildSocialActiveProfile, false);
+        }
+        async function loadGuildConversation(profile, silent = false) {
+            if (!profile?.memberId) return;
+            guildSocialActiveProfile = profile;
+            guildSocialView = 'conversation';
+            setGuildSocialInboxMode();
+            const title = document.getElementById('guild-social-chat-title');
+            const thread = document.getElementById('guild-social-message-thread');
+            const send = document.getElementById('guild-social-send');
+            if (send) send.disabled = profile.canMessage !== true;
+            if (title) title.textContent = `${profile.pantheonName || profile.label || 'Guild member'}`;
+            if (thread && !silent) thread.innerHTML = '<div class="guild-social-loading">Loading conversation…</div>';
+            try {
+                const response = await fetch(`/api/messages?with=${encodeURIComponent(profile.memberId)}`, { credentials:'same-origin', cache:'no-store' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || 'Could not load this conversation.');
+                guildSocialMessages = Array.isArray(data.messages) ? data.messages : [];
+                renderGuildSocialMessages();
+                await refreshGuildMessageInbox(true);
+            } catch (error) {
+                if (thread) thread.innerHTML = `<div class="guild-social-empty">${escapeHTML(error.message || 'Could not load conversation.')}</div>`;
+            }
+        }
+        function renderGuildSocialMessages() {
+            const thread = document.getElementById('guild-social-message-thread');
+            if (!thread) return;
+            if (!guildSocialMessages.length) { thread.innerHTML = '<div class="guild-social-empty">No messages yet. Break the ice with a hello! 👋</div>'; return; }
+            const byId = new Map(guildSocialMessages.map(message => [String(message.id), message]));
+            thread.innerHTML = guildSocialMessages.map(message => {
+                const mine = String(message.senderDiscordId) === String(pantheonDiscordUser?.id || '');
+                const reply = message.replyTo ? byId.get(String(message.replyTo)) : null;
+                const time = Number(message.createdAt) ? new Date(Number(message.createdAt)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+                return `<article class="guild-social-message ${mine ? 'is-mine' : ''}">${reply ? `<div class="guild-social-message-quote">↪ ${escapeHTML(reply.body)}</div>` : ''}<div class="guild-social-message-body">${escapeHTML(message.body)}</div><div class="guild-social-message-meta"><span>${time}</span><button type="button" data-social-reply="${escapeHTML(String(message.id))}">↩ Reply</button></div></article>`;
+            }).join('');
+            thread.scrollTop = thread.scrollHeight;
+            if (!thread.dataset.socialReplyBound) {
+                thread.dataset.socialReplyBound = 'true';
+                thread.addEventListener('click', event => {
+                    const button = event.target.closest('[data-social-reply]');
+                    if (!button) return;
+                    const message = guildSocialMessages.find(item => String(item.id) === button.dataset.socialReply);
+                    if (!message) return;
+                    guildSocialReplyTarget = message;
+                    renderGuildSocialReplyStrip();
+                    document.getElementById('guild-social-message-input')?.focus();
+                });
+            }
+        }
+        function renderGuildSocialReplyStrip() {
+            const strip = document.getElementById('guild-social-reply-strip');
+            if (!strip) return;
+            if (!guildSocialReplyTarget) { strip.hidden = true; strip.innerHTML = ''; return; }
+            strip.hidden = false;
+            strip.innerHTML = `<span>↩ Replying to: ${escapeHTML(String(guildSocialReplyTarget.body || '').slice(0,110))}</span><button type="button" onclick="cancelGuildSocialReply()">Cancel</button>`;
+        }
+        function cancelGuildSocialReply() { guildSocialReplyTarget = null; renderGuildSocialReplyStrip(); }
+        function insertGuildSocialEmoji(emoji) {
+            const input = document.getElementById('guild-social-message-input');
+            if (!input) return;
+            const start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? input.value.length;
+            input.value = input.value.slice(0,start) + emoji + input.value.slice(end);
+            const caret = start + emoji.length; input.setSelectionRange(caret,caret); input.focus();
+        }
+        async function sendGuildSocialMessage(event) {
+            if (event) event.preventDefault();
+            if (guildSocialSending || !guildSocialActiveProfile?.memberId) return;
+            const input = document.getElementById('guild-social-message-input');
+            const button = document.getElementById('guild-social-send');
+            const status = document.getElementById('guild-social-message-status');
+            const body = String(input?.value || '').trim();
+            if (!body) { if (status) status.textContent = 'Write a message first.'; input?.focus(); return; }
+            guildSocialSending = true; if (button) button.disabled = true; if (status) status.textContent = 'Sending…';
+            try {
+                const response = await fetch('/api/messages', {
+                    method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({ toMemberId:guildSocialActiveProfile.memberId, body, replyTo:guildSocialReplyTarget?.id || '' })
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || 'Message could not be sent.');
+                if (input) input.value = '';
+                cancelGuildSocialReply();
+                if (status) status.textContent = 'Sent ✓';
+                await loadGuildConversation(guildSocialActiveProfile, true);
+                await refreshGuildMessageInbox(true);
+            } catch (error) { if (status) status.textContent = error.message || 'Message could not be sent.'; }
+            finally { guildSocialSending = false; if (button) button.disabled = false; }
+        }
+        function initializeGuildSocialUi() {
+            const form = document.getElementById('guild-social-message-form');
+            if (form && !form.dataset.bound) { form.dataset.bound = 'true'; form.addEventListener('submit', sendGuildSocialMessage); }
+            document.querySelectorAll('[data-social-emoji]').forEach(button => {
+                if (button.dataset.bound) return;
+                button.dataset.bound = 'true';
+                button.addEventListener('click', () => insertGuildSocialEmoji(button.dataset.socialEmoji || '😊'));
+            });
+            const input = document.getElementById('guild-social-message-input');
+            if (input && !input.dataset.enterBound) {
+                input.dataset.enterBound = 'true';
+                input.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); sendGuildSocialMessage(event); }
+                });
+            }
+            const modal = document.getElementById('guild-social-modal');
+            if (modal && !modal.dataset.backdropBound) {
+                modal.dataset.backdropBound = 'true';
+                modal.addEventListener('click', event => { if (event.target === modal) closeModal('guild-social-modal'); });
+            }
         }
 
         let overviewEventCountdownTimer = null;
@@ -7711,7 +8273,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
                 const pendingTasks = states.filter(item => item.state !== 'done' && item.state !== 'excluded').sort((a, b) => (getLootWeight(b.task) - getLootWeight(a.task)) || a.task.localeCompare(b.task));
                 const rate = eligible ? Math.round(done / eligible * 100) : 0;
-                const snapshots = archives.map(([, archive]) => archive?.rates?.[name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
+                const snapshots = archives.map(([, archive]) => getArchivedCompletionRate(archive, name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number);
                 const trend = snapshots.length >= 2 ? snapshots[snapshots.length - 1] - snapshots[snapshots.length - 2] : null;
                 const profile = profiles.find(item => item.name.toLocaleLowerCase() === name.toLocaleLowerCase());
                 return { name, isMain: !!profile?.isMain, eligible, done, pending: Math.max(0, eligible - done), rate, excluded, marked, thisWeekActivity, latestTouch, pendingTasks, trend };
@@ -7913,17 +8475,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 recent.forEach(([,archive]) => {
                     const states = String(safeObject(archive.states)[profile.name] || '');
                     const order = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
-                    if (!states || !order.length) return;
+                    if (!states || !getCompletionTaskNames(order).length) return;
                     validWeeks++;
                     let weekDone = 0;
                     order.forEach((task, i) => {
+                        if (isBountyTask(task) || isExtraDungeonTask(task)) return;
                         if (states[i] === 'd') { done++; weekDone++; }
                         else if (states[i] === 'm') missed++;
                     });
                     if (weekDone) weeksWithProgress++;
                 });
                 let currentDone=0, currentOpen=0;
-                weeklyTaskNames.forEach(task => {
+                getCompletionTaskNames().forEach(task => {
                     const state = getCellState(profile.name, task);
                     if (state === 'done') currentDone++;
                     else if (state !== 'excluded') currentOpen++;
@@ -7933,7 +8496,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 // A recorded completion outside the weekly list helps distinguish a missed weekly tick from no recorded play.
                 const currentCells = safeObject(cloudData.cells?.[profile.name]);
                 const currentCycleRecorded = Object.values(currentCells).some(cell => cell?.state === 'done' && (Number(cell.updatedAt) || 0) >= cycleStart);
-                const archivedRates = recent.map(([,archive]) => safeObject(archive.rates)[profile.name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
+                const archivedRates = recent.map(([,archive]) => getArchivedCompletionRate(archive, profile.name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number);
                 const trend = archivedRates.length >= 2 ? Math.round(archivedRates[archivedRates.length - 1] - archivedRates[archivedRates.length - 2]) : null;
                 const regular = !profile.isMain && validWeeks >= 2 && (weeksWithProgress >= 2 || (done >= 4 && weeksWithProgress >= 1));
                 const emerging = !profile.isMain && !regular && (currentDone >= 2 || (weeksWithProgress >= 1 && done >= 2));
@@ -8518,7 +9081,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const codes = String(archive?.states?.[character?.name] || '');
                 let done = 0, eligible = 0;
                 order.forEach((otherTask, index) => {
-                    if (otherTask === taskName || isBountyTask(otherTask) || /\bbounty\b/i.test(otherTask)) return;
+                    if (otherTask === taskName || isBountyTask(otherTask) || isExtraDungeonTask(otherTask) || /\bbounty\b/i.test(otherTask)) return;
                     const code = codes[index] || '';
                     if (code === 'd') { done++; eligible++; }
                     else if (code === 'm') eligible++;
@@ -8901,7 +9464,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 let done = 0, missed = 0, excluded = 0;
                 const missedTasks = [];
                 taskOrder.forEach((task, index) => {
-                    if (!task || isBountyTask(task)) return;
+                    if (!task || isBountyTask(task) || isExtraDungeonTask(task)) return;
                     const code = codes[index] || '';
                     if (code === 'd') done++;
                     else if (code === 'x') excluded++;
@@ -8921,7 +9484,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const chartRows = rows.map(row => `<div class="weekly-report-chart-row"><span class="weekly-report-chart-name" title="${escapeHTML(row.name)}">${escapeHTML(row.name)}</span><div class="weekly-report-bar" role="img" aria-label="${row.done} completed, ${row.missed} unfinished"><span class="weekly-report-bar-done" style="width:${row.eligible?row.rate:0}%"></span><span class="weekly-report-bar-missed" style="width:${row.eligible?100-row.rate:0}%"></span></div><strong class="weekly-report-chart-value">${row.eligible?row.rate+'%':'—'}</strong></div>`).join('');
             const topMisses = [...taskCounts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,3);
             const focusHtml = topMisses.length ? `<section class="weekly-report-focus"><h4>Most often left unfinished</h4><div class="weekly-report-focus-list">${topMisses.map(([task,count])=>`<span class="weekly-report-focus-item">${escapeHTML(task)} <strong>${count} character${count===1?'':'s'}</strong></span>`).join('')}</div></section>` : '<section class="weekly-report-focus"><h4>Weekly result</h4><div class="weekly-report-empty">Every eligible task in this view was marked complete.</div></section>';
-            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks do not count against completion. This report reflects tracker checkmarks, not proof of dungeon clears.</p>`;
+            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks and Extra Dungeons do not count against completion. Extra Dungeons remain visible in the Tracker; this report reflects checkmarks, not proof of dungeon clears.</p>`;
             container.appendChild(card);
         }
         function openWeeklyReportModal({automatic=false}={}) {
@@ -8971,7 +9534,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
                 
-                const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...sortedArchiveEntries.map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
+                const legacyRates = (cloudData.settings?.extraDungeonTasks || []).length ? [] : (Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []);
+                const rts = [...legacyRates, ...sortedArchiveEntries.map(([,a])=>getArchivedCompletionRate(a,char.name)).filter(value=>value!==null&&Number.isFinite(Number(value))).map(Number)].slice(-5);
                 const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
 
                 const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m: 0, c: 0, x: 0, o: 0 });
@@ -9289,6 +9853,106 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             
             list.innerHTML = getCategories().length ? getCategories().map(c => `<div class="roster-editor-card"><div class="roster-editor-head dungeon-editor-head" style="border-top:4px solid ${c.color};"><input class="roster-name-input" data-cat-name="${escapeHTML(c.id)}" maxlength="30" value="${escapeHTML(c.name)}"><select data-cat-group="${escapeHTML(c.id)}" style="background-color:#17171d;color:#fff;"><option value="Weeklies" ${c.group==='Weeklies'?'selected':''}>Weeklies</option><option value="Dailies" ${c.group==='Dailies'?'selected':''}>Dailies</option></select><input type="color" data-cat-color="${escapeHTML(c.id)}" value="${c.color}"><button class="btn btn-dungeon" type="button" onclick="saveCategoryGroup('${escapeHTML(c.id)}')">Save</button><button class="btn btn-danger" type="button" onclick="removeCategoryGroup('${escapeHTML(c.id)}')">Remove</button></div><div class="character-chip-list" data-drag-list="dungeon" data-parent-id="${escapeHTML(c.id)}">${c.tasks.length ? c.tasks.map((t, i) => `<span class="character-chip" draggable="true" data-type="dungeon" data-parent="${escapeHTML(c.id)}" data-index="${i}">${escapeHTML(t)}<button type="button" onclick="removeTaskFromCategory('${escapeHTML(c.id)}', '${escapeHTML(t)}')">×</button></span>`).join('') : '<div style="color:#aaa;">No tasks yet.</div>'}</div></div>`).join('') : '<div style="color:#aaa;">No categories yet.</div>';
             attachDragDropListeners();
+            renderDungeonActivityDetailsOptions(document.getElementById('reg-dungeon-details-task')?.value || '');
+        }
+
+        let dungeonActivityDetailsProfiles = [];
+        let dungeonActivityDetailsBusy = false;
+        let dungeonActivityDetailsRequestSequence = 0;
+        function dungeonDetailsMatch(value) { return String(value || '').toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' '); }
+        function getRegisteredDungeonTaskNames() {
+            return [...new Set((Array.isArray(cloudData?.settings?.categories) ? cloudData.settings.categories : []).flatMap(category => Array.isArray(category?.tasks) ? category.tasks : []).map(value => String(value || '').trim()).filter(value => value && !/^bounty(?:\s+board)?\s*[1-6]$/i.test(value)))];
+        }
+        function findDungeonActivityDetails(taskName) {
+            const key = dungeonDetailsMatch(taskName);
+            return dungeonActivityDetailsProfiles.find(profile => [profile.name, ...(Array.isArray(profile.aliases) ? profile.aliases : [])].some(value => dungeonDetailsMatch(value) === key)) || null;
+        }
+        function renderDungeonActivityDetailsOptions(preferredName='') {
+            const select = document.getElementById('reg-dungeon-details-task');
+            if (!select) return;
+            const names = getRegisteredDungeonTaskNames();
+            const previous = String(preferredName || select.value || '');
+            select.innerHTML = names.length ? names.map(name => `<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`).join('') : '<option value="">Register a dungeon task first</option>';
+            if (names.includes(previous)) select.value = previous;
+            else if (names.length) select.value = names[0];
+            loadSelectedDungeonActivityDetails();
+        }
+        function loadSelectedDungeonActivityDetails() {
+            const taskName = document.getElementById('reg-dungeon-details-task')?.value || '';
+            const profile = findDungeonActivityDetails(taskName) || { name: taskName, aliases: [], entries: '-', milestoneGoal: '-', partySize: '-', averageRunTime: '-', serviceable: 'unknown', materials: '-', weeklyRewards: '-', recommendation: '' };
+            const set = (id, value) => { const field = document.getElementById(id); if (field) field.value = value == null ? '' : String(value); };
+            set('reg-dungeon-details-aliases', (profile.aliases || []).join(', '));
+            set('reg-dungeon-details-entries', profile.entries ?? '-');
+            set('reg-dungeon-details-milestone', profile.milestoneGoal || '-');
+            set('reg-dungeon-details-party', profile.partySize ?? '-');
+            set('reg-dungeon-details-time', profile.averageRunTime || '-');
+            set('reg-dungeon-details-serviceable', ['yes','no','unknown'].includes(profile.serviceable) ? profile.serviceable : 'unknown');
+            set('reg-dungeon-details-rewards', profile.weeklyRewards || '-');
+            set('reg-dungeon-details-materials', profile.materials || '-');
+            set('reg-dungeon-details-recommendation', profile.recommendation || '');
+            const status = document.getElementById('dungeon-details-status');
+            if (status) status.textContent = taskName ? (findDungeonActivityDetails(taskName) ? `Loaded saved details for ${taskName}.` : `No details saved yet for ${taskName}. Complete the fields and save.`) : 'Register a dungeon task first.';
+            const button = document.getElementById('save-dungeon-details'); if (button) button.disabled = !taskName;
+        }
+        async function refreshDungeonActivityDetails({force=false, preferredName=''}={}) {
+            if (dungeonActivityDetailsBusy) return;
+            const status = document.getElementById('dungeon-details-status');
+            const button = document.getElementById('refresh-dungeon-details');
+            dungeonActivityDetailsBusy = true;
+            const requestSequence = ++dungeonActivityDetailsRequestSequence;
+            if (button) button.disabled = true;
+            try {
+                const response = await fetch('/api/admin/activity-reference', { credentials: 'same-origin', cache: 'no-store', headers: authHeaders() });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(payload.error || `Could not load dungeon details (${response.status}).`);
+                if (requestSequence !== dungeonActivityDetailsRequestSequence) return;
+                dungeonActivityDetailsProfiles = normalizeActivityReferenceProfiles(payload.activities);
+                cloudData.settings.activityReferenceProfiles = dungeonActivityDetailsProfiles;
+                cloudData.settings.activityReferenceProfilesUpdatedAt = Number(payload.updatedAt) || 0;
+                cloudData.settings.activityReferenceProfilesUpdatedBy = String(payload.updatedBy || '');
+                persistLocalData();
+                renderDungeonActivityDetailsOptions(preferredName);
+                if (status && !preferredName) status.textContent = `Loaded ${dungeonActivityDetailsProfiles.length} saved detail profile(s) from ${payload.sourceRecordId || 'the shared server'}.`;
+            } catch (error) {
+                if (requestSequence !== dungeonActivityDetailsRequestSequence) return;
+                if (status) status.textContent = `Could not load saved details: ${error.message}`;
+                renderDungeonActivityDetailsOptions(preferredName);
+            } finally { dungeonActivityDetailsBusy = false; if (button) button.disabled = false; }
+        }
+        async function saveSelectedDungeonActivityDetails() {
+            if (!isAdminModeActive()) { alert('Dungeon details are available only to Pantheon administrators.'); return; }
+            const taskName = document.getElementById('reg-dungeon-details-task')?.value || '';
+            if (!taskName) return alert('Register a dungeon task first.');
+            const aliases = String(document.getElementById('reg-dungeon-details-aliases')?.value || '').split(',').map(value => value.trim()).filter(Boolean);
+            const profile = {
+                aliases,
+                entries: document.getElementById('reg-dungeon-details-entries')?.value || '-',
+                milestoneGoal: document.getElementById('reg-dungeon-details-milestone')?.value || '-',
+                partySize: document.getElementById('reg-dungeon-details-party')?.value || '-',
+                averageRunTime: document.getElementById('reg-dungeon-details-time')?.value || '-',
+                serviceable: document.getElementById('reg-dungeon-details-serviceable')?.value || 'unknown',
+                weeklyRewards: document.getElementById('reg-dungeon-details-rewards')?.value || '-',
+                materials: document.getElementById('reg-dungeon-details-materials')?.value || '-',
+                recommendation: document.getElementById('reg-dungeon-details-recommendation')?.value || ''
+            };
+            const button = document.getElementById('save-dungeon-details'); const status = document.getElementById('dungeon-details-status');
+            if (button) { button.disabled = true; button.textContent = 'Saving…'; }
+            try {
+                const response = await fetch('/api/admin/activity-reference', { method: 'PUT', credentials: 'same-origin', cache: 'no-store', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ taskName, profile }) });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || payload.ok !== true) throw new Error(payload.error || `Could not save dungeon details (${response.status}).`);
+                dungeonActivityDetailsRequestSequence++;
+                dungeonActivityDetailsProfiles = normalizeActivityReferenceProfiles(payload.activities);
+                cloudData.settings.activityReferenceProfiles = dungeonActivityDetailsProfiles;
+                cloudData.settings.activityReferenceProfilesUpdatedAt = Number(payload.updatedAt) || Date.now();
+                cloudData.settings.activityReferenceProfilesUpdatedBy = String(payload.updatedBy || pantheonDiscordUser?.id || deviceId);
+                cloudData.updatedAt = Date.now();
+                persistLocalData();
+                if (status) status.textContent = `Saved entries, drops, and recommendation details for ${taskName} to ${payload.sourceRecordId || 'the shared server'}.`;
+            } catch (error) {
+                if (status) status.textContent = `Save failed: ${error.message}`;
+                alert(`Dungeon details were not saved.\n\n${error.message}`);
+            } finally { if (button) { button.disabled = false; button.textContent = 'Save Dungeon Details'; } }
         }
 
         function handleDungeonCatChange(reset=true) {
@@ -9312,25 +9976,76 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         async function registerDungeonTask() {
             if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; }
-            const v = document.getElementById('reg-dungeon-task-name').value.trim(); if(!v) return alert('Enter task name.');
-            if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === v.toLowerCase()))) return alert('Task exists.');
-            const catChoice = document.getElementById('reg-dungeon-cat-select').value;
-            const newCatName = document.getElementById('reg-dungeon-cat-name')?.value.trim() || '';
-            const newCatGroup = document.getElementById('reg-dungeon-cat-group')?.value || 'Weeklies';
+            const input = document.getElementById('reg-dungeon-task-name');
+            const taskName = String(input?.value || '').trim().slice(0, 40);
+            if (!taskName) return alert('Enter task name.');
+            const catChoice = document.getElementById('reg-dungeon-cat-select')?.value || '__new__';
+            const newCatName = String(document.getElementById('reg-dungeon-cat-name')?.value || '').trim().slice(0, 30);
+            const newCatGroup = document.getElementById('reg-dungeon-cat-group')?.value === 'Dailies' ? 'Dailies' : 'Weeklies';
             const newCatColor = normalizeColor(document.getElementById('reg-dungeon-color')?.value, '#ffffff');
-            const taskName = v.slice(0,40);
             if (catChoice === '__new__' && !newCatName) return alert('Enter category.');
             if (!(await prepareGlobalChange(`Add dungeon task ${taskName}`))) return;
-            if (getCategories().some(c => c.tasks.some(t => t.toLowerCase() === taskName.toLowerCase()))) return alert('Task was already added by another device.');
-            let c;
-            if (catChoice === '__new__') {
-                c = { id: `cat-${Date.now().toString(36)}`, group: newCatGroup, name: newCatName.slice(0,30), color: newCatColor, tasks: [] };
-                getCategories().push(c);
-            } else {
-                c = findCategory(catChoice);
-                if (!c) return alert('That category no longer exists. Refresh the tracker and try again.');
+
+            const button = document.querySelector('#dungeon-modal button[onclick="registerDungeonTask()"]');
+            if (button) { button.disabled = true; button.textContent = 'Saving to server…'; }
+            try {
+                // Registration uses a narrow, server-authoritative write instead of depending
+                // on the whole-record background sync. This guarantees the Admin Console reads
+                // the exact category/task record committed here and prevents stale clients from
+                // dropping a newly registered dungeon.
+                const response = await fetch('/api/admin/dungeon-registration', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                    body: JSON.stringify({
+                        taskName,
+                        categoryId: catChoice === '__new__' ? '' : catChoice,
+                        categoryName: catChoice === '__new__' ? newCatName : '',
+                        group: newCatGroup,
+                        color: newCatColor
+                    })
+                });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok || payload.ok !== true) throw new Error(payload.error || payload.message || `Dungeon registration failed (${response.status}).`);
+                if (!Array.isArray(payload.categories)) throw new Error('The server did not return the saved dungeon categories. Reload before continuing.');
+
+                cloudData.settings.categories = normalizeCategories(payload.categories);
+                cloudData.settings.categoriesUpdatedAt = Number(payload.categoriesUpdatedAt) || cloudData.settings.categoriesUpdatedAt || Date.now();
+                cloudData.settings.categoriesUpdatedBy = String(payload.categoriesUpdatedBy || pantheonDiscordUser?.id || deviceId);
+                cloudData.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(payload.activityReferenceProfiles || cloudData.settings.activityReferenceProfiles);
+                cloudData.settings.activityReferenceProfilesUpdatedAt = Number(payload.activityReferenceProfilesUpdatedAt) || cloudData.settings.activityReferenceProfilesUpdatedAt || Date.now();
+                cloudData.settings.activityReferenceProfilesUpdatedBy = String(payload.activityReferenceProfilesUpdatedBy || pantheonDiscordUser?.id || deviceId);
+                cloudData.updatedAt = Number(payload.recordUpdatedAt) || Date.now();
+                persistLocalData();
+                input.value = '';
+                refreshTrackerUI();
+                renderDungeonRegistration();
+                const savedCategory = cloudData.settings.categories.find(category => category.id === payload.categoryId);
+                const select = document.getElementById('reg-dungeon-cat-select');
+                if (select && savedCategory) { select.value = savedCategory.id; handleDungeonCatChange(false); }
+                dungeonActivityDetailsRequestSequence++;
+                dungeonActivityDetailsProfiles = cloudData.settings.activityReferenceProfiles;
+                renderDungeonActivityDetailsOptions(taskName);
+
+                // Queue the same global revision entry used by ordinary registration writes.
+                // The category change itself is already durable in D1 at this point.
+                if (!payload.alreadyRegistered && pendingGlobalBeforeSnapshot) {
+                    const patch = diffGlobalImpact(pendingGlobalBeforeSnapshot, getGlobalImpactSnapshot(cloudData));
+                    if (!patchIsEmpty(patch)) queueRevisionEntry(makeRevisionEntry(pendingGlobalChangeLabel || `Add dungeon task ${taskName}`, 'global-change', patch, getGlobalImpactSignature(cloudData)));
+                }
+                clearPendingGlobalChange();
+                try { Promise.resolve(flushRevisionQueue()).catch(() => false); } catch (_) {}
+                setStatus(payload.alreadyRegistered
+                    ? `🟢 ${taskName} was already registered on the shared server. The local category list has been refreshed.`
+                    : `🟢 ${taskName} was saved directly to the shared server and confirmed. It is now available in Admin Console → Extra Dungeons, and its drops/entries profile is linked in this registration panel.`);
+            } catch (error) {
+                clearPendingGlobalChange();
+                setStatus(`🔴 ${taskName} was not confirmed by the shared server: ${String(error?.message || error)}`);
+                alert(`Dungeon registration was not confirmed. No server-side dungeon was added.\n\n${String(error?.message || error)}`);
+            } finally {
+                if (button) { button.disabled = false; button.textContent = 'Register Task'; }
             }
-            c.tasks.push(taskName); touchCategorySettings(); document.getElementById('reg-dungeon-task-name').value=''; refreshTrackerUI(); document.getElementById('reg-dungeon-cat-select').value = c.id; handleDungeonCatChange(false); triggerAutoSync();
         }
         
         async function saveCategoryGroup(id) {
@@ -10814,7 +11529,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r55';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r60';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -11351,7 +12066,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function closeRegistrationPage() { closeModal('roster-modal'); if (location.hash === '#registration') history.pushState(null, '', location.pathname + location.search); }
         function openRegistrationPage() { renderRosterRegistration(); location.hash = '#registration'; openModal('roster-modal'); }
         function closeDungeonPage() { closeModal('dungeon-modal'); if (location.hash === '#dungeons') history.pushState(null, '', location.pathname + location.search); }
-        function openDungeonPage() { if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); }
+        function openDungeonPage() { if (!isAdminModeActive()) { alert('Dungeon Registration is available only to Pantheon administrators.'); return; } renderDungeonRegistration(); location.hash = '#dungeons'; openModal('dungeon-modal'); refreshDungeonActivityDetails({ force: true }); }
         
         function handlePageRoute() {
             closeModal('roster-modal'); closeModal('dungeon-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('weights-modal'); closeModal('version-history-modal');
@@ -11444,7 +12159,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             if (['welcome-modal','profile-confirm-modal','salary-modal','help-modal'].includes(id)) setTimeout(maybeOpenWeeklyReportAfterReset, 80);
         }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); closeModal('guild-social-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 
 <script>
@@ -11543,7 +12258,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r55';
+  const CURRENT_BUILD = '1.6.8-r60';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

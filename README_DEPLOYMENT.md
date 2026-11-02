@@ -1,11 +1,14 @@
-# Deploy Pantheon Tools r55
+# Deploy Pantheon Tools r60
 
-1. Download `Pantheon_Cloudflare_Pages_v1.6.8-r55.zip`.
-2. Upload the ZIP contents to the existing Cloudflare Pages project, preserving the `functions/` directory structure.
-3. Keep the existing `PANTHEON_DB` D1 binding and environment variables unchanged.
-4. Do not run SQL, reset D1, clear browser data, or remove the old tracker record.
-5. After deployment, members should reopen or refresh Pantheon. Any checkbox/note edits still waiting in that same browser profile will be retried automatically after the app confirms player storage is ready.
+1. Upload the complete contents of `Pantheon_Cloudflare_Pages_v1.6.8-r60.zip` to the existing Cloudflare Pages project. Preserve the `functions/` directory structure.
+2. Keep the existing `PANTHEON_DB` D1 binding and Cloudflare environment variables unchanged.
+3. Do not reset D1, clear browser data, remove existing tracker records, or run a manual SQL migration.
+4. The new `/api/messages` endpoint creates its `guild_messages` table and indexes automatically the first time an authenticated member opens Messages. `schema.sql` also includes the DDL for reference.
+5. Members should open Pantheon normally. The Guild Activity list uses the existing approved-account directory. Clicking a member opens their profile card; the Messages button opens a private conversation.
+6. Messaging requires both participants to have a unique confirmed Discord ID link to a Member Roster entry and an enabled `allowed_users` account. Resolve incomplete or duplicate links through Admin Console → Player Ownership Audit.
 
-Admin Discord links are managed under Admin Console > Player ownership audit. To replace a link, choose the new enabled account and confirm. To unlink a non-bootstrap member, use Clear link. The bootstrap Admin personal-owner identity is protected.
+Direct messages are stored in D1 and are visible in the app only to the two authenticated participants. Message text is limited to 2,000 characters; rate limit is 20 sends per sender per minute. This release does not add attachments or external push notifications. The inbox unread badge refreshes while Pantheon is open.
 
-Note: no browser can upload while it is fully closed. r55 keeps unacknowledged task changes in local browser storage and resumes delivery when Pantheon next opens. Manually clearing site data or blocking browser storage can remove that local outbox.
+Existing checkbox syncing, local pending-save recovery, character data, Extra Dungeon settings, and dungeon registration/details are preserved. The What's New popup remains disabled.
+
+This release has not been deployed or verified against the live Cloudflare D1 database.

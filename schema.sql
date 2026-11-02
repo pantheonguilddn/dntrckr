@@ -126,3 +126,21 @@ CREATE TABLE IF NOT EXISTS tracker_legacy_backups (
   source_updated_at INTEGER NOT NULL DEFAULT 0,
   backed_up_at INTEGER NOT NULL
 );
+
+
+-- Private one-to-one guild messages. The API also creates this table lazily so no manual migration is required.
+CREATE TABLE IF NOT EXISTS guild_messages (
+  id TEXT PRIMARY KEY,
+  conversation_key TEXT NOT NULL,
+  sender_discord_id TEXT NOT NULL,
+  recipient_discord_id TEXT NOT NULL,
+  sender_member_id TEXT NOT NULL,
+  recipient_member_id TEXT NOT NULL,
+  body TEXT NOT NULL,
+  reply_to TEXT NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL,
+  read_at INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_guild_messages_conversation ON guild_messages(conversation_key, created_at);
+CREATE INDEX IF NOT EXISTS idx_guild_messages_recipient_unread ON guild_messages(recipient_discord_id, read_at, created_at);
+CREATE INDEX IF NOT EXISTS idx_guild_messages_sender ON guild_messages(sender_discord_id, created_at);
