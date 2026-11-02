@@ -4,23 +4,101 @@ import { loadCommunityDirectory, findConfirmedMemberByDiscordId, findUniqueMembe
 const MAX_MESSAGE_LENGTH = 2000;
 const MESSAGE_WINDOW_MS = 60_000;
 const MESSAGE_LIMIT_PER_MINUTE = 20;
+let messageSchemaPromise = null;
 
 async function ensureMessageTable(env) {
-  await env.PANTHEON_DB.prepare(`CREATE TABLE IF NOT EXISTS guild_messages (
-    id TEXT PRIMARY KEY,
-    conversation_key TEXT NOT NULL,
-    sender_discord_id TEXT NOT NULL,
-    recipient_discord_id TEXT NOT NULL,
-    sender_member_id TEXT NOT NULL,
-    recipient_member_id TEXT NOT NULL,
-    body TEXT NOT NULL,
-    reply_to TEXT NOT NULL DEFAULT '',
-    created_at INTEGER NOT NULL,
-    read_at INTEGER NOT NULL DEFAULT 0
-  )`).run();
-  await env.PANTHEON_DB.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_conversation ON guild_messages(conversation_key, created_at)').run();
-  await env.PANTHEON_DB.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_recipient_unread ON guild_messages(recipient_discord_id, read_at, created_at)').run();
-  await env.PANTHEON_DB.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_sender ON guild_messages(sender_discord_id, created_at)').run();
+  if (!messageSchemaPromise) {
+    messageSchemaPromise = (async () => {
+      const db = env.PANTHEON_DB;
+      await db.batch([
+        db.prepare(`CREATE TABLE IF NOT EXISTS guild_messages (
+          id TEXT PRIMARY KEY,
+          conversation_key TEXT NOT NULL,
+          sender_discord_id TEXT NOT NULL,
+          recipient_discord_id TEXT NOT NULL,
+          sender_member_id TEXT NOT NULL,
+          recipient_member_id TEXT NOT NULL,
+          body TEXT NOT NULL,
+          reply_to TEXT NOT NULL DEFAULT '',
+          created_at INTEGER NOT NULL,
+          read_at INTEGER NOT NULL DEFAULT 0
+        )`),
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_conversation ON guild_messages(conversation_key, created_at)'),
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_recipient_unread ON guild_messages(recipient_discord_id, read_at, created_at)'),
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_sender ON guild_messages(sender_discord_id, created_at)'),
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_messages_conversation_read ON guild_messages(conversation_key, recipient_discord_id, sender_discord_id, read_at)'),
+        db.prepare(`CREATE TABLE IF NOT EXISTS guild_conversation_inbox (
+          owner_discord_id TEXT NOT NULL,
+          conversation_key TEXT NOT NULL,
+          peer_discord_id TEXT NOT NULL,
+          peer_member_id TEXT NOT NULL,
+          last_message_id TEXT NOT NULL,
+          last_message_body TEXT NOT NULL,
+          last_message_at INTEGER NOT NULL,
+          last_message_sender_discord_id TEXT NOT NULL,
+          unread_count INTEGER NOT NULL DEFAULT 0,
+          PRIMARY KEY (owner_discord_id, conversation_key)
+        )`),
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_inbox_owner_recent ON guild_conversation_inbox(owner_discord_id, last_message_at DESC)'),
+        db.prepare(`CREATE TABLE IF NOT EXISTS guild_message_meta (
+          id INTEGER PRIMARY KEY CHECK (id = 1),
+          inbox_backfill_done INTEGER NOT NULL DEFAULT 0
+        )`),
+        db.prepare('INSERT OR IGNORE INTO guild_message_meta (id, inbox_backfill_done) VALUES (1, 0)')
+      ]);
+      const meta = await db.prepare('SELECT inbox_backfill_done FROM guild_message_meta WHERE id = 1 LIMIT 1').first();
+      if (Number(meta?.inbox_backfill_done) !== 1) {
+        // One-time migration for any messages created by r60. It creates two compact
+        // inbox rows per conversation; subsequent inbox polls never scan message history.
+        await db.prepare(`
+          WITH expanded AS (
+            SELECT conversation_key,
+                   sender_discord_id AS owner_discord_id,
+                   recipient_discord_id AS peer_discord_id,
+                   recipient_member_id AS peer_member_id,
+                   id AS last_message_id, body AS last_message_body,
+                   created_at AS last_message_at,
+                   sender_discord_id AS last_message_sender_discord_id,
+                   0 AS unread_delta
+            FROM guild_messages
+            UNION ALL
+            SELECT conversation_key,
+                   recipient_discord_id AS owner_discord_id,
+                   sender_discord_id AS peer_discord_id,
+                   sender_member_id AS peer_member_id,
+                   id AS last_message_id, body AS last_message_body,
+                   created_at AS last_message_at,
+                   sender_discord_id AS last_message_sender_discord_id,
+                   CASE WHEN read_at = 0 THEN 1 ELSE 0 END AS unread_delta
+            FROM guild_messages
+          ), ranked AS (
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                     PARTITION BY conversation_key, owner_discord_id
+                     ORDER BY last_message_at DESC, last_message_id DESC
+                   ) AS row_number,
+                   SUM(unread_delta) OVER (PARTITION BY conversation_key, owner_discord_id) AS unread_total
+            FROM expanded
+          )
+          INSERT OR IGNORE INTO guild_conversation_inbox (
+            owner_discord_id, conversation_key, peer_discord_id, peer_member_id,
+            last_message_id, last_message_body, last_message_at,
+            last_message_sender_discord_id, unread_count
+          )
+          SELECT owner_discord_id, conversation_key, peer_discord_id, peer_member_id,
+                 last_message_id, last_message_body, last_message_at,
+                 last_message_sender_discord_id, unread_total
+          FROM ranked WHERE row_number = 1
+        `).run();
+        await db.prepare('UPDATE guild_message_meta SET inbox_backfill_done = 1 WHERE id = 1').run();
+      }
+      return true;
+    })().catch(error => {
+      messageSchemaPromise = null;
+      throw error;
+    });
+  }
+  return messageSchemaPromise;
 }
 
 function conversationKey(a, b) {
@@ -50,6 +128,18 @@ async function resolveRecipient(env, members, memberId) {
   return { member, discordId };
 }
 
+async function markConversationRead(env, key, recipientDiscordId, senderDiscordId) {
+  const now = Date.now();
+  await env.PANTHEON_DB.batch([
+    env.PANTHEON_DB.prepare(`UPDATE guild_messages SET read_at = ?
+      WHERE conversation_key = ? AND recipient_discord_id = ? AND sender_discord_id = ? AND read_at = 0`)
+      .bind(now, key, recipientDiscordId, senderDiscordId),
+    env.PANTHEON_DB.prepare(`UPDATE guild_conversation_inbox SET unread_count = 0
+      WHERE owner_discord_id = ? AND conversation_key = ?`)
+      .bind(recipientDiscordId, key)
+  ]);
+}
+
 export async function onRequestGet({ request, env, data }) {
   const session = data?.session;
   if (!session?.discordId) return jsonResponse({ error:'Authentication required.' }, 401);
@@ -63,9 +153,7 @@ export async function onRequestGet({ request, env, data }) {
       if (peer.error) return jsonResponse({ error:peer.error }, 404);
       if (peer.discordId === linked.discordId) return jsonResponse({ error:'You cannot open a direct-message conversation with yourself.' }, 400);
       const key = conversationKey(linked.discordId, peer.discordId);
-      const now = Date.now();
-      await env.PANTHEON_DB.prepare(`UPDATE guild_messages SET read_at = ? WHERE conversation_key = ? AND recipient_discord_id = ? AND sender_discord_id = ? AND read_at = 0`)
-        .bind(now, key, linked.discordId, peer.discordId).run();
+      await markConversationRead(env, key, linked.discordId, peer.discordId);
       const result = await env.PANTHEON_DB.prepare(`
         SELECT id, sender_discord_id, recipient_discord_id, sender_member_id, recipient_member_id, body, reply_to, created_at, read_at
         FROM guild_messages WHERE conversation_key = ? ORDER BY created_at DESC LIMIT 150
@@ -75,34 +163,27 @@ export async function onRequestGet({ request, env, data }) {
         senderMemberId:String(row.sender_member_id), recipientMemberId:String(row.recipient_member_id),
         body:String(row.body), replyTo:String(row.reply_to || ''), createdAt:Number(row.created_at)||0, readAt:Number(row.read_at)||0
       }));
-      return jsonResponse({ ok:true, messages, peerMemberId:String(peer.member.id), now });
+      return jsonResponse({ ok:true, messages, peerMemberId:String(peer.member.id), now:Date.now() });
     }
 
+    // Small, indexed inbox summary instead of repeatedly loading up to 1,000 historic messages.
     const result = await env.PANTHEON_DB.prepare(`
-      SELECT id, conversation_key, sender_discord_id, recipient_discord_id, sender_member_id, recipient_member_id, body, created_at, read_at
-      FROM guild_messages
-      WHERE sender_discord_id = ? OR recipient_discord_id = ?
-      ORDER BY created_at DESC LIMIT 1000
-    `).bind(linked.discordId, linked.discordId).all();
-    const conversations = new Map();
-    for (const row of result.results || []) {
-      const isSender = String(row.sender_discord_id) === linked.discordId;
-      const otherDiscordId = isSender ? String(row.recipient_discord_id) : String(row.sender_discord_id);
-      let item = conversations.get(otherDiscordId);
-      if (!item) {
-        item = {
-          otherDiscordId,
-          otherMemberId:isSender ? String(row.recipient_member_id) : String(row.sender_member_id),
-          lastMessage:String(row.body || '').slice(0,180),
-          lastMessageAt:Number(row.created_at)||0,
-          lastMessageFromMe:isSender,
-          unreadCount:0
-        };
-        conversations.set(otherDiscordId, item);
-      }
-      if (!isSender && String(row.recipient_discord_id) === linked.discordId && Number(row.read_at) === 0) item.unreadCount += 1;
-    }
-    return jsonResponse({ ok:true, conversations:[...conversations.values()].sort((a,b)=>b.lastMessageAt-a.lastMessageAt) });
+      SELECT peer_discord_id, peer_member_id, last_message_body, last_message_at,
+             last_message_sender_discord_id, unread_count
+      FROM guild_conversation_inbox
+      WHERE owner_discord_id = ?
+      ORDER BY last_message_at DESC
+      LIMIT 100
+    `).bind(linked.discordId).all();
+    const conversations = (result.results || []).map(row => ({
+      otherDiscordId:String(row.peer_discord_id),
+      otherMemberId:String(row.peer_member_id),
+      lastMessage:String(row.last_message_body || '').slice(0,180),
+      lastMessageAt:Number(row.last_message_at)||0,
+      lastMessageFromMe:String(row.last_message_sender_discord_id) === linked.discordId,
+      unreadCount:Number(row.unread_count)||0
+    }));
+    return jsonResponse({ ok:true, conversations });
   } catch (error) {
     return jsonResponse({ error:`Could not load messages: ${String(error?.message || error).slice(0,180)}` }, 503);
   }
@@ -135,11 +216,43 @@ export async function onRequestPost({ request, env, data }) {
     const recent = await env.PANTHEON_DB.prepare('SELECT COUNT(*) AS n FROM guild_messages WHERE sender_discord_id = ? AND created_at >= ?').bind(linked.discordId, now - MESSAGE_WINDOW_MS).first();
     if (Number(recent?.n) >= MESSAGE_LIMIT_PER_MINUTE) return jsonResponse({ error:'You are sending messages too quickly. Please wait a moment.' }, 429);
     const id = crypto.randomUUID();
-    await env.PANTHEON_DB.prepare(`
-      INSERT INTO guild_messages (id, conversation_key, sender_discord_id, recipient_discord_id, sender_member_id, recipient_member_id, body, reply_to, created_at, read_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-    `).bind(id, key, linked.discordId, peer.discordId, String(linked.member.id), String(peer.member.id), message, replyTo, now, 0).run();
-    return jsonResponse({ ok:true, message:{ id, senderDiscordId:linked.discordId, recipientDiscordId:peer.discordId, senderMemberId:String(linked.member.id), recipientMemberId:String(peer.member.id), body:message, replyTo, createdAt:now, readAt:0 } });
+    const senderMemberId = String(linked.member.id);
+    const recipientDiscordId = peer.discordId;
+    const recipientMemberIdStable = String(peer.member.id);
+    const db = env.PANTHEON_DB;
+    // Use plain positional bindings with one supplied value for every placeholder.
+    // This avoids D1 parameter-count ambiguity from the previous mixed numbered/literal form.
+    const messageStatement = db.prepare(`INSERT INTO guild_messages
+      (id, conversation_key, sender_discord_id, recipient_discord_id, sender_member_id, recipient_member_id, body, reply_to, created_at, read_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(id, key, linked.discordId, recipientDiscordId, senderMemberId, recipientMemberIdStable, message, replyTo, now, 0);
+    const senderInboxStatement = db.prepare(`INSERT INTO guild_conversation_inbox
+      (owner_discord_id, conversation_key, peer_discord_id, peer_member_id, last_message_id, last_message_body, last_message_at, last_message_sender_discord_id, unread_count)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(owner_discord_id, conversation_key) DO UPDATE SET
+        peer_member_id = excluded.peer_member_id,
+        last_message_id = CASE WHEN excluded.last_message_at >= guild_conversation_inbox.last_message_at THEN excluded.last_message_id ELSE guild_conversation_inbox.last_message_id END,
+        last_message_body = CASE WHEN excluded.last_message_at >= guild_conversation_inbox.last_message_at THEN excluded.last_message_body ELSE guild_conversation_inbox.last_message_body END,
+        last_message_at = MAX(guild_conversation_inbox.last_message_at, excluded.last_message_at),
+        last_message_sender_discord_id = CASE WHEN excluded.last_message_at >= guild_conversation_inbox.last_message_at THEN excluded.last_message_sender_discord_id ELSE guild_conversation_inbox.last_message_sender_discord_id END`)
+      .bind(linked.discordId, key, recipientDiscordId, recipientMemberIdStable, id, message, now, linked.discordId, 0);
+    const recipientInboxStatement = db.prepare(`INSERT INTO guild_conversation_inbox
+      (owner_discord_id, conversation_key, peer_discord_id, peer_member_id, last_message_id, last_message_body, last_message_at, last_message_sender_discord_id, unread_count)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(owner_discord_id, conversation_key) DO UPDATE SET
+        peer_member_id = excluded.peer_member_id,
+        last_message_id = CASE WHEN excluded.last_message_at >= guild_conversation_inbox.last_message_at THEN excluded.last_message_id ELSE guild_conversation_inbox.last_message_id END,
+        last_message_body = CASE WHEN excluded.last_message_at >= guild_conversation_inbox.last_message_at THEN excluded.last_message_body ELSE guild_conversation_inbox.last_message_body END,
+        last_message_at = MAX(guild_conversation_inbox.last_message_at, excluded.last_message_at),
+        last_message_sender_discord_id = CASE WHEN excluded.last_message_at >= guild_conversation_inbox.last_message_at THEN excluded.last_message_sender_discord_id ELSE guild_conversation_inbox.last_message_sender_discord_id END,
+        unread_count = guild_conversation_inbox.unread_count + 1`)
+      .bind(recipientDiscordId, key, linked.discordId, senderMemberId, id, message, now, linked.discordId, 1);
+    // The public Guild Forum is now the primary social feature, but legacy DMs remain
+    // backward-compatible for cached clients and preserve the existing conversation history.
+    await messageStatement.run();
+    await senderInboxStatement.run();
+    await recipientInboxStatement.run();
+    return jsonResponse({ ok:true, message:{ id, senderDiscordId:linked.discordId, recipientDiscordId, senderMemberId, recipientMemberId:recipientMemberIdStable, body:message, replyTo, createdAt:now, readAt:0 } });
   } catch (error) {
     return jsonResponse({ error:`Could not send message: ${String(error?.message || error).slice(0,180)}` }, 503);
   }

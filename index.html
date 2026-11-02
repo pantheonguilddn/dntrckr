@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r60</title>
+    <title>Pantheon Tools v1.6.8-r62</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3051,7 +3051,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r60-social-community">
+<style id="pantheon-r61-social-community">
 /* Let the member rail blend into the workspace; its scrollbar appears only during interaction. */
 @media (min-width:1200px) {
   #online-presence-pane { background:transparent !important; border-right:1px solid color-mix(in srgb,var(--pt-border) 55%,transparent) !important; box-shadow:none !important; }
@@ -3145,7 +3145,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r60-collapsed-sidebar-actions">
+<style id="pantheon-r61-collapsed-sidebar-actions">
 @media(min-width:1200px) {
   #online-presence-pane.is-collapsed .online-presence-head > div:first-child,
   #online-presence-pane.is-collapsed .online-event-notice { display:none !important; }
@@ -3154,6 +3154,260 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 }
 </style>
 
+
+<style id="pantheon-r62-guild-board-and-profile-layout">
+/* Roomier, non-overlapping guild rail. The member list remains visually blended into the page. */
+@media (min-width:1200px) {
+  body.pantheon-discord-sidebar { padding-left:calc(344px + clamp(12px,2.5vw,36px)) !important; }
+  body.pantheon-discord-sidebar.pantheon-presence-collapsed { padding-left:calc(68px + clamp(12px,2.5vw,36px)) !important; }
+  #online-presence-pane { width:344px !important; min-width:344px !important; max-width:344px !important; }
+  #online-presence-pane.is-collapsed { width:56px !important; min-width:56px !important; max-width:56px !important; }
+  #online-presence-pane .online-presence-head { display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; align-items:center !important; gap:9px !important; min-height:58px !important; padding:10px 11px !important; }
+  #online-presence-pane .online-presence-head-copy { min-width:0; display:grid !important; grid-template-columns:9px minmax(0,1fr); align-items:center; column-gap:7px; row-gap:3px; }
+  #online-presence-pane .online-presence-head-copy strong { min-width:0; white-space:normal !important; line-height:1.2; }
+  #online-presence-pane .online-presence-head-copy .online-presence-count { grid-column:2; white-space:normal !important; }
+  #online-presence-pane .online-presence-head-actions { flex:0 0 auto; display:flex !important; align-items:center !important; justify-content:flex-end !important; gap:7px !important; min-width:max-content !important; }
+  #online-presence-pane .guild-forum-open { display:inline-flex !important; align-items:center; justify-content:center; gap:5px; min-width:93px; min-height:34px; padding:6px 9px; border:1px solid var(--pt-border); border-radius:8px; background:transparent; color:var(--pt-text); font:750 .64rem/1 system-ui,sans-serif; white-space:nowrap; cursor:pointer; }
+  #online-presence-pane .guild-forum-open:hover { background:var(--pt-hover); border-color:var(--pt-accent); }
+  #online-presence-pane #online-presence-collapse { width:34px !important; height:34px !important; flex:0 0 34px !important; display:grid !important; place-items:center; font-size:1rem; }
+  #online-presence-pane .online-presence-user { display:grid !important; grid-template-columns:8px minmax(0,1fr) auto !important; align-items:center !important; gap:8px !important; width:100%; box-sizing:border-box; padding:8px 6px !important; }
+  #online-presence-pane .online-presence-user-name { min-width:0 !important; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.3; }
+  #online-presence-pane .online-presence-state,#online-presence-pane .online-presence-admin { flex:0 0 auto; white-space:nowrap; }
+  #online-presence-pane.is-collapsed .online-presence-head { display:flex !important; justify-content:center !important; padding:10px 5px !important; }
+  #online-presence-pane.is-collapsed .online-presence-head-copy,#online-presence-pane.is-collapsed .guild-forum-open { display:none !important; }
+  #online-presence-pane.is-collapsed .online-presence-head-actions { justify-content:center !important; width:100%; }
+  #online-presence-pane.is-collapsed .online-presence-list,#online-presence-pane.is-collapsed .online-presence-foot { display:none !important; }
+}
+#online-presence-pane .online-presence-list { scrollbar-width:thin; scrollbar-color:transparent transparent; }
+#online-presence-pane .online-presence-list:focus-within,#online-presence-pane .online-presence-list.is-scrolling { scrollbar-color:var(--pt-border) transparent; }
+#online-presence-pane .online-presence-list::-webkit-scrollbar { width:6px; }
+#online-presence-pane .online-presence-list::-webkit-scrollbar-thumb { background:transparent; border-radius:20px; }
+#online-presence-pane .online-presence-list:focus-within::-webkit-scrollbar-thumb,#online-presence-pane .online-presence-list.is-scrolling::-webkit-scrollbar-thumb { background:var(--pt-border); }
+.guild-social-modal-card { width:min(1050px,calc(100vw - 28px)); max-height:min(900px,calc(100vh - 24px)); box-sizing:border-box; }
+.guild-social-modal-head-actions { display:flex; align-items:center; gap:7px; flex:0 0 auto; }
+.guild-social-modal-head h3 { line-height:1.25; overflow-wrap:anywhere; }
+.guild-social-profile-panel { flex:1 1 auto; min-height:0; overflow:auto; padding:2px 2px 6px; }
+.guild-social-profile-hero { box-sizing:border-box; align-items:center; min-width:0; }
+.guild-social-avatar { object-fit:cover; }
+.guild-social-identity { min-width:0; flex:1 1 auto; overflow:hidden; }
+.guild-social-identity h4,.guild-social-registered { overflow-wrap:anywhere; word-break:break-word; }
+.guild-social-hero-badge { flex:0 0 auto; align-self:center; max-width:100px; padding:6px 8px; border:1px solid var(--pt-border); border-radius:999px; color:var(--pt-muted); font-size:.62rem; white-space:nowrap; }
+.guild-social-profile-grid,.guild-social-profile-lower-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:10px; margin-top:10px; }
+.guild-social-profile-lower-grid { grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); }
+.guild-social-info-card { box-sizing:border-box; min-width:0; overflow:hidden; }
+.guild-social-info-card h5 { line-height:1.35; overflow-wrap:anywhere; }
+.guild-social-main-char,.guild-social-character-list,.guild-social-bio-text,.guild-social-activity-list { min-width:0; overflow-wrap:anywhere; }
+.guild-social-empty-inline { padding:4px 0; text-align:left; }
+.guild-social-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; min-width:0; margin-bottom:8px; }
+.guild-social-card-head h5 { margin:0; }
+.guild-social-card-head span { flex:0 0 auto; max-width:48%; color:var(--pt-muted); font-size:.55rem; text-align:right; white-space:normal; }
+#guild-social-bio-input { display:block; width:100%; min-width:0; max-width:100%; box-sizing:border-box; padding:9px 10px; border:1px solid var(--pt-border); border-radius:9px; resize:vertical; background:var(--pt-surface-soft); color:var(--pt-text); font:inherit; font-size:.7rem; line-height:1.45; }
+.guild-social-bio-text { margin:0; color:var(--pt-text); font-size:.72rem; line-height:1.55; white-space:pre-wrap; }
+.guild-social-bio-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:7px; }
+.guild-social-bio-foot small { color:var(--pt-muted); font-size:.57rem; }
+.guild-social-activity-list { display:grid; gap:8px; }
+.guild-social-activity-item { display:flex; align-items:flex-start; gap:8px; min-width:0; }
+.guild-social-activity-mark { flex:0 0 20px; width:20px; height:20px; display:grid; place-items:center; border-radius:7px; background:var(--pt-accent-soft); color:var(--pt-accent); font-size:.66rem; }
+.guild-social-activity-item > div { min-width:0; display:grid; gap:3px; }
+.guild-social-activity-item strong { color:var(--pt-text); font-size:.67rem; line-height:1.35; overflow-wrap:anywhere; }
+.guild-social-activity-item small { color:var(--pt-muted); font-size:.58rem; line-height:1.35; overflow-wrap:anywhere; }
+.guild-social-profile-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+.guild-social-profile-actions .modal-note { min-width:0; text-align:right; overflow-wrap:anywhere; }
+.guild-forum-panel { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; gap:10px; }
+.guild-forum-panel[hidden],.guild-social-profile-panel[hidden],.guild-forum-composer[hidden] { display:none !important; }
+.guild-forum-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:11px 13px; border:1px solid var(--pt-border); border-radius:12px; background:var(--pt-surface-soft); }
+.guild-forum-toolbar > div:first-child { min-width:0; display:grid; gap:3px; }
+.guild-forum-eyebrow { color:var(--pt-muted); font-size:.55rem; font-weight:900; letter-spacing:.13em; }
+.guild-forum-toolbar > div:first-child > strong { color:var(--pt-text); font-size:.95rem; }
+.guild-forum-toolbar small { color:var(--pt-muted); font-size:.62rem; line-height:1.4; }
+.guild-forum-toolbar-actions { display:flex; align-items:center; flex-wrap:wrap; gap:7px; }
+.guild-forum-filters { display:flex; flex:0 0 auto; gap:6px; overflow-x:auto; padding:1px 1px 5px; scrollbar-width:thin; }
+.guild-forum-filters button { flex:0 0 auto; min-height:30px; padding:6px 10px; border:1px solid var(--pt-border); border-radius:999px; background:var(--pt-surface); color:var(--pt-muted); font:700 .62rem system-ui; white-space:nowrap; cursor:pointer; }
+.guild-forum-filters button.is-active { border-color:var(--pt-accent); background:var(--pt-accent-soft); color:var(--pt-text); }
+.guild-forum-composer { flex:0 0 auto; max-height:46vh; overflow:auto; padding:12px; border:1px solid var(--pt-accent); border-radius:12px; background:var(--pt-surface-soft); }
+.guild-forum-composer-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; color:var(--pt-text); font-size:.76rem; }
+.guild-forum-composer-head button { width:28px; height:28px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-surface); color:var(--pt-text); cursor:pointer; }
+.guild-forum-form-row { display:grid; grid-template-columns:minmax(150px,.7fr) minmax(0,1.3fr); gap:9px; }
+.guild-forum-form-row label,.guild-forum-body-field { display:grid; gap:5px; min-width:0; color:var(--pt-muted); font-size:.62rem; font-weight:750; }
+.guild-forum-form-row input,.guild-forum-form-row select,.guild-forum-body-field textarea { width:100%; min-width:0; box-sizing:border-box; padding:9px 10px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font:inherit; font-size:.7rem; }
+.guild-forum-body-field { margin-top:9px; }
+.guild-forum-body-field textarea { resize:vertical; line-height:1.45; }
+.guild-forum-emoji-row { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.guild-forum-emoji-row button { width:29px; height:27px; border:1px solid var(--pt-border); border-radius:7px; background:var(--pt-surface); cursor:pointer; }
+.guild-forum-attachment-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px; color:var(--pt-muted); font-size:.59rem; }
+.guild-forum-photo-picker { padding:7px 9px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font-weight:800; cursor:pointer; }
+#guild-forum-photo-clear { border:0; background:transparent; color:var(--pt-accent); font:700 .61rem system-ui; cursor:pointer; }
+.guild-forum-photo-preview { display:block; max-width:min(100%,420px); max-height:180px; margin-top:9px; object-fit:contain; border:1px solid var(--pt-border); border-radius:9px; }
+.guild-forum-form-foot { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:9px; margin-top:10px; }
+.guild-forum-form-foot span { color:var(--pt-muted); font-size:.61rem; line-height:1.4; }
+.guild-forum-feed { flex:1 1 auto; min-height:100px; overflow:auto; display:grid; align-content:start; gap:10px; padding:1px 3px 7px 1px; }
+.guild-forum-post { min-width:0; padding:13px; border:1px solid var(--pt-border); border-radius:13px; background:var(--pt-surface); color:var(--pt-text); box-shadow:0 2px 8px rgba(0,0,0,.035); }
+.guild-forum-post.is-pinned { border-color:color-mix(in srgb,var(--pt-accent) 55%,var(--pt-border)); }
+.guild-forum-post-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.guild-forum-author { display:flex; align-items:center; gap:9px; min-width:0; padding:0; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+.guild-forum-avatar { flex:0 0 36px; width:36px; height:36px; display:grid; place-items:center; border-radius:11px; overflow:hidden; background:var(--pt-accent-soft); color:var(--pt-accent); font-weight:900; }
+.guild-forum-avatar img { display:block; width:100%; height:100%; object-fit:cover; }
+.guild-forum-author > span:last-child { min-width:0; display:grid; gap:3px; }
+.guild-forum-author strong { color:var(--pt-text); font-size:.69rem; overflow-wrap:anywhere; }
+.guild-forum-author small { color:var(--pt-muted); font-size:.56rem; line-height:1.3; overflow-wrap:anywhere; }
+.guild-forum-post-actions { flex:0 0 auto; display:flex; align-items:center; gap:7px; color:var(--pt-muted); }
+.guild-forum-post-actions button { width:27px; height:27px; border:1px solid var(--pt-border); border-radius:7px; background:transparent; color:var(--pt-muted); cursor:pointer; }
+.guild-forum-post h4 { margin:10px 0 5px; color:var(--pt-text); font-size:.87rem; line-height:1.35; overflow-wrap:anywhere; }
+.guild-forum-post-body { margin:0; color:var(--pt-text); font-size:.72rem; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+.guild-forum-post-photo-wrap { margin-top:10px; overflow:hidden; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-soft); }
+.guild-forum-post-photo { display:block; width:100%; max-height:450px; object-fit:contain; background:var(--pt-surface-soft); }
+.guild-forum-post-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:11px; padding-top:9px; border-top:1px solid var(--pt-border); color:var(--pt-muted); font-size:.57rem; }
+.guild-forum-post-foot button { padding:4px 0; border:0; background:transparent; color:var(--pt-accent); font:750 .62rem system-ui; cursor:pointer; }
+.guild-forum-comments { margin-top:8px; padding-top:7px; border-top:1px solid var(--pt-border); }
+.guild-forum-comment-list { display:grid; gap:8px; }
+.guild-forum-comment { min-width:0; margin-left:calc(min(var(--comment-depth),3) * 13px); padding:7px 9px; border-left:2px solid var(--pt-border); border-radius:0 8px 8px 0; background:var(--pt-surface-soft); }
+.guild-forum-comment-head { display:flex; align-items:center; gap:8px; }
+.guild-forum-comment-head button { padding:0; border:0; background:transparent; color:var(--pt-accent); font:750 .62rem system-ui; cursor:pointer; }
+.guild-forum-comment-head small { color:var(--pt-muted); font-size:.53rem; }
+.guild-forum-comment p { margin:5px 0; color:var(--pt-text); font-size:.67rem; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; }
+.guild-forum-comment-actions { display:flex; gap:10px; }
+.guild-forum-comment-actions button { padding:0; border:0; background:transparent; color:var(--pt-muted); font:650 .55rem system-ui; cursor:pointer; }
+.guild-forum-comment-form { display:flex; align-items:flex-end; flex-wrap:wrap; gap:7px; margin-top:9px; }
+.guild-forum-comment-form textarea { flex:1 1 220px; min-width:0; min-height:40px; box-sizing:border-box; padding:8px 9px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font:inherit; font-size:.67rem; resize:vertical; }
+.guild-forum-reply-target { flex:0 0 100%; padding:5px 7px; border-left:3px solid var(--pt-accent); background:var(--pt-accent-soft); color:var(--pt-text); font-size:.58rem; overflow-wrap:anywhere; }
+.guild-forum-no-comments { color:var(--pt-muted); font-size:.6rem; }
+.guild-forum-empty { display:grid; justify-items:center; gap:7px; padding:35px 15px; text-align:center; color:var(--pt-muted); }
+.guild-forum-empty > span { font-size:1.7rem; }
+.guild-forum-empty strong { color:var(--pt-text); font-size:.8rem; }
+.guild-forum-empty small { max-width:420px; font-size:.63rem; line-height:1.5; }
+.guild-forum-load-more-wrap { display:flex; justify-content:center; padding:0 0 3px; }
+@media(max-width:700px) {
+  .guild-social-modal-card { padding:12px; }
+  .guild-social-modal-head { align-items:flex-start; }
+  .guild-social-modal-head-actions .btn:first-child { display:none; }
+  .guild-social-profile-grid,.guild-social-profile-lower-grid { grid-template-columns:minmax(0,1fr); }
+  .guild-social-profile-hero { gap:9px; padding:10px; }
+  .guild-social-avatar { width:58px; height:58px; flex-basis:58px; }
+  .guild-social-hero-badge { font-size:.54rem; padding:5px 6px; }
+  .guild-forum-form-row { grid-template-columns:minmax(0,1fr); }
+  .guild-forum-toolbar { align-items:flex-start; }
+  .guild-forum-toolbar-actions { width:100%; }
+  .guild-forum-toolbar-actions button { flex:1; }
+}
+
+/* r62 final refinements: keep rail controls separate, profile text contained, and
+   the Guild Forum composer readable at all widths. */
+@media (min-width:1200px) {
+  #online-presence-pane .online-presence-head {
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:11px !important;
+    padding:12px 13px !important;
+  }
+  #online-presence-pane .online-presence-head-copy {
+    grid-template-columns:9px minmax(0,1fr) !important;
+    min-width:0 !important;
+    column-gap:8px !important;
+  }
+  #online-presence-pane .online-presence-head-copy strong {
+    font-size:.76rem !important;
+    line-height:1.25 !important;
+    overflow-wrap:anywhere;
+  }
+  #online-presence-pane .online-presence-head-copy .online-presence-count {
+    font-size:.62rem !important;
+    line-height:1.25 !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere;
+  }
+  #online-presence-pane .online-presence-head-actions {
+    flex-wrap:nowrap !important;
+    align-self:center !important;
+    gap:8px !important;
+  }
+  #online-presence-pane .guild-forum-open {
+    min-width:116px !important;
+    min-height:36px !important;
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+  }
+  #online-presence-pane #online-presence-collapse {
+    width:36px !important;
+    min-width:36px !important;
+    height:36px !important;
+    flex:0 0 36px !important;
+    padding:0 !important;
+    line-height:1 !important;
+  }
+  #online-presence-pane .online-presence-user {
+    grid-template-columns:8px minmax(0,1fr) auto !important;
+    min-height:40px !important;
+    gap:9px !important;
+  }
+  #online-presence-pane .online-presence-user-name {
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    overflow-wrap:anywhere !important;
+    line-height:1.35 !important;
+  }
+  body.pantheon-discord-sidebar.pantheon-presence-collapsed {
+    padding-left:calc(68px + clamp(12px,2.5vw,36px)) !important;
+  }
+}
+.guild-social-modal-card {
+  width:min(1080px,calc(100vw - 28px)) !important;
+  max-height:min(900px,calc(100dvh - 24px)) !important;
+  padding:clamp(14px,2vw,22px) !important;
+  box-sizing:border-box !important;
+}
+.guild-social-modal-head { min-width:0; flex-wrap:wrap; align-items:flex-start; }
+.guild-social-modal-head > div:first-child { min-width:0; flex:1 1 320px; }
+.guild-social-modal-head-actions { flex:0 0 auto; margin-left:auto; }
+.guild-social-modal-head h3,.guild-social-modal-head p { max-width:100%; overflow-wrap:anywhere; }
+.guild-social-profile-panel { width:100%; box-sizing:border-box; }
+.guild-social-profile-hero {
+  display:grid !important;
+  grid-template-columns:76px minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:14px !important;
+  width:100%; min-width:0; box-sizing:border-box;
+}
+.guild-social-identity { display:grid !important; align-content:center; gap:5px; min-width:0 !important; width:100%; overflow:visible !important; }
+.guild-social-identity h4 { margin:0 !important; max-width:100%; font-size:clamp(.95rem,2vw,1.18rem) !important; line-height:1.25 !important; white-space:normal !important; overflow-wrap:anywhere !important; word-break:break-word !important; }
+.guild-social-registered { margin:0 !important; font-size:.66rem !important; line-height:1.4 !important; white-space:normal !important; overflow-wrap:anywhere !important; }
+.guild-social-presence { margin-top:1px !important; line-height:1.35 !important; }
+.guild-social-hero-badge { justify-self:end; max-width:120px !important; white-space:normal !important; text-align:center; line-height:1.25; overflow-wrap:anywhere; }
+.guild-social-profile-grid,.guild-social-profile-lower-grid { grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr) !important; align-items:stretch; }
+.guild-social-info-card { min-width:0 !important; width:100%; box-sizing:border-box; overflow:visible !important; }
+.guild-social-info-card h5 { max-width:100%; line-height:1.35 !important; white-space:normal; overflow-wrap:anywhere; }
+.guild-social-card-head { flex-wrap:wrap; align-items:flex-start; }
+.guild-social-card-head h5 { flex:1 1 160px; min-width:0; }
+.guild-social-card-head span { flex:0 1 44%; max-width:44%; text-align:right; white-space:normal; overflow-wrap:anywhere; line-height:1.35; }
+.guild-social-main-char strong,.guild-social-main-char span,.guild-social-character-chip strong,.guild-social-character-chip small,.guild-social-bio-text,.guild-social-activity-item strong,.guild-social-activity-item small { overflow-wrap:anywhere !important; word-break:break-word; line-height:1.4; }
+.guild-social-character-chip { min-width:0; box-sizing:border-box; }
+.guild-social-profile-actions { width:100%; box-sizing:border-box; }
+.guild-forum-emoji-row { align-items:center; gap:6px !important; }
+.guild-forum-emoji-row button { width:34px !important; height:32px !important; flex:0 0 34px; font-size:1rem; display:grid; place-items:center; }
+.guild-forum-emoji-row button:hover,.guild-forum-emoji-row button:focus-visible { border-color:var(--pt-accent); background:var(--pt-accent-soft); outline:none; }
+.guild-forum-post-photo { max-height:520px !important; }
+@media(max-width:700px) {
+  .guild-social-modal-card { width:calc(100vw - 16px) !important; max-height:calc(100dvh - 16px) !important; padding:12px !important; }
+  .guild-social-modal-head { gap:8px; }
+  .guild-social-modal-head-actions { margin-left:auto; }
+  .guild-social-profile-hero { grid-template-columns:58px minmax(0,1fr) !important; align-items:center !important; }
+  .guild-social-hero-badge { grid-column:2; justify-self:start; max-width:100%; }
+  .guild-social-profile-grid,.guild-social-profile-lower-grid { grid-template-columns:minmax(0,1fr) !important; }
+  .guild-social-card-head span { flex:1 1 100%; max-width:none; text-align:left; }
+  #online-presence-pane .online-presence-head { flex-wrap:wrap !important; gap:8px !important; }
+  #online-presence-pane .online-presence-head-copy { min-width:0; flex:1 1 140px; }
+  #online-presence-pane .online-presence-head-actions { flex:0 0 auto; margin-left:auto; }
+  #online-presence-pane .guild-forum-open { min-width:0 !important; padding:6px 8px !important; }
+}
+
+.guild-social-hero-bio { margin:1px 0 0; color:var(--pt-text); font-size:.69rem; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; word-break:break-word; }
+.guild-social-hero-bio.is-empty { color:var(--pt-muted); font-style:italic; }
+.guild-social-identity { text-align:left; }
+.guild-social-identity > * { max-width:100%; }
+.guild-social-profile-panel,#guild-social-profile-content { min-width:0; max-width:100%; }
+.guild-social-activity-card { align-self:stretch; }
+.guild-social-activity-item { padding:2px 0; }
+.guild-social-info-card,.guild-social-profile-hero,.guild-social-profile-grid,.guild-social-profile-lower-grid { min-width:0; }
+</style>
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3260,32 +3514,48 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="developer-mode-banner" id="developer-mode-banner" hidden><strong>Developer Mode</strong><span>Click static text to edit · format and font sizes stay intact</span><button type="button" onclick="toggleDeveloperMode()">Turn off</button></div>
     <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Guild event notice and member presence">
         <div class="overview-event-notice online-event-notice" id="overview-event-notice" hidden>Guild events · Check the Tracker for current priorities</div>
-        <div class="online-presence-head"><div><span class="online-presence-dot"></span><strong>Guild activity</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><div class="online-presence-head-actions"><button type="button" id="guild-inbox-open" class="guild-inbox-open" aria-label="Open guild messages" onclick="openGuildInbox()">✉ <span>Messages</span><b id="guild-inbox-unread" hidden>0</b></button><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div></div>
+        <div class="online-presence-head"><div class="online-presence-head-copy"><span class="online-presence-dot"></span><strong>Guild members</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><div class="online-presence-head-actions"><button type="button" id="guild-forum-open" class="guild-forum-open" aria-label="Open Guild Forum" onclick="openGuildForum()">🏰 <span>Guild Forum</span></button><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div></div>
         <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading member activity…</div></div>
-        <div class="online-presence-foot">Approved Pantheon accounts · status updates live</div>
+        <div class="online-presence-foot">Click a member to view their profile · status updates live</div>
     </aside>
 
     <div class="modal-overlay hidden" id="guild-social-modal" role="dialog" aria-modal="true" aria-labelledby="guild-social-title">
         <div class="modal-card wide-modal guild-social-modal-card">
             <div class="guild-social-modal-head">
-                <div><div class="guild-social-kicker">PANTHEON · GUILD COMMUNITY</div><h3 id="guild-social-title">👥 Member Profile</h3><p id="guild-social-subtitle" class="modal-note">A little space to say hello.</p></div>
-                <button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild social popup">✕</button>
+                <div><div class="guild-social-kicker">PANTHEON · GUILD COMMUNITY</div><h3 id="guild-social-title">🏰 Pantheon Guild Forum</h3><p id="guild-social-subtitle" class="modal-note">Guild news, achievements, successful runs, and member updates.</p></div>
+                <div class="guild-social-modal-head-actions"><button class="btn btn-secondary" type="button" onclick="openGuildForum()">🏰 Guild Forum</button><button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild community">✕</button></div>
             </div>
-            <section id="guild-social-profile-panel" class="guild-social-profile-panel">
+            <section id="guild-social-profile-panel" class="guild-social-profile-panel" hidden>
                 <div id="guild-social-profile-content"><div class="guild-social-loading">Loading member profile…</div></div>
             </section>
-            <section id="guild-social-inbox-panel" class="guild-social-inbox-panel" hidden>
-                <aside class="guild-social-conversations"><div class="guild-social-section-title">💌 Conversations</div><div id="guild-social-conversation-list"><div class="guild-social-loading">Loading messages…</div></div></aside>
-                <section class="guild-social-chat">
-                    <div class="guild-social-chat-head"><button id="guild-social-back-profile" type="button" onclick="showGuildSocialProfile()">← Profile</button><div id="guild-social-chat-title">Choose a conversation</div></div>
-                    <div id="guild-social-message-thread" class="guild-social-message-thread"><div class="guild-social-empty">Choose a conversation or open a member profile to send a message. 💬</div></div>
-                    <div id="guild-social-reply-strip" class="guild-social-reply-strip" hidden></div>
-                    <div class="guild-social-composer">
-                        <div class="guild-social-emoji-row" aria-label="Quick emojis"><button type="button" data-social-emoji="😊">😊</button><button type="button" data-social-emoji="😂">😂</button><button type="button" data-social-emoji="❤️">❤️</button><button type="button" data-social-emoji="🔥">🔥</button><button type="button" data-social-emoji="🎉">🎉</button><button type="button" data-social-emoji="👏">👏</button><button type="button" data-social-emoji="🙏">🙏</button><button type="button" data-social-emoji="💪">💪</button></div>
-                        <form id="guild-social-message-form"><textarea id="guild-social-message-input" rows="2" maxlength="2000" placeholder="Write a message… (Enter to send, Shift+Enter for a new line)" aria-label="Write a guild message"></textarea><button id="guild-social-send" class="btn btn-cloud" type="submit" disabled>Send ✉</button></form>
-                        <div id="guild-social-message-status" class="guild-social-message-status" role="status" aria-live="polite"></div>
-                    </div>
+            <section id="guild-forum-panel" class="guild-forum-panel" hidden>
+                <div class="guild-forum-toolbar">
+                    <div><div class="guild-forum-eyebrow">THE GUILD HALL · COMMUNITY THREADS</div><strong>📜 Guild Forum</strong><small>Guild achievements, nest clears, screenshots, party calls, and discussions. Reply to keep each thread together.</small></div>
+                    <div class="guild-forum-toolbar-actions"><button type="button" class="btn btn-secondary" onclick="loadGuildForum(true)">↻ Refresh</button><button type="button" class="btn btn-cloud" id="guild-forum-compose-toggle" onclick="toggleGuildForumComposer(true)">＋ New Post</button></div>
+                </div>
+                <div class="guild-forum-filters" id="guild-forum-filters">
+                    <button type="button" class="is-active" data-forum-filter="all">All</button>
+                    <button type="button" data-forum-filter="announcement">📢 Notices</button>
+                    <button type="button" data-forum-filter="achievement">🏆 Achievements</button>
+                    <button type="button" data-forum-filter="raid">🐉 Runs & Clears</button>
+                    <button type="button" data-forum-filter="party">⚔️ Party Up</button>
+                    <button type="button" data-forum-filter="general">💬 General</button>
+                </div>
+                <section id="guild-forum-composer" class="guild-forum-composer" hidden>
+                    <div class="guild-forum-composer-head"><strong>✍️ Create a guild post</strong><button type="button" onclick="toggleGuildForumComposer(false)" aria-label="Close new post">✕</button></div>
+                    <form id="guild-forum-post-form">
+                        <div class="guild-forum-form-row"><label>Post type<select id="guild-forum-category"><option value="achievement">🏆 Guild achievement</option><option value="raid">🐉 Raid / Dungeon clear</option><option value="announcement">📢 Guild announcement</option><option value="party">⚔️ Party / recruitment</option><option value="general">💬 General discussion</option></select></label><label class="guild-forum-title-field">Title<input id="guild-forum-title-input" maxlength="100" required placeholder="e.g. GDN run successfully cleared!"/></label></div>
+                        <label class="guild-forum-body-field">Your post<textarea id="guild-forum-body-input" maxlength="2200" rows="4" placeholder="Share the details, congratulate the party, or leave a note for everyone…"></textarea></label>
+                        <div class="guild-forum-emoji-row" aria-label="Dragon Nest themed emoji shortcuts. Select an icon to insert it into your post.">
+                          <button type="button" data-forum-emoji="🐉" title="Dragon / Nest">🐉</button><button type="button" data-forum-emoji="🐲" title="Ancient Dragon">🐲</button><button type="button" data-forum-emoji="⚔️" title="Warrior / Raid">⚔️</button><button type="button" data-forum-emoji="🗡️" title="Assassin / Blade">🗡️</button><button type="button" data-forum-emoji="🏹" title="Archer">🏹</button><button type="button" data-forum-emoji="🛡️" title="Cleric / Guardian">🛡️</button><button type="button" data-forum-emoji="🪽" title="Wings">🪽</button><button type="button" data-forum-emoji="🔮" title="Sorceress / Magic">🔮</button><button type="button" data-forum-emoji="💠" title="Dragon Jade">💠</button><button type="button" data-forum-emoji="💎" title="Gems / Loot">💎</button><button type="button" data-forum-emoji="🧿" title="Heraldry / Charm">🧿</button><button type="button" data-forum-emoji="🧪" title="Alchemy">🧪</button><button type="button" data-forum-emoji="⚒️" title="Enhancement">⚒️</button><button type="button" data-forum-emoji="🔥" title="Fire">🔥</button><button type="button" data-forum-emoji="❄️" title="Ice">❄️</button><button type="button" data-forum-emoji="⚡" title="Lightning">⚡</button><button type="button" data-forum-emoji="🌪️" title="Wind">🌪️</button><button type="button" data-forum-emoji="🏆" title="Nest Clear / Achievement">🏆</button><button type="button" data-forum-emoji="👑" title="MVP">👑</button><button type="button" data-forum-emoji="🎖️" title="Guild Milestone">🎖️</button>
+                        </div>
+                        <div class="guild-forum-attachment-row"><label class="guild-forum-photo-picker">📷 Add guild photo<input type="file" id="guild-forum-photo-input" accept="image/jpeg,image/png,image/webp" hidden></label><span id="guild-forum-photo-name">No photo attached. Images are resized before upload.</span><button type="button" id="guild-forum-photo-clear" onclick="clearGuildForumPhoto()" hidden>Remove</button></div>
+                        <img id="guild-forum-photo-preview" class="guild-forum-photo-preview" alt="Photo preview" hidden>
+                        <div class="guild-forum-form-foot"><span id="guild-forum-post-status" role="status" aria-live="polite"></span><button type="submit" class="btn btn-cloud" id="guild-forum-publish">Publish to Guild Forum ↗</button></div>
+                    </form>
                 </section>
+                <div id="guild-forum-feed" class="guild-forum-feed"><div class="guild-social-loading">Loading the Guild Forum…</div></div>
+                <div class="guild-forum-load-more-wrap"><button type="button" id="guild-forum-load-more" class="btn btn-secondary" onclick="loadMoreGuildForumPosts()" hidden>Load older posts</button></div>
             </section>
         </div>
     </div>
@@ -3621,9 +3891,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r60</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r62</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r60:</strong> Added member profile cards and private guild messages with replies, emojis, and unread counts.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r62:</strong> Added member bios and activity insights, plus a guild-wide forum for achievements, successful runs, photos, and replies.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6503,12 +6773,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function startRemoteRefresh(){
             if(remoteRefreshTimer) clearInterval(remoteRefreshTimer);
-            // Read more frequently while someone is actively looking at the Tracker,
-            // but keep the idle Overview cadence lighter to avoid unnecessary D1 reads.
-            // The 5-second scheduler lets us switch cadence immediately after navigation.
+            // Saves are pushed immediately by the per-character outbox. Polling is only
+            // for other members' changes, so use a 15-second active cadence and a
+            // 2-minute idle cadence to avoid wasting D1 reads.
             remoteRefreshTimer = setInterval(()=>{
                 if(document.visibilityState !== 'visible')return;
-                const cadence=isTrackerPageCurrentlyVisible()?5000:60000;
+                const cadence=isTrackerPageCurrentlyVisible()?15000:120000;
                 if(Date.now()-lastRemoteRefreshAttemptAt>=cadence)refreshSharedDataIfChanged();
             },5000);
             window.addEventListener('online', () => { resumeQueuedCellWritesNow(); refreshSharedDataIfChanged({force:true}); });
@@ -7395,7 +7665,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             } else image.hidden = true;
         }
         let onlinePresenceTimer = null;
+        let onlinePresenceListTimer = null;
         let onlinePresenceBusy = false;
+        let lastPresenceHeartbeatAt = 0;
+        let lastPresenceFetchAt = 0;
         let onlinePresenceCollapsed = false;
         function toggleOnlinePresencePane() {
             onlinePresenceCollapsed = !onlinePresenceCollapsed;
@@ -7407,14 +7680,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         let guildPresenceUsers = [];
         let guildPresenceByDiscordId = new Map();
-        let guildMessageInboxTimer = null;
-        let guildMessageInboxBusy = false;
         let guildSocialActiveProfile = null;
         let guildSocialView = 'profile';
-        let guildSocialMessages = [];
-        let guildSocialReplyTarget = null;
-        let guildSocialSending = false;
-        let guildSocialLastUnread = 0;
 
         function renderOnlinePresence(users, status = '') {
             const list = document.getElementById('online-presence-list');
@@ -7423,7 +7690,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const clean = (Array.isArray(users) ? users : []).filter(user => user && (user.id || user.label || user.username));
             guildPresenceUsers = clean;
             guildPresenceByDiscordId = new Map(clean.map(user => [String(user.id || ''), user]));
-            if (guildSocialView !== 'profile' && !document.getElementById('guild-social-modal')?.classList.contains('hidden')) refreshGuildMessageInbox(true);
             const hasStatus = clean.some(user => Object.prototype.hasOwnProperty.call(user, 'online'));
             const isOnline = user => user.online === true || user.online === 1 || user.online === '1';
             const onlineUsers = hasStatus ? clean.filter(isOnline) : clean;
@@ -7455,8 +7721,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         }
 
-        async function refreshOnlinePresence(heartbeat=false) {
+        async function refreshOnlinePresence(heartbeat=false, force=false) {
             if (!pantheonDiscordUser?.id || onlinePresenceBusy || (document.visibilityState && document.visibilityState !== 'visible')) return;
+            const now = Date.now();
+            if (!force && heartbeat && now - lastPresenceHeartbeatAt < 45000) return;
+            if (!force && !heartbeat && now - lastPresenceFetchAt < 30000) return;
             onlinePresenceBusy = true;
             try {
                 const response = await fetch('/api/presence', {
@@ -7466,10 +7735,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
                 const data = await response.json().catch(()=>({}));
                 if (!response.ok) throw new Error(data.error || `Presence unavailable (${response.status})`);
-                renderOnlinePresence(data.users || []);
+                if (heartbeat) lastPresenceHeartbeatAt = Date.now();
+                else { lastPresenceFetchAt = Date.now(); renderOnlinePresence(data.users || []); }
             } catch (_) {
-                renderOnlinePresence([], 'Presence unavailable');
+                if (!heartbeat) renderOnlinePresence([], 'Presence unavailable');
             } finally { onlinePresenceBusy = false; }
+        }
+        function refreshPresenceAfterResume() {
+            refreshOnlinePresence(true, false).finally(() => refreshOnlinePresence(false, false));
         }
         function startOnlinePresence() {
             const pane = document.getElementById('online-presence-pane');
@@ -7477,18 +7750,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             initializeGuildSocialUi();
             document.body.classList.add('pantheon-discord-sidebar');
             if (onlinePresenceTimer) clearInterval(onlinePresenceTimer);
-            refreshOnlinePresence(true);
-            onlinePresenceTimer = setInterval(() => refreshOnlinePresence(true), 30000);
-            refreshGuildMessageInbox(true);
-            if (guildMessageInboxTimer) clearInterval(guildMessageInboxTimer);
-            guildMessageInboxTimer = setInterval(() => {
-                if (document.visibilityState === 'visible') {
-                    refreshGuildMessageInbox(true);
-                    if (guildSocialView === 'conversation' && guildSocialActiveProfile && !document.getElementById('guild-social-modal')?.classList.contains('hidden')) loadGuildConversation(guildSocialActiveProfile, true);
-                }
-            }, 20000);
-            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { refreshOnlinePresence(true); refreshGuildMessageInbox(true); } });
-            window.addEventListener('focus', () => { refreshOnlinePresence(true); refreshGuildMessageInbox(true); });
+            if (onlinePresenceListTimer) clearInterval(onlinePresenceListTimer);
+            refreshPresenceAfterResume();
+            onlinePresenceTimer = setInterval(() => refreshOnlinePresence(true), 60000);
+            onlinePresenceListTimer = setInterval(() => refreshOnlinePresence(false), 90000);
+            // Guild Forum is deliberately loaded on demand. No idle message polling or private-DM history scans.
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshPresenceAfterResume(); });
+            window.addEventListener('focus', () => refreshPresenceAfterResume());
         }
 
 
@@ -7497,22 +7765,36 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const initial = String(profile?.pantheonName || profile?.label || 'P').trim().charAt(0).toUpperCase() || 'P';
             return url ? `<div class="${sizeClass}"><img src="${escapeHTML(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent='${escapeHTML(initial)}'"></div>` : `<div class="${sizeClass}">${escapeHTML(initial)}</div>`;
         }
+        function openGuildForum() {
+            guildSocialActiveProfile = null;
+            guildSocialView = 'forum';
+            const profilePanel = document.getElementById('guild-social-profile-panel');
+            const forumPanel = document.getElementById('guild-forum-panel');
+            if (profilePanel) profilePanel.hidden = true;
+            if (forumPanel) forumPanel.hidden = false;
+            const title = document.getElementById('guild-social-title');
+            const subtitle = document.getElementById('guild-social-subtitle');
+            if (title) title.textContent = '🏰 Pantheon Guild Forum';
+            if (subtitle) subtitle.textContent = 'Shared guild threads for achievements, successful runs, screenshots, and conversations.';
+            openModal('guild-social-modal');
+            loadGuildForum(true);
+        }
         function openMemberProfile(discordId) {
             const profile = guildPresenceByDiscordId.get(String(discordId || ''));
             if (!profile) return;
             guildSocialActiveProfile = profile;
             guildSocialView = 'profile';
-            guildSocialReplyTarget = null;
             const profilePanel = document.getElementById('guild-social-profile-panel');
-            const inboxPanel = document.getElementById('guild-social-inbox-panel');
             if (profilePanel) profilePanel.hidden = false;
-            if (inboxPanel) inboxPanel.hidden = true;
             renderGuildSocialProfile(profile);
+            const forum = document.getElementById('guild-forum-panel');
+            if (forum) forum.hidden = true;
             const title = document.getElementById('guild-social-title');
             const subtitle = document.getElementById('guild-social-subtitle');
             if (title) title.textContent = '👤 Member Profile';
-            if (subtitle) subtitle.textContent = 'A little about your guildmate. Say hello! 💬';
+            if (subtitle) subtitle.textContent = 'Main character, roster, bio, and recent guild activity.';
             openModal('guild-social-modal');
+            loadGuildMemberExtras(profile);
         }
         function renderGuildSocialProfile(profile) {
             const host = document.getElementById('guild-social-profile-content');
@@ -7521,217 +7803,302 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const online = profile?.online === true || profile?.online === 1;
             const main = profile?.mainCharacter;
             const other = Array.isArray(profile?.otherCharacters) ? profile.otherCharacters : [];
+            const activities = Array.isArray(profile?.recentActivity) ? profile.recentActivity : [];
             const mainHtml = main
                 ? `<div class="guild-social-main-char"><strong>⭐ ${escapeHTML(main.name || 'Main character')}</strong><span>⚔️ ${escapeHTML(main.job || 'Class not set')}</span></div>`
-                : '<div class="guild-social-empty" style="padding:4px 0;text-align:left">Main character not selected yet.</div>';
+                : '<div class="guild-social-empty guild-social-empty-inline">Main character not selected yet.</div>';
             const otherHtml = other.length
                 ? other.map(character => `<span class="guild-social-character-chip"><strong>🎮 ${escapeHTML(character.name || '')}</strong><small>${escapeHTML(character.job || 'Class not set')}</small></span>`).join('')
-                : '<span class="guild-social-empty" style="padding:4px 0">No other characters listed.</span>';
-            const canMessage = !own && profile?.canMessage === true && !!profile?.memberId;
+                : '<span class="guild-social-empty guild-social-empty-inline">No other characters listed.</span>';
+            const bio = String(profile?.bio || '');
+            const bioPreview = bio
+                ? `<p class="guild-social-hero-bio">${escapeHTML(bio)}</p>`
+                : `<p class="guild-social-hero-bio is-empty">${own ? 'Add a short bio so guildmates know what you are working on.' : 'No profile bio added yet.'}</p>`;
+            const activityHtml = activities.length ? activities.slice(0,8).map(item => {
+                const when = Number(item.at) ? new Date(Number(item.at)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
+                return `<div class="guild-social-activity-item"><span class="guild-social-activity-mark">✓</span><div><strong>${escapeHTML(item.taskName || 'Completed activity')}</strong><small>${escapeHTML(item.characterName || 'Character')} · ${escapeHTML(when)}</small></div></div>`;
+            }).join('') : '<div class="guild-social-empty guild-social-empty-inline">No recent completions recorded yet. Their next clear will show up here. ✨</div>';
             host.innerHTML = `
                 <div class="guild-social-profile-hero">
                     ${guildProfileAvatarMarkup(profile)}
-                    <div class="guild-social-identity"><h4>${escapeHTML(profile?.pantheonName || profile?.label || 'Pantheon Member')}</h4><small class="guild-social-registered">Registered as ${escapeHTML(profile?.registeredName || profile?.discordName || 'Discord member')}</small><span class="guild-social-presence ${online ? 'is-online' : ''}">${online ? 'Online now' : 'Offline'}</span></div>
+                    <div class="guild-social-identity"><h4>${escapeHTML(profile?.pantheonName || profile?.label || 'Pantheon Member')}</h4><small class="guild-social-registered">Registered name · ${escapeHTML(profile?.registeredName || profile?.discordName || 'Discord member')}</small>${bioPreview}<span class="guild-social-presence ${online ? 'is-online' : ''}">${online ? 'Online now' : 'Offline'}</span></div>
+                    <div class="guild-social-hero-badge">${online ? '🟢 Active' : '🌙 Away'}</div>
                 </div>
                 <div class="guild-social-profile-grid">
                     <section class="guild-social-info-card"><h5>⭐ Main character</h5>${mainHtml}</section>
                     <section class="guild-social-info-card"><h5>🎭 Other characters · ${other.length}</h5><div class="guild-social-character-list">${otherHtml}</div></section>
                 </div>
-                <div class="guild-social-profile-actions">${own ? '<span class="modal-note">This is your profile! 👋</span>' : canMessage ? '<button class="btn btn-cloud" type="button" onclick="startGuildMessageFromProfile()">💌 Message</button>' : '<span class="modal-note">Messaging is available after this member links their Discord account.</span>'}</div>`;
-        }
-        function showGuildSocialProfile() {
-            guildSocialView = 'profile'; guildSocialReplyTarget = null;
-            const profile = document.getElementById('guild-social-profile-panel');
-            const inbox = document.getElementById('guild-social-inbox-panel');
-            if (profile) profile.hidden = false;
-            if (inbox) inbox.hidden = true;
-            if (guildSocialActiveProfile) renderGuildSocialProfile(guildSocialActiveProfile);
-            const title = document.getElementById('guild-social-title');
-            const subtitle = document.getElementById('guild-social-subtitle');
-            if (title) title.textContent = '👤 Member Profile';
-            if (subtitle) subtitle.textContent = 'A little about your guildmate. Say hello! 💬';
-        }
-        function setGuildSocialInboxMode() {
-            guildSocialView = 'inbox';
-            const profile = document.getElementById('guild-social-profile-panel');
-            const inbox = document.getElementById('guild-social-inbox-panel');
-            if (profile) profile.hidden = true;
-            if (inbox) inbox.hidden = false;
-            const title = document.getElementById('guild-social-title');
-            const subtitle = document.getElementById('guild-social-subtitle');
-            if (title) title.textContent = '💌 Guild Messages';
-            if (subtitle) subtitle.textContent = 'Private one-to-one conversations with your guildmates.';
-        }
-        async function openGuildInbox() {
-            setGuildSocialInboxMode();
-            openModal('guild-social-modal');
-            if (!guildPresenceByDiscordId.size) {
-                try { const response = await fetch('/api/presence', { credentials:'same-origin', cache:'no-store' }); const data = await response.json().catch(() => ({})); if (response.ok) renderOnlinePresence(data.users || []); } catch (_) {}
+                <div class="guild-social-profile-lower-grid">
+                    <section class="guild-social-info-card guild-social-bio-card"><div class="guild-social-card-head"><h5>🪶 About this member</h5>${own ? '<span>Only you can edit this</span>' : ''}</div>
+                        ${own ? `<textarea id="guild-social-bio-input" maxlength="240" rows="3" placeholder="Write a little about yourself, your goals, or what you enjoy in Dragon Nest…">${escapeHTML(bio)}</textarea><div class="guild-social-bio-foot"><small id="guild-social-bio-count">${[...bio].length}/240</small><button type="button" class="btn btn-secondary" onclick="saveGuildMemberBio()">Save bio</button></div>` : `<p class="guild-social-bio-text">${bio ? escapeHTML(bio) : 'This member has not added a bio yet.'}</p>`}
+                    </section>
+                    <section class="guild-social-info-card guild-social-activity-card"><div class="guild-social-card-head"><h5>⚔️ Recent activity</h5><span>Latest recorded clears</span></div><div class="guild-social-activity-list">${activityHtml}</div></section>
+                </div>
+                <div class="guild-social-profile-actions"><button class="btn btn-cloud" type="button" onclick="openGuildForum()">🏰 Open Guild Forum</button>${own ? '<span class="modal-note">This is your Pantheon profile. 👋</span>' : ''}</div>`;
+            if (own) {
+                const input = document.getElementById('guild-social-bio-input');
+                input?.addEventListener('input', () => { const count = document.getElementById('guild-social-bio-count'); if (count) count.textContent = `${[...input.value].length}/240`; });
             }
-            await refreshGuildMessageInbox(false);
-            const thread = document.getElementById('guild-social-message-thread');
-            const title = document.getElementById('guild-social-chat-title');
-            const send = document.getElementById('guild-social-send');
-            if (send) send.disabled = true;
-            if (title) title.textContent = 'Choose a conversation';
-            if (thread && guildSocialView === 'inbox') thread.innerHTML = '<div class="guild-social-empty">Choose a conversation or open a member profile to send a message. 💬</div>';
         }
-        async function refreshGuildMessageInbox(silent = false) {
-            if (!pantheonDiscordUser?.id || guildMessageInboxBusy) return;
-            guildMessageInboxBusy = true;
+        async function loadGuildMemberExtras(profile) {
+            const memberId = String(profile?.memberId || '');
+            if (!memberId) return;
             try {
-                const response = await fetch('/api/messages', { credentials:'same-origin', cache:'no-store' });
+                const response = await fetch(`/api/community/profile?memberId=${encodeURIComponent(memberId)}`, { credentials:'same-origin', cache:'no-store' });
                 const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data.error || 'Messages are unavailable.');
-                const conversations = Array.isArray(data.conversations) ? data.conversations : [];
-                const unread = conversations.reduce((sum, item) => sum + (Number(item.unreadCount) || 0), 0);
-                const badge = document.getElementById('guild-inbox-unread');
-                if (badge) { badge.textContent = unread > 99 ? '99+' : String(unread); badge.hidden = unread < 1; }
-                if (!silent && unread > guildSocialLastUnread) {
-                    const status = document.getElementById('guild-social-message-status');
-                    if (status) status.textContent = '✉ You have new guild messages.';
-                }
-                guildSocialLastUnread = unread;
-                const host = document.getElementById('guild-social-conversation-list');
-                if (host && guildSocialView !== 'profile') {
-                    if (!conversations.length) host.innerHTML = '<div class="guild-social-empty">No conversations yet. Open a member profile and send a hello! 👋</div>';
-                    else host.innerHTML = conversations.map(item => {
-                        const profile = guildPresenceByDiscordId.get(String(item.otherDiscordId || '')) || { id:item.otherDiscordId, memberId:item.otherMemberId, pantheonName:'Guild member', label:'Guild member' };
-                        const name = profile.pantheonName || profile.label || 'Guild member';
-                        const selected = guildSocialActiveProfile && String(guildSocialActiveProfile.id) === String(item.otherDiscordId) && guildSocialView === 'conversation';
-                        return `<button type="button" class="guild-social-conversation ${selected ? 'is-active' : ''}" data-social-conversation="${escapeHTML(String(item.otherDiscordId || ''))}">${guildProfileAvatarMarkup(profile,'guild-social-conversation-avatar')}<span class="guild-social-conversation-copy"><strong>${escapeHTML(name)}</strong><small>${item.lastMessageFromMe ? 'You: ' : ''}${escapeHTML(item.lastMessage || '')}</small></span>${Number(item.unreadCount) > 0 ? `<span class="guild-social-unread">${Number(item.unreadCount) > 99 ? '99+' : Number(item.unreadCount)}</span>` : ''}</button>`;
-                    }).join('');
-                    if (!host.dataset.socialClickBound) {
-                        host.dataset.socialClickBound = 'true';
-                        host.addEventListener('click', event => {
-                            const button = event.target.closest('[data-social-conversation]');
-                            if (!button) return;
-                            const peer = guildPresenceByDiscordId.get(button.dataset.socialConversation);
-                            if (peer) loadGuildConversation(peer, false);
-                        });
-                    }
-                }
-                return conversations;
+                if (!response.ok) throw new Error(data.error || 'Member details unavailable.');
+                if (guildSocialActiveProfile !== profile) return;
+                profile.bio = String(data.bio || '');
+                profile.recentActivity = Array.isArray(data.recentActivity) ? data.recentActivity : [];
+                profile.isOwnProfile = data.isOwn === true;
+                renderGuildSocialProfile(profile);
             } catch (error) {
-                const message = error.message || 'Messages are unavailable.';
-                const status = document.getElementById('guild-social-message-status');
-                const host = document.getElementById('guild-social-conversation-list');
-                if (status && !silent) status.textContent = message;
-                if (host && guildSocialView !== 'profile') host.innerHTML = `<div class="guild-social-empty">${escapeHTML(message)}</div>`;
-                return [];
-            } finally { guildMessageInboxBusy = false; }
+                const host = document.getElementById('guild-social-profile-content');
+                if (host && guildSocialActiveProfile === profile) {
+                    const note = document.createElement('p'); note.className = 'guild-social-profile-load-warning'; note.textContent = error.message || 'Bio and activity could not be loaded.'; host.appendChild(note);
+                }
+            }
         }
-        async function startGuildMessageFromProfile() {
-            if (!guildSocialActiveProfile?.canMessage || !guildSocialActiveProfile?.memberId) return;
-            setGuildSocialInboxMode();
-            await refreshGuildMessageInbox(true);
-            await loadGuildConversation(guildSocialActiveProfile, false);
-        }
-        async function loadGuildConversation(profile, silent = false) {
-            if (!profile?.memberId) return;
-            guildSocialActiveProfile = profile;
-            guildSocialView = 'conversation';
-            setGuildSocialInboxMode();
-            const title = document.getElementById('guild-social-chat-title');
-            const thread = document.getElementById('guild-social-message-thread');
-            const send = document.getElementById('guild-social-send');
-            if (send) send.disabled = profile.canMessage !== true;
-            if (title) title.textContent = `${profile.pantheonName || profile.label || 'Guild member'}`;
-            if (thread && !silent) thread.innerHTML = '<div class="guild-social-loading">Loading conversation…</div>';
+        async function saveGuildMemberBio() {
+            const input = document.getElementById('guild-social-bio-input');
+            const button = document.querySelector('.guild-social-bio-foot button');
+            if (!input || !guildSocialActiveProfile || String(guildSocialActiveProfile.id) !== String(pantheonDiscordUser?.id || '')) return;
+            const bio = input.value.trim();
+            if ([...bio].length > 240) return;
+            if (button) { button.disabled = true; button.textContent = 'Saving…'; }
             try {
-                const response = await fetch(`/api/messages?with=${encodeURIComponent(profile.memberId)}`, { credentials:'same-origin', cache:'no-store' });
+                const response = await fetch('/api/community/profile', { method:'PUT', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ bio }) });
                 const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data.error || 'Could not load this conversation.');
-                guildSocialMessages = Array.isArray(data.messages) ? data.messages : [];
-                renderGuildSocialMessages();
-                await refreshGuildMessageInbox(true);
+                if (!response.ok) throw new Error(data.error || 'Bio could not be saved.');
+                guildSocialActiveProfile.bio = String(data.bio || '');
+                renderGuildSocialProfile(guildSocialActiveProfile);
             } catch (error) {
-                if (thread) thread.innerHTML = `<div class="guild-social-empty">${escapeHTML(error.message || 'Could not load conversation.')}</div>`;
+                if (button) { button.disabled = false; button.textContent = 'Try again'; }
+                alert(error.message || 'Bio could not be saved.');
             }
         }
-        function renderGuildSocialMessages() {
-            const thread = document.getElementById('guild-social-message-thread');
-            if (!thread) return;
-            if (!guildSocialMessages.length) { thread.innerHTML = '<div class="guild-social-empty">No messages yet. Break the ice with a hello! 👋</div>'; return; }
-            const byId = new Map(guildSocialMessages.map(message => [String(message.id), message]));
-            thread.innerHTML = guildSocialMessages.map(message => {
-                const mine = String(message.senderDiscordId) === String(pantheonDiscordUser?.id || '');
-                const reply = message.replyTo ? byId.get(String(message.replyTo)) : null;
-                const time = Number(message.createdAt) ? new Date(Number(message.createdAt)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
-                return `<article class="guild-social-message ${mine ? 'is-mine' : ''}">${reply ? `<div class="guild-social-message-quote">↪ ${escapeHTML(reply.body)}</div>` : ''}<div class="guild-social-message-body">${escapeHTML(message.body)}</div><div class="guild-social-message-meta"><span>${time}</span><button type="button" data-social-reply="${escapeHTML(String(message.id))}">↩ Reply</button></div></article>`;
-            }).join('');
-            thread.scrollTop = thread.scrollHeight;
-            if (!thread.dataset.socialReplyBound) {
-                thread.dataset.socialReplyBound = 'true';
-                thread.addEventListener('click', event => {
-                    const button = event.target.closest('[data-social-reply]');
-                    if (!button) return;
-                    const message = guildSocialMessages.find(item => String(item.id) === button.dataset.socialReply);
-                    if (!message) return;
-                    guildSocialReplyTarget = message;
-                    renderGuildSocialReplyStrip();
-                    document.getElementById('guild-social-message-input')?.focus();
-                });
+        let guildForumPosts = [];
+        let guildForumCommentsByPost = new Map();
+        let guildForumFilter = 'all';
+        let guildForumNextBefore = 0;
+        let guildForumLoading = false;
+        let guildForumPhotoDataUrl = '';
+        let guildForumExpandedComments = new Set();
+        let guildForumReplyTargets = new Map();
+        const guildForumCategoryLabels = { announcement:'📢 Guild notice', achievement:'🏆 Achievement', raid:'🐉 Run / Clear', party:'⚔️ Party up', general:'💬 General' };
+        function toggleGuildForumComposer(show) {
+            const panel = document.getElementById('guild-forum-composer');
+            if (panel) panel.hidden = !show;
+            if (show) document.getElementById('guild-forum-title-input')?.focus();
+        }
+        function clearGuildForumPhoto() {
+            guildForumPhotoDataUrl = '';
+            const input = document.getElementById('guild-forum-photo-input');
+            const preview = document.getElementById('guild-forum-photo-preview');
+            const name = document.getElementById('guild-forum-photo-name');
+            const clear = document.getElementById('guild-forum-photo-clear');
+            if (input) input.value = '';
+            if (preview) { preview.removeAttribute('src'); preview.hidden = true; }
+            if (name) name.textContent = 'No photo attached. Images are resized before upload.';
+            if (clear) clear.hidden = true;
+        }
+        async function compressGuildForumPhoto(file) {
+            if (!file || !String(file.type || '').startsWith('image/')) throw new Error('Choose a JPG, PNG, or WebP image.');
+            if (file.size > 12 * 1024 * 1024) throw new Error('Choose a photo smaller than 12 MB before compression.');
+            if (!window.createImageBitmap) throw new Error('This browser cannot resize photos locally. Try a recent Chrome or Edge browser.');
+            const bitmap = await createImageBitmap(file);
+            const maxSide = 1400;
+            const ratio = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(bitmap.width * ratio));
+            canvas.height = Math.max(1, Math.round(bitmap.height * ratio));
+            const ctx = canvas.getContext('2d', { alpha:false });
+            if (!ctx) throw new Error('Could not prepare this photo.');
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.drawImage(bitmap,0,0,canvas.width,canvas.height); bitmap.close?.();
+            for (const quality of [0.78,0.68,0.58,0.48]) {
+                const dataUrl = canvas.toDataURL('image/jpeg',quality);
+                const base64 = dataUrl.split(',')[1] || '';
+                const approxBytes = Math.floor(base64.length * 3 / 4);
+                if (approxBytes <= 250 * 1024) return dataUrl;
             }
+            throw new Error('This photo is still too large after resizing. Choose a smaller image.');
         }
-        function renderGuildSocialReplyStrip() {
-            const strip = document.getElementById('guild-social-reply-strip');
-            if (!strip) return;
-            if (!guildSocialReplyTarget) { strip.hidden = true; strip.innerHTML = ''; return; }
-            strip.hidden = false;
-            strip.innerHTML = `<span>↩ Replying to: ${escapeHTML(String(guildSocialReplyTarget.body || '').slice(0,110))}</span><button type="button" onclick="cancelGuildSocialReply()">Cancel</button>`;
-        }
-        function cancelGuildSocialReply() { guildSocialReplyTarget = null; renderGuildSocialReplyStrip(); }
-        function insertGuildSocialEmoji(emoji) {
-            const input = document.getElementById('guild-social-message-input');
+        function insertGuildForumEmoji(emoji) {
+            const input = document.getElementById('guild-forum-body-input');
             if (!input) return;
             const start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? input.value.length;
             input.value = input.value.slice(0,start) + emoji + input.value.slice(end);
             const caret = start + emoji.length; input.setSelectionRange(caret,caret); input.focus();
         }
-        async function sendGuildSocialMessage(event) {
-            if (event) event.preventDefault();
-            if (guildSocialSending || !guildSocialActiveProfile?.memberId) return;
-            const input = document.getElementById('guild-social-message-input');
-            const button = document.getElementById('guild-social-send');
-            const status = document.getElementById('guild-social-message-status');
-            const body = String(input?.value || '').trim();
-            if (!body) { if (status) status.textContent = 'Write a message first.'; input?.focus(); return; }
-            guildSocialSending = true; if (button) button.disabled = true; if (status) status.textContent = 'Sending…';
+        async function onGuildForumPhotoSelected(file) {
+            const status = document.getElementById('guild-forum-post-status');
+            const name = document.getElementById('guild-forum-photo-name');
             try {
-                const response = await fetch('/api/messages', {
-                    method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({ toMemberId:guildSocialActiveProfile.memberId, body, replyTo:guildSocialReplyTarget?.id || '' })
-                });
-                const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data.error || 'Message could not be sent.');
-                if (input) input.value = '';
-                cancelGuildSocialReply();
-                if (status) status.textContent = 'Sent ✓';
-                await loadGuildConversation(guildSocialActiveProfile, true);
-                await refreshGuildMessageInbox(true);
-            } catch (error) { if (status) status.textContent = error.message || 'Message could not be sent.'; }
-            finally { guildSocialSending = false; if (button) button.disabled = false; }
+                if (status) status.textContent = 'Preparing photo…';
+                guildForumPhotoDataUrl = await compressGuildForumPhoto(file);
+                const preview = document.getElementById('guild-forum-photo-preview');
+                if (preview) { preview.src = guildForumPhotoDataUrl; preview.hidden = false; }
+                if (name) name.textContent = `${file.name} · compressed for the guild forum`;
+                const clear = document.getElementById('guild-forum-photo-clear'); if (clear) clear.hidden = false;
+                if (status) status.textContent = 'Photo ready ✓';
+            } catch (error) { clearGuildForumPhoto(); if (status) status.textContent = error.message || 'Photo could not be prepared.'; }
         }
-        function initializeGuildSocialUi() {
-            const form = document.getElementById('guild-social-message-form');
-            if (form && !form.dataset.bound) { form.dataset.bound = 'true'; form.addEventListener('submit', sendGuildSocialMessage); }
-            document.querySelectorAll('[data-social-emoji]').forEach(button => {
-                if (button.dataset.bound) return;
-                button.dataset.bound = 'true';
-                button.addEventListener('click', () => insertGuildSocialEmoji(button.dataset.socialEmoji || '😊'));
-            });
-            const input = document.getElementById('guild-social-message-input');
-            if (input && !input.dataset.enterBound) {
-                input.dataset.enterBound = 'true';
-                input.addEventListener('keydown', event => {
-                    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); sendGuildSocialMessage(event); }
+        function formatGuildForumTime(timestamp) {
+            if (!Number(timestamp)) return '';
+            return new Date(Number(timestamp)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+        }
+        function renderGuildForumPosts(append=false) {
+            const host = document.getElementById('guild-forum-feed');
+            if (!host) return;
+            const visible = guildForumFilter === 'all' ? guildForumPosts : guildForumPosts.filter(post => post.category === guildForumFilter);
+            const html = visible.map(post => {
+                const author = guildPresenceByDiscordId.get(String(post.authorDiscordId)) || { id:post.authorDiscordId, pantheonName:post.authorName || 'Pantheon Member' };
+                const authorName = post.authorName || author.pantheonName || 'Pantheon Member';
+                const commentsOpen = guildForumExpandedComments.has(String(post.id));
+                const comments = guildForumCommentsByPost.get(String(post.id)) || [];
+                const imageMarkup = post.hasImage ? `<div class="guild-forum-post-photo-wrap"><img class="guild-forum-post-photo" src="/api/forum?imageFor=${encodeURIComponent(post.id)}" alt="Guild photo attached to ${escapeHTML(post.title)}" loading="lazy"></div>` : '';
+                return `<article class="guild-forum-post ${post.pinned ? 'is-pinned' : ''}" data-forum-post-card="${escapeHTML(post.id)}">
+                    <div class="guild-forum-post-head"><button type="button" class="guild-forum-author" data-social-discord-id="${escapeHTML(post.authorDiscordId)}">${guildProfileAvatarMarkup(author,'guild-forum-avatar')}<span><strong>${escapeHTML(authorName)}</strong><small>${escapeHTML(guildForumCategoryLabels[post.category] || 'Guild post')} · ${escapeHTML(formatGuildForumTime(post.createdAt))}</small></span></button><div class="guild-forum-post-actions">${post.pinned ? '<span title="Pinned by an administrator">📌</span>' : ''}${post.canDelete ? `<button type="button" data-forum-delete-post="${escapeHTML(post.id)}" title="Remove post">⋯</button>` : ''}</div></div>
+                    <h4>${escapeHTML(post.title)}</h4>${post.body ? `<p class="guild-forum-post-body">${escapeHTML(post.body)}</p>` : ''}${imageMarkup}
+                    <div class="guild-forum-post-foot"><button type="button" data-forum-toggle-comments="${escapeHTML(post.id)}">💬 ${post.commentsCount} ${post.commentsCount === 1 ? 'reply' : 'replies'} ${commentsOpen ? '⌃' : '⌄'}</button><span>🏰 Pantheon Guild</span></div>
+                    <section class="guild-forum-comments" id="guild-forum-comments-${escapeHTML(post.id)}" ${commentsOpen ? '' : 'hidden'}>${commentsOpen ? renderGuildForumComments(post.id,comments) : ''}</section>
+                </article>`;
+            }).join('');
+            if (append) host.insertAdjacentHTML('beforeend',html);
+            else host.innerHTML = html || '<div class="guild-forum-empty"><span>🐉</span><strong>The Guild Forum is quiet for now.</strong><small>Share your next clear, raid screenshot, or achievement with everyone.</small><button type="button" class="btn btn-cloud" onclick="toggleGuildForumComposer(true)">Create the first post</button></div>';
+            const loadMore = document.getElementById('guild-forum-load-more');
+            if (loadMore) loadMore.hidden = !guildForumNextBefore;
+            if (!host.dataset.forumEventsBound) {
+                host.dataset.forumEventsBound = 'true';
+                host.addEventListener('click', event => {
+                    const toggle = event.target.closest('[data-forum-toggle-comments]'); if (toggle) { toggleGuildForumComments(toggle.dataset.forumToggleComments); return; }
+                    const remove = event.target.closest('[data-forum-delete-post]'); if (remove) { deleteGuildForumPost(remove.dataset.forumDeletePost); return; }
                 });
             }
+        }
+        function renderGuildForumComments(postId,comments) {
+            const rows = Array.isArray(comments) ? comments : [];
+            const byParent = new Map();
+            rows.forEach(item => { const key = String(item.parentCommentId || ''); if (!byParent.has(key)) byParent.set(key,[]); byParent.get(key).push(item); });
+            const ownId = String(pantheonDiscordUser?.id || '');
+            const draw = (items,depth=0) => items.map(item => {
+                const author = guildPresenceByDiscordId.get(String(item.authorDiscordId)) || { id:item.authorDiscordId, pantheonName:item.authorName || 'Member' };
+                const name = item.authorName || author.pantheonName || 'Member';
+                const children = byParent.get(String(item.id)) || [];
+                return `<div class="guild-forum-comment" style="--comment-depth:${Math.min(depth,3)}"><div class="guild-forum-comment-head"><button type="button" data-social-discord-id="${escapeHTML(item.authorDiscordId)}">${escapeHTML(name)}</button><small>${escapeHTML(formatGuildForumTime(item.createdAt))}</small></div><p>${escapeHTML(item.body)}</p><div class="guild-forum-comment-actions"><button type="button" data-forum-reply-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">↩ Reply</button>${item.canDelete ? `<button type="button" data-forum-delete-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">Remove</button>` : ''}</div>${draw(children,depth+1)}</div>`;
+            }).join('');
+            const top = byParent.get('') || [];
+            return `<div class="guild-forum-comment-list">${draw(top) || '<small class="guild-forum-no-comments">No replies yet. Be the first to respond.</small>'}</div><form class="guild-forum-comment-form" data-forum-comment-form="${escapeHTML(postId)}"><div class="guild-forum-reply-target" id="guild-forum-reply-target-${escapeHTML(postId)}" hidden></div><textarea rows="2" maxlength="1500" placeholder="Write a reply… 🐉" aria-label="Write a reply"></textarea><button type="submit" class="btn btn-secondary">Reply ↗</button></form>`;
+        }
+        async function loadGuildForum(reset=true) {
+            if (guildForumLoading) return;
+            guildForumLoading = true;
+            const host = document.getElementById('guild-forum-feed');
+            if (reset) { guildForumPosts = []; guildForumNextBefore = 0; if (host) host.innerHTML = '<div class="guild-social-loading">Loading the Guild Forum…</div>'; }
+            try {
+                const params = new URLSearchParams({ limit:'20', category:guildForumFilter === 'all' ? '' : guildForumFilter });
+                if (!reset && guildForumNextBefore) params.set('before',String(guildForumNextBefore));
+                const response = await fetch(`/api/forum?${params}`,{ credentials:'same-origin', cache:'no-store' });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || 'Guild Forum could not be loaded.');
+                const incoming = Array.isArray(data.posts) ? data.posts : [];
+                guildForumPosts = reset ? incoming : [...guildForumPosts,...incoming];
+                guildForumNextBefore = Number(data.nextBefore) || 0;
+                renderGuildForumPosts(false);
+            } catch (error) { if (host) host.innerHTML = `<div class="guild-forum-empty"><strong>Guild Forum unavailable</strong><small>${escapeHTML(error.message || 'Try refreshing.')}</small></div>`; }
+            finally { guildForumLoading = false; }
+        }
+        async function loadMoreGuildForumPosts() { await loadGuildForum(false); }
+        async function toggleGuildForumComments(postId) {
+            if (guildForumExpandedComments.has(postId)) guildForumExpandedComments.delete(postId);
+            else {
+                guildForumExpandedComments.add(postId);
+                const wrap = document.getElementById(`guild-forum-comments-${postId}`);
+                if (wrap) wrap.innerHTML = '<div class="guild-social-loading">Loading replies…</div>';
+                try {
+                    const response = await fetch(`/api/forum?commentsFor=${encodeURIComponent(postId)}`,{ credentials:'same-origin', cache:'no-store' });
+                    const data = await response.json().catch(()=>({}));
+                    if (!response.ok) throw new Error(data.error || 'Replies could not be loaded.');
+                    guildForumCommentsByPost.set(postId,Array.isArray(data.comments)?data.comments:[]);
+                } catch (error) { guildForumCommentsByPost.set(postId,[]); }
+            }
+            renderGuildForumPosts(false);
+        }
+        async function deleteGuildForumPost(postId) {
+            if (!confirm('Remove this guild post and its replies?')) return;
+            try {
+                const response = await fetch(`/api/forum?postId=${encodeURIComponent(postId)}`,{ method:'DELETE',credentials:'same-origin' });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || 'Post could not be removed.');
+                guildForumPosts = guildForumPosts.filter(item => String(item.id)!==String(postId));
+                renderGuildForumPosts(false);
+            } catch (error) { alert(error.message || 'Post could not be removed.'); }
+        }
+        async function deleteGuildForumComment(commentId,postId) {
+            if (!confirm('Remove this reply?')) return;
+            try {
+                const response = await fetch(`/api/forum?commentId=${encodeURIComponent(commentId)}`,{ method:'DELETE',credentials:'same-origin' });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || 'Reply could not be removed.');
+                await toggleGuildForumComments(postId); await toggleGuildForumComments(postId);
+            } catch (error) { alert(error.message || 'Reply could not be removed.'); }
+        }
+        async function submitGuildForumComment(postId,form) {
+            const input = form.querySelector('textarea'); const text = String(input?.value || '').trim();
+            if (!text) return;
+            const submit = form.querySelector('button[type="submit"]'); if (submit) { submit.disabled=true; submit.textContent='Sending…'; }
+            try {
+                const response = await fetch('/api/forum',{ method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:'comment',postId,body:text,parentCommentId:guildForumReplyTargets.get(postId)?.id || '' }) });
+                const data = await response.json().catch(()=>({})); if (!response.ok) throw new Error(data.error || 'Reply could not be sent.');
+                input.value=''; guildForumReplyTargets.delete(postId);
+                const target = document.getElementById(`guild-forum-reply-target-${postId}`); if (target) target.hidden=true;
+                const comments = await fetch(`/api/forum?commentsFor=${encodeURIComponent(postId)}`,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());
+                guildForumCommentsByPost.set(postId,Array.isArray(comments.comments)?comments.comments:[]);
+                const post = guildForumPosts.find(item=>String(item.id)===postId); if (post) post.commentsCount = guildForumCommentsByPost.get(postId).length;
+                renderGuildForumPosts(false);
+            } catch (error) { alert(error.message || 'Reply could not be sent.'); }
+            finally { if (submit) { submit.disabled=false; submit.textContent='Reply ↗'; } }
+        }
+        async function publishGuildForumPost(event) {
+            event.preventDefault();
+            const category = document.getElementById('guild-forum-category')?.value || 'general';
+            const title = String(document.getElementById('guild-forum-title-input')?.value || '').trim();
+            const body = String(document.getElementById('guild-forum-body-input')?.value || '').trim();
+            const status = document.getElementById('guild-forum-post-status'); const submit = document.getElementById('guild-forum-publish');
+            if (!title || (!body && !guildForumPhotoDataUrl)) { if (status) status.textContent='Add a title and some text or a photo.'; return; }
+            if (submit) { submit.disabled=true; submit.textContent='Publishing…'; }
+            if (status) status.textContent='Sending to the Guild Forum…';
+            try {
+                const response = await fetch('/api/forum',{ method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'post',category,title,body,imageDataUrl:guildForumPhotoDataUrl}) });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || 'Post could not be published.');
+                document.getElementById('guild-forum-post-form')?.reset(); clearGuildForumPhoto(); toggleGuildForumComposer(false);
+                guildForumFilter='all'; document.querySelectorAll('[data-forum-filter]').forEach(button=>button.classList.toggle('is-active',button.dataset.forumFilter==='all'));
+                const filters = document.getElementById('guild-forum-filters'); if (filters) filters.scrollLeft=0;
+                await loadGuildForum(true);
+                if (status) status.textContent='Published ✓';
+            } catch (error) { if (status) status.textContent=error.message || 'Post could not be published.'; }
+            finally { if (submit) { submit.disabled=false; submit.textContent='Publish to Guild Forum ↗'; } }
+        }
+        function initializeGuildSocialUi() {
             const modal = document.getElementById('guild-social-modal');
-            if (modal && !modal.dataset.backdropBound) {
-                modal.dataset.backdropBound = 'true';
-                modal.addEventListener('click', event => { if (event.target === modal) closeModal('guild-social-modal'); });
+            if (modal && !modal.dataset.backdropBound) { modal.dataset.backdropBound='true'; modal.addEventListener('click',event=>{if(event.target===modal)closeModal('guild-social-modal');}); }
+            const form = document.getElementById('guild-forum-post-form');
+            if (form && !form.dataset.bound) { form.dataset.bound='true'; form.addEventListener('submit',publishGuildForumPost); }
+            const photo = document.getElementById('guild-forum-photo-input');
+            if (photo && !photo.dataset.bound) { photo.dataset.bound='true'; photo.addEventListener('change',()=>{ if(photo.files?.[0]) onGuildForumPhotoSelected(photo.files[0]); }); }
+            const filters = document.getElementById('guild-forum-filters');
+            if (filters && !filters.dataset.bound) { filters.dataset.bound='true'; filters.addEventListener('click',event=>{const button=event.target.closest('[data-forum-filter]');if(!button)return;guildForumFilter=button.dataset.forumFilter||'all';filters.querySelectorAll('[data-forum-filter]').forEach(item=>item.classList.toggle('is-active',item===button));loadGuildForum(true);}); }
+            const emoji = document.querySelector('.guild-forum-emoji-row');
+            if (emoji && !emoji.dataset.bound) { emoji.dataset.bound='true'; emoji.addEventListener('click',event=>{const button=event.target.closest('[data-forum-emoji]');if(button)insertGuildForumEmoji(button.dataset.forumEmoji||'🐉');}); }
+            const feed = document.getElementById('guild-forum-feed');
+            if (feed && !feed.dataset.commentBound) { feed.dataset.commentBound='true';
+                feed.addEventListener('click',event=>{
+                    const authorButton=event.target.closest('[data-social-discord-id]'); if(authorButton){openMemberProfile(authorButton.dataset.socialDiscordId || '');return;}
+                    const reply=event.target.closest('[data-forum-reply-comment]'); if(reply){const postId=reply.dataset.forumPost;const item=(guildForumCommentsByPost.get(postId)||[]).find(row=>String(row.id)===reply.dataset.forumReplyComment);if(item){guildForumReplyTargets.set(postId,item);const box=document.getElementById(`guild-forum-reply-target-${postId}`);if(box){box.hidden=false;box.textContent=`Replying to ${item.authorName}: ${item.body.slice(0,90)}`;}document.querySelector(`[data-forum-comment-form="${postId}"] textarea`)?.focus();}return;}
+                    const remove=event.target.closest('[data-forum-delete-comment]'); if(remove){deleteGuildForumComment(remove.dataset.forumDeleteComment,remove.dataset.forumPost);return;}
+                });
+                feed.addEventListener('submit',event=>{const form=event.target.closest('[data-forum-comment-form]');if(!form)return;event.preventDefault();submitGuildForumComment(form.dataset.forumCommentForm,form);});
             }
         }
 
@@ -11529,7 +11896,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r60';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r62';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12258,7 +12625,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r60';
+  const CURRENT_BUILD = '1.6.8-r62';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

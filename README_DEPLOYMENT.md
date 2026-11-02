@@ -1,14 +1,14 @@
-# Deploy Pantheon Tools r60
+# Deploy Pantheon Tools r62
 
-1. Upload the complete contents of `Pantheon_Cloudflare_Pages_v1.6.8-r60.zip` to the existing Cloudflare Pages project. Preserve the `functions/` directory structure.
-2. Keep the existing `PANTHEON_DB` D1 binding and Cloudflare environment variables unchanged.
-3. Do not reset D1, clear browser data, remove existing tracker records, or run a manual SQL migration.
-4. The new `/api/messages` endpoint creates its `guild_messages` table and indexes automatically the first time an authenticated member opens Messages. `schema.sql` also includes the DDL for reference.
-5. Members should open Pantheon normally. The Guild Activity list uses the existing approved-account directory. Clicking a member opens their profile card; the Messages button opens a private conversation.
-6. Messaging requires both participants to have a unique confirmed Discord ID link to a Member Roster entry and an enabled `allowed_users` account. Resolve incomplete or duplicate links through Admin Console → Player Ownership Audit.
+1. Download `Pantheon_Cloudflare_Pages_v1.6.8-r62.zip`.
+2. Upload the ZIP contents to the existing Cloudflare Pages project, preserving the `functions/` directory structure.
+3. Keep the existing `PANTHEON_DB` D1 binding and environment variables unchanged.
+4. Do not run SQL manually, reset D1, clear browser data, or delete existing records.
+5. On first authenticated use, the Community Profile and Forum APIs create their new tables and indexes automatically. There is no manual schema step.
+6. Members open the **Guild Forum** from the left rail to load the current feed. The forum does not poll while closed. Use Refresh to retrieve new posts.
+7. Forum photos are resized in the browser and stored in D1. One photo per post is supported, with the compressed image capped at about 250 KiB. No R2 binding is required.
+8. The visible private-message entry point is replaced by the shared Guild Forum. Existing private-message rows remain in D1 and are not deleted. The legacy message API also has an updated explicit binding path for clients that still call it.
 
-Direct messages are stored in D1 and are visible in the app only to the two authenticated participants. Message text is limited to 2,000 characters; rate limit is 20 sends per sender per minute. This release does not add attachments or external push notifications. The inbox unread badge refreshes while Pantheon is open.
+The tracker checkbox outbox, automatic retry/acknowledgement behavior, character ownership, Discord links, Dungeon Registration, and Extra Dungeons are preserved. The What's New popup remains disabled.
 
-Existing checkbox syncing, local pending-save recovery, character data, Extra Dungeon settings, and dungeon registration/details are preserved. The What's New popup remains disabled.
-
-This release has not been deployed or verified against the live Cloudflare D1 database.
+No live deployment or production D1 verification is included in this package. After deployment, confirm login, member profile, bio save, a new Guild Forum post with a photo, a reply, and one existing tracker checkbox save. Do not clear browser storage or reset the database during verification.

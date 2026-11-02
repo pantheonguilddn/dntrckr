@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS allowed_users (
   created_by TEXT NOT NULL DEFAULT ''
 );
 
+CREATE INDEX IF NOT EXISTS idx_allowed_users_enabled ON allowed_users(enabled, discord_id);
+
 CREATE TABLE IF NOT EXISTS sessions (
   token_hash TEXT PRIMARY KEY,
   discord_id TEXT NOT NULL,
@@ -52,7 +54,8 @@ CREATE INDEX IF NOT EXISTS idx_audit_created_at ON audit_events(created_at DESC)
 CREATE TABLE IF NOT EXISTS user_presence (
   discord_id TEXT PRIMARY KEY,
   username TEXT NOT NULL DEFAULT '',
-  last_seen_at INTEGER NOT NULL
+  last_seen_at INTEGER NOT NULL,
+  avatar TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_user_presence_seen ON user_presence(last_seen_at);
 
@@ -144,3 +147,65 @@ CREATE TABLE IF NOT EXISTS guild_messages (
 CREATE INDEX IF NOT EXISTS idx_guild_messages_conversation ON guild_messages(conversation_key, created_at);
 CREATE INDEX IF NOT EXISTS idx_guild_messages_recipient_unread ON guild_messages(recipient_discord_id, read_at, created_at);
 CREATE INDEX IF NOT EXISTS idx_guild_messages_sender ON guild_messages(sender_discord_id, created_at);
+
+
+-- Compact per-member inbox summaries. Keeps routine unread polling independent of message history size.
+CREATE TABLE IF NOT EXISTS guild_conversation_inbox (
+  owner_discord_id TEXT NOT NULL,
+  conversation_key TEXT NOT NULL,
+  peer_discord_id TEXT NOT NULL,
+  peer_member_id TEXT NOT NULL,
+  last_message_id TEXT NOT NULL,
+  last_message_body TEXT NOT NULL,
+  last_message_at INTEGER NOT NULL,
+  last_message_sender_discord_id TEXT NOT NULL,
+  unread_count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (owner_discord_id, conversation_key)
+);
+CREATE INDEX IF NOT EXISTS idx_guild_inbox_owner_recent ON guild_conversation_inbox(owner_discord_id, last_message_at DESC);
+CREATE TABLE IF NOT EXISTS guild_message_meta (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  inbox_backfill_done INTEGER NOT NULL DEFAULT 0
+);
+INSERT OR IGNORE INTO guild_message_meta (id, inbox_backfill_done) VALUES (1, 0);
+
+
+-- Member bios for public Pantheon profile cards.
+CREATE TABLE IF NOT EXISTS guild_member_profiles (
+  discord_id TEXT PRIMARY KEY,
+  bio TEXT NOT NULL DEFAULT '',
+  updated_at INTEGER NOT NULL DEFAULT 0
+);
+
+-- Guild-wide forum. Photo data is resized client-side and stored as compact base64 JPEG text.
+CREATE TABLE IF NOT EXISTS guild_forum_posts (
+  id TEXT PRIMARY KEY,
+  author_discord_id TEXT NOT NULL,
+  author_member_id TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'general',
+  title TEXT NOT NULL,
+  body TEXT NOT NULL DEFAULT '',
+  image_data TEXT NOT NULL DEFAULT '',
+  image_mime TEXT NOT NULL DEFAULT '',
+  comments_count INTEGER NOT NULL DEFAULT 0,
+  is_pinned INTEGER NOT NULL DEFAULT 0,
+  is_deleted INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_guild_forum_posts_recent ON guild_forum_posts(is_deleted, is_pinned DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_guild_forum_posts_category_recent ON guild_forum_posts(category, is_deleted, is_pinned DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_guild_forum_posts_author ON guild_forum_posts(author_discord_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS guild_forum_comments (
+  id TEXT PRIMARY KEY,
+  post_id TEXT NOT NULL,
+  author_discord_id TEXT NOT NULL,
+  author_member_id TEXT NOT NULL,
+  parent_comment_id TEXT NOT NULL DEFAULT '',
+  body TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  is_deleted INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_guild_forum_comments_post ON guild_forum_comments(post_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_guild_forum_comments_author ON guild_forum_comments(author_discord_id, created_at DESC);
