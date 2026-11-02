@@ -214,7 +214,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
   </section>
   <section class="card" id="extra-dungeons-panel">
     <h2>5. Extra Dungeons</h2>
-    <p>Mark optional dungeon tasks here. All registered weekly and daily dungeons are listed by reset group. Weekly tasks tagged as Extra Dungeons remain visible and checkable but are excluded from weekly completion rates and reports. Daily tasks are already outside weekly completion math. Existing progress is not changed.</p>
+    <p>Mark optional dungeon tasks here. All registered weekly and daily dungeons are listed by reset group. Weekly tasks tagged as Extra Dungeons remain visible and checkable but are normally excluded from weekly completion rates and reports. Exception: if a task is also set to Exclude from calculations by default in Dungeon Registration, a character owner can right-click that character’s N/A cell to opt in that character only. Other characters remain excluded. Daily tasks are already outside weekly completion math. Existing progress is not changed.</p>
     <div class="actions"><button class="btn" type="button" id="refresh-extra-dungeons">Reload registered dungeon list</button><span class="hint" id="extra-dungeon-count">Loading registered dungeon tasks…</span></div>
     <div id="extra-dungeon-status" class="status hidden"></div>
     <div id="extra-dungeon-list" class="extra-dungeon-groups"></div>
@@ -446,7 +446,7 @@ async function saveExtraDungeons(){
     extraDungeonSelection=new Set((data.extraDungeonTasks||[]).map(value=>String(value||'').toLocaleLowerCase()));
     extraDungeonDraftDirty=false;
     renderExtraDungeons();
-    setStatus('extra-dungeon-status',`Saved ${extraDungeonSelection.size} Extra Dungeon(s). Their checks remain intact and they are now excluded from completion calculations for the whole guild.`,'ok');
+    setStatus('extra-dungeon-status',`Saved ${extraDungeonSelection.size} Extra Dungeon(s). Their checks remain intact and they are excluded from completion calculations for the whole guild, except tasks configured as N/A-by-default can be opted in separately by each character.`,'ok');
   }catch(error){setStatus('extra-dungeon-status',error.message,'error');}
   finally{button.disabled=false;}
 }

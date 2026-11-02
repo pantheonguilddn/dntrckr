@@ -177,6 +177,11 @@ export async function onRequestPut(context) {
         next.settings.extraDungeonTasks = Array.isArray(previous?.settings?.extraDungeonTasks) ? previous.settings.extraDungeonTasks : [];
         next.settings.extraDungeonTasksUpdatedAt = Number(previous?.settings?.extraDungeonTasksUpdatedAt) || 0;
         next.settings.extraDungeonTasksUpdatedBy = String(previous?.settings?.extraDungeonTasksUpdatedBy || '');
+        // Default-N/A task policies are admin-owned shared configuration. Preserve the
+        // server's committed list even when a member submits an older browser snapshot.
+        next.settings.defaultExcludedTasks = Array.isArray(previous?.settings?.defaultExcludedTasks) ? previous.settings.defaultExcludedTasks : [];
+        next.settings.defaultExcludedTasksUpdatedAt = Number(previous?.settings?.defaultExcludedTasksUpdatedAt) || 0;
+        next.settings.defaultExcludedTasksUpdatedBy = String(previous?.settings?.defaultExcludedTasksUpdatedBy || '');
         const previousClearAt = Number(previous?.settings?.analyticsHistoryClearedAt) || 0;
         const incomingClearAt = Number(next.settings.analyticsHistoryClearedAt) || 0;
         const timingClearAt = Math.max(previousClearAt, incomingClearAt);

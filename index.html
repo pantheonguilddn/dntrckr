@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r67</title>
+    <title>Pantheon Tools v1.6.8-r69</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3471,6 +3471,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 }
 </style>
 
+
+<style id="pantheon-r69-default-na-task">
+.registration-default-na{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--pt-border,#555);border-radius:8px;background:var(--pt-surface-soft,#292933);color:var(--pt-text,#eee);cursor:pointer}
+.registration-default-na>input{flex:0 0 auto;width:auto!important;margin:2px 0 0;accent-color:var(--pt-accent,#608bd9)}
+.registration-default-na>span{display:grid;gap:3px;min-width:0}
+.registration-default-na strong{font-size:.78rem;line-height:1.3}
+.registration-default-na small{font-size:.68rem;line-height:1.45;color:var(--pt-muted,#aaa)}
+#dn-tracker td.interactive-cell.default-na-cell{cursor:context-menu}
+#dn-tracker td.interactive-cell.default-na-cell.excluded::after{content:"N/A";font-size:.82rem;letter-spacing:.04em}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3953,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r67</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r69</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r67:</strong> Added optional profile banners with automatic text contrast and removed duplicate Guild Forum buttons.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r69:</strong> Fixed Extra Dungeons so a task marked N/A by default can be explicitly opted into per character and counted only for that character.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4196,7 +4207,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <h4>Tracker & Bounty Checker</h4>
                         <p>Use the checkbox to record a completed task. Uncheck it if it was marked by mistake. The weekly reset archives progress, resets weekly states, and clears bounty target text for a clean new week.</p>
                         <h5>Bounty workflow</h5>
-                        <p>For a dungeon you want to use for a Unique+ bounty, <b>right-click the dungeon cell</b>. It becomes <b>🎯 Marked</b> and the system places that dungeon into the first available, empty bounty target line.</p>
+                        <p>For a dungeon you want to use for a Unique+ bounty, <b>right-click the dungeon cell</b>. It becomes <b>Marked</b> for that character and appears in Share Bounties. If an empty Bounty Board line is available, the system links it automatically; an empty line is not required.</p>
                         <p>When you later complete the marked dungeon, only its linked bounty line is completed. If you remove the dungeon's bounty mark, the matching target text is cleared.</p>
                         <h5>Right-click states</h5>
                         <p><b>Dungeon rows:</b> Open/Done → 🎯 Marked → N/A → Open. <b>Bounty-list rows:</b> Open/Done → 🎯 Marked → 🔄 Reset Bounty → N/A → Open.</p>
@@ -4412,6 +4423,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <div id="reg-dungeon-palette" class="pastel-palette"></div>
                         <input type="hidden" id="reg-dungeon-color" value="#ffffff">
                         <label>Task name</label><input id="reg-dungeon-task-name" maxlength="40" placeholder="Exact task name" onkeydown="if(event.key==='Enter') registerDungeonTask()">
+                        <label class="registration-default-na"><input type="checkbox" id="reg-dungeon-exclude-default"><span><strong>Exclude from calculations by default</strong><small>Each character starts muted at N/A. Right-click a character’s cell to include only that character; this opt-in also overrides the Extra Dungeons exclusion. An empty Bounty Board slot is linked when available.</small></span></label>
                         <button class="btn btn-dungeon" type="button" onclick="registerDungeonTask()">Register Task</button>
                     </div>
                 </section>
@@ -5052,7 +5064,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 weeklyArchive: {},
                 completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -5837,7 +5849,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
             updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
-            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an'
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an', defaultExcludedTasks:'~ao', defaultExcludedTasksUpdatedAt:'~ap', defaultExcludedTasksUpdatedBy:'~aq'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -5960,6 +5972,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             norm.settings.extraDungeonTasks = [...new Map((Array.isArray(sets.extraDungeonTasks) ? sets.extraDungeonTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, 300);
             norm.settings.extraDungeonTasksUpdatedAt = Number(sets.extraDungeonTasksUpdatedAt) || 0;
             norm.settings.extraDungeonTasksUpdatedBy = String(sets.extraDungeonTasksUpdatedBy || '');
+            norm.settings.defaultExcludedTasks = [...new Map((Array.isArray(sets.defaultExcludedTasks) ? sets.defaultExcludedTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, 300);
+            norm.settings.defaultExcludedTasksUpdatedAt = Number(sets.defaultExcludedTasksUpdatedAt) || 0;
+            norm.settings.defaultExcludedTasksUpdatedBy = String(sets.defaultExcludedTasksUpdatedBy || '');
             norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
             ensureMemberRosterMaster(norm);
             const historyClearAt = Number(norm.settings.analyticsHistoryClearedAt) || 0;
@@ -6217,6 +6232,21 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const cSrc = (lcTime > rcTime || (lcTime === rcTime && String(local.settings.categoriesUpdatedBy) >= String(remote.settings.categoriesUpdatedBy))) ? local.settings : remote.settings;
             merged.settings.categories = cloneCategories(cSrc.categories);
             merged.settings.categoriesUpdatedAt = cSrc.categoriesUpdatedAt; merged.settings.categoriesUpdatedBy = cSrc.categoriesUpdatedBy;
+
+            // These admin-owned registries must survive a merge from an older browser cache.
+            // Resolve each list by its own timestamp, independently of category edits.
+            const leTime = Number(local.settings.extraDungeonTasksUpdatedAt) || 0, reTime = Number(remote.settings.extraDungeonTasksUpdatedAt) || 0;
+            const eSrc = (leTime > reTime || (leTime === reTime && String(local.settings.extraDungeonTasksUpdatedBy) >= String(remote.settings.extraDungeonTasksUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.extraDungeonTasks = [...new Map((Array.isArray(eSrc.extraDungeonTasks) ? eSrc.extraDungeonTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, 300);
+            merged.settings.extraDungeonTasksUpdatedAt = Math.max(leTime, reTime);
+            merged.settings.extraDungeonTasksUpdatedBy = String(eSrc.extraDungeonTasksUpdatedBy || '');
+
+            const ldTime = Number(local.settings.defaultExcludedTasksUpdatedAt) || 0, rdTime = Number(remote.settings.defaultExcludedTasksUpdatedAt) || 0;
+            const dSrc = (ldTime > rdTime || (ldTime === rdTime && String(local.settings.defaultExcludedTasksUpdatedBy) >= String(remote.settings.defaultExcludedTasksUpdatedBy))) ? local.settings : remote.settings;
+            merged.settings.defaultExcludedTasks = [...new Map((Array.isArray(dSrc.defaultExcludedTasks) ? dSrc.defaultExcludedTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, 300);
+            merged.settings.defaultExcludedTasksUpdatedAt = Math.max(ldTime, rdTime);
+            merged.settings.defaultExcludedTasksUpdatedBy = String(dSrc.defaultExcludedTasksUpdatedBy || '');
+
             merged.settings.characterJobs = mergeCharacterJobs(local.settings.characterJobs, remote.settings.characterJobs);
             const ljp = Number(local.settings.jobProfilesUpdatedAt) || 0, rjp = Number(remote.settings.jobProfilesUpdatedAt) || 0;
             const jsrc = (ljp > rjp || (ljp === rjp && String(local.settings.jobProfilesUpdatedBy) >= String(remote.settings.jobProfilesUpdatedBy))) ? local.settings : remote.settings;
@@ -6414,22 +6444,24 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const jobProfiles = normalizeJobProfiles(settings.jobProfiles || {});
             const lootWeights = {};
             Object.keys(settings.lootWeights || {}).sort().forEach(k => { lootWeights[k] = clampWeight(settings.lootWeights[k]); });
-            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
+            const defaultExcludedTasks = [...new Map((Array.isArray(settings.defaultExcludedTasks) ? settings.defaultExcludedTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].sort((a,b) => a.localeCompare(b));
+            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, defaultExcludedTasks, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
         }
         function getGlobalImpactSignature(data = cloudData) { return JSON.stringify(getGlobalImpactSnapshot(data)); }
         function sameValue(a,b){try{return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b);}catch(e){return false;}}
         function mapById(items){const map=new Map();for(const item of Array.isArray(items)?items:[])if(item?.id)map.set(String(item.id),item);return map;}
         function diffObjectMaps(beforeObj,afterObj){const out=[],b=safeObject(beforeObj),a=safeObject(afterObj);for(const key of [...new Set([...Object.keys(b),...Object.keys(a)])].sort()){const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null,av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;if(!sameValue(bv,av))out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});}return out;}
         function diffGlobalImpact(before,after){
-            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};
+            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],defaultExcludedTasks:null,splitPartyMechanic:null};
             const bR=mapById(b.rosters),aR=mapById(a.rosters);for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;if(!sameValue(bv,av))patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             const bC=mapById(b.categories),aC=mapById(a.categories);for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;if(!sameValue(bv,av))patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
             const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;if(!sameValue(bv,av))patch.lootWeights.push({key,before:bv,after:av});}
+            if(!sameValue(b.defaultExcludedTasks||[],a.defaultExcludedTasks||[]))patch.defaultExcludedTasks={before:[...(b.defaultExcludedTasks||[])],after:[...(a.defaultExcludedTasks||[])]};
             if(b.splitPartyMechanic!==a.splitPartyMechanic)patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
             return patch;
         }
-        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.splitPartyMechanic);}
+        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.defaultExcludedTasks&&!p.splitPartyMechanic);}
 
         function normalizeRevisionEntry(entry){
             if(!entry||!entry.id)return null;
@@ -6440,6 +6472,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
                 jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
                 lootWeights:Array.isArray(p.lootWeights)?p.lootWeights.map(x=>({key:String(x.key||''),before:x.before==null?null:Number(x.before),after:x.after==null?null:Number(x.after)})).filter(x=>x.key):[],
+                defaultExcludedTasks:p.defaultExcludedTasks&&typeof p.defaultExcludedTasks==='object'?{before:Array.isArray(p.defaultExcludedTasks.before)?p.defaultExcludedTasks.before.map(String):[],after:Array.isArray(p.defaultExcludedTasks.after)?p.defaultExcludedTasks.after.map(String):[]}:null,
                 splitPartyMechanic:p.splitPartyMechanic&&typeof p.splitPartyMechanic==='object'?{before:!!p.splitPartyMechanic.before,after:!!p.splitPartyMechanic.after}:null
             };}
             return e;
@@ -6466,6 +6499,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             for(const item of p?.characterJobs||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Set Job for ${item.key} to ${a.job||'Unassigned'}`);else if(b&&!a)labels.push(`Cleared Job for ${item.key}`);else labels.push(`Changed Job for ${item.key} to ${a?.job||'Unassigned'}`);}
             if(p?.jobProfiles?.length)labels.push('Updated Job / Role settings');
             if(p?.lootWeights?.length)labels.push('Updated Loot Weights');
+            if(p?.defaultExcludedTasks)labels.push('Updated default N/A dungeon tasks');
             if(p?.splitPartyMechanic)labels.push(`Set Split Party Mechanic ${p.splitPartyMechanic.after?'ON':'OFF'}`);
             return labels.join(' + ')||'Global change';
         }
@@ -6543,7 +6577,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function clearPendingGlobalChange(){pendingGlobalChangeLabel='';pendingGlobalBeforeSnapshot=null;}
 
         function versionRowHtml(row,index){const entry=row.entry;if(!entry)return '';const kind=entry.kind==='marker'?'<span class="version-badge">SAVEPOINT</span>':(entry.kind==='before-external-change'?'<span class="version-badge">EXTERNAL CHANGE</span>':'<span class="version-badge">GLOBAL CHANGE</span>');const action=entry.patch?`<button class="btn btn-secondary" type="button" onclick="openRevisionDetails('${escapeHTML(entry.id)}')">Details</button><button class="btn btn-danger" type="button" onclick="restoreHistoryVersion('${escapeHTML(entry.id)}')">Undo All</button>`:'<span style="color:#8b92a0;font-size:.75rem;padding:0 6px;">Logged</span>';return `<div class="version-row"><div class="version-number">R${String(index+1).padStart(2,'0')}</div><div class="version-main"><strong>${escapeHTML(entry.label||'Global change')} ${kind}</strong><small>${escapeHTML(entry.by||'author unknown')} · ${escapeHTML(versionTimestamp(entry.at))}${entry.patch?` · ${escapeHTML(describePatch(entry.patch))}`:''}</small></div><div class="version-actions"><button class="btn btn-secondary" type="button" onclick="downloadHistoryVersion('${escapeHTML(entry.id)}')">Download</button>${action}</div></div>`;}
-        function describePatch(p){const bits=[];if(p?.rosters?.length)bits.push(`Roster ${p.rosters.length}`);if(p?.categories?.length)bits.push(`Dungeon ${p.categories.length}`);if(p?.characterJobs?.length)bits.push(`Jobs ${p.characterJobs.length}`);if(p?.jobProfiles?.length)bits.push(`Role settings ${p.jobProfiles.length}`);if(p?.lootWeights?.length)bits.push(`Loot weights ${p.lootWeights.length}`);if(p?.splitPartyMechanic)bits.push('Split Party');return bits.join(' · ')||'Global change';}
+        function describePatch(p){const bits=[];if(p?.rosters?.length)bits.push(`Roster ${p.rosters.length}`);if(p?.categories?.length)bits.push(`Dungeon ${p.categories.length}`);if(p?.characterJobs?.length)bits.push(`Jobs ${p.characterJobs.length}`);if(p?.jobProfiles?.length)bits.push(`Role settings ${p.jobProfiles.length}`);if(p?.lootWeights?.length)bits.push(`Loot weights ${p.lootWeights.length}`);if(p?.defaultExcludedTasks)bits.push('Default N/A tasks');if(p?.splitPartyMechanic)bits.push('Split Party');return bits.join(' · ')||'Global change';}
         function getSharedHistory(data=cloudData){return trimRevisionJournal(revisionJournalCache);}
 
         async function createVersionCheckpoint(customLabel=''){
@@ -6580,11 +6614,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(p.characterJobs?.length)html+=`<h4 style="margin:14px 0 8px;">Character Jobs</h4><div style="color:#b8beca;font-size:.82rem;">${p.characterJobs.map(x=>`${escapeHTML(x.key)}: ${escapeHTML(x.before?.job||'none')} → ${escapeHTML(x.after?.job||'none')}`).join('<br>')}</div>`;
             if(p.jobProfiles?.length)html+='<h4 style="margin:14px 0 8px;">Role Settings</h4><div style="color:#b8beca;font-size:.82rem;">'+p.jobProfiles.length+' profile change(s)</div>';
             if(p.lootWeights?.length)html+='<h4 style="margin:14px 0 8px;">Loot Weights</h4><div style="color:#b8beca;font-size:.82rem;">'+p.lootWeights.length+' weight change(s)</div>';
+            if(p.defaultExcludedTasks)html+=`<h4 style="margin:14px 0 8px;">Tasks excluded by default</h4><div style="color:#b8beca;font-size:.82rem;">Before: ${escapeHTML((p.defaultExcludedTasks.before||[]).join(', ')||'none')}<br>After: ${escapeHTML((p.defaultExcludedTasks.after||[]).join(', ')||'none')}</div>`;
             if(p.splitPartyMechanic)html+=`<h4 style="margin:14px 0 8px;">Split Party Mechanic</h4><div style="color:#b8beca;">${p.splitPartyMechanic.before?'ON':'OFF'} → ${p.splitPartyMechanic.after?'ON':'OFF'}</div>`;
             box.innerHTML=html;openModal('revision-detail-modal');
         }
 
-        async function recoverPatchSlice(id,type,itemId,direction){if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);try{const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(journal.revisions||[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry?.patch?.[type])throw new Error('Revision detail not found.');const item=(entry.patch[type]||[]).find(x=>(x.id||x.key)===itemId);if(!item)throw new Error('Selected item not found.');const one={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],splitPartyMechanic:null};one[type]=[item];if(direction!=='before'&&direction!=='after')throw new Error('Invalid recovery direction.');const expected=direction==='before'?item.after:item.before;let cur=null;if(type==='rosters')cur=(current.settings.rosters||[]).find(x=>x.id===item.id)||null;else if(type==='categories')cur=(current.settings.categories||[]).find(x=>x.id===item.id)||null;if(!sameValue(cur,expected)&&!confirm('This item has changed since this revision. Recover it anyway?'))return;const beforeSnap=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,one,direction);restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok)throw new Error(`Recovery failed (${res.status})`);cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));const afterSnap=cloneDataObject(getGlobalImpactSnapshot(cloudData));const safety=diffGlobalImpact(afterSnap,beforeSnap);if(!patchIsEmpty(safety)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before selective recovery · ${entry.label}`,'global-change',safety,getGlobalImpactSignature(cloudData)));}setStatus(`🟢 Recovered ${type==='rosters'?'roster':'dungeon category'} from ${direction} state`);closeModal('revision-detail-modal');refreshTrackerUI();await loadVersionHistory(false);}catch(err){setStatus(`🔴 Recovery failed: ${err.message}`);alert(`Recovery failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}}
+        async function recoverPatchSlice(id,type,itemId,direction){if(!hasCloudConfig()||window.__pantheonVersionWriteBusy)return;if(!getRevisionBinId()){alert('Shared revision journal is not initialized.');return;}window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);try{const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(journal.revisions||[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry?.patch?.[type])throw new Error('Revision detail not found.');const item=(entry.patch[type]||[]).find(x=>(x.id||x.key)===itemId);if(!item)throw new Error('Selected item not found.');const one={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],defaultExcludedTasks:null,splitPartyMechanic:null};one[type]=type==='defaultExcludedTasks'?item:[item];if(direction!=='before'&&direction!=='after')throw new Error('Invalid recovery direction.');const expected=direction==='before'?item.after:item.before;let cur=null;if(type==='rosters')cur=(current.settings.rosters||[]).find(x=>x.id===item.id)||null;else if(type==='categories')cur=(current.settings.categories||[]).find(x=>x.id===item.id)||null;if(!sameValue(cur,expected)&&!confirm('This item has changed since this revision. Recover it anyway?'))return;const beforeSnap=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,one,direction);restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok)throw new Error(`Recovery failed (${res.status})`);cloudData=normalizeData((await res.json()).record||send);persistLocalData();setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));const afterSnap=cloneDataObject(getGlobalImpactSnapshot(cloudData));const safety=diffGlobalImpact(afterSnap,beforeSnap);if(!patchIsEmpty(safety)){await appendRevisionEntryToJournal(makeRevisionEntry(`Safety before selective recovery · ${entry.label}`,'global-change',safety,getGlobalImpactSignature(cloudData)));}setStatus(`🟢 Recovered ${type==='rosters'?'roster':'dungeon category'} from ${direction} state`);closeModal('revision-detail-modal');refreshTrackerUI();await loadVersionHistory(false);}catch(err){setStatus(`🔴 Recovery failed: ${err.message}`);alert(`Recovery failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}}
         function recoverRosterFromRevision(id,itemId,direction){return recoverPatchSlice(id,'rosters',itemId,direction);}
         function recoverCategoryFromRevision(id,itemId,direction){return recoverPatchSlice(id,'categories',itemId,direction);}
 
@@ -6595,6 +6630,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(Array.isArray(p.characterJobs)){const jobs=normalizeCharacterJobs(data.settings.characterJobs||{});for(const item of p.characterJobs){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete jobs[item.key];else jobs[item.key]=cloneDataObject(value);}data.settings.characterJobs=normalizeCharacterJobs(jobs);}
             if(Array.isArray(p.jobProfiles)){const prof=normalizeJobProfiles(data.settings.jobProfiles||{});for(const item of p.jobProfiles){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete prof[item.key];else prof[item.key]=cloneDataObject(value);}data.settings.jobProfiles=normalizeJobProfiles(prof);data.settings.jobProfilesUpdatedAt=now;data.settings.jobProfilesUpdatedBy=deviceId;}
             if(Array.isArray(p.lootWeights)){data.settings.lootWeights={...DEFAULT_LOOT_WEIGHTS,...data.settings.lootWeights};for(const item of p.lootWeights){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete data.settings.lootWeights[item.key];else data.settings.lootWeights[item.key]=clampWeight(value);}data.settings.lootWeightUpdatedAt={...safeObject(data.settings.lootWeightUpdatedAt)};for(const item of p.lootWeights)data.settings.lootWeightUpdatedAt[item.key]=now;}
+            if(p.defaultExcludedTasks){data.settings.defaultExcludedTasks=[...(direction==='before'?p.defaultExcludedTasks.before:p.defaultExcludedTasks.after)||[]];data.settings.defaultExcludedTasksUpdatedAt=now;data.settings.defaultExcludedTasksUpdatedBy=deviceId;}
             if(p.splitPartyMechanic){data.settings.teamBuilder=data.settings.teamBuilder||createEmptyTeamBuilder();data.settings.teamBuilder.splitPartyMechanic=direction==='before'?!!p.splitPartyMechanic.before:!!p.splitPartyMechanic.after;data.settings.teamBuilder.splitPartyUpdatedAt=now;data.settings.teamBuilder.splitPartyUpdatedBy=deviceId;}
             data.updatedAt=now;return data;
         }
@@ -6605,6 +6641,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const jobs=safeObject(data.settings.characterJobs);for(const item of p.characterJobs||[]){check(`Job ${item.key}`,Object.prototype.hasOwnProperty.call(jobs,item.key)?jobs[item.key]:undefined,direction==='before'?item.after:item.before);}
             const prof=safeObject(data.settings.jobProfiles);for(const item of p.jobProfiles||[]){check(`Profile ${item.key}`,Object.prototype.hasOwnProperty.call(prof,item.key)?prof[item.key]:undefined,direction==='before'?item.after:item.before);}
             const weights=safeObject(data.settings.lootWeights);for(const item of p.lootWeights||[]){check(`Loot weight ${item.key}`,Object.prototype.hasOwnProperty.call(weights,item.key)?weights[item.key]:undefined,direction==='before'?item.after:item.before);}
+            if(p.defaultExcludedTasks)check('Default N/A task list',data.settings.defaultExcludedTasks||[],direction==='before'?p.defaultExcludedTasks.after:p.defaultExcludedTasks.before);
             if(p.splitPartyMechanic)check('Split Party Mechanic',!!data.settings.teamBuilder?.splitPartyMechanic,direction==='before'?!!p.splitPartyMechanic.after:!!p.splitPartyMechanic.before);return conflicts;
         }
 
@@ -6875,18 +6912,33 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function collectBountyShareItems(){
             const category=getBountyCategory();
-            if(!category)return [];
             const prefs=loadBountySharePrefs(),groups=new Map();
+            const addGroup=(charName,dungeon,sourceSlot,state,saved={})=>{
+                const cleanDungeon=String(dungeon||'').trim();
+                if(!cleanDungeon)return;
+                const id=bountyShareGroupKey(charName,cleanDungeon);
+                if(!groups.has(id))groups.set(id,{id,charName:String(charName),dungeon:cleanDungeon,sourceSlots:[],sourceStates:[],sourcePreferences:[],characterOptIn:false});
+                const group=groups.get(id);
+                if(sourceSlot==='__character_opt_in__') group.characterOptIn=true;
+                else if(sourceSlot && !group.sourceSlots.includes(String(sourceSlot))) group.sourceSlots.push(String(sourceSlot));
+                if(state)group.sourceStates.push(String(state));
+                if(Object.keys(safeObject(saved)).length)group.sourcePreferences.push(saved);
+            };
             (Array.isArray(characters)?characters:[]).forEach(char=>{
-                (category.tasks||[]).forEach(slot=>{
+                // Legacy and ordinary Bounty Board notes remain supported.
+                (category?.tasks||[]).forEach(slot=>{
                     const record=getCellRecord(char.name,slot),dungeon=String(record.note||'').trim();
                     if(!dungeon)return;
-                    const id=bountyShareGroupKey(char.name,dungeon);
-                    if(!groups.has(id))groups.set(id,{id,charName:String(char.name),dungeon,sourceSlots:[],sourceStates:[],sourcePreferences:[]});
-                    const group=groups.get(id),saved=safeObject(prefs[bountyShareKey(char.name,slot,dungeon)]);
-                    group.sourceSlots.push(String(slot));
-                    group.sourceStates.push(getCellState(char.name,slot));
-                    if(Object.keys(saved).length)group.sourcePreferences.push(saved);
+                    addGroup(char.name,dungeon,slot,getCellState(char.name,slot),safeObject(prefs[bountyShareKey(char.name,slot,dungeon)]));
+                });
+                // A default-excluded task is a bounty only for characters who explicitly
+                // right-clicked their own cell to opt in. This direct path does not depend
+                // on an empty Bounty Board line being available.
+                (cloudData.settings?.defaultExcludedTasks||[]).forEach(task=>{
+                    if(isBountyListTask(task) || !isDefaultExcludedTask(task))return;
+                    const state=getCellState(char.name,task);
+                    if(!['marked','done'].includes(state))return;
+                    addGroup(char.name,task,'__character_opt_in__',state,{});
                 });
             });
             return Array.from(groups.values()).map(group=>{
@@ -6902,8 +6954,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     count:Math.max(1,Math.min(BOUNTY_SHARE_WEEKLY_LIMIT,Math.floor(Number(chosen.count)||1))),
                     state:group.sourceStates.length&&group.sourceStates.every(state=>state==='done')?'done':'active'
                 };
-                // Migrate old per-slot preferences into one preference per
-                // character + dungeon. Existing tier/condition data is retained.
                 if(!Object.keys(savedGroup).length){
                     prefs[group.id]={tier:item.tier,clearMode:item.clearMode,partyMode:item.partyMode,minutes:item.minutes,count:item.count};
                 }
@@ -6951,7 +7001,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(!bountyShareItems.length){preview.innerHTML='<div class="bounty-share-empty">No bounty targets are currently listed in this Tracker view.</div>';return;}
             const totals=bountyShareCharacterTotals(),chars=[...new Set(bountyShareItems.map(item=>item.charName))];
             const sections=chars.map(charName=>{
-                const rows=bountyShareItems.filter(item=>item.charName===charName).map(item=>`<div class="bounty-share-preview-item"><div class="bounty-share-preview-dungeon"><strong>${escapeHTML(item.dungeon)}</strong>${item.sourceSlots.length>1?`<small>${item.sourceSlots.length} Tracker slots listed</small>`:''}</div><div class="bounty-share-preview-condition"><span class="bounty-share-tier ${item.tier==='legendary'?'is-legendary':item.tier==='unique'?'is-unique':''}">${escapeHTML(bountyShareTierLabel(item))}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div><strong class="bounty-share-preview-multiplier">×${item.count}</strong></div>`).join('');
+                const rows=bountyShareItems.filter(item=>item.charName===charName).map(item=>`<div class="bounty-share-preview-item"><div class="bounty-share-preview-dungeon"><strong>${escapeHTML(item.dungeon)}</strong>${item.sourceSlots.length>1?`<small>${item.sourceSlots.length} Tracker slots listed</small>`:item.characterOptIn?'<small>Character-specific opt-in</small>':''}</div><div class="bounty-share-preview-condition"><span class="bounty-share-tier ${item.tier==='legendary'?'is-legendary':item.tier==='unique'?'is-unique':''}">${escapeHTML(bountyShareTierLabel(item))}</span><span>${escapeHTML(bountyShareRequirement(item))}${item.state==='done'?' · Completed':''}</span></div><strong class="bounty-share-preview-multiplier">×${item.count}</strong></div>`).join('');
                 return `<section class="bounty-share-preview-character"><div class="bounty-share-preview-character-head"><strong>${escapeHTML(charName)}</strong><span>${totals[charName]}/${BOUNTY_SHARE_WEEKLY_LIMIT} weekly claims</span></div>${rows}</section>`;
             }).join('');
             preview.innerHTML=`<div class="bounty-share-receipt" id="bounty-share-receipt"><div class="bounty-share-receipt-brand"><small>PANTHEON · GUILD OPERATIONS</small><h4>WEEKLY BOUNTY LIST</h4><p>${bountyShareItems.length} dungeon entr${bountyShareItems.length===1?'y':'ies'} · each character has a separate 6-claim limit</p></div>${sections}<div class="bounty-share-receipt-footer">Bounty requirements are grouped by character and dungeon. × indicates how many weekly claims the entry consumes. Each character is limited to 6 claims.</div></div>`;
@@ -6967,7 +7017,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const charItems=bountyShareItems.map((item,index)=>({item,index})).filter(entry=>entry.item.charName===charName);
                 const spent=totals[charName]||0,atLimit=spent>=BOUNTY_SHARE_WEEKLY_LIMIT;
                 const rows=charItems.map(({item,index})=>`<div class="bounty-share-row" data-bounty-share-index="${index}">
-                    <div class="bounty-share-dungeon"><strong>${escapeHTML(item.dungeon)}</strong><small>${item.sourceSlots.length>1?`${item.sourceSlots.length} Tracker bounty slots consolidated`:'Listed bounty'}</small></div>
+                    <div class="bounty-share-dungeon"><strong>${escapeHTML(item.dungeon)}</strong><small>${item.sourceSlots.length>1?`${item.sourceSlots.length} Tracker bounty slots consolidated`:item.characterOptIn?'Character-specific opt-in':'Listed bounty'}</small></div>
                     <label class="bounty-share-control"><small>Highest bounty tier</small><select aria-label="Highest bounty tier for ${escapeHTML(charName)} ${escapeHTML(item.dungeon)}" onchange="updateBountyShareField(${index},'tier',this.value)"><option value="" ${!item.tier?'selected':''}>Select tier</option><option value="unique" ${item.tier==='unique'?'selected':''}>Unique</option><option value="legendary" ${item.tier==='legendary'?'selected':''}>Legendary</option></select></label>
                     <label class="bounty-share-control"><small>Clear condition</small><select aria-label="Clear condition for ${escapeHTML(item.dungeon)}" onchange="updateBountyShareField(${index},'clearMode',this.value)"><option value="basic" ${item.clearMode==='basic'?'selected':''}>Basic clear</option><option value="timed" ${item.clearMode==='timed'?'selected':''}>Time-limited</option></select>${item.clearMode==='timed'?`<span class="bounty-share-inline-input"><input type="number" inputmode="numeric" min="1" max="999" step="1" value="${item.minutes||''}" placeholder="e.g. 15" aria-label="Time limit in minutes" onchange="updateBountyShareField(${index},'minutes',this.value)"><small>minutes</small></span>`:''}</label>
                     <label class="bounty-share-control"><small>Party requirement</small><select aria-label="Party requirement for ${escapeHTML(item.dungeon)}" onchange="updateBountyShareField(${index},'partyMode',this.value)"><option value="any" ${item.partyMode==='any'?'selected':''}>Any party</option><option value="guild8" ${item.partyMode==='guild8'?'selected':''}>8-man Guild Members</option></select></label>
@@ -7347,9 +7397,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             const canEdit = access.canEdit;
                             const owner = access.owner;
                             if (canEdit) {
+                                const defaultExcluded = isDefaultExcludedTask(taskName) && !isBountyListTask(taskName);
+                                td.classList.toggle('default-na-cell', defaultExcluded);
                                 td.title = isBountyListTask(taskName)
                                     ? 'Right-click to cycle bounty-line status. Reset Bounty reserves this line; removing a mark clears its target text.'
-                                    : 'Right-click to mark a bounty target or set N/A. Reset Bounty is available only on bounty-list lines; removing a target mark clears its linked text.';
+                                    : defaultExcluded
+                                        ? 'N/A by default for this character. Right-click to include only this character in completion calculations and Share Bounties. A free Bounty Board slot is linked automatically when available.'
+                                        : 'Right-click to mark a bounty target or set N/A. Reset Bounty is available only on bounty-list lines; removing a target mark clears its linked text.';
                                 td.addEventListener('contextmenu', handleRightClick);
                             } else {
                                 td.classList.add('read-only-cell');
@@ -7381,7 +7435,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
         }
 
-        function getCellRecord(c, t) { return cloudData.cells?.[c]?.[t] || { state: 'open', note: '', updatedAt: 0, deviceId: '' }; }
+        function isDefaultExcludedTask(taskName) {
+            const key = String(taskName || '').trim().toLocaleLowerCase();
+            if (!key || isBountyListTask(taskName)) return false;
+            return (cloudData.settings?.defaultExcludedTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === key);
+        }
+        function getCellRecord(c, t) {
+            const saved = cloudData.cells?.[c]?.[t];
+            if (!saved) return { state: isDefaultExcludedTask(t) ? 'excluded' : 'open', note: '', updatedAt: 0, deviceId: '' };
+            // A task flagged N/A-by-default treats untouched/legacy-open cells as excluded.
+            // Only an explicit bounty opt-in (marked) or completion (done) makes this
+            // character's cell count toward that character's calculations.
+            if (isDefaultExcludedTask(t) && !['marked', 'done'].includes(saved.state)) return { ...saved, state: 'excluded' };
+            return saved;
+        }
         function getCellState(c, t) { return getCellRecord(c, t).state || 'open'; }
 
         function getBountyCategory() {
@@ -7402,15 +7469,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(String(charName))}"][data-task="${CSS.escape(String(bountyTask))}"]`);
             if (input) input.value = '';
         }
-        function clearLinkedBountySlot(charName, dungeonTask) {
+        function findLinkedBountySlot(charName, dungeonTask) {
             const bountyCategory = getBountyCategory();
-            if (!bountyCategory) return false;
-            for (const bountyTask of bountyCategory.tasks || []) {
-                if (String(getCellRecord(charName, bountyTask).note || '') !== String(dungeonTask)) continue;
-                clearBountySlotText(charName, bountyTask);
-                return true;
-            }
-            return false;
+            if (!bountyCategory) return null;
+            return (bountyCategory.tasks || []).find(bountyTask => String(getCellRecord(charName, bountyTask).note || '').trim().toLocaleLowerCase() === String(dungeonTask || '').trim().toLocaleLowerCase()) || null;
+        }
+        function clearLinkedBountySlot(charName, dungeonTask) {
+            const bountyTask = findLinkedBountySlot(charName, dungeonTask);
+            if (!bountyTask) return false;
+            clearBountySlotText(charName, bountyTask);
+            return true;
         }
         function findAvailableBountySlot(charName, bountyCategory) {
             if (!bountyCategory) return null;
@@ -7484,7 +7552,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return;
             }
             const prev = getCellState(c, t);
-            setCellState(c, t, e.target.checked ? 'done' : 'open');
+            const defaultExcluded = isDefaultExcludedTask(t) && !isBountyListTask(t);
+            setCellState(c, t, e.target.checked ? 'done' : (defaultExcluded ? 'marked' : 'open'));
+            if (!e.target.checked && defaultExcluded) {
+                const linkedSlot = findLinkedBountySlot(c, t);
+                if (linkedSlot && getCellState(c, linkedSlot) === 'done') { setCellState(c, linkedSlot, 'open'); updateCellPresentation(c, linkedSlot); }
+            }
 
             // Complete only the bounty line explicitly linked to this marked dungeon.
             // Never fall back to the first unfinished line: Reset Bounty slots are reserved.
@@ -7512,32 +7585,46 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
             const rawState = getCellState(c, t);
             const isBountyRow = isBountyListTask(t);
-            // Legacy Reset state on dungeon cells is treated like Open. Reset now belongs only to bounty rows.
-            const state = (!isBountyRow && rawState === 'reset') ? 'open' : rawState;
+            const defaultExcluded = isDefaultExcludedTask(t) && !isBountyRow;
+            // Legacy Reset state on dungeon cells is treated like Open. Reset now belongs only to the bounty list.
+            const state = (!isBountyRow && rawState === 'reset') ? (defaultExcluded ? 'excluded' : 'open') : rawState;
+            const bountyCategory = getBountyCategory();
             let newState;
-            if (state === 'open' || state === 'done') newState = 'marked';
+            let reservedBountySlot = null;
+
+            if (defaultExcluded && state === 'excluded') {
+                // Opt-in belongs to this character only. A Bounty Board line is linked
+                // when available, but it is not a prerequisite for inclusion or sharing.
+                reservedBountySlot = findLinkedBountySlot(c, t) || findAvailableBountySlot(c, bountyCategory);
+                newState = 'marked';
+            } else if (state === 'open' || state === 'done') newState = 'marked';
             else if (isBountyRow && state === 'marked') newState = 'reset';
             else if (state === 'marked' || state === 'reset') newState = 'excluded';
             else newState = 'open';
 
             setCellState(c, t, newState);
-            const bountyCategory = getBountyCategory();
 
             // Removing a dungeon target mark clears exactly the bounty line linked to that dungeon.
             if (!isBountyRow && state === 'marked') clearLinkedBountySlot(c, t);
+            if (!isBountyRow && state === 'done' && newState === 'marked') {
+                const linkedSlot = findLinkedBountySlot(c, t);
+                if (linkedSlot && getCellState(c, linkedSlot) === 'done') { setCellState(c, linkedSlot, 'open'); updateCellPresentation(c, linkedSlot); }
+            }
 
             // Removing either special mark from a bounty line clears its own target text.
-            // The Reset state itself remains reserved until the user cycles it through N/A and Open.
+            // Reset remains reserved until the user cycles it through N/A and Open.
             if (isBountyRow && (state === 'marked' || state === 'reset')) clearBountySlotText(c, t);
 
-            // Assign a newly marked dungeon to the first genuinely available bounty line.
-            // Marked, Reset, N/A, completed, or manually populated lines are never overwritten.
+            // Link a newly marked dungeon once per character. Re-marking a completed/linked
+            // default-excluded task must not consume a second bounty slot.
             if (newState === 'marked' && !isBountyRow && bountyCategory) {
-                const targetBounty = findAvailableBountySlot(c, bountyCategory);
+                const targetBounty = reservedBountySlot || findLinkedBountySlot(c, t) || findAvailableBountySlot(c, bountyCategory);
                 if (targetBounty) {
                     setCellNote(c, targetBounty, t);
                     const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(String(c))}"][data-task="${CSS.escape(String(targetBounty))}"]`);
                     if (input) input.value = t;
+                } else if (defaultExcluded) {
+                    setStatus(`${t} is now included for ${c} only and will appear in Share Bounties. No empty Bounty Board line was available to link.`);
                 } else {
                     setStatus('Bounty target marked, but no bounty line is available. Clear or reopen a bounty line before adding another target.');
                 }
@@ -7572,15 +7659,21 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const key = String(taskName || '').trim().toLocaleLowerCase();
             return !!key && (cloudData.settings?.extraDungeonTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === key);
         }
+        // Extra Dungeons are normally excluded for the whole guild. A task that is also
+        // configured as N/A-by-default is different: its per-character Marked/Done state
+        // is an explicit opt-in and must be allowed into that character's calculations.
+        function isExtraDungeonExcludedFromCalculations(taskName) {
+            return isExtraDungeonTask(taskName) && !isDefaultExcludedTask(taskName);
+        }
         function getCompletionTaskNames(taskNames = weeklyTaskNames) {
-            return (Array.isArray(taskNames) ? taskNames : []).filter(task => !isBountyTask(task) && !isExtraDungeonTask(task));
+            return (Array.isArray(taskNames) ? taskNames : []).filter(task => !isBountyTask(task) && !isExtraDungeonExcludedFromCalculations(task));
         }
         function getArchivedCompletionRate(archive, characterName) {
             const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
             const codes = String(archive?.states?.[characterName] || '');
             let done = 0, eligible = 0;
             order.forEach((task, index) => {
-                if (isBountyTask(task) || isExtraDungeonTask(task)) return;
+                if (isBountyTask(task) || isExtraDungeonExcludedFromCalculations(task)) return;
                 const code = codes[index] || '';
                 if (code === 'd') { done++; eligible++; }
                 else if (code === 'm') eligible++;
@@ -7642,7 +7735,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 .filter(category => category.group === 'Dailies')
                 .flatMap(category => (category.tasks || []).filter(task => trackBountyBoards || !isBountyBoardSlot(category, task)));
             targets.forEach(character => dailyTasks.forEach(task => {
-                if (getCellState(character, task) === 'done') setCellState(character, task, 'open', ts);
+                const state = getCellState(character, task);
+                if (isDefaultExcludedTask(task) && state !== 'excluded') setCellState(character, task, 'excluded', ts);
+                else if (state === 'done') setCellState(character, task, 'open', ts);
             }));
         }
 
@@ -7674,7 +7769,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             targets.forEach(character => {
                 weeklyTaskNames.forEach(task => {
                     const state = getCellState(character, task);
-                    if (state !== 'open' && state !== 'excluded') setCellState(character, task, 'open', ts);
+                    if (isDefaultExcludedTask(task)) {
+                        if (state !== 'excluded') setCellState(character, task, 'excluded', ts);
+                    } else if (state !== 'open' && state !== 'excluded') setCellState(character, task, 'open', ts);
                 });
                 // Clear only this reset's characters' bounty target fields.
                 bountyTasks.forEach(task => {
@@ -9076,7 +9173,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     validWeeks++;
                     let weekDone = 0;
                     order.forEach((task, i) => {
-                        if (isBountyTask(task) || isExtraDungeonTask(task)) return;
+                        if (isBountyTask(task) || isExtraDungeonExcludedFromCalculations(task)) return;
                         if (states[i] === 'd') { done++; weekDone++; }
                         else if (states[i] === 'm') missed++;
                     });
@@ -9678,7 +9775,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const codes = String(archive?.states?.[character?.name] || '');
                 let done = 0, eligible = 0;
                 order.forEach((otherTask, index) => {
-                    if (otherTask === taskName || isBountyTask(otherTask) || isExtraDungeonTask(otherTask) || /\bbounty\b/i.test(otherTask)) return;
+                    if (otherTask === taskName || isBountyTask(otherTask) || isExtraDungeonExcludedFromCalculations(otherTask) || /\bbounty\b/i.test(otherTask)) return;
                     const code = codes[index] || '';
                     if (code === 'd') { done++; eligible++; }
                     else if (code === 'm') eligible++;
@@ -10061,7 +10158,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 let done = 0, missed = 0, excluded = 0;
                 const missedTasks = [];
                 taskOrder.forEach((task, index) => {
-                    if (!task || isBountyTask(task) || isExtraDungeonTask(task)) return;
+                    if (!task || isBountyTask(task) || isExtraDungeonExcludedFromCalculations(task)) return;
                     const code = codes[index] || '';
                     if (code === 'd') done++;
                     else if (code === 'x') excluded++;
@@ -10580,6 +10677,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const newCatName = String(document.getElementById('reg-dungeon-cat-name')?.value || '').trim().slice(0, 30);
             const newCatGroup = document.getElementById('reg-dungeon-cat-group')?.value === 'Dailies' ? 'Dailies' : 'Weeklies';
             const newCatColor = normalizeColor(document.getElementById('reg-dungeon-color')?.value, '#ffffff');
+            const excludeByDefault = document.getElementById('reg-dungeon-exclude-default')?.checked === true;
             if (catChoice === '__new__' && !newCatName) return alert('Enter category.');
             if (!(await prepareGlobalChange(`Add dungeon task ${taskName}`))) return;
 
@@ -10600,7 +10698,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         categoryId: catChoice === '__new__' ? '' : catChoice,
                         categoryName: catChoice === '__new__' ? newCatName : '',
                         group: newCatGroup,
-                        color: newCatColor
+                        color: newCatColor,
+                        excludeByDefault
                     })
                 });
                 const payload = await response.json().catch(() => ({}));
@@ -10613,9 +10712,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 cloudData.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(payload.activityReferenceProfiles || cloudData.settings.activityReferenceProfiles);
                 cloudData.settings.activityReferenceProfilesUpdatedAt = Number(payload.activityReferenceProfilesUpdatedAt) || cloudData.settings.activityReferenceProfilesUpdatedAt || Date.now();
                 cloudData.settings.activityReferenceProfilesUpdatedBy = String(payload.activityReferenceProfilesUpdatedBy || pantheonDiscordUser?.id || deviceId);
+                cloudData.settings.defaultExcludedTasks = Array.isArray(payload.defaultExcludedTasks) ? payload.defaultExcludedTasks : (Array.isArray(cloudData.settings.defaultExcludedTasks) ? cloudData.settings.defaultExcludedTasks : []);
+                cloudData.settings.defaultExcludedTasksUpdatedAt = Number(payload.defaultExcludedTasksUpdatedAt) || cloudData.settings.defaultExcludedTasksUpdatedAt || 0;
+                cloudData.settings.defaultExcludedTasksUpdatedBy = String(payload.defaultExcludedTasksUpdatedBy || cloudData.settings.defaultExcludedTasksUpdatedBy || '');
                 cloudData.updatedAt = Number(payload.recordUpdatedAt) || Date.now();
                 persistLocalData();
                 input.value = '';
+                const excludeCheckbox = document.getElementById('reg-dungeon-exclude-default');
+                if (excludeCheckbox) excludeCheckbox.checked = false;
                 refreshTrackerUI();
                 renderDungeonRegistration();
                 const savedCategory = cloudData.settings.categories.find(category => category.id === payload.categoryId);
@@ -10633,9 +10737,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
                 clearPendingGlobalChange();
                 try { Promise.resolve(flushRevisionQueue()).catch(() => false); } catch (_) {}
+                const isDefaultExcluded = (cloudData.settings.defaultExcludedTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === taskName.toLocaleLowerCase());
                 setStatus(payload.alreadyRegistered
-                    ? `🟢 ${taskName} was already registered on the shared server. The local category list has been refreshed.`
-                    : `🟢 ${taskName} was saved directly to the shared server and confirmed. It is now available in Admin Console → Extra Dungeons, and its drops/entries profile is linked in this registration panel.`);
+                    ? `🟢 ${taskName} was already registered on the shared server. ${isDefaultExcluded ? 'It defaults to N/A for each character until that character is opted in.' : 'The local category list has been refreshed.'}`
+                    : `🟢 ${taskName} was saved directly to the shared server and confirmed. ${isDefaultExcluded ? 'Its cells default to muted N/A; right-click an individual character cell to include only that character in calculations and Share Bounties.' : 'It is now available in the Tracker and its drops/entries profile is linked in this registration panel.'}`);
             } catch (error) {
                 clearPendingGlobalChange();
                 setStatus(`🔴 ${taskName} was not confirmed by the shared server: ${String(error?.message || error)}`);
@@ -12126,7 +12231,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r67';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r69';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12855,7 +12960,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r67';
+  const CURRENT_BUILD = '1.6.8-r69';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

@@ -50,6 +50,7 @@ export async function onRequestPost(context) {
   const categoryName = clean(body.categoryName, 30);
   const group = body.group === 'Dailies' ? 'Dailies' : 'Weeklies';
   const color = safeColor(body.color);
+  const excludeByDefault = body.excludeByDefault === true;
   if (!taskName) return jsonResponse({ error: 'Enter a dungeon task name.' }, 400);
   if (!categoryId && !categoryName) return jsonResponse({ error: 'Choose an existing category or enter a new category name.' }, 400);
 
@@ -86,11 +87,19 @@ export async function onRequestPost(context) {
 
       const alreadyRegistered = !!duplicateCategory;
       if (!alreadyRegistered) category.tasks.push(taskName);
+      const registrationCategory = duplicateCategory || category;
+      const isBountyTask = /bounty(?:\s+board|\s+claim)?/i.test(taskName) || /bounty/i.test(String(registrationCategory?.name || ''));
+      if (excludeByDefault && isBountyTask) return jsonResponse({ error: 'Bounty Board claim rows cannot be excluded by default. Apply the default N/A policy to the dungeon task instead.' }, 400);
 
       const profileResult = ensureActivityProfile(settings, taskName);
       const categoriesChanged = !alreadyRegistered;
       const profilesChanged = profileResult.changed;
-      if (!categoriesChanged && !profilesChanged) {
+      const existingDefaultExcluded = Array.isArray(settings.defaultExcludedTasks) ? settings.defaultExcludedTasks : [];
+      const isAlreadyDefaultExcluded = existingDefaultExcluded.some(value => String(value || '').trim().toLocaleLowerCase() === taskName.toLocaleLowerCase());
+      const defaultExcludedTasks = [...existingDefaultExcluded];
+      const defaultExclusionChanged = excludeByDefault && !isAlreadyDefaultExcluded;
+      if (defaultExclusionChanged) defaultExcludedTasks.push(taskName);
+      if (!categoriesChanged && !profilesChanged && !defaultExclusionChanged) {
         return jsonResponse({
           ok: true,
           alreadyRegistered: true,
@@ -102,6 +111,9 @@ export async function onRequestPost(context) {
           categoriesUpdatedBy: String(settings.categoriesUpdatedBy || ''),
           activityReferenceProfilesUpdatedAt: Number(settings.activityReferenceProfilesUpdatedAt) || 0,
           activityReferenceProfilesUpdatedBy: String(settings.activityReferenceProfilesUpdatedBy || ''),
+          defaultExcludedTasks: existingDefaultExcluded,
+          defaultExcludedTasksUpdatedAt: Number(settings.defaultExcludedTasksUpdatedAt) || 0,
+          defaultExcludedTasksUpdatedBy: String(settings.defaultExcludedTasksUpdatedBy || ''),
           recordUpdatedAt: Number(result.row.updated_at) || Number(result.record.updatedAt) || 0,
           sourceRecordId: result.row.id
         });
@@ -118,6 +130,11 @@ export async function onRequestPost(context) {
         settings.activityReferenceProfilesUpdatedAt = now;
         settings.activityReferenceProfilesUpdatedBy = String(context.data.session.discordId || 'admin');
       }
+      if (defaultExclusionChanged) {
+        settings.defaultExcludedTasks = defaultExcludedTasks;
+        settings.defaultExcludedTasksUpdatedAt = now;
+        settings.defaultExcludedTasksUpdatedBy = String(context.data.session.discordId || 'admin');
+      }
       result.record.updatedAt = now;
       const packed = encodePantheonCompactRecord(result.record);
       const recordJson = JSON.stringify(packed);
@@ -131,7 +148,7 @@ export async function onRequestPost(context) {
       try {
         await context.env.PANTHEON_DB.prepare(
           'INSERT INTO audit_events (actor_discord_id, action, target_discord_id, created_at, details_json) VALUES (?, ?, ?, ?, ?)'
-        ).bind(context.data.session.discordId, 'admin-dungeon-task-register', '', now, JSON.stringify({ taskName, categoryId: category.id, categoryName: category.name, group, activityProfileCreated: profilesChanged })).run();
+        ).bind(context.data.session.discordId, 'admin-dungeon-task-register', '', now, JSON.stringify({ taskName, categoryId: category.id, categoryName: category.name, group, activityProfileCreated: profilesChanged, excludedFromCalculationsByDefault: isAlreadyDefaultExcluded || defaultExclusionChanged })).run();
       } catch (_) { /* The durable D1 category/profile update is authoritative; audit logging is secondary. */ }
 
       return jsonResponse({
@@ -145,6 +162,9 @@ export async function onRequestPost(context) {
         categoriesUpdatedBy: String(settings.categoriesUpdatedBy || ''),
         activityReferenceProfilesUpdatedAt: Number(settings.activityReferenceProfilesUpdatedAt) || 0,
         activityReferenceProfilesUpdatedBy: String(settings.activityReferenceProfilesUpdatedBy || ''),
+        defaultExcludedTasks: Array.isArray(settings.defaultExcludedTasks) ? settings.defaultExcludedTasks : [],
+        defaultExcludedTasksUpdatedAt: Number(settings.defaultExcludedTasksUpdatedAt) || 0,
+        defaultExcludedTasksUpdatedBy: String(settings.defaultExcludedTasksUpdatedBy || ''),
         recordUpdatedAt: now,
         sourceRecordId: result.row.id
       });
