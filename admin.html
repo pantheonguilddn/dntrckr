@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Tools · Admin Console · r57</title>
+<title>Pantheon Tools · Admin Console · r51</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1020;--surface:#111a2d;--surface2:#1b2742;--border:#2a3857;--text:#eef2ff;--muted:#a7b4d0;--accent:#8d9aff;--good:#57d6a4;--danger:#ff8796}
 :root[data-pantheon-theme="light"]{color-scheme:light;--bg:#f4f6fb;--surface:#fff;--surface2:#e9eef7;--border:#cfd7e5;--text:#1a2230;--muted:#4d5a70;--accent:#465acb;--good:#087e65;--danger:#b93852}
@@ -158,9 +158,6 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
 .owner-audit-controls select{min-width:min(360px,100%);max-width:100%;min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-size:11px}
 .owner-audit-issues{padding:9px 11px;border-radius:8px;border:1px solid var(--border);font-size:10px;color:var(--muted);line-height:1.55}
 @media(max-width:640px){.owner-audit-controls{align-items:stretch}.owner-audit-controls select,.owner-audit-controls button{width:100%}}
-
-.extra-dungeon-groups{display:grid;gap:10px;margin-top:12px}.extra-dungeon-group{border:1px solid var(--border);border-radius:11px;padding:12px;background:var(--surface2)}.extra-dungeon-group-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.extra-dungeon-group-head strong{font-size:11px}.extra-dungeon-group-head small{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.07em}.extra-dungeon-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:7px}.extra-dungeon-option{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-size:11px;line-height:1.45}.extra-dungeon-option input{margin:2px 0 0;accent-color:var(--accent);flex:0 0 auto}.extra-dungeon-option span{overflow-wrap:anywhere}.extra-dungeon-footnote{margin-top:10px;font-size:10px;color:var(--muted);line-height:1.6}
-
 </style>
 
 </head>
@@ -191,7 +188,6 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
       <a class="tool-launcher-link" href="/#version-history" target="_blank" rel="noopener">Version History<small>Inspect and restore global savepoints.</small></a>
       <a class="tool-launcher-link" href="/#landing-settings" target="_blank" rel="noopener">Default Landing Page<small>Set where your Pantheon session opens.</small></a>
       <a class="tool-launcher-link" href="/#dungeons" target="_blank" rel="noopener">Dungeon Registration<small>Maintain daily and weekly task categories.</small></a>
-      <a class="tool-launcher-link" href="#extra-dungeons-panel">Extra Dungeons<small>Exclude optional weekly dungeons from completion rates.</small></a>
       <a class="tool-launcher-link" href="#activity-reference-panel">Activity Reference<small>Edit raid timing, rewards, serviceability and recommendation tips.</small></a>
       <a class="tool-launcher-link" href="/#loot-weights" target="_blank" rel="noopener">Loot Weights<small>Adjust task prioritization weights.</small></a>
       <a class="tool-launcher-link" href="/#help" target="_blank" rel="noopener">Tracker Guide<small>Read the member-facing instructions.</small></a>
@@ -213,17 +209,8 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
     <div id="owner-audit-list" class="list"></div>
     <p class="hint">A suggested account is based only on an exact allowlist-label match. It is never assigned automatically. For each unresolved owner, verify the person before linking their Discord account. If someone has not been added to the allowlist, add or enable their account above first.</p>
   </section>
-  <section class="card" id="extra-dungeons-panel">
-    <h2>5. Extra Dungeons</h2>
-    <p>Mark optional dungeon tasks here. All registered weekly and daily dungeons are listed by reset group. Weekly tasks tagged as Extra Dungeons remain visible and checkable but are excluded from weekly completion rates and reports. Daily tasks are already outside weekly completion math. Existing progress is not changed.</p>
-    <div class="actions"><button class="btn" type="button" id="refresh-extra-dungeons">Reload registered dungeon list</button><span class="hint" id="extra-dungeon-count">Loading registered dungeon tasks…</span></div>
-    <div id="extra-dungeon-status" class="status hidden"></div>
-    <div id="extra-dungeon-list" class="extra-dungeon-groups"></div>
-    <div class="actions"><button class="btn primary" type="button" id="save-extra-dungeons">Save Extra Dungeons</button></div>
-    <p class="extra-dungeon-footnote">Only administrators can see or edit this list. The selection is saved to the shared server record and applies to every member after their next background refresh.</p>
-  </section>
   <section class="card" id="activity-reference-panel">
-    <h2>6. Activity Reference &amp; Recommendation Data</h2>
+    <h2>5. Activity Reference &amp; Recommendation Data</h2>
     <p>Maintain the facts Activity Insights should use: weekly entries, milestone goals, party size, typical run time, service availability, materials, rewards, and practical advice. These profiles are stored in the shared Pantheon record and can be updated as the game changes. Keep the player-facing recommendation short and actionable.</p>
     <div class="activity-reference-meta">Save changes to publish them to the app. Import/export JSON to back up the reference or prepare a bulk update. A starter list based on the current guild notes is shown if no reference has been saved yet.</div>
     <div class="activity-reference-toolbar"><button class="btn primary" type="button" id="save-activity-reference">Save Activity Reference</button><button class="btn" type="button" id="refresh-activity-reference">Reload saved data</button><button class="btn" type="button" id="add-activity-reference">＋ Add activity</button><button class="btn" type="button" id="load-activity-reference-starter">Load starter list</button><button class="btn" type="button" id="export-activity-reference">Export JSON</button><button class="btn" type="button" id="import-activity-reference">Import JSON</button><input class="hidden" type="file" id="activity-reference-import-file" accept="application/json,.json"></div>
@@ -233,12 +220,12 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
     <div class="activity-reference-toolbar"><button class="btn primary" type="button" id="save-activity-reference-bottom">Save Activity Reference</button></div>
   </section>
   <section class="card">
-    <h2>7. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
+    <h2>6. Move the old guild record from JSONBin to D1</h2><p>Run this once, from an administrator session, to copy the existing tracker and revision journal into Cloudflare D1. The target records are the private IDs used by the new Pantheon backend. This leaves the old JSONBin records untouched as a backup.</p>
     <form id="migration-form"><div class="grid"><label class="field">Existing main JSONBin ID<input id="old-bin-id" autocomplete="off" placeholder="Existing tracker Bin ID" required></label><label class="field">Existing JSONBin Master Key<input id="old-bin-key" type="password" autocomplete="off" placeholder="Used for this import only" required></label></div><label class="checkbox-line"><input type="checkbox" id="confirm-migration" required><span>I understand this imports the selected main record into Pantheon D1 and overwrites the new Pantheon main record if it already exists.</span></label><div class="actions"><button class="btn primary" type="submit">Import main record and revision journal</button></div></form>
     <div id="migration-status" class="status hidden"></div>
   </section>
   <section class="card">
-    <h2>8. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
+    <h2>7. Initialize an empty database instead</h2><p>Use this only if there is no JSONBin data to migrate. It creates a clean, empty tracker record. It will not overwrite an existing main record.</p><div class="actions"><button class="btn danger" type="button" id="initialize-empty">Initialize empty tracker</button></div><div id="initialize-status" class="status hidden"></div>
   </section>
 </div>
 </main>
@@ -246,8 +233,6 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
 const $ = id => document.getElementById(id);
 let adminSessionState = null;
 let ownerAuditSnapshot = null;
-let extraDungeonCategories = [];
-let extraDungeonSelection = new Set();
 const ADMIN_JOBS = ["Adept", "Physician", "Gear Master", "Shooting Star", "Sniper", "Artillery", "Wind Walker", "Tempest", "Light Fury", "Abyss Walker", "Raven", "Ripper", "Saint", "Inquisitor", "Crusader", "Guardian", "Spirit Dancer", "Blade Dancer", "Dark Summoner", "Soul Eater", "Saleana", "Elestra", "Majesty", "Smasher", "Gladiator", "Moonlord", "Barbarian", "Destroyer", "Dark Avenger"];
 let adminCharacterMembers = [];
 
@@ -501,49 +486,9 @@ $('character-admin-list')?.addEventListener('click',async event=>{
   }
 });
 $('refresh-character-list')?.addEventListener('click',refreshCharacterAdmin);
-let extraDungeonDraftDirty=false;
-function renderExtraDungeons(){
-  const list=$('extra-dungeon-list');if(!list)return;
-  const available=extraDungeonCategories.reduce((sum,category)=>sum+(category.tasks||[]).length,0);
-  $('extra-dungeon-count').textContent=`${available} registered dungeon task(s) available · ${extraDungeonSelection.size} tagged as Extra Dungeons`;
-  if(!extraDungeonCategories.length){list.innerHTML='<div class="owner-audit-issues">No dungeon tasks are currently registered. Add them in Dungeon Registration first.</div>';return;}
-  list.innerHTML=extraDungeonCategories.map(category=>`<section class="extra-dungeon-group"><div class="extra-dungeon-group-head"><strong>${escapeHtml(category.name)}</strong><small>${escapeHtml(category.group || 'Weeklies')}</small></div><div class="extra-dungeon-options">${category.tasks.map(task=>`<label class="extra-dungeon-option"><input type="checkbox" data-extra-dungeon-task value="${escapeHtml(task)}" ${extraDungeonSelection.has(task.toLocaleLowerCase())?'checked':''}><span>${escapeHtml(task)}</span></label>`).join('')}</div></section>`).join('');
-}
-async function refreshExtraDungeons({quiet=false,force=false}={}){
-  if(extraDungeonDraftDirty&&!force)return;
-  try{
-    const data=await api('/api/admin/extra-dungeons');
-    const nextCategories=Array.isArray(data.categories)?data.categories:[];
-    const nextSelection=new Set((Array.isArray(data.extraDungeonTasks)?data.extraDungeonTasks:[]).map(value=>String(value||'').trim().toLocaleLowerCase()).filter(Boolean));
-    const changed=JSON.stringify(nextCategories)!==JSON.stringify(extraDungeonCategories)||JSON.stringify([...nextSelection].sort())!==JSON.stringify([...extraDungeonSelection].sort());
-    if(changed||!quiet){extraDungeonCategories=nextCategories;extraDungeonSelection=nextSelection;renderExtraDungeons();}
-    if(!quiet)setStatus('extra-dungeon-status','Registered dungeon tasks and saved Extra Dungeon settings loaded from the shared server record.','ok');
-  }catch(error){if(!quiet)setStatus('extra-dungeon-status',error.message,'error');}
-}
-async function saveExtraDungeons(){
-  const button=$('save-extra-dungeons');if(!button)return;
-  const selected=[...document.querySelectorAll('[data-extra-dungeon-task]:checked')].map(input=>input.value);
-  button.disabled=true;
-  try{
-    const data=await api('/api/admin/extra-dungeons',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({extraDungeonTasks:selected})});
-    extraDungeonSelection=new Set((data.extraDungeonTasks||[]).map(value=>String(value||'').toLocaleLowerCase()));
-    extraDungeonDraftDirty=false;
-    renderExtraDungeons();
-    setStatus('extra-dungeon-status',`Saved ${extraDungeonSelection.size} Extra Dungeon(s). Their checks remain intact and they are now excluded from completion calculations for the whole guild.`,'ok');
-  }catch(error){setStatus('extra-dungeon-status',error.message,'error');}
-  finally{button.disabled=false;}
-}
-$('refresh-extra-dungeons')?.addEventListener('click',()=>{extraDungeonDraftDirty=false;refreshExtraDungeons({force:true});});
-$('extra-dungeon-list')?.addEventListener('change',()=>{extraDungeonDraftDirty=true;const selected=document.querySelectorAll('[data-extra-dungeon-task]:checked').length;$('extra-dungeon-count').textContent=`${extraDungeonCategories.reduce((sum,category)=>sum+(category.tasks||[]).length,0)} registered dungeon task(s) available · ${selected} tagged as Extra Dungeons`;});
-$('save-extra-dungeons')?.addEventListener('click',saveExtraDungeons);
-// A second Pantheon tab may add a dungeon. Refresh this admin list automatically while visible,
-// but never overwrite an administrator's unsaved checkbox selections.
-setInterval(()=>{if(adminSessionState && document.visibilityState==='visible')refreshExtraDungeons({quiet:true});},10000);
-document.addEventListener('visibilitychange',()=>{if(adminSessionState && document.visibilityState==='visible')refreshExtraDungeons({quiet:true});});
-window.addEventListener('focus',()=>{if(adminSessionState)refreshExtraDungeons({quiet:true});});
 function setStatus(id, text, kind=''){const el=$(id);el.textContent=text;el.className='status'+(kind?' '+kind:'');el.classList.remove('hidden');}
 async function api(url, options={}){const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||data.message||`Request failed (${response.status})`);return data;}
-async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}adminSessionState=state.user;setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();await refreshOwnerAudit();await refreshExtraDungeons();await refreshActivityReference();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
+async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}adminSessionState=state.user;setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();await refreshOwnerAudit();await refreshActivityReference();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
 async function refreshAllowlist(){try{const data=await api('/api/admin/allowlist');const list=$('allowlist-list');list.replaceChildren();if(!data.users?.length){list.textContent='No approved accounts yet.';return;}for(const user of data.users){const row=document.createElement('div');row.className='person';const info=document.createElement('div');const name=document.createElement('strong');name.textContent=user.label||user.discord_id;const meta=document.createElement('small');meta.textContent=`${user.discord_id} · ${user.enabled?'Enabled':'Disabled'} · added by ${user.created_by||'system'}`;info.append(name,meta);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='7px';const badge=document.createElement('span');badge.className='badge';badge.textContent=user.role==='admin'?'ADMIN':'MEMBER';right.append(badge);if(user.enabled && user.role!=='admin'){const button=document.createElement('button');button.className='btn danger';button.type='button';button.textContent='Revoke';button.addEventListener('click',async()=>{if(!confirm(`Revoke access for ${user.label||user.discord_id}?`))return;try{await api('/api/admin/allowlist?discordId='+encodeURIComponent(user.discord_id),{method:'DELETE'});setStatus('allowlist-status',`Access revoked for ${user.discord_id}.`,'ok');await refreshAllowlist();await refreshOwnerAudit();}catch(error){setStatus('allowlist-status',error.message,'error');}});right.append(button);}row.append(info,right);list.append(row);}}catch(error){setStatus('allowlist-status',error.message,'error');}}
 $('allowlist-form').addEventListener('submit',async event=>{event.preventDefault();const button=event.submitter;button.disabled=true;try{const data=await api('/api/admin/allowlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({discordId:$('discord-id').value.trim(),label:$('discord-label').value.trim()})});setStatus('allowlist-status',`Approved Discord account ${data.discordId}.`,'ok');$('allowlist-form').reset();await refreshAllowlist();await refreshOwnerAudit();}catch(error){setStatus('allowlist-status',error.message,'error');}finally{button.disabled=false;}});
 $('refresh-list').addEventListener('click',refreshAllowlist);
