@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 CREATE INDEX IF NOT EXISTS idx_sessions_expiry ON sessions(expires_at);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(discord_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_user_created ON sessions(discord_id, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS oauth_states (
   state_hash TEXT PRIMARY KEY,

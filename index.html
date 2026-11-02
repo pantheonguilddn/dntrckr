@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r62</title>
+    <title>Pantheon Tools v1.6.8-r63</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3514,7 +3514,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="developer-mode-banner" id="developer-mode-banner" hidden><strong>Developer Mode</strong><span>Click static text to edit · format and font sizes stay intact</span><button type="button" onclick="toggleDeveloperMode()">Turn off</button></div>
     <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Guild event notice and member presence">
         <div class="overview-event-notice online-event-notice" id="overview-event-notice" hidden>Guild events · Check the Tracker for current priorities</div>
-        <div class="online-presence-head"><div class="online-presence-head-copy"><span class="online-presence-dot"></span><strong>Guild members</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><div class="online-presence-head-actions"><button type="button" id="guild-forum-open" class="guild-forum-open" aria-label="Open Guild Forum" onclick="openGuildForum()">🏰 <span>Guild Forum</span></button><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div></div>
+        <div class="online-presence-head"><div class="online-presence-head-copy"><span class="online-presence-dot"></span><strong>Guild members</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><div class="online-presence-head-actions"><button type="button" id="guild-forum-open" class="guild-forum-open" aria-label="Open Guild Forum" onclick="openGuildForum()"><span>Guild Forum</span></button><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div></div>
         <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading member activity…</div></div>
         <div class="online-presence-foot">Click a member to view their profile · status updates live</div>
     </aside>
@@ -3522,36 +3522,36 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="guild-social-modal" role="dialog" aria-modal="true" aria-labelledby="guild-social-title">
         <div class="modal-card wide-modal guild-social-modal-card">
             <div class="guild-social-modal-head">
-                <div><div class="guild-social-kicker">PANTHEON · GUILD COMMUNITY</div><h3 id="guild-social-title">🏰 Pantheon Guild Forum</h3><p id="guild-social-subtitle" class="modal-note">Guild news, achievements, successful runs, and member updates.</p></div>
-                <div class="guild-social-modal-head-actions"><button class="btn btn-secondary" type="button" onclick="openGuildForum()">🏰 Guild Forum</button><button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild community">✕</button></div>
+                <div><div class="guild-social-kicker">PANTHEON · GUILD COMMUNITY</div><h3 id="guild-social-title">Pantheon Guild Forum</h3><p id="guild-social-subtitle" class="modal-note">Guild news, achievements, successful runs, and member updates.</p></div>
+                <div class="guild-social-modal-head-actions"><button class="btn btn-secondary" type="button" onclick="openGuildForum()">Guild Forum</button><button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild community">✕</button></div>
             </div>
             <section id="guild-social-profile-panel" class="guild-social-profile-panel" hidden>
                 <div id="guild-social-profile-content"><div class="guild-social-loading">Loading member profile…</div></div>
             </section>
             <section id="guild-forum-panel" class="guild-forum-panel" hidden>
                 <div class="guild-forum-toolbar">
-                    <div><div class="guild-forum-eyebrow">THE GUILD HALL · COMMUNITY THREADS</div><strong>📜 Guild Forum</strong><small>Guild achievements, nest clears, screenshots, party calls, and discussions. Reply to keep each thread together.</small></div>
-                    <div class="guild-forum-toolbar-actions"><button type="button" class="btn btn-secondary" onclick="loadGuildForum(true)">↻ Refresh</button><button type="button" class="btn btn-cloud" id="guild-forum-compose-toggle" onclick="toggleGuildForumComposer(true)">＋ New Post</button></div>
+                    <div><div class="guild-forum-eyebrow">THE GUILD HALL · COMMUNITY THREADS</div><strong>Guild Forum</strong><small>Guild achievements, nest clears, screenshots, party calls, and discussions. Reply to keep each thread together.</small></div>
+                    <div class="guild-forum-toolbar-actions"><button type="button" class="btn btn-secondary" onclick="loadGuildForum(true)">Refresh</button><button type="button" class="btn btn-cloud" id="guild-forum-compose-toggle" onclick="toggleGuildForumComposer(true)">＋ New Post</button></div>
                 </div>
                 <div class="guild-forum-filters" id="guild-forum-filters">
                     <button type="button" class="is-active" data-forum-filter="all">All</button>
-                    <button type="button" data-forum-filter="announcement">📢 Notices</button>
-                    <button type="button" data-forum-filter="achievement">🏆 Achievements</button>
-                    <button type="button" data-forum-filter="raid">🐉 Runs & Clears</button>
-                    <button type="button" data-forum-filter="party">⚔️ Party Up</button>
-                    <button type="button" data-forum-filter="general">💬 General</button>
+                    <button type="button" data-forum-filter="announcement">Notices</button>
+                    <button type="button" data-forum-filter="achievement">Achievements</button>
+                    <button type="button" data-forum-filter="raid">Runs &amp; Clears</button>
+                    <button type="button" data-forum-filter="party">Party Up</button>
+                    <button type="button" data-forum-filter="general">General</button>
                 </div>
                 <section id="guild-forum-composer" class="guild-forum-composer" hidden>
-                    <div class="guild-forum-composer-head"><strong>✍️ Create a guild post</strong><button type="button" onclick="toggleGuildForumComposer(false)" aria-label="Close new post">✕</button></div>
+                    <div class="guild-forum-composer-head"><strong>Create a guild post</strong><button type="button" onclick="toggleGuildForumComposer(false)" aria-label="Close new post">✕</button></div>
                     <form id="guild-forum-post-form">
-                        <div class="guild-forum-form-row"><label>Post type<select id="guild-forum-category"><option value="achievement">🏆 Guild achievement</option><option value="raid">🐉 Raid / Dungeon clear</option><option value="announcement">📢 Guild announcement</option><option value="party">⚔️ Party / recruitment</option><option value="general">💬 General discussion</option></select></label><label class="guild-forum-title-field">Title<input id="guild-forum-title-input" maxlength="100" required placeholder="e.g. GDN run successfully cleared!"/></label></div>
+                        <div class="guild-forum-form-row"><label>Post type<select id="guild-forum-category"><option value="achievement">Guild achievement</option><option value="raid">Raid / Dungeon clear</option><option value="announcement">Guild announcement</option><option value="party">Party / recruitment</option><option value="general">General discussion</option></select></label><label class="guild-forum-title-field">Title<input id="guild-forum-title-input" maxlength="100" required placeholder="e.g. GDN run successfully cleared!"/></label></div>
                         <label class="guild-forum-body-field">Your post<textarea id="guild-forum-body-input" maxlength="2200" rows="4" placeholder="Share the details, congratulate the party, or leave a note for everyone…"></textarea></label>
                         <div class="guild-forum-emoji-row" aria-label="Dragon Nest themed emoji shortcuts. Select an icon to insert it into your post.">
                           <button type="button" data-forum-emoji="🐉" title="Dragon / Nest">🐉</button><button type="button" data-forum-emoji="🐲" title="Ancient Dragon">🐲</button><button type="button" data-forum-emoji="⚔️" title="Warrior / Raid">⚔️</button><button type="button" data-forum-emoji="🗡️" title="Assassin / Blade">🗡️</button><button type="button" data-forum-emoji="🏹" title="Archer">🏹</button><button type="button" data-forum-emoji="🛡️" title="Cleric / Guardian">🛡️</button><button type="button" data-forum-emoji="🪽" title="Wings">🪽</button><button type="button" data-forum-emoji="🔮" title="Sorceress / Magic">🔮</button><button type="button" data-forum-emoji="💠" title="Dragon Jade">💠</button><button type="button" data-forum-emoji="💎" title="Gems / Loot">💎</button><button type="button" data-forum-emoji="🧿" title="Heraldry / Charm">🧿</button><button type="button" data-forum-emoji="🧪" title="Alchemy">🧪</button><button type="button" data-forum-emoji="⚒️" title="Enhancement">⚒️</button><button type="button" data-forum-emoji="🔥" title="Fire">🔥</button><button type="button" data-forum-emoji="❄️" title="Ice">❄️</button><button type="button" data-forum-emoji="⚡" title="Lightning">⚡</button><button type="button" data-forum-emoji="🌪️" title="Wind">🌪️</button><button type="button" data-forum-emoji="🏆" title="Nest Clear / Achievement">🏆</button><button type="button" data-forum-emoji="👑" title="MVP">👑</button><button type="button" data-forum-emoji="🎖️" title="Guild Milestone">🎖️</button>
                         </div>
-                        <div class="guild-forum-attachment-row"><label class="guild-forum-photo-picker">📷 Add guild photo<input type="file" id="guild-forum-photo-input" accept="image/jpeg,image/png,image/webp" hidden></label><span id="guild-forum-photo-name">No photo attached. Images are resized before upload.</span><button type="button" id="guild-forum-photo-clear" onclick="clearGuildForumPhoto()" hidden>Remove</button></div>
+                        <div class="guild-forum-attachment-row"><label class="guild-forum-photo-picker">Add guild photo<input type="file" id="guild-forum-photo-input" accept="image/jpeg,image/png,image/webp" hidden></label><span id="guild-forum-photo-name">No photo attached. Images are resized before upload.</span><button type="button" id="guild-forum-photo-clear" onclick="clearGuildForumPhoto()" hidden>Remove</button></div>
                         <img id="guild-forum-photo-preview" class="guild-forum-photo-preview" alt="Photo preview" hidden>
-                        <div class="guild-forum-form-foot"><span id="guild-forum-post-status" role="status" aria-live="polite"></span><button type="submit" class="btn btn-cloud" id="guild-forum-publish">Publish to Guild Forum ↗</button></div>
+                        <div class="guild-forum-form-foot"><span id="guild-forum-post-status" role="status" aria-live="polite"></span><button type="submit" class="btn btn-cloud" id="guild-forum-publish">Publish post</button></div>
                     </form>
                 </section>
                 <div id="guild-forum-feed" class="guild-forum-feed"><div class="guild-social-loading">Loading the Guild Forum…</div></div>
@@ -3891,9 +3891,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r62</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r63</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r62:</strong> Added member bios and activity insights, plus a guild-wide forum for achievements, successful runs, photos, and replies.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r63:</strong> Simplified social controls and made profile pictures use each member’s Discord avatar.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -7630,23 +7630,31 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function clampWeight(v) { return Math.min(5, Math.max(1, Math.round(Number(v) || 1))); }
         function getLootWeight(t) { return clampWeight(cloudData.settings?.lootWeights?.[t] ?? DEFAULT_LOOT_WEIGHTS[t] ?? 3); }
 
+        function discordDefaultAvatarUrl(discordId) {
+            const id = String(discordId || '');
+            if (!/^\d{5,25}$/.test(id)) return '';
+            try {
+                // Discord's default avatar index is (snowflake >> 22) % 6.
+                const index = Number((BigInt(id) >> 22n) % 6n);
+                return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
+            } catch (_) { return ''; }
+        }
         function discordAvatarUrl(user, size = 96) {
             const id = String(user?.id || '');
             const rawAvatar = String(user?.avatar || '').trim();
             if (!/^\d{5,25}$/.test(id)) return '';
-            // Legacy sessions saved the complete CDN URL; accept it, but only from Discord's CDN
-            // and only when the URL belongs to the authenticated Discord ID.
+            // Only accept legacy CDN URLs that belong to the same Discord user.
             const urlMatch = /^https:\/\/cdn\.discordapp\.com\/avatars\/(\d{5,25})\/([a-zA-Z0-9_-]+)\.(png|gif|webp)(?:\?[^#]*)?$/i.exec(rawAvatar);
             if (urlMatch && urlMatch[1] === id) {
                 const extension = urlMatch[2].startsWith('a_') ? 'gif' : urlMatch[3].toLowerCase();
                 return `https://cdn.discordapp.com/avatars/${id}/${urlMatch[2]}.${extension}?size=${size}`;
             }
-            // Current sessions store the avatar hash returned by Discord.
+            // OAuth stores Discord's current avatar hash, not a generated Pantheon avatar.
             if (/^[a-zA-Z0-9_-]+$/.test(rawAvatar)) {
                 const extension = rawAvatar.startsWith('a_') ? 'gif' : 'png';
                 return `https://cdn.discordapp.com/avatars/${id}/${rawAvatar}.${extension}?size=${size}`;
             }
-            try { return `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(id) % 6n)}.png`; } catch (_) { return ''; }
+            return discordDefaultAvatarUrl(id);
         }
         function paintDiscordAvatar(image, user, fallbackName) {
             if (!image) return;
@@ -7657,7 +7665,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 image.onerror = () => {
                     if (image.dataset.avatarFallback !== 'true' && /^\d{5,25}$/.test(String(user?.id || ''))) {
                         image.dataset.avatarFallback = 'true';
-                        try { image.src = `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(String(user.id)) % 6n)}.png`; return; } catch (_) {}
+                        try { image.src = discordDefaultAvatarUrl(user.id); return; } catch (_) {}
                     }
                     image.hidden = true;
                 };
@@ -7761,9 +7769,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 
         function guildProfileAvatarMarkup(profile, sizeClass = 'guild-social-avatar') {
-            const url = discordAvatarUrl({ id:profile?.id, avatar:profile?.avatar }, 128);
+            const user = { id:profile?.id, avatar:profile?.avatar };
+            const url = discordAvatarUrl(user, 128);
             const initial = String(profile?.pantheonName || profile?.label || 'P').trim().charAt(0).toUpperCase() || 'P';
-            return url ? `<div class="${sizeClass}"><img src="${escapeHTML(url)}" alt="" referrerpolicy="no-referrer" onerror="this.remove();this.parentElement.textContent='${escapeHTML(initial)}'"></div>` : `<div class="${sizeClass}">${escapeHTML(initial)}</div>`;
+            const fallback = discordDefaultAvatarUrl(profile?.id);
+            return url ? `<div class="${sizeClass}"><img src="${escapeHTML(url)}" alt="Discord profile picture" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.fallbackUsed&&'${escapeHTML(fallback)}'){this.dataset.fallbackUsed='1';this.src='${escapeHTML(fallback)}'}else{this.remove();this.parentElement.textContent='${escapeHTML(initial)}'}"></div>` : `<div class="${sizeClass}">${escapeHTML(initial)}</div>`;
         }
         function openGuildForum() {
             guildSocialActiveProfile = null;
@@ -7774,7 +7784,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (forumPanel) forumPanel.hidden = false;
             const title = document.getElementById('guild-social-title');
             const subtitle = document.getElementById('guild-social-subtitle');
-            if (title) title.textContent = '🏰 Pantheon Guild Forum';
+            if (title) title.textContent = 'Pantheon Guild Forum';
             if (subtitle) subtitle.textContent = 'Shared guild threads for achievements, successful runs, screenshots, and conversations.';
             openModal('guild-social-modal');
             loadGuildForum(true);
@@ -7791,7 +7801,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (forum) forum.hidden = true;
             const title = document.getElementById('guild-social-title');
             const subtitle = document.getElementById('guild-social-subtitle');
-            if (title) title.textContent = '👤 Member Profile';
+            if (title) title.textContent = 'Member Profile';
             if (subtitle) subtitle.textContent = 'Main character, roster, bio, and recent guild activity.';
             openModal('guild-social-modal');
             loadGuildMemberExtras(profile);
@@ -7805,10 +7815,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const other = Array.isArray(profile?.otherCharacters) ? profile.otherCharacters : [];
             const activities = Array.isArray(profile?.recentActivity) ? profile.recentActivity : [];
             const mainHtml = main
-                ? `<div class="guild-social-main-char"><strong>⭐ ${escapeHTML(main.name || 'Main character')}</strong><span>⚔️ ${escapeHTML(main.job || 'Class not set')}</span></div>`
+                ? `<div class="guild-social-main-char"><strong>${escapeHTML(main.name || 'Main character')}</strong><span>${escapeHTML(main.job || 'Class not set')}</span></div>`
                 : '<div class="guild-social-empty guild-social-empty-inline">Main character not selected yet.</div>';
             const otherHtml = other.length
-                ? other.map(character => `<span class="guild-social-character-chip"><strong>🎮 ${escapeHTML(character.name || '')}</strong><small>${escapeHTML(character.job || 'Class not set')}</small></span>`).join('')
+                ? other.map(character => `<span class="guild-social-character-chip"><strong>${escapeHTML(character.name || '')}</strong><small>${escapeHTML(character.job || 'Class not set')}</small></span>`).join('')
                 : '<span class="guild-social-empty guild-social-empty-inline">No other characters listed.</span>';
             const bio = String(profile?.bio || '');
             const bioPreview = bio
@@ -7817,24 +7827,24 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const activityHtml = activities.length ? activities.slice(0,8).map(item => {
                 const when = Number(item.at) ? new Date(Number(item.at)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }) : '';
                 return `<div class="guild-social-activity-item"><span class="guild-social-activity-mark">✓</span><div><strong>${escapeHTML(item.taskName || 'Completed activity')}</strong><small>${escapeHTML(item.characterName || 'Character')} · ${escapeHTML(when)}</small></div></div>`;
-            }).join('') : '<div class="guild-social-empty guild-social-empty-inline">No recent completions recorded yet. Their next clear will show up here. ✨</div>';
+            }).join('') : '<div class="guild-social-empty guild-social-empty-inline">No recent completions recorded yet. Their next clear will show up here.</div>';
             host.innerHTML = `
                 <div class="guild-social-profile-hero">
                     ${guildProfileAvatarMarkup(profile)}
                     <div class="guild-social-identity"><h4>${escapeHTML(profile?.pantheonName || profile?.label || 'Pantheon Member')}</h4><small class="guild-social-registered">Registered name · ${escapeHTML(profile?.registeredName || profile?.discordName || 'Discord member')}</small>${bioPreview}<span class="guild-social-presence ${online ? 'is-online' : ''}">${online ? 'Online now' : 'Offline'}</span></div>
-                    <div class="guild-social-hero-badge">${online ? '🟢 Active' : '🌙 Away'}</div>
+                    <div class="guild-social-hero-badge">${online ? 'Online' : 'Offline'}</div>
                 </div>
                 <div class="guild-social-profile-grid">
-                    <section class="guild-social-info-card"><h5>⭐ Main character</h5>${mainHtml}</section>
-                    <section class="guild-social-info-card"><h5>🎭 Other characters · ${other.length}</h5><div class="guild-social-character-list">${otherHtml}</div></section>
+                    <section class="guild-social-info-card"><h5>Main character</h5>${mainHtml}</section>
+                    <section class="guild-social-info-card"><h5>Other characters · ${other.length}</h5><div class="guild-social-character-list">${otherHtml}</div></section>
                 </div>
                 <div class="guild-social-profile-lower-grid">
-                    <section class="guild-social-info-card guild-social-bio-card"><div class="guild-social-card-head"><h5>🪶 About this member</h5>${own ? '<span>Only you can edit this</span>' : ''}</div>
+                    <section class="guild-social-info-card guild-social-bio-card"><div class="guild-social-card-head"><h5>About this member</h5>${own ? '<span>Only you can edit this</span>' : ''}</div>
                         ${own ? `<textarea id="guild-social-bio-input" maxlength="240" rows="3" placeholder="Write a little about yourself, your goals, or what you enjoy in Dragon Nest…">${escapeHTML(bio)}</textarea><div class="guild-social-bio-foot"><small id="guild-social-bio-count">${[...bio].length}/240</small><button type="button" class="btn btn-secondary" onclick="saveGuildMemberBio()">Save bio</button></div>` : `<p class="guild-social-bio-text">${bio ? escapeHTML(bio) : 'This member has not added a bio yet.'}</p>`}
                     </section>
-                    <section class="guild-social-info-card guild-social-activity-card"><div class="guild-social-card-head"><h5>⚔️ Recent activity</h5><span>Latest recorded clears</span></div><div class="guild-social-activity-list">${activityHtml}</div></section>
+                    <section class="guild-social-info-card guild-social-activity-card"><div class="guild-social-card-head"><h5>Recent activity</h5><span>Latest recorded clears</span></div><div class="guild-social-activity-list">${activityHtml}</div></section>
                 </div>
-                <div class="guild-social-profile-actions"><button class="btn btn-cloud" type="button" onclick="openGuildForum()">🏰 Open Guild Forum</button>${own ? '<span class="modal-note">This is your Pantheon profile. 👋</span>' : ''}</div>`;
+                <div class="guild-social-profile-actions"><button class="btn btn-cloud" type="button" onclick="openGuildForum()">Open Guild Forum</button>${own ? '<span class="modal-note">This is your Pantheon profile.</span>' : ''}</div>`;
             if (own) {
                 const input = document.getElementById('guild-social-bio-input');
                 input?.addEventListener('input', () => { const count = document.getElementById('guild-social-bio-count'); if (count) count.textContent = `${[...input.value].length}/240`; });
@@ -7885,7 +7895,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let guildForumPhotoDataUrl = '';
         let guildForumExpandedComments = new Set();
         let guildForumReplyTargets = new Map();
-        const guildForumCategoryLabels = { announcement:'📢 Guild notice', achievement:'🏆 Achievement', raid:'🐉 Run / Clear', party:'⚔️ Party up', general:'💬 General' };
+        const guildForumCategoryLabels = { announcement:'Guild notice', achievement:'Achievement', raid:'Run / Clear', party:'Party up', general:'General' };
         function toggleGuildForumComposer(show) {
             const panel = document.getElementById('guild-forum-composer');
             if (panel) panel.hidden = !show;
@@ -7958,9 +7968,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const comments = guildForumCommentsByPost.get(String(post.id)) || [];
                 const imageMarkup = post.hasImage ? `<div class="guild-forum-post-photo-wrap"><img class="guild-forum-post-photo" src="/api/forum?imageFor=${encodeURIComponent(post.id)}" alt="Guild photo attached to ${escapeHTML(post.title)}" loading="lazy"></div>` : '';
                 return `<article class="guild-forum-post ${post.pinned ? 'is-pinned' : ''}" data-forum-post-card="${escapeHTML(post.id)}">
-                    <div class="guild-forum-post-head"><button type="button" class="guild-forum-author" data-social-discord-id="${escapeHTML(post.authorDiscordId)}">${guildProfileAvatarMarkup(author,'guild-forum-avatar')}<span><strong>${escapeHTML(authorName)}</strong><small>${escapeHTML(guildForumCategoryLabels[post.category] || 'Guild post')} · ${escapeHTML(formatGuildForumTime(post.createdAt))}</small></span></button><div class="guild-forum-post-actions">${post.pinned ? '<span title="Pinned by an administrator">📌</span>' : ''}${post.canDelete ? `<button type="button" data-forum-delete-post="${escapeHTML(post.id)}" title="Remove post">⋯</button>` : ''}</div></div>
+                    <div class="guild-forum-post-head"><button type="button" class="guild-forum-author" data-social-discord-id="${escapeHTML(post.authorDiscordId)}">${guildProfileAvatarMarkup(author,'guild-forum-avatar')}<span><strong>${escapeHTML(authorName)}</strong><small>${escapeHTML(guildForumCategoryLabels[post.category] || 'Guild post')} · ${escapeHTML(formatGuildForumTime(post.createdAt))}</small></span></button><div class="guild-forum-post-actions">${post.pinned ? '<span title="Pinned by an administrator">Pinned</span>' : ''}${post.canDelete ? `<button type="button" data-forum-delete-post="${escapeHTML(post.id)}" title="Remove post">⋯</button>` : ''}</div></div>
                     <h4>${escapeHTML(post.title)}</h4>${post.body ? `<p class="guild-forum-post-body">${escapeHTML(post.body)}</p>` : ''}${imageMarkup}
-                    <div class="guild-forum-post-foot"><button type="button" data-forum-toggle-comments="${escapeHTML(post.id)}">💬 ${post.commentsCount} ${post.commentsCount === 1 ? 'reply' : 'replies'} ${commentsOpen ? '⌃' : '⌄'}</button><span>🏰 Pantheon Guild</span></div>
+                    <div class="guild-forum-post-foot"><button type="button" data-forum-toggle-comments="${escapeHTML(post.id)}">${post.commentsCount} ${post.commentsCount === 1 ? 'reply' : 'replies'} ${commentsOpen ? '⌃' : '⌄'}</button><span>Pantheon Guild</span></div>
                     <section class="guild-forum-comments" id="guild-forum-comments-${escapeHTML(post.id)}" ${commentsOpen ? '' : 'hidden'}>${commentsOpen ? renderGuildForumComments(post.id,comments) : ''}</section>
                 </article>`;
             }).join('');
@@ -7988,7 +7998,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return `<div class="guild-forum-comment" style="--comment-depth:${Math.min(depth,3)}"><div class="guild-forum-comment-head"><button type="button" data-social-discord-id="${escapeHTML(item.authorDiscordId)}">${escapeHTML(name)}</button><small>${escapeHTML(formatGuildForumTime(item.createdAt))}</small></div><p>${escapeHTML(item.body)}</p><div class="guild-forum-comment-actions"><button type="button" data-forum-reply-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">↩ Reply</button>${item.canDelete ? `<button type="button" data-forum-delete-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">Remove</button>` : ''}</div>${draw(children,depth+1)}</div>`;
             }).join('');
             const top = byParent.get('') || [];
-            return `<div class="guild-forum-comment-list">${draw(top) || '<small class="guild-forum-no-comments">No replies yet. Be the first to respond.</small>'}</div><form class="guild-forum-comment-form" data-forum-comment-form="${escapeHTML(postId)}"><div class="guild-forum-reply-target" id="guild-forum-reply-target-${escapeHTML(postId)}" hidden></div><textarea rows="2" maxlength="1500" placeholder="Write a reply… 🐉" aria-label="Write a reply"></textarea><button type="submit" class="btn btn-secondary">Reply ↗</button></form>`;
+            return `<div class="guild-forum-comment-list">${draw(top) || '<small class="guild-forum-no-comments">No replies yet. Be the first to respond.</small>'}</div><form class="guild-forum-comment-form" data-forum-comment-form="${escapeHTML(postId)}"><div class="guild-forum-reply-target" id="guild-forum-reply-target-${escapeHTML(postId)}" hidden></div><textarea rows="2" maxlength="1500" placeholder="Write a reply…" aria-label="Write a reply"></textarea><button type="submit" class="btn btn-secondary">Reply ↗</button></form>`;
         }
         async function loadGuildForum(reset=true) {
             if (guildForumLoading) return;
@@ -8078,7 +8088,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 await loadGuildForum(true);
                 if (status) status.textContent='Published ✓';
             } catch (error) { if (status) status.textContent=error.message || 'Post could not be published.'; }
-            finally { if (submit) { submit.disabled=false; submit.textContent='Publish to Guild Forum ↗'; } }
+            finally { if (submit) { submit.disabled=false; submit.textContent='Publish post'; } }
         }
         function initializeGuildSocialUi() {
             const modal = document.getElementById('guild-social-modal');
@@ -11896,7 +11906,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r62';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r63';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12625,7 +12635,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r62';
+  const CURRENT_BUILD = '1.6.8-r63';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

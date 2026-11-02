@@ -18,7 +18,8 @@ async function ensurePresenceTable(env) {
           avatar TEXT NOT NULL DEFAULT ''
         )`),
         db.prepare('CREATE INDEX IF NOT EXISTS idx_user_presence_seen ON user_presence(last_seen_at)'),
-        db.prepare('CREATE INDEX IF NOT EXISTS idx_allowed_users_enabled ON allowed_users(enabled, discord_id)')
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_allowed_users_enabled ON allowed_users(enabled, discord_id)'),
+        db.prepare('CREATE INDEX IF NOT EXISTS idx_sessions_user_created ON sessions(discord_id, created_at DESC)')
       ]);
       // Additive compatibility for installations created by r60.
       try {
@@ -37,14 +38,19 @@ async function ensurePresenceTable(env) {
 
 async function listAuthorizedUsers(env, now = Date.now()) {
   const cutoff = now - ONLINE_WINDOW_MS;
-  // Keep this query to the two small indexed tables. Discord username and avatar
-  // are captured by the heartbeat; correlated session lookups per member are avoided.
+  // Discord OAuth sessions are authoritative for profile pictures. The latest
+  // session avatar keeps offline members' cards accurate, while the composite
+  // index makes the per-member lookup cheap. Heartbeat presence still controls online state.
   const result = await env.PANTHEON_DB.prepare(`
     SELECT a.discord_id AS id,
            COALESCE(NULLIF(a.label, ''), NULLIF(p.username, ''), 'Discord member') AS label,
            COALESCE(NULLIF(p.username, ''), NULLIF(a.label, ''), '') AS username,
            COALESCE(p.username, a.label, 'Discord member') AS discordName,
-           COALESCE(p.avatar, '') AS avatar,
+           COALESCE(
+             (SELECT s.avatar FROM sessions s WHERE s.discord_id = a.discord_id ORDER BY s.created_at DESC LIMIT 1),
+             p.avatar,
+             ''
+           ) AS avatar,
            a.role AS role,
            COALESCE(p.last_seen_at, 0) AS lastSeenAt,
            CASE WHEN p.last_seen_at >= ? THEN 1 ELSE 0 END AS online
