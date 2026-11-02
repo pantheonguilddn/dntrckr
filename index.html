@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r69</title>
+    <title>Pantheon Tools v1.6.8-r70</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3472,7 +3472,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r69-default-na-task">
+<style id="pantheon-r70-category-resolution">
 .registration-default-na{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--pt-border,#555);border-radius:8px;background:var(--pt-surface-soft,#292933);color:var(--pt-text,#eee);cursor:pointer}
 .registration-default-na>input{flex:0 0 auto;width:auto!important;margin:2px 0 0;accent-color:var(--pt-accent,#608bd9)}
 .registration-default-na>span{display:grid;gap:3px;min-width:0}
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r69</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r70</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r69:</strong> Fixed Extra Dungeons so a task marked N/A by default can be explicitly opted into per character and counted only for that character.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r70:</strong> Dungeon Registration now safely resolves a stale category ID by its exact visible category name and reset group, while preserving the per-character default N/A and Extra Dungeons opt-in behavior.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -10674,9 +10674,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const taskName = String(input?.value || '').trim().slice(0, 40);
             if (!taskName) return alert('Enter task name.');
             const catChoice = document.getElementById('reg-dungeon-cat-select')?.value || '__new__';
+            const selectedCategory = catChoice !== '__new__' ? getCategories().find(category => category.id === catChoice) : null;
             const newCatName = String(document.getElementById('reg-dungeon-cat-name')?.value || '').trim().slice(0, 30);
             const newCatGroup = document.getElementById('reg-dungeon-cat-group')?.value === 'Dailies' ? 'Dailies' : 'Weeklies';
             const newCatColor = normalizeColor(document.getElementById('reg-dungeon-color')?.value, '#ffffff');
+            const targetCategoryName = String(selectedCategory?.name || newCatName).trim().slice(0, 30);
+            const targetCategoryGroup = selectedCategory ? (selectedCategory.group === 'Dailies' ? 'Dailies' : 'Weeklies') : newCatGroup;
+            const targetCategoryColor = normalizeColor(selectedCategory?.color || newCatColor, '#ffffff');
             const excludeByDefault = document.getElementById('reg-dungeon-exclude-default')?.checked === true;
             if (catChoice === '__new__' && !newCatName) return alert('Enter category.');
             if (!(await prepareGlobalChange(`Add dungeon task ${taskName}`))) return;
@@ -10696,9 +10700,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     body: JSON.stringify({
                         taskName,
                         categoryId: catChoice === '__new__' ? '' : catChoice,
-                        categoryName: catChoice === '__new__' ? newCatName : '',
-                        group: newCatGroup,
-                        color: newCatColor,
+                        // Always send the category's visible identity too. The server uses
+                        // it only as a safe fallback when the cached category ID has drifted.
+                        categoryName: targetCategoryName,
+                        group: targetCategoryGroup,
+                        color: targetCategoryColor,
                         excludeByDefault
                     })
                 });
@@ -12231,7 +12237,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r69';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r70';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12960,7 +12966,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r69';
+  const CURRENT_BUILD = '1.6.8-r70';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

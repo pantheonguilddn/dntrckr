@@ -71,7 +71,23 @@ export async function onRequestPost(context) {
       const duplicateCategory = categories.find(item => item.tasks.some(value => String(value).trim().toLocaleLowerCase() === taskName.toLocaleLowerCase()));
       let category = categoryId ? categories.find(item => item.id === categoryId) : null;
       if (categoryId && !category) {
-        return jsonResponse({ error: 'The selected dungeon category is no longer registered. Reload Dungeon Registration and try again.' }, 409);
+        // A cached browser can hold a category ID from before an admin-side category
+        // refresh/repair. Resolve only by the exact visible name and reset group; do not
+        // create a duplicate or attach the task to an unrelated category.
+        const requestedName = clean(categoryName, 30).toLocaleLowerCase();
+        const sameName = requestedName
+          ? categories.filter(item => item.name.toLocaleLowerCase() === requestedName)
+          : [];
+        const sameGroup = sameName.filter(item => item.group === group);
+        category = sameGroup.length === 1 ? sameGroup[0] : (sameGroup.length === 0 && sameName.length === 1 ? sameName[0] : null);
+        if (!category) {
+          return jsonResponse({
+            code: 'DUNGEON_CATEGORY_STALE',
+            error: sameName.length > 1
+              ? `The selected category ID changed and more than one category is named \"${clean(categoryName, 30)}\". Reload Dungeon Registration and select the intended category again.`
+              : `The selected category \"${clean(categoryName, 30) || 'Unknown'}\" could not be matched on the shared server. Reload Dungeon Registration and try again.`
+          }, 409);
+        }
       }
       if (!category && duplicateCategory) category = duplicateCategory;
       if (!category) {
