@@ -111,11 +111,16 @@ export async function onRequestPost(context) {
       const categoriesChanged = !alreadyRegistered;
       const profilesChanged = profileResult.changed;
       const existingDefaultExcluded = Array.isArray(settings.defaultExcludedTasks) ? settings.defaultExcludedTasks : [];
+      const existingExtraDungeons = Array.isArray(settings.extraDungeonTasks) ? settings.extraDungeonTasks : [];
       const isAlreadyDefaultExcluded = existingDefaultExcluded.some(value => String(value || '').trim().toLocaleLowerCase() === taskName.toLocaleLowerCase());
+      const isAlreadyExtraDungeon = existingExtraDungeons.some(value => String(value || '').trim().toLocaleLowerCase() === taskName.toLocaleLowerCase());
       const defaultExcludedTasks = [...existingDefaultExcluded];
+      const extraDungeonTasks = [...existingExtraDungeons];
       const defaultExclusionChanged = excludeByDefault && !isAlreadyDefaultExcluded;
+      const extraDungeonChanged = excludeByDefault && !isAlreadyExtraDungeon;
       if (defaultExclusionChanged) defaultExcludedTasks.push(taskName);
-      if (!categoriesChanged && !profilesChanged && !defaultExclusionChanged) {
+      if (extraDungeonChanged) extraDungeonTasks.push(taskName);
+      if (!categoriesChanged && !profilesChanged && !defaultExclusionChanged && !extraDungeonChanged) {
         return jsonResponse({
           ok: true,
           alreadyRegistered: true,
@@ -130,6 +135,9 @@ export async function onRequestPost(context) {
           defaultExcludedTasks: existingDefaultExcluded,
           defaultExcludedTasksUpdatedAt: Number(settings.defaultExcludedTasksUpdatedAt) || 0,
           defaultExcludedTasksUpdatedBy: String(settings.defaultExcludedTasksUpdatedBy || ''),
+          extraDungeonTasks: existingExtraDungeons,
+          extraDungeonTasksUpdatedAt: Number(settings.extraDungeonTasksUpdatedAt) || 0,
+          extraDungeonTasksUpdatedBy: String(settings.extraDungeonTasksUpdatedBy || ''),
           recordUpdatedAt: Number(result.row.updated_at) || Number(result.record.updatedAt) || 0,
           sourceRecordId: result.row.id
         });
@@ -146,10 +154,15 @@ export async function onRequestPost(context) {
         settings.activityReferenceProfilesUpdatedAt = now;
         settings.activityReferenceProfilesUpdatedBy = String(context.data.session.discordId || 'admin');
       }
-      if (defaultExclusionChanged) {
+      if (defaultExclusionChanged || extraDungeonChanged) {
         settings.defaultExcludedTasks = defaultExcludedTasks;
         settings.defaultExcludedTasksUpdatedAt = now;
         settings.defaultExcludedTasksUpdatedBy = String(context.data.session.discordId || 'admin');
+      }
+      if (extraDungeonChanged) {
+        settings.extraDungeonTasks = extraDungeonTasks;
+        settings.extraDungeonTasksUpdatedAt = now;
+        settings.extraDungeonTasksUpdatedBy = String(context.data.session.discordId || 'admin');
       }
       result.record.updatedAt = now;
       const packed = encodePantheonCompactRecord(result.record);
@@ -164,7 +177,7 @@ export async function onRequestPost(context) {
       try {
         await context.env.PANTHEON_DB.prepare(
           'INSERT INTO audit_events (actor_discord_id, action, target_discord_id, created_at, details_json) VALUES (?, ?, ?, ?, ?)'
-        ).bind(context.data.session.discordId, 'admin-dungeon-task-register', '', now, JSON.stringify({ taskName, categoryId: category.id, categoryName: category.name, group, activityProfileCreated: profilesChanged, excludedFromCalculationsByDefault: isAlreadyDefaultExcluded || defaultExclusionChanged })).run();
+        ).bind(context.data.session.discordId, 'admin-dungeon-task-register', '', now, JSON.stringify({ taskName, categoryId: category.id, categoryName: category.name, group, activityProfileCreated: profilesChanged, excludedFromCalculationsByDefault: isAlreadyDefaultExcluded || defaultExclusionChanged || isAlreadyExtraDungeon || extraDungeonChanged })).run();
       } catch (_) { /* The durable D1 category/profile update is authoritative; audit logging is secondary. */ }
 
       return jsonResponse({
@@ -181,6 +194,9 @@ export async function onRequestPost(context) {
         defaultExcludedTasks: Array.isArray(settings.defaultExcludedTasks) ? settings.defaultExcludedTasks : [],
         defaultExcludedTasksUpdatedAt: Number(settings.defaultExcludedTasksUpdatedAt) || 0,
         defaultExcludedTasksUpdatedBy: String(settings.defaultExcludedTasksUpdatedBy || ''),
+        extraDungeonTasks: Array.isArray(settings.extraDungeonTasks) ? settings.extraDungeonTasks : [],
+        extraDungeonTasksUpdatedAt: Number(settings.extraDungeonTasksUpdatedAt) || 0,
+        extraDungeonTasksUpdatedBy: String(settings.extraDungeonTasksUpdatedBy || ''),
         recordUpdatedAt: now,
         sourceRecordId: result.row.id
       });

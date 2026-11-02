@@ -43,7 +43,12 @@ function canonicalExtraTasks(record) {
   for (const category of registeredDungeonCategories(record)) {
     for (const task of category.tasks) allowed.set(task.toLocaleLowerCase(), task);
   }
-  const current = Array.isArray(record?.settings?.extraDungeonTasks) ? record.settings.extraDungeonTasks : [];
+  // Include the legacy r68-r70 defaultExcludedTasks in the displayed selection so
+  // existing policies migrate into this single Admin Console #5 list without data loss.
+  const current = [
+    ...(Array.isArray(record?.settings?.extraDungeonTasks) ? record.settings.extraDungeonTasks : []),
+    ...(Array.isArray(record?.settings?.defaultExcludedTasks) ? record.settings.defaultExcludedTasks : [])
+  ];
   return [...new Set(current.map(value => allowed.get(text(value).toLocaleLowerCase())).filter(Boolean))];
 }
 
@@ -98,6 +103,11 @@ export async function onRequestPut(context) {
       result.record.settings.extraDungeonTasks = extraDungeonTasks;
       result.record.settings.extraDungeonTasksUpdatedAt = now;
       result.record.settings.extraDungeonTasksUpdatedBy = String(context.data.session.discordId || 'admin');
+      // Synchronize the legacy field so r68-r70 clients that still read it receive
+      // the exact same character-level default N/A policy during the transition.
+      result.record.settings.defaultExcludedTasks = extraDungeonTasks;
+      result.record.settings.defaultExcludedTasksUpdatedAt = now;
+      result.record.settings.defaultExcludedTasksUpdatedBy = String(context.data.session.discordId || 'admin');
       result.record.updatedAt = now;
       const packed = encodePantheonCompactRecord(result.record);
       const recordJson = JSON.stringify(packed);

@@ -191,7 +191,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
       <a class="tool-launcher-link" href="/#version-history" target="_blank" rel="noopener">Version History<small>Inspect and restore global savepoints.</small></a>
       <a class="tool-launcher-link" href="/#landing-settings" target="_blank" rel="noopener">Default Landing Page<small>Set where your Pantheon session opens.</small></a>
       <a class="tool-launcher-link" href="/#dungeons" target="_blank" rel="noopener">Dungeon Registration<small>Register tasks and edit entries, drops, rewards and run details.</small></a>
-      <a class="tool-launcher-link" href="#extra-dungeons-panel">Extra Dungeons<small>Exclude optional weekly dungeons from completion rates.</small></a>
+      <a class="tool-launcher-link" href="#extra-dungeons-panel">Extra Dungeons<small>Set tasks to N/A by default and allow per-character opt-in.</small></a>
       <a class="tool-launcher-link" href="/#loot-weights" target="_blank" rel="noopener">Loot Weights<small>Adjust task prioritization weights.</small></a>
       <a class="tool-launcher-link" href="/#help" target="_blank" rel="noopener">Tracker Guide<small>Read the member-facing instructions.</small></a>
     </div>
@@ -214,12 +214,12 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
   </section>
   <section class="card" id="extra-dungeons-panel">
     <h2>5. Extra Dungeons</h2>
-    <p>Mark optional dungeon tasks here. All registered weekly and daily dungeons are listed by reset group. Weekly tasks tagged as Extra Dungeons remain visible and checkable but are normally excluded from weekly completion rates and reports. Exception: if a task is also set to Exclude from calculations by default in Dungeon Registration, a character owner can right-click that character’s N/A cell to opt in that character only. Other characters remain excluded. Daily tasks are already outside weekly completion math. Existing progress is not changed.</p>
+    <p>This is the shared exclusion list for every registered dungeon task. Checked tasks remain visible in the Tracker but default to muted N/A for every character. A character owner can right-click that character’s cell to opt in only that character for completion calculations and Share Bounties; everyone else stays N/A. The optional checkbox in Dungeon Registration adds the task to this same list immediately. Daily tasks remain outside weekly completion math. Existing marked/completed cells are preserved.</p>
     <div class="actions"><button class="btn" type="button" id="refresh-extra-dungeons">Reload registered dungeon list</button><span class="hint" id="extra-dungeon-count">Loading registered dungeon tasks…</span></div>
     <div id="extra-dungeon-status" class="status hidden"></div>
     <div id="extra-dungeon-list" class="extra-dungeon-groups"></div>
     <div class="actions"><button class="btn primary" type="button" id="save-extra-dungeons">Save Extra Dungeons</button></div>
-    <p class="extra-dungeon-footnote">Only administrators can see or edit this list. The selection is saved to the shared server record and applies to every member after their next background refresh.</p>
+    <p class="extra-dungeon-footnote">Only administrators can edit this list. This is the single shared source for default N/A/exclusion behavior. Saving updates the same policy used by Dungeon Registration and applies to every member after their next shared-data refresh.</p>
   </section>
   <section class="card" id="activity-reference-panel">
     <h2>6. Dungeon Entries, Drops &amp; Rewards</h2>
@@ -446,7 +446,7 @@ async function saveExtraDungeons(){
     extraDungeonSelection=new Set((data.extraDungeonTasks||[]).map(value=>String(value||'').toLocaleLowerCase()));
     extraDungeonDraftDirty=false;
     renderExtraDungeons();
-    setStatus('extra-dungeon-status',`Saved ${extraDungeonSelection.size} Extra Dungeon(s). Their checks remain intact and they are excluded from completion calculations for the whole guild, except tasks configured as N/A-by-default can be opted in separately by each character.`,'ok');
+    setStatus('extra-dungeon-status',`Saved ${extraDungeonSelection.size} task(s) as default N/A. Each character can opt in independently by right-clicking that task's cell; other characters remain excluded.`,'ok');
   }catch(error){setStatus('extra-dungeon-status',error.message,'error');}
   finally{button.disabled=false;}
 }

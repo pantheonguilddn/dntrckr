@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r70</title>
+    <title>Pantheon Tools v1.6.8-r71</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3472,7 +3472,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 </style>
 
 
-<style id="pantheon-r70-category-resolution">
+<style id="pantheon-r71-unified-extra-exclusion">
 .registration-default-na{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--pt-border,#555);border-radius:8px;background:var(--pt-surface-soft,#292933);color:var(--pt-text,#eee);cursor:pointer}
 .registration-default-na>input{flex:0 0 auto;width:auto!important;margin:2px 0 0;accent-color:var(--pt-accent,#608bd9)}
 .registration-default-na>span{display:grid;gap:3px;min-width:0}
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r70</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r71</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r70:</strong> Dungeon Registration now safely resolves a stale category ID by its exact visible category name and reset group, while preserving the per-character default N/A and Extra Dungeons opt-in behavior.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r71:</strong> Admin Console #5 Extra Dungeons is now the shared exclusion control. Checked tasks default to muted N/A per character; right-click opts in only that character. Dungeon Registration can add a task directly to the same list.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4423,7 +4423,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <div id="reg-dungeon-palette" class="pastel-palette"></div>
                         <input type="hidden" id="reg-dungeon-color" value="#ffffff">
                         <label>Task name</label><input id="reg-dungeon-task-name" maxlength="40" placeholder="Exact task name" onkeydown="if(event.key==='Enter') registerDungeonTask()">
-                        <label class="registration-default-na"><input type="checkbox" id="reg-dungeon-exclude-default"><span><strong>Exclude from calculations by default</strong><small>Each character starts muted at N/A. Right-click a character’s cell to include only that character; this opt-in also overrides the Extra Dungeons exclusion. An empty Bounty Board slot is linked when available.</small></span></label>
+                        <label class="registration-default-na"><input type="checkbox" id="reg-dungeon-exclude-default"><span><strong>Add to Admin Console #5: Extra Dungeons</strong><small>Checked tasks default to muted N/A for every character. Right-click an individual character’s cell to opt in only that character for calculations and Share Bounties. An empty Bounty Board slot is linked when available.</small></span></label>
                         <button class="btn btn-dungeon" type="button" onclick="registerDungeonTask()">Register Task</button>
                     </div>
                 </section>
@@ -6934,7 +6934,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 // A default-excluded task is a bounty only for characters who explicitly
                 // right-clicked their own cell to opt in. This direct path does not depend
                 // on an empty Bounty Board line being available.
-                (cloudData.settings?.defaultExcludedTasks||[]).forEach(task=>{
+                [...new Set([...(cloudData.settings?.extraDungeonTasks||[]),...(cloudData.settings?.defaultExcludedTasks||[])])].forEach(task=>{
                     if(isBountyListTask(task) || !isDefaultExcludedTask(task))return;
                     const state=getCellState(char.name,task);
                     if(!['marked','done'].includes(state))return;
@@ -7438,7 +7438,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function isDefaultExcludedTask(taskName) {
             const key = String(taskName || '').trim().toLocaleLowerCase();
             if (!key || isBountyListTask(taskName)) return false;
-            return (cloudData.settings?.defaultExcludedTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === key);
+            // Admin Console #5 Extra Dungeons is the canonical catalogue for tasks that
+            // start at N/A. Keep defaultExcludedTasks in the lookup for backwards
+            // compatibility with r68-r70 records; both lists are synchronized on save.
+            const excluded = [
+                ...(cloudData.settings?.extraDungeonTasks || []),
+                ...(cloudData.settings?.defaultExcludedTasks || [])
+            ];
+            return excluded.some(value => String(value || '').trim().toLocaleLowerCase() === key);
         }
         function getCellRecord(c, t) {
             const saved = cloudData.cells?.[c]?.[t];
@@ -7659,9 +7666,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const key = String(taskName || '').trim().toLocaleLowerCase();
             return !!key && (cloudData.settings?.extraDungeonTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === key);
         }
-        // Extra Dungeons are normally excluded for the whole guild. A task that is also
-        // configured as N/A-by-default is different: its per-character Marked/Done state
-        // is an explicit opt-in and must be allowed into that character's calculations.
+        // Extra Dungeons are now the shared default-N/A catalogue. The task remains in
+        // the completion catalogue, but an individual character only counts when
+        // their own cell is explicitly Marked/Done; untouched cells stay excluded.
         function isExtraDungeonExcludedFromCalculations(taskName) {
             return isExtraDungeonTask(taskName) && !isDefaultExcludedTask(taskName);
         }
@@ -10178,7 +10185,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const chartRows = rows.map(row => `<div class="weekly-report-chart-row"><span class="weekly-report-chart-name" title="${escapeHTML(row.name)}">${escapeHTML(row.name)}</span><div class="weekly-report-bar" role="img" aria-label="${row.done} completed, ${row.missed} unfinished"><span class="weekly-report-bar-done" style="width:${row.eligible?row.rate:0}%"></span><span class="weekly-report-bar-missed" style="width:${row.eligible?100-row.rate:0}%"></span></div><strong class="weekly-report-chart-value">${row.eligible?row.rate+'%':'—'}</strong></div>`).join('');
             const topMisses = [...taskCounts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,3);
             const focusHtml = topMisses.length ? `<section class="weekly-report-focus"><h4>Most often left unfinished</h4><div class="weekly-report-focus-list">${topMisses.map(([task,count])=>`<span class="weekly-report-focus-item">${escapeHTML(task)} <strong>${count} character${count===1?'':'s'}</strong></span>`).join('')}</div></section>` : '<section class="weekly-report-focus"><h4>Weekly result</h4><div class="weekly-report-empty">Every eligible task in this view was marked complete.</div></section>';
-            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks and Extra Dungeons do not count against completion. Extra Dungeons remain visible in the Tracker; this report reflects checkmarks, not proof of dungeon clears.</p>`;
+            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks do not count against completion. Extra Dungeons default to N/A; only characters who opt in by marking that cell have the task included. Extra Dungeons remain visible in the Tracker; this report reflects checkmarks, not proof of dungeon clears.</p>`;
             container.appendChild(card);
         }
         function openWeeklyReportModal({automatic=false}={}) {
@@ -10718,6 +10725,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 cloudData.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(payload.activityReferenceProfiles || cloudData.settings.activityReferenceProfiles);
                 cloudData.settings.activityReferenceProfilesUpdatedAt = Number(payload.activityReferenceProfilesUpdatedAt) || cloudData.settings.activityReferenceProfilesUpdatedAt || Date.now();
                 cloudData.settings.activityReferenceProfilesUpdatedBy = String(payload.activityReferenceProfilesUpdatedBy || pantheonDiscordUser?.id || deviceId);
+                cloudData.settings.extraDungeonTasks = Array.isArray(payload.extraDungeonTasks) ? payload.extraDungeonTasks : (Array.isArray(cloudData.settings.extraDungeonTasks) ? cloudData.settings.extraDungeonTasks : []);
+                cloudData.settings.extraDungeonTasksUpdatedAt = Number(payload.extraDungeonTasksUpdatedAt) || cloudData.settings.extraDungeonTasksUpdatedAt || 0;
+                cloudData.settings.extraDungeonTasksUpdatedBy = String(payload.extraDungeonTasksUpdatedBy || cloudData.settings.extraDungeonTasksUpdatedBy || '');
                 cloudData.settings.defaultExcludedTasks = Array.isArray(payload.defaultExcludedTasks) ? payload.defaultExcludedTasks : (Array.isArray(cloudData.settings.defaultExcludedTasks) ? cloudData.settings.defaultExcludedTasks : []);
                 cloudData.settings.defaultExcludedTasksUpdatedAt = Number(payload.defaultExcludedTasksUpdatedAt) || cloudData.settings.defaultExcludedTasksUpdatedAt || 0;
                 cloudData.settings.defaultExcludedTasksUpdatedBy = String(payload.defaultExcludedTasksUpdatedBy || cloudData.settings.defaultExcludedTasksUpdatedBy || '');
@@ -10743,7 +10753,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
                 clearPendingGlobalChange();
                 try { Promise.resolve(flushRevisionQueue()).catch(() => false); } catch (_) {}
-                const isDefaultExcluded = (cloudData.settings.defaultExcludedTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === taskName.toLocaleLowerCase());
+                const isDefaultExcluded = [...(cloudData.settings.extraDungeonTasks || []), ...(cloudData.settings.defaultExcludedTasks || [])].some(value => String(value || '').trim().toLocaleLowerCase() === taskName.toLocaleLowerCase());
                 setStatus(payload.alreadyRegistered
                     ? `🟢 ${taskName} was already registered on the shared server. ${isDefaultExcluded ? 'It defaults to N/A for each character until that character is opted in.' : 'The local category list has been refreshed.'}`
                     : `🟢 ${taskName} was saved directly to the shared server and confirmed. ${isDefaultExcluded ? 'Its cells default to muted N/A; right-click an individual character cell to include only that character in calculations and Share Bounties.' : 'It is now available in the Tracker and its drops/entries profile is linked in this registration panel.'}`);
@@ -12237,7 +12247,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r70';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r71';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12966,7 +12976,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r70';
+  const CURRENT_BUILD = '1.6.8-r71';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
