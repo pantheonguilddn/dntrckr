@@ -172,6 +172,11 @@ export async function onRequestPut(context) {
         // Group-run timing is shared learning data. Merge it independently so members' whole-record
         // syncs cannot erase another member's timestamps. A newer history-clear marker always wins.
         next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};
+        // Extra Dungeon classification is controlled only by the authenticated Admin Console API.
+        // Preserve the committed server value even when a member or older admin tab submits a stale snapshot.
+        next.settings.extraDungeonTasks = Array.isArray(previous?.settings?.extraDungeonTasks) ? previous.settings.extraDungeonTasks : [];
+        next.settings.extraDungeonTasksUpdatedAt = Number(previous?.settings?.extraDungeonTasksUpdatedAt) || 0;
+        next.settings.extraDungeonTasksUpdatedBy = String(previous?.settings?.extraDungeonTasksUpdatedBy || '');
         const previousClearAt = Number(previous?.settings?.analyticsHistoryClearedAt) || 0;
         const incomingClearAt = Number(next.settings.analyticsHistoryClearedAt) || 0;
         const timingClearAt = Math.max(previousClearAt, incomingClearAt);

@@ -1,11 +1,9 @@
-# Deploy Pantheon Tools r55
+# Deployment notes · Pantheon Tools v1.6.8-r56
 
-1. Download `Pantheon_Cloudflare_Pages_v1.6.8-r55.zip`.
-2. Upload the ZIP contents to the existing Cloudflare Pages project, preserving the `functions/` directory structure.
-3. Keep the existing `PANTHEON_DB` D1 binding and environment variables unchanged.
-4. Do not run SQL, reset D1, clear browser data, or remove the old tracker record.
-5. After deployment, members should reopen or refresh Pantheon. Any checkbox/note edits still waiting in that same browser profile will be retried automatically after the app confirms player storage is ready.
+1. Upload the full ZIP contents to the existing Cloudflare Pages project.
+2. Keep the existing `PANTHEON_DB` binding and environment variables. No D1 migration or schema change is needed.
+3. After deployment, sign in as an administrator and open **Admin Console → Extra Dungeons**.
+4. Tick optional weekly dungeon tasks and choose **Save Extra Dungeons**.
+5. Open the Tracker or wait for its normal shared-data refresh. Selected dungeons stay visible and their saved checkboxes are untouched, but they no longer affect completion percentages or weekly report totals.
 
-Admin Discord links are managed under Admin Console > Player ownership audit. To replace a link, choose the new enabled account and confirm. To unlink a non-bootstrap member, use Clear link. The bootstrap Admin personal-owner identity is protected.
-
-Note: no browser can upload while it is fully closed. r55 keeps unacknowledged task changes in local browser storage and resumes delivery when Pantheon next opens. Manually clearing site data or blocking browser storage can remove that local outbox.
+The release popup remains disabled. Do not delete, reset, or recreate the D1 database. Existing progress and owner links are preserved.

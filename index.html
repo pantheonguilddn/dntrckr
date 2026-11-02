@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r55</title>
+    <title>Pantheon Tools v1.6.8-r56</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3394,9 +3394,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r55</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r56</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r55:</strong> The redundant account dropdown has been removed. Discord now selects your linked roster automatically, while the single “Only [member]” dropdown remains for filtering a specific person in Universal View. The Tools hamburger is now hidden outside Admin View, including when an administrator previews the member experience.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r56:</strong> Admins can mark optional weekly dungeon tasks as Extra Dungeons. These tasks remain visible and trackable but are excluded from completion-rate calculations and weekly completion totals.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4477,7 +4477,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 weeklyArchive: {},
                 completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -5262,7 +5262,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
             updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
-            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak'
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -5382,6 +5382,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             norm.settings.activityReferenceProfiles = normalizeActivityReferenceProfiles(sets.activityReferenceProfiles);
             norm.settings.activityReferenceProfilesUpdatedAt = Number(sets.activityReferenceProfilesUpdatedAt) || 0;
             norm.settings.activityReferenceProfilesUpdatedBy = String(sets.activityReferenceProfilesUpdatedBy || '');
+            norm.settings.extraDungeonTasks = [...new Map((Array.isArray(sets.extraDungeonTasks) ? sets.extraDungeonTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].slice(0, 300);
+            norm.settings.extraDungeonTasksUpdatedAt = Number(sets.extraDungeonTasksUpdatedAt) || 0;
+            norm.settings.extraDungeonTasksUpdatedBy = String(sets.extraDungeonTasksUpdatedBy || '');
             norm.settings.teamBuilder = normalizeTeamBuilder(sets.teamBuilder);
             ensureMemberRosterMaster(norm);
             const historyClearAt = Number(norm.settings.analyticsHistoryClearedAt) || 0;
@@ -5535,6 +5538,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             merged.settings.rateUpEvents = normalizeRateUpEvents(rateSource.rateUpEvents);
             merged.settings.rateUpEventsUpdatedAt = Math.max(localRateAt, remoteRateAt);
             merged.settings.rateUpEventsUpdatedBy = String(rateSource.rateUpEventsUpdatedBy || '');
+            // Extra Dungeon classification is edited only through the authenticated Admin Console.
+            // Always take this field from the latest server record, never from a stale local cache.
+            merged.settings.extraDungeonTasks = [...(remote.settings.extraDungeonTasks || [])];
+            merged.settings.extraDungeonTasksUpdatedAt = Number(remote.settings.extraDungeonTasksUpdatedAt) || 0;
+            merged.settings.extraDungeonTasksUpdatedBy = String(remote.settings.extraDungeonTasksUpdatedBy || '');
             const localTextAt = Number(local.settings.uiTextOverridesUpdatedAt) || 0;
             const remoteTextAt = Number(remote.settings.uiTextOverridesUpdatedAt) || 0;
             const localTexts = safeObject(local.settings.uiTextOverrides), remoteTexts = safeObject(remote.settings.uiTextOverrides);
@@ -6979,7 +6987,25 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function isBountyTask(taskName) {
             return !!cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'))?.tasks.includes(taskName);
         }
-        function getCompletionTaskNames() { return weeklyTaskNames.filter(t => !isBountyTask(t)); }
+        function isExtraDungeonTask(taskName) {
+            const key = String(taskName || '').trim().toLocaleLowerCase();
+            return !!key && (cloudData.settings?.extraDungeonTasks || []).some(value => String(value || '').trim().toLocaleLowerCase() === key);
+        }
+        function getCompletionTaskNames(taskNames = weeklyTaskNames) {
+            return (Array.isArray(taskNames) ? taskNames : []).filter(task => !isBountyTask(task) && !isExtraDungeonTask(task));
+        }
+        function getArchivedCompletionRate(archive, characterName) {
+            const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+            const codes = String(archive?.states?.[characterName] || '');
+            let done = 0, eligible = 0;
+            order.forEach((task, index) => {
+                if (isBountyTask(task) || isExtraDungeonTask(task)) return;
+                const code = codes[index] || '';
+                if (code === 'd') { done++; eligible++; }
+                else if (code === 'm') eligible++;
+            });
+            return eligible ? Math.round(done / eligible * 100) : null;
+        }
 
         function updateRateForCharacter(charName) {
             let ct = 0, dn = 0;
@@ -7711,7 +7737,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
                 const pendingTasks = states.filter(item => item.state !== 'done' && item.state !== 'excluded').sort((a, b) => (getLootWeight(b.task) - getLootWeight(a.task)) || a.task.localeCompare(b.task));
                 const rate = eligible ? Math.round(done / eligible * 100) : 0;
-                const snapshots = archives.map(([, archive]) => archive?.rates?.[name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
+                const snapshots = archives.map(([, archive]) => getArchivedCompletionRate(archive, name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number);
                 const trend = snapshots.length >= 2 ? snapshots[snapshots.length - 1] - snapshots[snapshots.length - 2] : null;
                 const profile = profiles.find(item => item.name.toLocaleLowerCase() === name.toLocaleLowerCase());
                 return { name, isMain: !!profile?.isMain, eligible, done, pending: Math.max(0, eligible - done), rate, excluded, marked, thisWeekActivity, latestTouch, pendingTasks, trend };
@@ -7913,17 +7939,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 recent.forEach(([,archive]) => {
                     const states = String(safeObject(archive.states)[profile.name] || '');
                     const order = Array.isArray(archive.taskOrder) ? archive.taskOrder : weeklyTaskNames;
-                    if (!states || !order.length) return;
+                    if (!states || !getCompletionTaskNames(order).length) return;
                     validWeeks++;
                     let weekDone = 0;
                     order.forEach((task, i) => {
+                        if (isBountyTask(task) || isExtraDungeonTask(task)) return;
                         if (states[i] === 'd') { done++; weekDone++; }
                         else if (states[i] === 'm') missed++;
                     });
                     if (weekDone) weeksWithProgress++;
                 });
                 let currentDone=0, currentOpen=0;
-                weeklyTaskNames.forEach(task => {
+                getCompletionTaskNames().forEach(task => {
                     const state = getCellState(profile.name, task);
                     if (state === 'done') currentDone++;
                     else if (state !== 'excluded') currentOpen++;
@@ -7933,7 +7960,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 // A recorded completion outside the weekly list helps distinguish a missed weekly tick from no recorded play.
                 const currentCells = safeObject(cloudData.cells?.[profile.name]);
                 const currentCycleRecorded = Object.values(currentCells).some(cell => cell?.state === 'done' && (Number(cell.updatedAt) || 0) >= cycleStart);
-                const archivedRates = recent.map(([,archive]) => safeObject(archive.rates)[profile.name]).filter(value => value !== undefined && value !== null && Number.isFinite(Number(value))).map(Number);
+                const archivedRates = recent.map(([,archive]) => getArchivedCompletionRate(archive, profile.name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number);
                 const trend = archivedRates.length >= 2 ? Math.round(archivedRates[archivedRates.length - 1] - archivedRates[archivedRates.length - 2]) : null;
                 const regular = !profile.isMain && validWeeks >= 2 && (weeksWithProgress >= 2 || (done >= 4 && weeksWithProgress >= 1));
                 const emerging = !profile.isMain && !regular && (currentDone >= 2 || (weeksWithProgress >= 1 && done >= 2));
@@ -8518,7 +8545,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const codes = String(archive?.states?.[character?.name] || '');
                 let done = 0, eligible = 0;
                 order.forEach((otherTask, index) => {
-                    if (otherTask === taskName || isBountyTask(otherTask) || /\bbounty\b/i.test(otherTask)) return;
+                    if (otherTask === taskName || isBountyTask(otherTask) || isExtraDungeonTask(otherTask) || /\bbounty\b/i.test(otherTask)) return;
                     const code = codes[index] || '';
                     if (code === 'd') { done++; eligible++; }
                     else if (code === 'm') eligible++;
@@ -8901,7 +8928,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 let done = 0, missed = 0, excluded = 0;
                 const missedTasks = [];
                 taskOrder.forEach((task, index) => {
-                    if (!task || isBountyTask(task)) return;
+                    if (!task || isBountyTask(task) || isExtraDungeonTask(task)) return;
                     const code = codes[index] || '';
                     if (code === 'd') done++;
                     else if (code === 'x') excluded++;
@@ -8921,7 +8948,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const chartRows = rows.map(row => `<div class="weekly-report-chart-row"><span class="weekly-report-chart-name" title="${escapeHTML(row.name)}">${escapeHTML(row.name)}</span><div class="weekly-report-bar" role="img" aria-label="${row.done} completed, ${row.missed} unfinished"><span class="weekly-report-bar-done" style="width:${row.eligible?row.rate:0}%"></span><span class="weekly-report-bar-missed" style="width:${row.eligible?100-row.rate:0}%"></span></div><strong class="weekly-report-chart-value">${row.eligible?row.rate+'%':'—'}</strong></div>`).join('');
             const topMisses = [...taskCounts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,3);
             const focusHtml = topMisses.length ? `<section class="weekly-report-focus"><h4>Most often left unfinished</h4><div class="weekly-report-focus-list">${topMisses.map(([task,count])=>`<span class="weekly-report-focus-item">${escapeHTML(task)} <strong>${count} character${count===1?'':'s'}</strong></span>`).join('')}</div></section>` : '<section class="weekly-report-focus"><h4>Weekly result</h4><div class="weekly-report-empty">Every eligible task in this view was marked complete.</div></section>';
-            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks do not count against completion. This report reflects tracker checkmarks, not proof of dungeon clears.</p>`;
+            card.innerHTML = `<div class="weekly-report-head"><div><h3>Week at a glance</h3><div class="weekly-report-period">${escapeHTML(formatWeeklyReportPeriod(weekKey))}</div></div><span class="weekly-plan-status">${rows.length} tracked character${rows.length===1?'':'s'}</span></div><div class="weekly-report-kpis"><span class="weekly-report-kpi"><strong>${totalEligible?average+'%':'—'}</strong>overall completion</span><span class="weekly-report-kpi"><strong>${totalDone}</strong>tasks completed</span><span class="weekly-report-kpi"><strong>${totalMissed}</strong>left unfinished</span><span class="weekly-report-kpi"><strong>${totalExcluded}</strong>N/A excluded</span></div><div class="weekly-report-chart" aria-label="Completion by character">${chartRows}</div><div class="weekly-report-legend"><span>Completed</span><span>Unfinished</span></div>${focusHtml}<p class="weekly-report-foot">Sorted from lowest completion to highest. N/A tasks and Extra Dungeons do not count against completion. Extra Dungeons remain visible in the Tracker; this report reflects checkmarks, not proof of dungeon clears.</p>`;
             container.appendChild(card);
         }
         function openWeeklyReportModal({automatic=false}={}) {
@@ -8971,7 +8998,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
                 
-                const rts = [...(Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []), ...sortedArchiveEntries.map(([,a])=>Number(a.rates?.[char.name])).filter(Number.isFinite)].slice(-5);
+                const legacyRates = (cloudData.settings?.extraDungeonTasks || []).length ? [] : (Array.isArray(cloudData.history?.[char.name]?.rates) ? cloudData.history[char.name].rates : []);
+                const rts = [...legacyRates, ...sortedArchiveEntries.map(([,a])=>getArchivedCompletionRate(a,char.name)).filter(value=>value!==null&&Number.isFinite(Number(value))).map(Number)].slice(-5);
                 const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
 
                 const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m: 0, c: 0, x: 0, o: 0 });
@@ -10814,7 +10842,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r55';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r56';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -11543,7 +11571,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r55';
+  const CURRENT_BUILD = '1.6.8-r56';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
