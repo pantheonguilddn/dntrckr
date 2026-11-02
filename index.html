@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r65</title>
+    <title>Pantheon Tools v1.6.8-r66</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3435,6 +3435,42 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .guild-social-next-focus p,.guild-social-next-focus-complete { margin:0; color:var(--pt-muted); font-size:.59rem; line-height:1.45; overflow-wrap:anywhere; }
 </style>
 
+
+<style id="pantheon-r66-profile-banner-and-clean-actions">
+/* A profile banner is decorative. Its computed ink/scrim combination preserves contrast. */
+.guild-social-profile-hero { position:relative; isolation:isolate; min-height:138px; overflow:hidden; }
+.guild-social-profile-hero.has-banner { border-color:rgba(127,127,127,.28); background:var(--pt-surface-soft); }
+.guild-social-profile-banner-image { position:absolute; z-index:-2; inset:0; display:block; width:100%; height:100%; object-fit:cover; object-position:center 48%; }
+.guild-social-profile-hero.has-banner::before { content:""; position:absolute; z-index:-1; inset:0; pointer-events:none; }
+.guild-social-profile-hero.banner-ink-light::before { background:linear-gradient(100deg,rgba(0,0,0,.64),rgba(0,0,0,.30) 66%,rgba(0,0,0,.22)); }
+.guild-social-profile-hero.banner-ink-dark::before { background:linear-gradient(100deg,rgba(255,255,255,.78),rgba(255,255,255,.46) 66%,rgba(255,255,255,.34)); }
+.guild-social-profile-hero.has-banner .guild-social-identity h4,
+.guild-social-profile-hero.has-banner .guild-social-registered,
+.guild-social-profile-hero.has-banner .guild-social-hero-bio,
+.guild-social-profile-hero.has-banner .guild-social-presence { color:var(--guild-profile-ink) !important; text-shadow:var(--guild-profile-shadow); }
+.guild-social-profile-hero.banner-ink-light { --guild-profile-ink:#fff; --guild-profile-shadow:0 1px 3px rgba(0,0,0,.62); }
+.guild-social-profile-hero.banner-ink-dark { --guild-profile-ink:#17202b; --guild-profile-shadow:0 1px 2px rgba(255,255,255,.55); }
+.guild-social-profile-hero.has-banner .guild-social-hero-badge { color:var(--guild-profile-ink); border-color:color-mix(in srgb,var(--guild-profile-ink) 44%,transparent); background:color-mix(in srgb,var(--guild-profile-ink) 10%,transparent); text-shadow:var(--guild-profile-shadow); }
+.guild-social-profile-hero.has-banner .guild-social-hero-bio.is-empty { opacity:.88; }
+.guild-social-banner-settings { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:9px 14px; margin-top:9px; padding:10px 12px; border:1px solid var(--pt-border); border-radius:11px; background:var(--pt-surface-soft); }
+.guild-social-banner-settings > div:first-child { display:grid; gap:3px; min-width:180px; flex:1 1 220px; }
+.guild-social-banner-settings strong { color:var(--pt-text); font-size:.68rem; }
+.guild-social-banner-settings small { color:var(--pt-muted); font-size:.57rem; line-height:1.4; }
+.guild-social-banner-controls { display:flex; align-items:center; gap:7px; flex:0 0 auto; }
+.guild-social-banner-pick { position:relative; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+.guild-social-banner-controls button:disabled { opacity:.45; cursor:not-allowed; }
+.guild-social-banner-settings > small { width:100%; }
+.guild-social-profile-self-note { margin:10px 2px 0; color:var(--pt-muted); font-size:.61rem; text-align:right; }
+.guild-social-modal-head-actions { margin-left:auto; }
+@media(max-width:640px) {
+ .guild-social-profile-hero { min-height:120px; flex-wrap:wrap; }
+ .guild-social-profile-hero .guild-social-identity { flex:1 1 calc(100% - 85px); }
+ .guild-social-hero-badge { position:relative; margin-left:auto; }
+ .guild-social-banner-settings { align-items:flex-start; }
+ .guild-social-banner-controls { width:100%; }
+}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3550,7 +3586,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         <div class="modal-card wide-modal guild-social-modal-card">
             <div class="guild-social-modal-head">
                 <div><div class="guild-social-kicker">PANTHEON · GUILD COMMUNITY</div><h3 id="guild-social-title">Pantheon Guild Forum</h3><p id="guild-social-subtitle" class="modal-note">Guild news, achievements, successful runs, and member updates.</p></div>
-                <div class="guild-social-modal-head-actions"><button class="btn btn-secondary" type="button" onclick="openGuildForum()">Guild Forum</button><button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild community">✕</button></div>
+                <div class="guild-social-modal-head-actions"><button class="btn btn-secondary" type="button" onclick="closeModal('guild-social-modal')" aria-label="Close guild community">✕</button></div>
             </div>
             <section id="guild-social-profile-panel" class="guild-social-profile-panel" hidden>
                 <div id="guild-social-profile-content"><div class="guild-social-loading">Loading member profile…</div></div>
@@ -3917,9 +3953,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r65</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r66</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r65:</strong> Simplified social controls and made profile pictures use each member’s Discord avatar.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r66:</strong> Added optional profile banners with automatic text contrast and removed duplicate Guild Forum buttons.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -7898,26 +7934,41 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     : focus?.tasks?.length
                     ? `<div class="guild-social-next-focus"><div class="guild-social-next-focus-head"><strong>${escapeHTML(focus.characterName || 'Next character')}</strong><small>${focus.isMain ? 'Main character' : 'Next tracked character'}</small></div><div class="guild-social-next-focus-tasks">${focus.tasks.map(task => `<span>${escapeHTML(task.name || '')}</span>`).join('')}</div><p>${escapeHTML(focus.note || 'Suggested from unfinished weekly tasks and shared task priorities.')}</p></div>`
                     : '<div class="guild-social-empty guild-social-empty-inline">No next focus is available yet.</div>';
+            const bannerDataUrl = String(profile?.bannerDataUrl || '');
+            const bannerMode = profile?.bannerTextMode === 'dark' ? 'dark' : 'light';
+            const bannerClass = bannerDataUrl ? `has-banner banner-ink-${bannerMode}` : '';
+            const bannerImage = bannerDataUrl ? `<img class="guild-social-profile-banner-image" src="${escapeHTML(bannerDataUrl)}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : '';
             host.innerHTML = `
-                <div class="guild-social-profile-hero">
+                <div class="guild-social-profile-hero ${bannerClass}">
+                    ${bannerImage}
                     ${guildProfileAvatarMarkup(profile)}
                     <div class="guild-social-identity"><h4>${escapeHTML(profile?.pantheonName || profile?.label || 'Pantheon Member')}</h4><small class="guild-social-registered">Registered name · ${escapeHTML(profile?.registeredName || profile?.discordName || 'Discord member')}</small>${bioPreview}<span class="guild-social-presence ${online ? 'is-online' : ''}">${online ? 'Online now' : 'Offline'}</span></div>
                     <div class="guild-social-hero-badge">${online ? 'Online' : 'Offline'}</div>
                 </div>
+                ${own ? `<section class="guild-social-banner-settings"><div><strong>Profile banner</strong><small>Optional landscape image. Pantheon crops it to fit and adjusts profile text contrast automatically.</small></div><div class="guild-social-banner-controls"><label class="btn btn-secondary guild-social-banner-pick">${bannerDataUrl ? 'Change banner' : 'Upload banner'}<input id="guild-social-banner-input" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button type="button" class="btn btn-secondary" id="guild-social-banner-remove" ${bannerDataUrl ? '' : 'disabled'}>Remove</button></div><small id="guild-social-banner-status" role="status">Recommended: wide image, up to 8 MB before compression.</small></section>` : ''}
                 <div class="guild-social-profile-grid">
                     <section class="guild-social-info-card"><h5>Main character</h5>${mainHtml}</section>
                     <section class="guild-social-info-card"><h5>Other characters · ${other.length}</h5><div class="guild-social-character-list">${otherHtml}</div></section>
                 </div>
                 <div class="guild-social-profile-lower-grid">
                     <section class="guild-social-info-card guild-social-bio-card"><div class="guild-social-card-head"><h5>About this member</h5>${own ? '<span>Only you can edit this</span>' : ''}</div>
-                        ${own ? `<textarea id="guild-social-bio-input" maxlength="240" rows="3" placeholder="Write a little about yourself, your goals, or what you enjoy in Dragon Nest…">${escapeHTML(bio)}</textarea><div class="guild-social-bio-foot"><small id="guild-social-bio-count">${[...bio].length}/240</small><button type="button" class="btn btn-secondary" onclick="saveGuildMemberBio()">Save bio</button></div>` : `<p class="guild-social-bio-text">${bio ? escapeHTML(bio) : 'This member has not added a bio yet.'}</p>`}
+                        ${own ? `<textarea id="guild-social-bio-input" maxlength="240" rows="3" placeholder="Write a little about yourself, your goals, or what you enjoy in Dragon Nest…">${escapeHTML(bio)}</textarea><div class="guild-social-bio-foot"><small id="guild-social-bio-count">${[...bio].length}/240</small><button type="button" class="btn btn-secondary" onclick="saveGuildMemberBio()">Save profile</button></div>` : `<p class="guild-social-bio-text">${bio ? escapeHTML(bio) : 'This member has not added a bio yet.'}</p>`}
                     </section>
                     <section class="guild-social-info-card guild-social-activity-card"><div class="guild-social-card-head"><h5>Weekly activity</h5><span>Current reset period</span></div>${activityHtml}<div class="guild-social-next-focus-wrap"><h6>Next focus</h6>${focusHtml}</div></section>
                 </div>
-                <div class="guild-social-profile-actions"><button class="btn btn-cloud" type="button" onclick="openGuildForum()">Open Guild Forum</button>${own ? '<span class="modal-note">This is your Pantheon profile.</span>' : ''}</div>`;
+                ${own ? '<p class="guild-social-profile-self-note">This is your Pantheon profile.</p>' : ''}`;
             if (own) {
                 const input = document.getElementById('guild-social-bio-input');
                 input?.addEventListener('input', () => { const count = document.getElementById('guild-social-bio-count'); if (count) count.textContent = `${[...input.value].length}/240`; });
+                document.getElementById('guild-social-banner-input')?.addEventListener('change', handleGuildProfileBannerChange);
+                document.getElementById('guild-social-banner-remove')?.addEventListener('click', () => {
+                    if (!guildSocialActiveProfile) return;
+                    guildSocialActiveProfile.bannerDataUrl = '';
+                    guildSocialActiveProfile.bannerTextMode = 'light';
+                    renderGuildSocialProfile(guildSocialActiveProfile);
+                    const status = document.getElementById('guild-social-banner-status');
+                    if (status) status.textContent = 'Banner removed from the draft. Select Save profile to apply the change.';
+                });
             }
         }
         async function loadGuildMemberExtras(profile) {
@@ -7929,6 +7980,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (!response.ok) throw new Error(data.error || 'Member details unavailable.');
                 if (guildSocialActiveProfile !== profile) return;
                 profile.bio = String(data.bio || '');
+                profile.bannerDataUrl = String(data.bannerDataUrl || '');
+                profile.bannerTextMode = data.bannerTextMode === 'dark' ? 'dark' : 'light';
                 profile.activitySnapshot = data.activitySnapshot && typeof data.activitySnapshot === 'object' ? data.activitySnapshot : null;
                 profile.nextFocus = data.nextFocus && typeof data.nextFocus === 'object' ? data.nextFocus : null;
                 profile.isOwnProfile = data.isOwn === true;
@@ -7940,6 +7993,96 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
             }
         }
+        function guildProfileBlobToDataUrl(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('The banner image could not be read.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+        function guildProfileLoadImageFromBlob(blob) {
+            return new Promise((resolve, reject) => {
+                const objectUrl = URL.createObjectURL(blob);
+                const image = new Image();
+                image.onload = () => { URL.revokeObjectURL(objectUrl); resolve(image); };
+                image.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('This image could not be decoded.')); };
+                image.src = objectUrl;
+            });
+        }
+        function guildProfileCanvasBlob(canvas, type, quality) {
+            return new Promise(resolve => canvas.toBlob(resolve, type, quality));
+        }
+        async function prepareGuildProfileBanner(file) {
+            if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type || '')) throw new Error('Choose a JPG, PNG, or WebP image.');
+            if (file.size > 8 * 1024 * 1024) throw new Error('Choose an image smaller than 8 MB. It will be compressed before saving.');
+            const source = await guildProfileLoadImageFromBlob(file);
+            const width = 1400, height = 420;
+            const canvas = document.createElement('canvas');
+            canvas.width = width; canvas.height = height;
+            const context = canvas.getContext('2d', { alpha:false });
+            if (!context) throw new Error('Image compression is unavailable in this browser.');
+            const scale = Math.max(width / source.naturalWidth, height / source.naturalHeight);
+            const drawWidth = source.naturalWidth * scale;
+            const drawHeight = source.naturalHeight * scale;
+            context.drawImage(source, (width-drawWidth)/2, (height-drawHeight)/2, drawWidth, drawHeight);
+            let blob = null;
+            for (const quality of [0.82, 0.74, 0.66, 0.58, 0.5]) {
+                blob = await guildProfileCanvasBlob(canvas, 'image/webp', quality);
+                if (blob && blob.size <= 135 * 1024) break;
+            }
+            if (!blob) throw new Error('The browser could not compress this image.');
+            if (blob.size > 160 * 1024) {
+                const smaller = document.createElement('canvas'); smaller.width = 1120; smaller.height = 336;
+                const smallerContext = smaller.getContext('2d', { alpha:false });
+                smallerContext.drawImage(canvas, 0, 0, smaller.width, smaller.height);
+                blob = await guildProfileCanvasBlob(smaller, 'image/webp', 0.48);
+            }
+            if (!blob || blob.type !== 'image/webp') throw new Error('This browser could not create a WebP banner. Try another browser or image.');
+            if (blob.size > 135 * 1024) {
+                const smaller = document.createElement('canvas'); smaller.width = 960; smaller.height = 288;
+                const smallerContext = smaller.getContext('2d', { alpha:false });
+                smallerContext.drawImage(canvas, 0, 0, smaller.width, smaller.height);
+                for (const quality of [0.48, 0.40, 0.34]) {
+                    blob = await guildProfileCanvasBlob(smaller, 'image/webp', quality);
+                    if (blob && blob.size <= 135 * 1024) break;
+                }
+            }
+            if (!blob || blob.size > 135 * 1024) throw new Error('This banner is still too large after compression. Try a simpler image.');
+            const dataUrl = await guildProfileBlobToDataUrl(blob);
+            const sample = document.createElement('canvas'); sample.width = 48; sample.height = 14;
+            const sampleContext = sample.getContext('2d', { willReadFrequently:true });
+            const sampledImage = await guildProfileLoadImageFromBlob(blob);
+            // Profile text sits to the right of the avatar on the left half of the banner.
+            sampleContext.drawImage(sampledImage, 0, 0, sampledImage.naturalWidth * 0.72, sampledImage.naturalHeight, 0, 0, sample.width, sample.height);
+            const pixels = sampleContext.getImageData(0, 0, sample.width, sample.height).data;
+            let luminance = 0, count = 0;
+            for (let i=0; i<pixels.length; i+=4) {
+                luminance += 0.2126*pixels[i] + 0.7152*pixels[i+1] + 0.0722*pixels[i+2]; count++;
+            }
+            const average = count ? luminance / count : 0;
+            return { dataUrl, textMode: average >= 148 ? 'dark' : 'light', bytes:blob.size };
+        }
+        async function handleGuildProfileBannerChange(event) {
+            const file = event?.target?.files?.[0];
+            if (!file || !guildSocialActiveProfile || String(guildSocialActiveProfile.id) !== String(pantheonDiscordUser?.id || '')) return;
+            const status = document.getElementById('guild-social-banner-status');
+            if (status) status.textContent = 'Preparing banner…';
+            try {
+                const banner = await prepareGuildProfileBanner(file);
+                if (!guildSocialActiveProfile) return;
+                guildSocialActiveProfile.bannerDataUrl = banner.dataUrl;
+                guildSocialActiveProfile.bannerTextMode = banner.textMode;
+                renderGuildSocialProfile(guildSocialActiveProfile);
+                const nextStatus = document.getElementById('guild-social-banner-status');
+                if (nextStatus) nextStatus.textContent = `Banner ready (${Math.max(1, Math.round(banner.bytes/1024))} KB). Text contrast is set automatically. Select Save profile to publish it.`;
+            } catch (error) {
+                if (status) status.textContent = error.message || 'Banner could not be prepared.';
+                alert(error.message || 'Banner could not be prepared.');
+            } finally {
+                if (event?.target) event.target.value = '';
+            }
+        }
         async function saveGuildMemberBio() {
             const input = document.getElementById('guild-social-bio-input');
             const button = document.querySelector('.guild-social-bio-foot button');
@@ -7948,10 +8091,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if ([...bio].length > 240) return;
             if (button) { button.disabled = true; button.textContent = 'Saving…'; }
             try {
-                const response = await fetch('/api/community/profile', { method:'PUT', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ bio }) });
+                const response = await fetch('/api/community/profile', { method:'PUT', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
+                    bio,
+                    bannerDataUrl:String(guildSocialActiveProfile.bannerDataUrl || ''),
+                    bannerTextMode:guildSocialActiveProfile.bannerTextMode === 'dark' ? 'dark' : 'light'
+                }) });
                 const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data.error || 'Bio could not be saved.');
+                if (!response.ok) throw new Error(data.error || 'Profile could not be saved.');
                 guildSocialActiveProfile.bio = String(data.bio || '');
+                guildSocialActiveProfile.bannerDataUrl = String(data.bannerDataUrl || '');
+                guildSocialActiveProfile.bannerTextMode = data.bannerTextMode === 'dark' ? 'dark' : 'light';
                 renderGuildSocialProfile(guildSocialActiveProfile);
             } catch (error) {
                 if (button) { button.disabled = false; button.textContent = 'Try again'; }
@@ -11977,7 +12126,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r65';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r66';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12706,7 +12855,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r65';
+  const CURRENT_BUILD = '1.6.8-r66';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

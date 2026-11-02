@@ -7,8 +7,21 @@ async function ensureProfileTable(env) {
     profileSchemaPromise = env.PANTHEON_DB.prepare(`CREATE TABLE IF NOT EXISTS guild_member_profiles (
       discord_id TEXT PRIMARY KEY,
       bio TEXT NOT NULL DEFAULT '',
+      banner_data_url TEXT NOT NULL DEFAULT '',
+      banner_text_mode TEXT NOT NULL DEFAULT 'light',
       updated_at INTEGER NOT NULL DEFAULT 0
-    )`).run().then(() => true).catch(error => { profileSchemaPromise = null; throw error; });
+    )`).run().then(async () => {
+      // Existing r60+ profile tables are upgraded in place. Duplicate-column errors
+      // are expected when another Cloudflare isolate performs the same first-use setup.
+      for (const statement of [
+        "ALTER TABLE guild_member_profiles ADD COLUMN banner_data_url TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE guild_member_profiles ADD COLUMN banner_text_mode TEXT NOT NULL DEFAULT 'light'"
+      ]) {
+        try { await env.PANTHEON_DB.prepare(statement).run(); }
+        catch (error) { if (!/duplicate column name/i.test(String(error?.message || error))) throw error; }
+      }
+      return true;
+    }).catch(error => { profileSchemaPromise = null; throw error; });
   }
   return profileSchemaPromise;
 }
@@ -151,13 +164,15 @@ export async function onRequestGet({ request, env, data }) {
     if (!targetDiscordId || linked.members.filter(item => String(item.profileConfirmedDiscordId || '').trim() === targetDiscordId).length !== 1) {
       return jsonResponse({ error:'This member has not linked one unique Discord account.' }, 409);
     }
-    const bioRow = await env.PANTHEON_DB.prepare('SELECT bio, updated_at FROM guild_member_profiles WHERE discord_id = ? LIMIT 1').bind(targetDiscordId).first();
+    const bioRow = await env.PANTHEON_DB.prepare('SELECT bio, banner_data_url, banner_text_mode, updated_at FROM guild_member_profiles WHERE discord_id = ? LIMIT 1').bind(targetDiscordId).first();
     let activity = { activitySnapshot:null, nextFocus:null };
     try { activity = await loadWeeklyActivity(env, target, linked.record); } catch (_) { /* Keep the public profile available if player storage is still provisioning. */ }
     return jsonResponse({
       ok:true,
       memberId:String(target.id || ''),
       bio:String(bioRow?.bio || ''),
+      bannerDataUrl:String(bioRow?.banner_data_url || ''),
+      bannerTextMode:String(bioRow?.banner_text_mode || 'light') === 'dark' ? 'dark' : 'light',
       bioUpdatedAt:Number(bioRow?.updated_at) || 0,
       ...activity,
       isOwn:String(targetDiscordId) === linked.discordId
@@ -176,12 +191,23 @@ export async function onRequestPut({ request, env, data }) {
     try { body = await request.json(); } catch (_) { return jsonResponse({ error:'Expected a JSON profile body.' }, 400); }
     const bio = String(body?.bio || '').normalize('NFKC').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim();
     if ([...bio].length > 240) return jsonResponse({ error:'Your bio must be 240 characters or fewer.' }, 400);
+    const bannerDataUrl = String(body?.bannerDataUrl || '').trim();
+    if (bannerDataUrl.length > 190000) return jsonResponse({ error:'The compressed profile banner is too large. Choose a simpler image.' }, 413);
+    if (bannerDataUrl && !/^data:image\/webp;base64,[A-Za-z0-9+/]+={0,2}$/.test(bannerDataUrl)) {
+      return jsonResponse({ error:'Profile banners must be compressed WebP images.' }, 400);
+    }
+    const bannerTextMode = body?.bannerTextMode === 'dark' ? 'dark' : 'light';
     const now = Date.now();
     await env.PANTHEON_DB.prepare(`
-      INSERT INTO guild_member_profiles (discord_id, bio, updated_at) VALUES (?, ?, ?)
-      ON CONFLICT(discord_id) DO UPDATE SET bio = excluded.bio, updated_at = excluded.updated_at
-    `).bind(linked.discordId, bio, now).run();
-    return jsonResponse({ ok:true, bio, updatedAt:now });
+      INSERT INTO guild_member_profiles (discord_id, bio, banner_data_url, banner_text_mode, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(discord_id) DO UPDATE SET
+        bio = excluded.bio,
+        banner_data_url = excluded.banner_data_url,
+        banner_text_mode = excluded.banner_text_mode,
+        updated_at = excluded.updated_at
+    `).bind(linked.discordId, bio, bannerDataUrl, bannerTextMode, now).run();
+    return jsonResponse({ ok:true, bio, bannerDataUrl, bannerTextMode, updatedAt:now });
   } catch (error) {
     return jsonResponse({ error:`Could not save your bio: ${String(error?.message || error).slice(0,180)}` }, 503);
   }
