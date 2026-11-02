@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r63</title>
+    <title>Pantheon Tools v1.6.8-r64</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3408,6 +3408,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .guild-social-activity-item { padding:2px 0; }
 .guild-social-info-card,.guild-social-profile-hero,.guild-social-profile-grid,.guild-social-profile-lower-grid { min-width:0; }
 </style>
+
+<style id="pantheon-r64-presence-status">
+.online-presence-error { display:flex; flex-direction:column; align-items:flex-start; gap:7px; padding:14px 12px; }
+.online-presence-error strong { color:var(--pt-text); font-size:.68rem; }
+.online-presence-error span { color:var(--pt-muted); font-size:.62rem; line-height:1.5; }
+.online-presence-retry { border:1px solid var(--pt-border); border-radius:7px; padding:6px 10px; background:var(--pt-surface-soft); color:var(--pt-text); font:inherit; font-size:.63rem; cursor:pointer; }
+.online-presence-retry:hover { border-color:var(--pt-accent); }
+</style>
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3515,7 +3523,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <aside class="online-presence-pane" id="online-presence-pane" hidden aria-label="Guild event notice and member presence">
         <div class="overview-event-notice online-event-notice" id="overview-event-notice" hidden>Guild events · Check the Tracker for current priorities</div>
         <div class="online-presence-head"><div class="online-presence-head-copy"><span class="online-presence-dot"></span><strong>Guild members</strong><span class="online-presence-count" id="online-presence-count">Checking…</span></div><div class="online-presence-head-actions"><button type="button" id="guild-forum-open" class="guild-forum-open" aria-label="Open Guild Forum" onclick="openGuildForum()"><span>Guild Forum</span></button><button type="button" id="online-presence-collapse" aria-expanded="true" aria-label="Collapse member list" onclick="toggleOnlinePresencePane()">−</button></div></div>
-        <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading member activity…</div></div>
+        <div class="online-presence-list" id="online-presence-list"><div class="online-presence-empty">Loading guild members…</div></div>
         <div class="online-presence-foot">Click a member to view their profile · status updates live</div>
     </aside>
 
@@ -3537,14 +3545,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <button type="button" class="is-active" data-forum-filter="all">All</button>
                     <button type="button" data-forum-filter="announcement">Notices</button>
                     <button type="button" data-forum-filter="achievement">Achievements</button>
-                    <button type="button" data-forum-filter="raid">Runs &amp; Clears</button>
                     <button type="button" data-forum-filter="party">Party Up</button>
                     <button type="button" data-forum-filter="general">General</button>
                 </div>
                 <section id="guild-forum-composer" class="guild-forum-composer" hidden>
                     <div class="guild-forum-composer-head"><strong>Create a guild post</strong><button type="button" onclick="toggleGuildForumComposer(false)" aria-label="Close new post">✕</button></div>
                     <form id="guild-forum-post-form">
-                        <div class="guild-forum-form-row"><label>Post type<select id="guild-forum-category"><option value="achievement">Guild achievement</option><option value="raid">Raid / Dungeon clear</option><option value="announcement">Guild announcement</option><option value="party">Party / recruitment</option><option value="general">General discussion</option></select></label><label class="guild-forum-title-field">Title<input id="guild-forum-title-input" maxlength="100" required placeholder="e.g. GDN run successfully cleared!"/></label></div>
+                        <div class="guild-forum-form-row"><label>Post type<select id="guild-forum-category"><option value="achievement">Guild achievement</option><option value="raid">Dungeon report</option><option value="announcement">Guild announcement</option><option value="party">Party / recruitment</option><option value="general">General discussion</option></select></label><label class="guild-forum-title-field">Title<input id="guild-forum-title-input" maxlength="100" required placeholder="e.g. GDN run successfully cleared!"/></label></div>
                         <label class="guild-forum-body-field">Your post<textarea id="guild-forum-body-input" maxlength="2200" rows="4" placeholder="Share the details, congratulate the party, or leave a note for everyone…"></textarea></label>
                         <div class="guild-forum-emoji-row" aria-label="Dragon Nest themed emoji shortcuts. Select an icon to insert it into your post.">
                           <button type="button" data-forum-emoji="🐉" title="Dragon / Nest">🐉</button><button type="button" data-forum-emoji="🐲" title="Ancient Dragon">🐲</button><button type="button" data-forum-emoji="⚔️" title="Warrior / Raid">⚔️</button><button type="button" data-forum-emoji="🗡️" title="Assassin / Blade">🗡️</button><button type="button" data-forum-emoji="🏹" title="Archer">🏹</button><button type="button" data-forum-emoji="🛡️" title="Cleric / Guardian">🛡️</button><button type="button" data-forum-emoji="🪽" title="Wings">🪽</button><button type="button" data-forum-emoji="🔮" title="Sorceress / Magic">🔮</button><button type="button" data-forum-emoji="💠" title="Dragon Jade">💠</button><button type="button" data-forum-emoji="💎" title="Gems / Loot">💎</button><button type="button" data-forum-emoji="🧿" title="Heraldry / Charm">🧿</button><button type="button" data-forum-emoji="🧪" title="Alchemy">🧪</button><button type="button" data-forum-emoji="⚒️" title="Enhancement">⚒️</button><button type="button" data-forum-emoji="🔥" title="Fire">🔥</button><button type="button" data-forum-emoji="❄️" title="Ice">❄️</button><button type="button" data-forum-emoji="⚡" title="Lightning">⚡</button><button type="button" data-forum-emoji="🌪️" title="Wind">🌪️</button><button type="button" data-forum-emoji="🏆" title="Nest Clear / Achievement">🏆</button><button type="button" data-forum-emoji="👑" title="MVP">👑</button><button type="button" data-forum-emoji="🎖️" title="Guild Milestone">🎖️</button>
@@ -3637,7 +3644,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             <colgroup id="table-colgroup"></colgroup>
             <thead>
                 <tr id="roster-row">
-                    <th rowspan="2" colspan="3" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker & Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>
+                    <th rowspan="2" colspan="2" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker & Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>
                 </tr>
                 <tr id="header-row">
                 </tr>
@@ -3646,7 +3653,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             </tbody>
             <tfoot>
                 <tr id="footer-row">
-                    <th colspan="3" class="bg-dark">Weekly Completion Rate</th>
+                    <th colspan="2" class="bg-dark">Weekly Completion Rate</th>
                 </tr>
             </tfoot>
         </table>
@@ -3891,9 +3898,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r63</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r64</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r63:</strong> Simplified social controls and made profile pictures use each member’s Discord avatar.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r64:</strong> Simplified social controls and made profile pictures use each member’s Discord avatar.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -7212,22 +7219,21 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const visibleTaskNames = cloudData.settings.categories.flatMap(category => (category.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(category, taskName)));
             const longestTaskName = visibleTaskNames.reduce((longest, taskName) => Math.max(longest, [...String(taskName || '')].length), 0);
             const taskColWidth = Math.max(230, Math.min(460, Math.ceil(longestTaskName * 7.6 + 38)));
-            const groupColWidth = 82;
             const categoryColWidth = 158;
-            const fixedLabelWidth = groupColWidth + categoryColWidth + taskColWidth;
+            const fixedLabelWidth = categoryColWidth + taskColWidth;
             if (isUniversal) {
                 const charColWidth = 110;
                 table.style.minWidth = `${fixedLabelWidth + (characters.length * charColWidth)}px`;
-                colgroup.innerHTML = `<col style="width: ${groupColWidth}px;"><col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col style="width: ${charColWidth}px;">`).join('');
+                colgroup.innerHTML = `<col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col style="width: ${charColWidth}px;">`).join('');
             } else {
                 const personalCharMinimum = 86;
                 table.style.minWidth = `${Math.max(0, fixedLabelWidth + (characters.length * personalCharMinimum))}px`;
-                colgroup.innerHTML = `<col style="width: ${groupColWidth}px;"><col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col>`).join('');
+                colgroup.innerHTML = `<col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col>`).join('');
             }
             
-            rosterRow.innerHTML = `<th rowspan="2" colspan="3" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker &amp; Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>`;
+            rosterRow.innerHTML = `<th rowspan="2" colspan="2" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker &amp; Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>`;
             headerRow.innerHTML = '';
-            footerRow.innerHTML = '<th colspan="3" class="bg-dark">Weekly Completion Rate</th>';
+            footerRow.innerHTML = '<th colspan="2" class="bg-dark">Weekly Completion Rate</th>';
             tbody.innerHTML = '';
 
             const visibleRosters = activeRosterFilter === 'all' ? cloudData.settings.rosters : cloudData.settings.rosters.filter(r => r.id === activeRosterFilter);
@@ -7267,7 +7273,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             });
             
             for (const [groupName, groupData] of Object.entries(grouped)) {
-                let isFirstGroup = true;
                 groupData.categories.forEach(cat => {
                     let isFirstCat = true;
                     const isBounty = cat.name.toLowerCase().includes('bounty');
@@ -7276,7 +7281,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         tr.className = `task-row ${groupName === 'Dailies' ? 'is-daily' : 'is-weekly'}`;
                         tr.style.background = cat.color; tr.style.color = getContrastText(cat.color);
                         
-                        if (isFirstGroup) { const td = document.createElement('td'); td.rowSpan = groupData.totalTasks; td.className = 'col-group'; td.textContent = groupName; tr.appendChild(td); isFirstGroup = false; }
                         if (isFirstCat) { const td = document.createElement('td'); td.rowSpan = cat.visibleTasks.length; td.className = 'col-category'; td.textContent = cat.name; tr.appendChild(td); isFirstCat = false; }
                         
                         const tdTask = document.createElement('td'); tdTask.className = 'task-name'; tdTask.textContent = taskName; tdTask.title = taskName; tr.appendChild(tdTask);
@@ -7674,7 +7678,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         let onlinePresenceTimer = null;
         let onlinePresenceListTimer = null;
-        let onlinePresenceBusy = false;
+        let onlinePresenceListBusy = false;
+        let onlinePresenceHeartbeatBusy = false;
+        let onlinePresenceListQueued = false;
         let lastPresenceHeartbeatAt = 0;
         let lastPresenceFetchAt = 0;
         let onlinePresenceCollapsed = false;
@@ -7695,6 +7701,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const list = document.getElementById('online-presence-list');
             const count = document.getElementById('online-presence-count');
             if (!list || !count) return;
+            if (status) {
+                guildPresenceUsers = [];
+                guildPresenceByDiscordId = new Map();
+                count.textContent = 'Unavailable';
+                list.innerHTML = `<div class="online-presence-empty online-presence-error"><strong>Guild members could not be loaded.</strong><span>${escapeHTML(status)}</span><button type="button" class="online-presence-retry" onclick="refreshOnlinePresence(false, true)">Retry</button></div>`;
+                return;
+            }
             const clean = (Array.isArray(users) ? users : []).filter(user => user && (user.id || user.label || user.username));
             guildPresenceUsers = clean;
             guildPresenceByDiscordId = new Map(clean.map(user => [String(user.id || ''), user]));
@@ -7709,9 +7722,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const statusLabel = online ? 'Online' : 'Offline';
                 return `<button type="button" class="online-presence-user ${online ? '' : 'is-offline'}" data-social-discord-id="${escapeHTML(String(user.id || ''))}" aria-label="Open ${escapeHTML(label)} profile · ${statusLabel}"><span class="online-presence-user-dot"></span><span class="online-presence-user-name" title="${escapeHTML(label)}">${escapeHTML(label)}${own ? ' <em>You</em>' : ''}</span>${online && user.role === 'admin' ? '<span class="online-presence-admin">ADMIN</span>' : `<span class="online-presence-state">${statusLabel}</span>`}</button>`;
             };
-            const onlineHtml = status ? '<div class="online-presence-empty">Presence data is unavailable.</div>' : (onlineUsers.length ? onlineUsers.map(user => row(user, true)).join('') : '<div class="online-presence-empty">No active tabs detected</div>');
-            const offlineHtml = status ? '<div class="online-presence-empty">Account status is currently unknown.</div>' : (hasStatus ? (offlineUsers.length ? offlineUsers.map(user => row(user, false)).join('') : '<div class="online-presence-empty">No offline accounts.</div>') : '<div class="online-presence-empty">Offline status needs the updated presence API.</div>');
-            count.textContent = status ? 'Presence unavailable' : hasStatus ? `${onlineUsers.length} online · ${offlineUsers.length} offline` : `${onlineUsers.length} online · offline list unavailable`;
+            const onlineHtml = onlineUsers.length ? onlineUsers.map(user => row(user, true)).join('') : '<div class="online-presence-empty">No active tabs detected</div>';
+            const offlineHtml = hasStatus ? (offlineUsers.length ? offlineUsers.map(user => row(user, false)).join('') : '<div class="online-presence-empty">No offline accounts.</div>') : '<div class="online-presence-empty">Offline status needs the updated presence API.</div>';
+            count.textContent = hasStatus ? `${onlineUsers.length} online · ${offlineUsers.length} offline` : `${onlineUsers.length} online · offline list unavailable`;
             list.innerHTML = `<section class="online-presence-group"><div class="online-presence-group-title"><span>Online</span><b>${status ? '—' : onlineUsers.length}</b></div>${onlineHtml}</section><section class="online-presence-group"><div class="online-presence-group-title"><span>Offline</span><b>${status || !hasStatus ? '—' : offlineUsers.length}</b></div>${offlineHtml}</section>`;
             if (!list.dataset.socialClickBound) {
                 list.dataset.socialClickBound = 'true';
@@ -7730,27 +7743,54 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         async function refreshOnlinePresence(heartbeat=false, force=false) {
-            if (!pantheonDiscordUser?.id || onlinePresenceBusy || (document.visibilityState && document.visibilityState !== 'visible')) return;
+            if (!pantheonDiscordUser?.id || (document.visibilityState && document.visibilityState !== 'visible')) return;
             const now = Date.now();
-            if (!force && heartbeat && now - lastPresenceHeartbeatAt < 45000) return;
-            if (!force && !heartbeat && now - lastPresenceFetchAt < 30000) return;
-            onlinePresenceBusy = true;
+            if (heartbeat) {
+                if (onlinePresenceHeartbeatBusy || (!force && now - lastPresenceHeartbeatAt < 45000)) return;
+                onlinePresenceHeartbeatBusy = true;
+            } else {
+                if (onlinePresenceListBusy) { onlinePresenceListQueued = true; return; }
+                if (!force && now - lastPresenceFetchAt < 30000) return;
+                onlinePresenceListBusy = true;
+            }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
             try {
                 const response = await fetch('/api/presence', {
                     method: heartbeat ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
                     headers: heartbeat ? {'Content-Type':'application/json'} : undefined,
-                    body: heartbeat ? '{}' : undefined
+                    body: heartbeat ? '{}' : undefined,
+                    signal: controller.signal
                 });
                 const data = await response.json().catch(()=>({}));
                 if (!response.ok) throw new Error(data.error || `Presence unavailable (${response.status})`);
                 if (heartbeat) lastPresenceHeartbeatAt = Date.now();
                 else { lastPresenceFetchAt = Date.now(); renderOnlinePresence(data.users || []); }
-            } catch (_) {
-                if (!heartbeat) renderOnlinePresence([], 'Presence unavailable');
-            } finally { onlinePresenceBusy = false; }
+            } catch (error) {
+                if (!heartbeat) {
+                    lastPresenceFetchAt = 0;
+                    const message = error?.name === 'AbortError'
+                        ? 'The member service did not respond in time.'
+                        : 'The member service is temporarily unavailable.';
+                    renderOnlinePresence([], message);
+                }
+            } finally {
+                clearTimeout(timeoutId);
+                if (heartbeat) onlinePresenceHeartbeatBusy = false;
+                else {
+                    onlinePresenceListBusy = false;
+                    if (onlinePresenceListQueued) {
+                        onlinePresenceListQueued = false;
+                        setTimeout(() => refreshOnlinePresence(false, true), 0);
+                    }
+                }
+            }
         }
         function refreshPresenceAfterResume() {
-            refreshOnlinePresence(true, false).finally(() => refreshOnlinePresence(false, false));
+            // Heartbeat and roster refresh are independent; a slow heartbeat must never
+            // prevent the left member list from loading.
+            refreshOnlinePresence(true, false);
+            return refreshOnlinePresence(false, true);
         }
         function startOnlinePresence() {
             const pane = document.getElementById('online-presence-pane');
@@ -7759,7 +7799,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             document.body.classList.add('pantheon-discord-sidebar');
             if (onlinePresenceTimer) clearInterval(onlinePresenceTimer);
             if (onlinePresenceListTimer) clearInterval(onlinePresenceListTimer);
-            refreshPresenceAfterResume();
+            refreshOnlinePresence(false, true);
+            refreshOnlinePresence(true, true);
             onlinePresenceTimer = setInterval(() => refreshOnlinePresence(true), 60000);
             onlinePresenceListTimer = setInterval(() => refreshOnlinePresence(false), 90000);
             // Guild Forum is deliberately loaded on demand. No idle message polling or private-DM history scans.
@@ -7895,7 +7936,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let guildForumPhotoDataUrl = '';
         let guildForumExpandedComments = new Set();
         let guildForumReplyTargets = new Map();
-        const guildForumCategoryLabels = { announcement:'Guild notice', achievement:'Achievement', raid:'Run / Clear', party:'Party up', general:'General' };
+        const guildForumCategoryLabels = { announcement:'Guild notice', achievement:'Achievement', raid:'Dungeon report', party:'Party up', general:'General' };
         function toggleGuildForumComposer(show) {
             const panel = document.getElementById('guild-forum-composer');
             if (panel) panel.hidden = !show;
@@ -7975,7 +8016,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 </article>`;
             }).join('');
             if (append) host.insertAdjacentHTML('beforeend',html);
-            else host.innerHTML = html || '<div class="guild-forum-empty"><span>🐉</span><strong>The Guild Forum is quiet for now.</strong><small>Share your next clear, raid screenshot, or achievement with everyone.</small><button type="button" class="btn btn-cloud" onclick="toggleGuildForumComposer(true)">Create the first post</button></div>';
+            else host.innerHTML = html || '<div class="guild-forum-empty"><span>📌</span><strong>The Guild Forum is quiet for now.</strong><small>Share your next clear, raid screenshot, or achievement with everyone.</small><button type="button" class="btn btn-cloud" onclick="toggleGuildForumComposer(true)">Create the first post</button></div>';
             const loadMore = document.getElementById('guild-forum-load-more');
             if (loadMore) loadMore.hidden = !guildForumNextBefore;
             if (!host.dataset.forumEventsBound) {
@@ -11906,7 +11947,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r63';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r64';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12635,7 +12676,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r63';
+  const CURRENT_BUILD = '1.6.8-r64';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
