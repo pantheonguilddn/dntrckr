@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r66</title>
+    <title>Pantheon Tools v1.6.8-r67</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3608,8 +3608,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <form id="guild-forum-post-form">
                         <div class="guild-forum-form-row"><label>Post type<select id="guild-forum-category"><option value="achievement">Guild achievement</option><option value="raid">Dungeon report</option><option value="announcement">Guild announcement</option><option value="party">Party / recruitment</option><option value="general">General discussion</option></select></label><label class="guild-forum-title-field">Title<input id="guild-forum-title-input" maxlength="100" required placeholder="e.g. GDN run successfully cleared!"/></label></div>
                         <label class="guild-forum-body-field">Your post<textarea id="guild-forum-body-input" maxlength="2200" rows="4" placeholder="Share the details, congratulate the party, or leave a note for everyone…"></textarea></label>
-                        <div class="guild-forum-emoji-row" aria-label="Dragon Nest themed emoji shortcuts. Select an icon to insert it into your post.">
-                          <button type="button" data-forum-emoji="🐉" title="Dragon / Nest">🐉</button><button type="button" data-forum-emoji="🐲" title="Ancient Dragon">🐲</button><button type="button" data-forum-emoji="⚔️" title="Warrior / Raid">⚔️</button><button type="button" data-forum-emoji="🗡️" title="Assassin / Blade">🗡️</button><button type="button" data-forum-emoji="🏹" title="Archer">🏹</button><button type="button" data-forum-emoji="🛡️" title="Cleric / Guardian">🛡️</button><button type="button" data-forum-emoji="🪽" title="Wings">🪽</button><button type="button" data-forum-emoji="🔮" title="Sorceress / Magic">🔮</button><button type="button" data-forum-emoji="💠" title="Dragon Jade">💠</button><button type="button" data-forum-emoji="💎" title="Gems / Loot">💎</button><button type="button" data-forum-emoji="🧿" title="Heraldry / Charm">🧿</button><button type="button" data-forum-emoji="🧪" title="Alchemy">🧪</button><button type="button" data-forum-emoji="⚒️" title="Enhancement">⚒️</button><button type="button" data-forum-emoji="🔥" title="Fire">🔥</button><button type="button" data-forum-emoji="❄️" title="Ice">❄️</button><button type="button" data-forum-emoji="⚡" title="Lightning">⚡</button><button type="button" data-forum-emoji="🌪️" title="Wind">🌪️</button><button type="button" data-forum-emoji="🏆" title="Nest Clear / Achievement">🏆</button><button type="button" data-forum-emoji="👑" title="MVP">👑</button><button type="button" data-forum-emoji="🎖️" title="Guild Milestone">🎖️</button>
+                        <div class="guild-forum-emoji-row" aria-label="Common emoji shortcuts. Select an emoji to insert it into your post.">
+                          <button type="button" data-forum-emoji="😀" title="Grinning face">😀</button><button type="button" data-forum-emoji="😃" title="Smiling face">😃</button><button type="button" data-forum-emoji="😄" title="Smiling face with smiling eyes">😄</button><button type="button" data-forum-emoji="😁" title="Beaming face">😁</button><button type="button" data-forum-emoji="😆" title="Laughing face">😆</button><button type="button" data-forum-emoji="😂" title="Face with tears of joy">😂</button><button type="button" data-forum-emoji="🤣" title="Rolling on the floor laughing">🤣</button><button type="button" data-forum-emoji="😊" title="Smiling face">😊</button><button type="button" data-forum-emoji="🙂" title="Slightly smiling face">🙂</button><button type="button" data-forum-emoji="😉" title="Winking face">😉</button><button type="button" data-forum-emoji="😍" title="Heart eyes">😍</button><button type="button" data-forum-emoji="🥰" title="Smiling face with hearts">🥰</button><button type="button" data-forum-emoji="😘" title="Blowing a kiss">😘</button><button type="button" data-forum-emoji="😎" title="Cool face">😎</button><button type="button" data-forum-emoji="🤔" title="Thinking face">🤔</button><button type="button" data-forum-emoji="😭" title="Loudly crying face">😭</button><button type="button" data-forum-emoji="😅" title="Grinning face with sweat">😅</button><button type="button" data-forum-emoji="🥳" title="Partying face">🥳</button><button type="button" data-forum-emoji="👍" title="Thumbs up">👍</button><button type="button" data-forum-emoji="👎" title="Thumbs down">👎</button><button type="button" data-forum-emoji="👏" title="Clapping hands">👏</button><button type="button" data-forum-emoji="🙌" title="Raising hands">🙌</button><button type="button" data-forum-emoji="🙏" title="Folded hands">🙏</button><button type="button" data-forum-emoji="💪" title="Flexed biceps">💪</button><button type="button" data-forum-emoji="❤️" title="Red heart">❤️</button><button type="button" data-forum-emoji="💕" title="Two hearts">💕</button><button type="button" data-forum-emoji="💖" title="Sparkling heart">💖</button><button type="button" data-forum-emoji="🎉" title="Party popper">🎉</button><button type="button" data-forum-emoji="🔥" title="Fire">🔥</button><button type="button" data-forum-emoji="✨" title="Sparkles">✨</button><button type="button" data-forum-emoji="✅" title="Check mark">✅</button>
                         </div>
                         <div class="guild-forum-attachment-row"><label class="guild-forum-photo-picker">Add guild photo<input type="file" id="guild-forum-photo-input" accept="image/jpeg,image/png,image/webp" hidden></label><span id="guild-forum-photo-name">No photo attached. Images are resized before upload.</span><button type="button" id="guild-forum-photo-clear" onclick="clearGuildForumPhoto()" hidden>Remove</button></div>
                         <img id="guild-forum-photo-preview" class="guild-forum-photo-preview" alt="Photo preview" hidden>
@@ -3953,9 +3953,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r66</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r67</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r66:</strong> Added optional profile banners with automatic text contrast and removed duplicate Guild Forum buttons.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r67:</strong> Added optional profile banners with automatic text contrast and removed duplicate Guild Forum buttons.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -7881,7 +7881,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const title = document.getElementById('guild-social-title');
             const subtitle = document.getElementById('guild-social-subtitle');
             if (title) title.textContent = 'Pantheon Guild Forum';
-            if (subtitle) subtitle.textContent = 'Shared guild threads for achievements, successful runs, screenshots, and conversations.';
+            if (subtitle) { subtitle.textContent = 'Shared guild threads for achievements, successful runs, screenshots, and conversations.'; subtitle.hidden = false; }
             openModal('guild-social-modal');
             loadGuildForum(true);
         }
@@ -7898,7 +7898,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const title = document.getElementById('guild-social-title');
             const subtitle = document.getElementById('guild-social-subtitle');
             if (title) title.textContent = 'Member Profile';
-            if (subtitle) subtitle.textContent = 'Main character, roster, bio, and recent guild activity.';
+            if (subtitle) { subtitle.textContent = ''; subtitle.hidden = true; }
             openModal('guild-social-modal');
             loadGuildMemberExtras(profile);
         }
@@ -7945,7 +7945,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     <div class="guild-social-identity"><h4>${escapeHTML(profile?.pantheonName || profile?.label || 'Pantheon Member')}</h4><small class="guild-social-registered">Registered name · ${escapeHTML(profile?.registeredName || profile?.discordName || 'Discord member')}</small>${bioPreview}<span class="guild-social-presence ${online ? 'is-online' : ''}">${online ? 'Online now' : 'Offline'}</span></div>
                     <div class="guild-social-hero-badge">${online ? 'Online' : 'Offline'}</div>
                 </div>
-                ${own ? `<section class="guild-social-banner-settings"><div><strong>Profile banner</strong><small>Optional landscape image. Pantheon crops it to fit and adjusts profile text contrast automatically.</small></div><div class="guild-social-banner-controls"><label class="btn btn-secondary guild-social-banner-pick">${bannerDataUrl ? 'Change banner' : 'Upload banner'}<input id="guild-social-banner-input" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button type="button" class="btn btn-secondary" id="guild-social-banner-remove" ${bannerDataUrl ? '' : 'disabled'}>Remove</button></div><small id="guild-social-banner-status" role="status">Recommended: wide image, up to 8 MB before compression.</small></section>` : ''}
+                ${own ? `<section class="guild-social-banner-settings"><div><strong>Profile banner</strong></div><div class="guild-social-banner-controls"><label class="btn btn-secondary guild-social-banner-pick">${bannerDataUrl ? 'Change banner' : 'Upload banner'}<input id="guild-social-banner-input" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button type="button" class="btn btn-secondary" id="guild-social-banner-remove" ${bannerDataUrl ? '' : 'disabled'}>Remove</button></div><small id="guild-social-banner-status" role="status">Recommended: wide image, up to 8 MB before compression.</small></section>` : ''}
                 <div class="guild-social-profile-grid">
                     <section class="guild-social-info-card"><h5>Main character</h5>${mainHtml}</section>
                     <section class="guild-social-info-card"><h5>Other characters · ${other.length}</h5><div class="guild-social-character-list">${otherHtml}</div></section>
@@ -12126,7 +12126,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r66';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r67';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12855,7 +12855,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r66';
+  const CURRENT_BUILD = '1.6.8-r67';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
