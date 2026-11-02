@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.8-r56</title>
+    <title>Pantheon Tools v1.6.8-r57</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2952,6 +2952,90 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 #drawer-scrim[hidden] { display:none !important; }
 </style>
 
+
+<style id="pantheon-r57-discord-rail-and-flexible-task-labels">
+/* Discord-style guild member rail: full-height on desktop, in-flow on smaller screens. */
+@media (min-width:1200px) {
+  body.pantheon-discord-sidebar {
+    box-sizing:border-box !important;
+    padding:22px clamp(12px,2.5vw,36px) 48px calc(264px + clamp(12px,2.5vw,36px)) !important;
+    align-items:center !important;
+  }
+  #online-presence-pane {
+    position:fixed !important; inset:0 auto 0 0 !important;
+    display:flex !important; flex-direction:column !important;
+    width:264px !important; min-width:264px !important; max-width:264px !important;
+    height:100vh !important; height:100dvh !important; max-height:none !important;
+    margin:0 !important; padding:0 !important; z-index:1100 !important;
+    border:0 !important; border-right:1px solid var(--pt-border) !important;
+    border-radius:0 !important; box-shadow:6px 0 26px rgba(0,0,0,.10) !important;
+    overflow:hidden !important; background:var(--pt-surface) !important;
+  }
+  #online-presence-pane .online-event-notice { flex:0 0 auto; margin:0 !important; border-radius:0 !important; }
+  #online-presence-pane .online-presence-head {
+    flex:0 0 auto; min-height:54px; box-sizing:border-box;
+    padding:13px 14px !important; border:0 !important; border-bottom:1px solid var(--pt-border) !important;
+    border-radius:0 !important; background:var(--pt-surface-raised) !important;
+  }
+  #online-presence-pane .online-presence-head strong { font-size:.74rem !important; letter-spacing:.06em; text-transform:uppercase; }
+  #online-presence-pane .online-presence-count { font-size:.61rem !important; }
+  #online-presence-pane .online-presence-list {
+    display:flex !important; flex:1 1 auto !important; flex-direction:column !important;
+    min-height:0 !important; max-height:none !important; overflow-y:auto !important; overflow-x:hidden !important;
+    grid-template-columns:1fr !important; gap:10px !important; padding:12px 10px 16px !important;
+    overscroll-behavior:contain;
+  }
+  #online-presence-pane .online-presence-group { flex:0 0 auto; padding:0 5px !important; }
+  #online-presence-pane .online-presence-group + .online-presence-group {
+    border:0 !important; border-top:1px solid var(--pt-border) !important;
+    margin:3px 0 0 !important; padding:12px 5px 0 !important;
+  }
+  #online-presence-pane .online-presence-group-title { padding:3px 4px 9px !important; font-size:.65rem !important; letter-spacing:.08em; text-transform:uppercase; }
+  #online-presence-pane .online-presence-user { min-height:37px; align-items:center !important; gap:9px !important; padding:7px 5px !important; border:0 !important; border-radius:7px; }
+  #online-presence-pane .online-presence-user:hover { background:var(--pt-hover); }
+  #online-presence-pane .online-presence-user-name { font-size:.72rem !important; line-height:1.35 !important; }
+  #online-presence-pane .online-presence-foot { flex:0 0 auto; border-top:1px solid var(--pt-border) !important; padding:11px 13px !important; text-align:left !important; }
+  body.pantheon-discord-sidebar.pantheon-presence-collapsed {
+    padding-left:calc(68px + clamp(12px,2.5vw,36px)) !important;
+  }
+  #online-presence-pane.is-collapsed { width:56px !important; min-width:56px !important; max-width:56px !important; }
+  #online-presence-pane.is-collapsed .online-presence-head { justify-content:center !important; padding:10px 5px !important; }
+  #online-presence-pane.is-collapsed .online-presence-head > div,
+  #online-presence-pane.is-collapsed .online-event-notice { display:none !important; }
+  #online-presence-pane.is-collapsed #online-presence-collapse { width:34px !important; height:34px !important; }
+  #online-presence-pane.is-collapsed .online-presence-list,
+  #online-presence-pane.is-collapsed .online-presence-foot { display:none !important; }
+}
+/* At laptop/tablet widths keep the list accessible without stealing the main work area. */
+@media (max-width:1199px) {
+  body.pantheon-discord-sidebar,
+  body.pantheon-discord-sidebar.pantheon-presence-collapsed {
+    padding:18px clamp(12px,2.5vw,24px) 36px !important;
+    align-items:stretch !important;
+  }
+  #online-presence-pane {
+    position:relative !important; inset:auto !important; transform:none !important;
+    width:min(100%,1600px) !important; min-width:0 !important; max-width:1600px !important;
+    height:auto !important; max-height:260px !important; margin:0 auto 14px !important;
+    border:1px solid var(--pt-border) !important; border-radius:12px !important;
+  }
+  #online-presence-pane .online-presence-list { display:grid !important; flex:1 1 auto !important; max-height:190px !important; grid-template-columns:minmax(0,1fr) !important; }
+  #online-presence-pane .online-presence-group + .online-presence-group { border:0 !important; border-top:1px solid var(--pt-border) !important; margin-top:8px !important; padding-top:8px !important; }
+  #online-presence-pane.is-collapsed { max-height:none !important; }
+  #online-presence-pane.is-collapsed .online-presence-list,
+  #online-presence-pane.is-collapsed .online-presence-foot { display:none !important; }
+}
+/* Registered task labels wrap and receive enough width for their text instead of ending in ellipses. */
+#dn-tracker td.task-name {
+  box-sizing:border-box !important; white-space:normal !important;
+  overflow:visible !important; text-overflow:clip !important;
+  overflow-wrap:anywhere !important; word-break:normal !important;
+  line-height:1.35 !important; min-width:0;
+}
+#dn-tracker { table-layout:fixed !important; }
+#tracker-table-wrap { width:100% !important; max-width:100% !important; overflow-x:auto !important; }
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3394,9 +3478,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title">
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r56</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.8-r57</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r56:</strong> Admins can mark optional weekly dungeon tasks as Extra Dungeons. These tasks remain visible and trackable but are excluded from completion-rate calculations and weekly completion totals.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.8-r57:</strong> Admins can mark optional weekly dungeon tasks as Extra Dungeons. These tasks remain visible and trackable but are excluded from completion-rate calculations and weekly completion totals.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6143,7 +6227,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                                 if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('current','Your task changes are saved · checked '+trackerSyncTimeLabel());
                                 setStatus(showSuccess?'🟢 Cloud Sync Complete':(queuedEntries.length||loadRevisionQueue().length?'🟢 Tracker saved to the shared database · Revision History is queued separately':'🟢 Tracker saved to the shared database'));
                             }
-                            return;
+                            return true;
                         }
                         cloudData=mergeData(cloudData,latest);
                         cloudData=restoreRemoteCellsForPendingWrites(cloudData,latest,{});
@@ -6159,6 +6243,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     if (isTrackerPageCurrentlyVisible()) setTrackerLiveSyncNote('error', pendingCount ? `${pendingCount} task edit${pendingCount === 1 ? '' : 's'} not confirmed · retained locally` : 'Cloud sync failed · retry');
                     const transient = /(?:failed \((?:409|425|429|5\d\d)\)|fetch|network|timeout|changed repeatedly)/i.test(String(err?.message || err));
                     if (transient && pendingCount) schedulePendingCellRetry();
+                    return false;
                 }
                 finally{
                     syncInProgress=false;updateOverviewStatusCards();
@@ -6693,14 +6778,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
             const isUniversal = activeRosterFilter === 'all';
 
-            // Increase min-width for table and explicitly define char column width when in Universal View
+            // Size the task-name column from the actual registered dungeon labels.
+            // The name wraps within this measured column instead of being clipped with an ellipsis.
+            const visibleTaskNames = cloudData.settings.categories.flatMap(category => (category.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(category, taskName)));
+            const longestTaskName = visibleTaskNames.reduce((longest, taskName) => Math.max(longest, [...String(taskName || '')].length), 0);
+            const taskColWidth = Math.max(230, Math.min(460, Math.ceil(longestTaskName * 7.6 + 38)));
+            const groupColWidth = 82;
+            const categoryColWidth = 158;
+            const fixedLabelWidth = groupColWidth + categoryColWidth + taskColWidth;
             if (isUniversal) {
                 const charColWidth = 110;
-                table.style.minWidth = `${440 + (characters.length * charColWidth)}px`;
-                colgroup.innerHTML = `<col style="width: 80px;"><col style="width: 150px;"><col style="width: 210px;">` + characters.map(() => `<col style="width: ${charColWidth}px;">`).join('');
+                table.style.minWidth = `${fixedLabelWidth + (characters.length * charColWidth)}px`;
+                colgroup.innerHTML = `<col style="width: ${groupColWidth}px;"><col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col style="width: ${charColWidth}px;">`).join('');
             } else {
-                table.style.minWidth = '100%';
-                colgroup.innerHTML = `<col style="width: 80px;"><col style="width: 150px;"><col style="width: 210px;">` + characters.map(() => `<col>`).join('');
+                const personalCharMinimum = 86;
+                table.style.minWidth = `${Math.max(0, fixedLabelWidth + (characters.length * personalCharMinimum))}px`;
+                colgroup.innerHTML = `<col style="width: ${groupColWidth}px;"><col style="width: ${categoryColWidth}px;"><col style="width: ${taskColWidth}px;">` + characters.map(() => `<col>`).join('');
             }
             
             rosterRow.innerHTML = `<th rowspan="2" colspan="3" class="tracker-title">DN Tracker <button class="mini-help" type="button" title="Tracker &amp; Bounty Guide" onclick="openHelpModal('tracker')">?</button></th>`;
@@ -7150,7 +7243,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const pane = document.getElementById('online-presence-pane');
             const button = document.getElementById('online-presence-collapse');
             if (pane) pane.classList.toggle('is-collapsed', onlinePresenceCollapsed);
-            if (button) { button.textContent = onlinePresenceCollapsed ? '+' : '−'; button.setAttribute('aria-expanded', String(!onlinePresenceCollapsed)); button.setAttribute('aria-label', onlinePresenceCollapsed ? 'Expand online list' : 'Collapse online list'); }
+            document.body.classList.toggle('pantheon-presence-collapsed', onlinePresenceCollapsed);
+            if (button) { button.textContent = onlinePresenceCollapsed ? '+' : '−'; button.setAttribute('aria-expanded', String(!onlinePresenceCollapsed)); button.setAttribute('aria-label', onlinePresenceCollapsed ? 'Expand guild member list' : 'Collapse guild member list'); }
         }
         function renderOnlinePresence(users, status = '') {
             const list = document.getElementById('online-presence-list');
@@ -7192,6 +7286,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function startOnlinePresence() {
             const pane = document.getElementById('online-presence-pane');
             if (pane) pane.hidden = false;
+            document.body.classList.add('pantheon-discord-sidebar');
             if (onlinePresenceTimer) clearInterval(onlinePresenceTimer);
             refreshOnlinePresence(true);
             onlinePresenceTimer = setInterval(() => refreshOnlinePresence(true), 30000);
@@ -9358,7 +9453,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 c = findCategory(catChoice);
                 if (!c) return alert('That category no longer exists. Refresh the tracker and try again.');
             }
-            c.tasks.push(taskName); touchCategorySettings(); document.getElementById('reg-dungeon-task-name').value=''; refreshTrackerUI(); document.getElementById('reg-dungeon-cat-select').value = c.id; handleDungeonCatChange(false); triggerAutoSync();
+            c.tasks.push(taskName); touchCategorySettings(); document.getElementById('reg-dungeon-task-name').value=''; refreshTrackerUI(); document.getElementById('reg-dungeon-cat-select').value = c.id; handleDungeonCatChange(false);
+            clearTimeout(autoSyncTimer);
+            const saved = await forceSync(false);
+            if (saved) {
+                setStatus(`🟢 ${taskName} was registered and confirmed in the shared guild settings.`);
+            } else {
+                setStatus(`🟠 ${taskName} was added on this device, but the server has not confirmed it yet. Keep Pantheon open or retry Sync Changes before closing.`);
+                clearTimeout(autoSyncTimer); autoSyncTimer = setTimeout(() => forceSync(false), 1400);
+            }
         }
         
         async function saveCategoryGroup(id) {
@@ -10842,7 +10945,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r56';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.8-r57';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -11571,7 +11674,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.8-r56';
+  const CURRENT_BUILD = '1.6.8-r57';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

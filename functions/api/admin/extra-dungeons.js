@@ -6,13 +6,14 @@ const MAIN_ID = 'pantheon-main';
 const MAX_EXTRA_DUNGEONS = 200;
 const text = value => String(value ?? '').trim().slice(0, 140);
 
-function weeklyDungeonCategories(record) {
+function registeredDungeonCategories(record) {
   const categories = Array.isArray(record?.settings?.categories) ? record.settings.categories : [];
   return categories
-    .filter(category => category && category.group === 'Weeklies' && !String(category.name || '').toLocaleLowerCase().includes('bounty'))
+    .filter(category => category && !String(category.name || '').toLocaleLowerCase().includes('bounty'))
     .map(category => ({
       id: String(category.id || ''),
-      name: String(category.name || 'Weekly dungeons').slice(0, 60),
+      name: String(category.name || 'Registered dungeons').slice(0, 60),
+      group: category.group === 'Dailies' ? 'Dailies' : 'Weeklies',
       tasks: [...new Set((Array.isArray(category.tasks) ? category.tasks : []).map(text).filter(task => task && !/\bbounty\b/i.test(task)))]
     }))
     .filter(category => category.tasks.length);
@@ -33,7 +34,7 @@ async function readMainRecord(env) {
 
 function canonicalExtraTasks(record) {
   const allowed = new Map();
-  for (const category of weeklyDungeonCategories(record)) {
+  for (const category of registeredDungeonCategories(record)) {
     for (const task of category.tasks) allowed.set(task.toLocaleLowerCase(), task);
   }
   const current = Array.isArray(record?.settings?.extraDungeonTasks) ? record.settings.extraDungeonTasks : [];
@@ -48,7 +49,7 @@ export async function onRequestGet(context) {
     if (!result) return jsonResponse({ error: 'The shared Pantheon main record has not been initialized.' }, 404);
     const settings = result.record.settings;
     return jsonResponse({
-      categories: weeklyDungeonCategories(result.record),
+      categories: registeredDungeonCategories(result.record),
       extraDungeonTasks: canonicalExtraTasks(result.record),
       updatedAt: Number(settings.extraDungeonTasksUpdatedAt) || 0,
       updatedBy: String(settings.extraDungeonTasksUpdatedBy || '')
@@ -76,11 +77,11 @@ export async function onRequestPut(context) {
       const result = await readMainRecord(context.env);
       if (!result) return jsonResponse({ error: 'The shared Pantheon main record has not been initialized.' }, 404);
       const allowed = new Map();
-      for (const category of weeklyDungeonCategories(result.record)) {
+      for (const category of registeredDungeonCategories(result.record)) {
         for (const task of category.tasks) allowed.set(task.toLocaleLowerCase(), task);
       }
       const invalid = requested.filter(key => !allowed.has(key));
-      if (invalid.length) return jsonResponse({ error: `These tasks are no longer available as weekly dungeon tasks: ${invalid.map(key => requested.find(value => value === key)).join(', ')}. Refresh the list and try again.` }, 400);
+      if (invalid.length) return jsonResponse({ error: `These tasks are no longer registered dungeon tasks: ${invalid.map(key => requested.find(value => value === key)).join(', ')}. Refresh the list and try again.` }, 400);
       const extraDungeonTasks = requested.map(key => allowed.get(key));
       const now = Date.now();
       result.record.settings.extraDungeonTasks = extraDungeonTasks;

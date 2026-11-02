@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pantheon Tools · Admin Console · r56</title>
+<title>Pantheon Tools · Admin Console · r57</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1020;--surface:#111a2d;--surface2:#1b2742;--border:#2a3857;--text:#eef2ff;--muted:#a7b4d0;--accent:#8d9aff;--good:#57d6a4;--danger:#ff8796}
 :root[data-pantheon-theme="light"]{color-scheme:light;--bg:#f4f6fb;--surface:#fff;--surface2:#e9eef7;--border:#cfd7e5;--text:#1a2230;--muted:#4d5a70;--accent:#465acb;--good:#087e65;--danger:#b93852}
@@ -215,8 +215,8 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
   </section>
   <section class="card" id="extra-dungeons-panel">
     <h2>5. Extra Dungeons</h2>
-    <p>Mark optional weekly dungeons here. They remain visible in the Tracker and their checkboxes still work, but they are excluded from personal and guild completion rates, eligible-task totals, and weekly completion reports. Existing progress is not changed.</p>
-    <div class="actions"><button class="btn" type="button" id="refresh-extra-dungeons">Reload weekly dungeon list</button><span class="hint" id="extra-dungeon-count">Loading weekly dungeon tasks…</span></div>
+    <p>Mark optional dungeon tasks here. All registered weekly and daily dungeons are listed by reset group. Weekly tasks tagged as Extra Dungeons remain visible and checkable but are excluded from weekly completion rates and reports. Daily tasks are already outside weekly completion math. Existing progress is not changed.</p>
+    <div class="actions"><button class="btn" type="button" id="refresh-extra-dungeons">Reload registered dungeon list</button><span class="hint" id="extra-dungeon-count">Loading registered dungeon tasks…</span></div>
     <div id="extra-dungeon-status" class="status hidden"></div>
     <div id="extra-dungeon-list" class="extra-dungeon-groups"></div>
     <div class="actions"><button class="btn primary" type="button" id="save-extra-dungeons">Save Extra Dungeons</button></div>
@@ -501,21 +501,24 @@ $('character-admin-list')?.addEventListener('click',async event=>{
   }
 });
 $('refresh-character-list')?.addEventListener('click',refreshCharacterAdmin);
+let extraDungeonDraftDirty=false;
 function renderExtraDungeons(){
   const list=$('extra-dungeon-list');if(!list)return;
   const available=extraDungeonCategories.reduce((sum,category)=>sum+(category.tasks||[]).length,0);
-  $('extra-dungeon-count').textContent=`${available} weekly dungeon task(s) available · ${extraDungeonSelection.size} tagged as Extra Dungeons`;
-  if(!extraDungeonCategories.length){list.innerHTML='<div class="owner-audit-issues">No weekly dungeon tasks are currently registered. Add them in Dungeon Registration first.</div>';return;}
-  list.innerHTML=extraDungeonCategories.map(category=>`<section class="extra-dungeon-group"><div class="extra-dungeon-group-head"><strong>${escapeHtml(category.name)}</strong><small>Weeklies</small></div><div class="extra-dungeon-options">${category.tasks.map(task=>`<label class="extra-dungeon-option"><input type="checkbox" data-extra-dungeon-task value="${escapeHtml(task)}" ${extraDungeonSelection.has(task.toLocaleLowerCase())?'checked':''}><span>${escapeHtml(task)}</span></label>`).join('')}</div></section>`).join('');
+  $('extra-dungeon-count').textContent=`${available} registered dungeon task(s) available · ${extraDungeonSelection.size} tagged as Extra Dungeons`;
+  if(!extraDungeonCategories.length){list.innerHTML='<div class="owner-audit-issues">No dungeon tasks are currently registered. Add them in Dungeon Registration first.</div>';return;}
+  list.innerHTML=extraDungeonCategories.map(category=>`<section class="extra-dungeon-group"><div class="extra-dungeon-group-head"><strong>${escapeHtml(category.name)}</strong><small>${escapeHtml(category.group || 'Weeklies')}</small></div><div class="extra-dungeon-options">${category.tasks.map(task=>`<label class="extra-dungeon-option"><input type="checkbox" data-extra-dungeon-task value="${escapeHtml(task)}" ${extraDungeonSelection.has(task.toLocaleLowerCase())?'checked':''}><span>${escapeHtml(task)}</span></label>`).join('')}</div></section>`).join('');
 }
-async function refreshExtraDungeons(){
+async function refreshExtraDungeons({quiet=false,force=false}={}){
+  if(extraDungeonDraftDirty&&!force)return;
   try{
     const data=await api('/api/admin/extra-dungeons');
-    extraDungeonCategories=Array.isArray(data.categories)?data.categories:[];
-    extraDungeonSelection=new Set((Array.isArray(data.extraDungeonTasks)?data.extraDungeonTasks:[]).map(value=>String(value||'').trim().toLocaleLowerCase()).filter(Boolean));
-    renderExtraDungeons();
-    setStatus('extra-dungeon-status','Saved Extra Dungeon settings loaded from the shared server record.','ok');
-  }catch(error){setStatus('extra-dungeon-status',error.message,'error');}
+    const nextCategories=Array.isArray(data.categories)?data.categories:[];
+    const nextSelection=new Set((Array.isArray(data.extraDungeonTasks)?data.extraDungeonTasks:[]).map(value=>String(value||'').trim().toLocaleLowerCase()).filter(Boolean));
+    const changed=JSON.stringify(nextCategories)!==JSON.stringify(extraDungeonCategories)||JSON.stringify([...nextSelection].sort())!==JSON.stringify([...extraDungeonSelection].sort());
+    if(changed||!quiet){extraDungeonCategories=nextCategories;extraDungeonSelection=nextSelection;renderExtraDungeons();}
+    if(!quiet)setStatus('extra-dungeon-status','Registered dungeon tasks and saved Extra Dungeon settings loaded from the shared server record.','ok');
+  }catch(error){if(!quiet)setStatus('extra-dungeon-status',error.message,'error');}
 }
 async function saveExtraDungeons(){
   const button=$('save-extra-dungeons');if(!button)return;
@@ -524,14 +527,20 @@ async function saveExtraDungeons(){
   try{
     const data=await api('/api/admin/extra-dungeons',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({extraDungeonTasks:selected})});
     extraDungeonSelection=new Set((data.extraDungeonTasks||[]).map(value=>String(value||'').toLocaleLowerCase()));
+    extraDungeonDraftDirty=false;
     renderExtraDungeons();
     setStatus('extra-dungeon-status',`Saved ${extraDungeonSelection.size} Extra Dungeon(s). Their checks remain intact and they are now excluded from completion calculations for the whole guild.`,'ok');
   }catch(error){setStatus('extra-dungeon-status',error.message,'error');}
   finally{button.disabled=false;}
 }
-$('refresh-extra-dungeons')?.addEventListener('click',refreshExtraDungeons);
-$('extra-dungeon-list')?.addEventListener('change',()=>{const selected=document.querySelectorAll('[data-extra-dungeon-task]:checked').length;$('extra-dungeon-count').textContent=`${extraDungeonCategories.reduce((sum,category)=>sum+(category.tasks||[]).length,0)} weekly dungeon task(s) available · ${selected} tagged as Extra Dungeons`;});
+$('refresh-extra-dungeons')?.addEventListener('click',()=>{extraDungeonDraftDirty=false;refreshExtraDungeons({force:true});});
+$('extra-dungeon-list')?.addEventListener('change',()=>{extraDungeonDraftDirty=true;const selected=document.querySelectorAll('[data-extra-dungeon-task]:checked').length;$('extra-dungeon-count').textContent=`${extraDungeonCategories.reduce((sum,category)=>sum+(category.tasks||[]).length,0)} registered dungeon task(s) available · ${selected} tagged as Extra Dungeons`;});
 $('save-extra-dungeons')?.addEventListener('click',saveExtraDungeons);
+// A second Pantheon tab may add a dungeon. Refresh this admin list automatically while visible,
+// but never overwrite an administrator's unsaved checkbox selections.
+setInterval(()=>{if(adminSessionState && document.visibilityState==='visible')refreshExtraDungeons({quiet:true});},10000);
+document.addEventListener('visibilitychange',()=>{if(adminSessionState && document.visibilityState==='visible')refreshExtraDungeons({quiet:true});});
+window.addEventListener('focus',()=>{if(adminSessionState)refreshExtraDungeons({quiet:true});});
 function setStatus(id, text, kind=''){const el=$(id);el.textContent=text;el.className='status'+(kind?' '+kind:'');el.classList.remove('hidden');}
 async function api(url, options={}){const response=await fetch(url,{credentials:'same-origin',cache:'no-store',...options,headers:{...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||data.message||`Request failed (${response.status})`);return data;}
 async function requireAdmin(){try{const state=await api('/api/session');if(!state.authenticated){setStatus('auth-status','You are not signed in. Go back to Pantheon and sign in with an approved Discord account.','error');return false;}if(state.user?.role!=='admin'){setStatus('auth-status','This page is restricted to Pantheon administrators.','error');return false;}adminSessionState=state.user;setStatus('auth-status',`Administrator verified: ${state.user.username}`,'ok');$('admin-content').classList.remove('hidden');await refreshAllowlist();await refreshCharacterAdmin();await refreshOwnerAudit();await refreshExtraDungeons();await refreshActivityReference();return true;}catch(error){setStatus('auth-status',`Admin service is not ready: ${error.message}`,'error');return false;}}
