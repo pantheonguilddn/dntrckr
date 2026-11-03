@@ -105,6 +105,17 @@ CREATE TABLE IF NOT EXISTS character_completion_timing (
 );
 CREATE INDEX IF NOT EXISTS idx_character_timing_week ON character_completion_timing(week_key);
 CREATE INDEX IF NOT EXISTS idx_character_timing_character_at ON character_completion_timing(character_key, at);
+CREATE INDEX IF NOT EXISTS idx_character_timing_at ON character_completion_timing(at);
+
+CREATE TABLE IF NOT EXISTS tracker_storage_changes (
+  change_type TEXT NOT NULL CHECK (change_type IN ('cell', 'timing', 'full', 'feed')),
+  character_key TEXT NOT NULL DEFAULT '',
+  task_key TEXT NOT NULL DEFAULT '',
+  week_key TEXT NOT NULL DEFAULT '',
+  revision INTEGER NOT NULL,
+  PRIMARY KEY (change_type, character_key, task_key, week_key)
+);
+CREATE INDEX IF NOT EXISTS idx_tracker_storage_changes_type_revision ON tracker_storage_changes(change_type, revision);
 
 CREATE TABLE IF NOT EXISTS tracker_storage_meta (
   id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -122,6 +133,10 @@ CREATE TABLE IF NOT EXISTS tracker_storage_meta (
 );
 INSERT OR IGNORE INTO tracker_storage_meta (id, migration_complete, migration_in_progress, migration_lock_until, schema_version, revision, updated_at, migration_at)
 VALUES (1, 0, 0, 0, 1, 0, 0, 0);
+INSERT OR IGNORE INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+SELECT 'full', '', '', '', revision FROM tracker_storage_meta WHERE id = 1;
+INSERT OR IGNORE INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+SELECT 'feed', '', '', '', revision FROM tracker_storage_meta WHERE id = 1;
 
 CREATE TABLE IF NOT EXISTS tracker_legacy_backups (
   id TEXT PRIMARY KEY,

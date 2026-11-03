@@ -18,12 +18,19 @@ export async function onRequestGet(context) {
   }
   const row = await env.PANTHEON_DB.prepare('SELECT updated_at FROM data_records WHERE id = ? LIMIT 1').bind(targetId).first();
   if (!row) return jsonResponse({ message: 'Record not found.' }, 404);
-  let updatedAt = Number(row.updated_at) || 0;
+  const recordUpdatedAt = Number(row.updated_at) || 0;
+  let characterStorageUpdatedAt = 0;
+  let characterStorageRevision = 0;
   let characterStorageReady = false;
   let characterStorageMigrating = false;
   if (targetId === 'pantheon-main') {
-    try { const storage = await getCharacterStorageState(env); characterStorageReady = Number(storage?.migration_complete) === 1; characterStorageMigrating = Number(storage?.migration_in_progress) === 1 && Number(storage?.migration_lock_until) > Date.now(); if (characterStorageReady) updatedAt = Math.max(updatedAt, Number(storage.updated_at) || 0); }
-    catch (_) { /* Legacy status remains readable until the additive migration is installed. */ }
+    try {
+      const storage = await getCharacterStorageState(env);
+      characterStorageReady = Number(storage?.migration_complete) === 1;
+      characterStorageMigrating = Number(storage?.migration_in_progress) === 1 && Number(storage?.migration_lock_until) > Date.now();
+      if (characterStorageReady) { characterStorageUpdatedAt = Number(storage.updated_at) || 0; characterStorageRevision = Number(storage.revision) || 0; }
+    } catch (_) { /* Legacy status remains readable until the additive migration is installed. */ }
   }
-  return jsonResponse({ metadata: { id: requestedId, updatedAt, serverTime: Date.now(), characterStorageReady, characterStorageMigrating } });
+  const updatedAt = Math.max(recordUpdatedAt, characterStorageUpdatedAt);
+  return jsonResponse({ metadata: { id: requestedId, updatedAt, recordUpdatedAt, characterStorageUpdatedAt, characterStorageRevision, serverTime: Date.now(), characterStorageReady, characterStorageMigrating } });
 }

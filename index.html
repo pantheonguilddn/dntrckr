@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r02</title>
+    <title>Pantheon Tools v1.6.9-r03</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r02</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r03</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r02:</strong> Browser focus and page navigation now reuse revision checks instead of reloading unchanged character data. This reduces unnecessary database reads while preserving automatic sync and the r01 dungeon-registration correction.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r03:</strong> Character progress now synchronizes incrementally, unchanged startup syncs no longer rewrite the shared record, and settings saves no longer re-read every character cell. This reduces D1 row reads while preserving per-character save acknowledgements.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4670,9 +4670,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 } else {
                     updatePendingCellStatus(`${name} progress saved to the shared Tracker`);
                 }
-                // The cell route increments the shared D1 revision. Leave our remembered
-                // revision untouched so the normal poll fetches the complete current record,
-                // including changes made by other members in the same interval.
+                // The cell route increments the storage revision. Leave our remembered
+                // cursor untouched so the next poll retrieves only changed character rows
+                // for the whole guild through the incremental /changes feed.
                 persistLocalData();
                 updateOverviewStatusCards();
                 return ack.mismatches.length === 0 && stillPending.length === 0;
@@ -4921,6 +4921,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         let lastSeenRemoteMarker = '';
         let lastRemoteRefreshAttemptAt = 0;
         let lastRemoteRevision = 0;
+        let lastRemoteRecordRevision = 0;
+        let lastCharacterStorageRevision = 0;
+        const REMOTE_SYNC_CURSOR_KEY = 'pantheon-remote-sync-cursors-v1';
+        const GLOBAL_SYNC_FINGERPRINT_KEY = 'pantheon-global-sync-fingerprint-v1';
+        let startupRemoteCursorRestored = false;
         let activeRosterFilter = 'all'; 
         let isAnalyticsVisible = true;
         let isPersonalView = true;
@@ -6304,15 +6309,84 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             } finally { clearTimeout(timer); }
         }
 
+        function restoreRemoteSyncCursors(config = getCloudConfig()) {
+            try {
+                const saved = JSON.parse(localStorage.getItem(REMOTE_SYNC_CURSOR_KEY) || 'null');
+                if (!saved || saved.protocol !== 3 || String(saved.binId || '') !== String(config.binId || '') || !Number(saved.recordRevision) || !Number(saved.characterStorageRevision)) return false;
+                lastRemoteRecordRevision = Number(saved.recordRevision) || 0;
+                lastCharacterStorageRevision = Number(saved.characterStorageRevision) || 0;
+                lastRemoteRevision = Math.max(lastRemoteRecordRevision, lastCharacterStorageRevision);
+                return true;
+            } catch (_) { return false; }
+        }
+        function persistRemoteSyncCursors(config = getCloudConfig()) {
+            if (!lastRemoteRecordRevision || !lastCharacterStorageRevision) return false;
+            try {
+                localStorage.setItem(REMOTE_SYNC_CURSOR_KEY, JSON.stringify({ protocol:3, binId:String(config.binId || ''), recordRevision:lastRemoteRecordRevision, characterStorageRevision:lastCharacterStorageRevision, savedAt:Date.now() }));
+                return true;
+            } catch (_) { return false; }
+        }
+        function hasUsableLocalTrackerSnapshot() {
+            try {
+                const raw = localStorage.getItem(LOCAL_DATA_KEY) || localStorage.getItem(LEGACY_LOCAL_DATA_KEY);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                return !!parsed && typeof parsed === 'object' && !Array.isArray(parsed);
+            } catch (_) { return false; }
+        }
+
         async function fetchRemoteRecord(config = getCloudConfig()) {
             const res = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/latest`, { method: 'GET', headers: authHeaders(config), cache: 'no-store' }, 15000);
             const p = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(p.message || `Read failed (${res.status})`);
+            if (p.metadata) {
+                lastRemoteRevision = Number(p.metadata.updatedAt) || lastRemoteRevision;
+                lastRemoteRecordRevision = Number(p.metadata.recordUpdatedAt ?? p.metadata.updatedAt) || lastRemoteRecordRevision;
+                lastCharacterStorageRevision = Number(p.metadata.characterStorageRevision ?? p.metadata.characterStorageUpdatedAt) || lastCharacterStorageRevision;
+            }
             return p.record || p;
         }
 
-        // Poll a tiny D1 row revision first. A full shared tracker record is downloaded only
-        // when the server revision changes, rather than transferring the whole payload every poll.
+        async function fetchRemoteChanges(sinceRevision, config = getCloudConfig()) {
+            const params = new URLSearchParams({ sinceRevision:String(Math.max(0,Number(sinceRevision)||0)) });
+            const res = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/changes?${params.toString()}`, { method:'GET', headers:authHeaders(config), cache:'no-store' }, 12000);
+            const payload = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(payload.message || `Incremental progress read failed (${res.status})`);
+            return payload;
+        }
+
+        function applyCharacterStorageDelta(payload) {
+            const cellRows = Array.isArray(payload?.cells) ? payload.cells : [];
+            for (const row of cellRows) {
+                const charName = String(row.characterName || '').trim();
+                const taskName = String(row.taskName || '').trim();
+                if (!charName || !taskName) continue;
+                ensureCellMap(cloudData, charName);
+                const incoming = normalizeCellRecord({ state:row.state, note:row.note, updatedAt:row.updatedAt, deviceId:row.deviceId });
+                cloudData.cells[charName][taskName] = compareCellRecords(cloudData.cells[charName][taskName], incoming);
+            }
+            const timingRows = Array.isArray(payload?.timing) ? payload.timing : [];
+            for (const row of timingRows) {
+                const charName = String(row.characterName || '').trim();
+                const taskName = String(row.taskName || '').trim();
+                const weekKey = String(row.weekKey || '');
+                const at = Number(row.at) || 0;
+                if (!charName || !taskName || !weekKey || !at) continue;
+                if (!cloudData.completionTiming[weekKey]) cloudData.completionTiming[weekKey] = {};
+                if (!cloudData.completionTiming[weekKey][charName]) cloudData.completionTiming[weekKey][charName] = {};
+                const existing = cloudData.completionTiming[weekKey][charName][taskName];
+                const incoming = { state:row.state === 'done' ? 'done' : 'open', at, ownerKey:String(row.ownerKey || '').slice(0,120) };
+                if (!existing || at > (Number(existing.at)||0) || (at === (Number(existing.at)||0) && incoming.state === 'open')) {
+                    cloudData.completionTiming[weekKey][charName][taskName] = incoming;
+                }
+            }
+            cloudData.completionTiming = normalizeCompletionTiming(cloudData.completionTiming, cloudData.settings?.analyticsHistoryClearedAt || 0);
+            if (Object.keys(pendingCellWrites).length) cloudData = applyPendingCellWrites(cloudData, cloudData, clonePendingCellWrites(pendingCellWrites));
+            return cellRows.length + timingRows.length;
+        }
+
+        // Poll a tiny D1 row revision first. Character-only changes use the incremental
+        // feed; a full Tracker hydration is reserved for actual shared-record changes.
         async function fetchRemoteRevision(config = getCloudConfig()) {
             const res = await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}/status`, { method:'GET', headers:authHeaders(config), cache:'no-store' }, 8000);
             const payload = await res.json().catch(() => ({}));
@@ -6332,12 +6406,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             const revision = Number(payload.metadata?.updatedAt) || 0;
             if (!revision) throw new Error('The shared database did not return a valid revision.');
+            lastRemoteRecordRevision = Number(payload.metadata?.recordUpdatedAt) || lastRemoteRecordRevision;
+            lastCharacterStorageRevision = Number(payload.metadata?.characterStorageRevision ?? payload.metadata?.characterStorageUpdatedAt) || lastCharacterStorageRevision;
+            lastRemoteRevision = revision;
             return revision;
         }
         function pantheonNow() { return Date.now() + (Number(serverClockOffsetMs) || 0); }
 
         async function loadLiveTracker() {
+            const hadLocalSnapshot = hasUsableLocalTrackerSnapshot();
             cloudData = loadLocalData();
+            startupRemoteCursorRestored = hadLocalSnapshot && restoreRemoteSyncCursors(getCloudConfig());
+            if (Object.keys(pendingCellWrites).length) cloudData = applyPendingCellWrites(cloudData, cloudData, clonePendingCellWrites());
+            const startupCachedRecordRevision = lastRemoteRecordRevision;
+            const startupCachedStorageRevision = lastCharacterStorageRevision;
             syncDataStructures();
             getLocalTeamBuilderState();
             refreshTrackerUI();
@@ -6346,6 +6428,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // IMPORTANT: provision/migrate owner-scoped storage before any whole-record sync
             // or pending character-save request can run. In r49 this happened after forceSync,
             // allowing early cell writes to hit an uninitialized player-storage table.
+            let startupRevisionChecked = false;
             if (isPantheonAdmin()) {
                 const setup = await refreshCharacterStorageStatus();
                 if (!setup || setup.migrationComplete !== true) {
@@ -6365,7 +6448,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 // A regular member must never attempt legacy whole-record writes before the
                 // administrator has completed the one-time migration. They can still view the
                 // legacy snapshot and their edits remain queued locally until readiness is true.
-                try { await fetchRemoteRevision(getCloudConfig()); } catch (_) {}
+                try { await fetchRemoteRevision(getCloudConfig()); startupRevisionChecked = true; } catch (_) {}
                 if (!characterStorageReady) {
                     try {
                         const legacy = normalizeData(await fetchRemoteRecord(getCloudConfig()));
@@ -6385,8 +6468,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
 
             // At this point player storage is ready and reads aggregate the owner-scoped rows.
-            try { await fetchRemoteRevision(getCloudConfig()); } catch (_) { /* D1 timestamps remain authoritative if clock calibration is temporarily unavailable. */ }
-            await forceSync(false);
+            if (!startupRevisionChecked) {
+                try { await fetchRemoteRevision(getCloudConfig()); } catch (_) { /* D1 timestamps remain authoritative if clock calibration is temporarily unavailable. */ }
+            }
+            const localGlobalSnapshotIsUnchanged = startupRemoteCursorRestored && hasMatchingGlobalSyncFingerprint(cloudData);
+            if (localGlobalSnapshotIsUnchanged) {
+                await synchronizeStartupFromKnownRevision(startupCachedRecordRevision, startupCachedStorageRevision);
+            } else {
+                // First launch after r03 has no verified incremental cursor, or the local
+                // shared snapshot contains unconfirmed global edits. Perform one canonical
+                // merge, then remember its cursors so future launches stay incremental.
+                await forceSync(false);
+            }
             refreshTrackerUI();
             if (pantheonDiscordUser) updateOverviewProfile(pantheonDiscordUser);
             const rb = String(cloudData.settings?.versionControl?.revisionBinId || '');
@@ -6661,6 +6754,89 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }catch(err){setStatus(`🔴 Undo failed: ${err.message}`);alert(`Undo failed: ${err.message}`);}finally{window.__pantheonVersionWriteBusy=false;}
         }
 
+        function stableSyncValue(value) {
+            if (Array.isArray(value)) return value.map(stableSyncValue);
+            if (!value || typeof value !== 'object') return value;
+            const out = {};
+            Object.keys(value).sort().forEach(key => { out[key] = stableSyncValue(value[key]); });
+            return out;
+        }
+        function globalSyncSnapshot(record) {
+            const copy = cloneDataObject(record);
+            // Character cells and timing are persisted through the independent per-character
+            // endpoint. updatedAt/syncInfo are transport metadata, not shared user changes.
+            delete copy.cells;
+            delete copy.completionTiming;
+            delete copy.updatedAt;
+            delete copy.syncInfo;
+            return JSON.stringify(stableSyncValue(copy));
+        }
+        function globalSyncFingerprint(record) {
+            const value = globalSyncSnapshot(record);
+            let hash = 2166136261;
+            for (let i = 0; i < value.length; i++) { hash ^= value.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+            return `${value.length}:${(hash >>> 0).toString(16)}`;
+        }
+        function hasMatchingGlobalSyncFingerprint(record) {
+            try { const saved = localStorage.getItem(GLOBAL_SYNC_FINGERPRINT_KEY); return !!saved && saved === globalSyncFingerprint(record); } catch (_) { return false; }
+        }
+        function persistGlobalSyncFingerprint(record) {
+            try { localStorage.setItem(GLOBAL_SYNC_FINGERPRINT_KEY, globalSyncFingerprint(record)); } catch (_) {}
+        }
+
+        async function synchronizeStartupFromKnownRevision(previousRecordRevision, previousStorageRevision) {
+            const pendingSnapshot = clonePendingCellWrites(pendingCellWrites);
+            const observedRecordRevision = lastRemoteRecordRevision;
+            const observedStorageRevision = lastCharacterStorageRevision;
+            try {
+                if (!previousRecordRevision || observedRecordRevision !== previousRecordRevision) {
+                    const remote = await fetchRemoteRecord(getCloudConfig());
+                    const latestRemote = normalizeData(remote);
+                    cloudData = mergeData(cloudData, latestRemote);
+                    cloudData = restoreRemoteCellsForPendingWrites(cloudData, latestRemote, pendingSnapshot);
+                    if (Object.keys(pendingSnapshot).length) cloudData = applyPendingCellWrites(cloudData, latestRemote, pendingSnapshot);
+                    delete cloudData.syncInfo;
+                    lastSeenRemoteMarker = remoteSyncMarker(remote);
+                } else if (!previousStorageRevision || observedStorageRevision !== previousStorageRevision) {
+                    const delta = await fetchRemoteChanges(previousStorageRevision, getCloudConfig());
+                    if (delta.fullSnapshotRequired === true) {
+                        const remote = await fetchRemoteRecord(getCloudConfig());
+                        const latestRemote = normalizeData(remote);
+                        cloudData = mergeData(cloudData, latestRemote);
+                        cloudData = restoreRemoteCellsForPendingWrites(cloudData, latestRemote, pendingSnapshot);
+                        if (Object.keys(pendingSnapshot).length) cloudData = applyPendingCellWrites(cloudData, latestRemote, pendingSnapshot);
+                        delete cloudData.syncInfo;
+                        lastSeenRemoteMarker = remoteSyncMarker(remote);
+                    } else {
+                        applyCharacterStorageDelta(delta);
+                        lastCharacterStorageRevision = Number(delta.metadata?.characterStorageRevision) || lastCharacterStorageRevision;
+                    }
+                }
+                const resetChanged = checkAutoResets();
+                setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                persistGlobalSyncFingerprint(cloudData);
+                persistLocalData();
+                persistRemoteSyncCursors();
+                lastRemoteRefreshAttemptAt = Date.now();
+                if (resetChanged) {
+                    unsavedCloudChanges = true;
+                    await forceSync(false);
+                } else {
+                    unsavedCloudChanges = false;
+                    updateOverviewStatusCards();
+                    applyDeveloperTextOverrides();
+                    updateOverviewEventNotice();
+                    setStatus(lastRemoteRecordRevision !== previousRecordRevision || lastCharacterStorageRevision !== previousStorageRevision ? '🟢 Guild data refreshed' : '🟢 Tracker is current');
+                }
+                return true;
+            } catch (error) {
+                lastRemoteRecordRevision = previousRecordRevision;
+                lastCharacterStorageRevision = previousStorageRevision;
+                setStatus(`🟠 Cached Tracker is available · live update will retry: ${String(error?.message || error).slice(0,180)}`);
+                return false;
+            }
+        }
+
         // Normal sync. The revision journal is a separate best-effort service.
         // The main tracker sync succeeds independently of journal availability.
         function forceSync(showSuccess = false){
@@ -6700,6 +6876,30 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         let candidate=hasMeaningfulLocalData?mergeData(cloudData,remote):remote;
                         candidate = restoreRemoteCellsForPendingWrites(candidate, remote, pendingCellWrites);
                         candidate = enforceMemberSafeSyncWrite(candidate, remote);
+                        cloudData = candidate;
+                        const resetChangesBeforeSync = checkAutoResets();
+                        candidate = cloudData;
+                        const hasPendingVersionIntent = !!pendingGlobalBeforeSnapshot || !!pendingGlobalChangeLabel;
+                        if (!hasPendingVersionIntent && globalSyncSnapshot(candidate) === globalSyncSnapshot(remote)) {
+                            // No shared/global changes exist. Do not issue a PUT that bumps
+                            // data_records.updated_at and causes every member to refresh.
+                            candidate = restoreRemoteCellsForPendingWrites(candidate, remote, pendingCellWrites);
+                            if (Object.keys(pendingCellWrites).length) candidate = applyPendingCellWrites(candidate, remote, pendingCellWrites);
+                            cloudData = candidate;
+                            delete cloudData.syncInfo;
+                            lastSeenRemoteMarker = remoteSyncMarker(remote);
+                            setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                            persistGlobalSyncFingerprint(cloudData);
+                            persistRemoteSyncCursors(config);
+                            lastRemoteRefreshAttemptAt = Date.now();
+                            unsavedCloudChanges = false;
+                            persistLocalData();
+                            if (remoteChangedSinceUI) refreshTrackerUI(); else updateOverviewStatusCards();
+                            applyDeveloperTextOverrides();
+                            updateOverviewEventNotice();
+                            setStatus(showSuccess ? '🟢 Already synchronized · no shared changes to upload' : '🟢 Shared Tracker is current');
+                            return true;
+                        }
                         let queuedEntries=[];
                         const localAfter=cloneDataObject(getGlobalImpactSnapshot(cloudData));
                         if(pendingGlobalBeforeSnapshot){
@@ -6718,7 +6918,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         const res=await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)},15000);if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
                         const responsePayload=await res.json();
                         const latest=normalizeData(responsePayload.record||await fetchRemoteRecord(config));
+                        const preservedCells = safeObject(cloudData.cells);
+                        const preservedTiming = safeObject(cloudData.completionTiming);
+                        const legacyCells = safeObject(latest.cells);
+                        latest.cells = {};
+                        for (const charName of new Set([...Object.keys(preservedCells), ...Object.keys(legacyCells)])) {
+                            const tasks = {};
+                            const localTasks = safeObject(preservedCells[charName]), serverTasks = safeObject(legacyCells[charName]);
+                            for (const taskName of new Set([...Object.keys(localTasks), ...Object.keys(serverTasks)])) {
+                                const chosen = compareCellRecords(localTasks[taskName], serverTasks[taskName]);
+                                if (chosen) tasks[taskName] = chosen;
+                            }
+                            if (Object.keys(tasks).length) latest.cells[charName] = tasks;
+                        }
+                        latest.completionTiming = mergeCompletionTiming(preservedTiming, latest.completionTiming, latest.settings?.analyticsHistoryClearedAt || 0);
                         lastRemoteRevision=Number(responsePayload.metadata?.updatedAt)||lastRemoteRevision;
+                        lastRemoteRecordRevision=Number(responsePayload.metadata?.recordUpdatedAt)||lastRemoteRecordRevision;
                         const latestOp=String(safeObject(latest.syncInfo).operationId||'');
                         if(latestOp===opId){
                             lastSeenRemoteMarker=remoteSyncMarker(latest);lastRemoteRefreshAttemptAt=Date.now();unsavedCloudChanges=false;
@@ -6726,7 +6941,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             const cellWriteConflicts = cellAck.mismatches.length;
                             cloudData=latest;
                             if (Object.keys(pendingCellWrites).length) cloudData = applyPendingCellWrites(cloudData, latest, pendingCellWrites);
-                            delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));clearPendingGlobalChange();
+                            delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));persistGlobalSyncFingerprint(cloudData);persistRemoteSyncCursors(config);clearPendingGlobalChange();
                             // Global/settings save confirmation is independent of per-character
                             // cell saves, which have their own requests and acknowledgements.
                             unsavedCloudChanges = false;
@@ -6821,28 +7036,68 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             remoteRefreshBusy = true;
             lastRemoteRefreshAttemptAt = Date.now();
+            let previousRecordRevision = lastRemoteRecordRevision;
+            let previousStorageRevision = lastCharacterStorageRevision;
             if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('checking','Checking for guild changes…');
             try{
+                previousRecordRevision = lastRemoteRecordRevision;
+                previousStorageRevision = lastCharacterStorageRevision;
                 const revision = await fetchRemoteRevision(getCloudConfig());
-                const changed = !lastRemoteRevision || revision !== lastRemoteRevision;
-                if(changed){
+                const recordChanged = !previousRecordRevision || lastRemoteRecordRevision !== previousRecordRevision;
+                const storageChanged = lastCharacterStorageRevision !== previousStorageRevision;
+                const changed = recordChanged || storageChanged || !lastRemoteRevision;
+                if (recordChanged) {
                     const remote = await fetchRemoteRecord(getCloudConfig());
-                    if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) return false;
+                    if(syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) {
+                        lastRemoteRecordRevision = previousRecordRevision;
+                        lastCharacterStorageRevision = previousStorageRevision;
+                        return false;
+                    }
                     const latestRemote = normalizeData(remote);
-                    // A pending local cell is no reason to stop the rest of the guild view
-                    // from refreshing. Merge the current local snapshot, then overlay only
-                    // this device's unconfirmed character cells so they cannot be lost.
                     cloudData = hasQueuedCellEdits ? mergeData(cloudData, latestRemote) : latestRemote;
                     cloudData = restoreRemoteCellsForPendingWrites(cloudData, latestRemote, pendingCellSnapshot);
                     if (hasQueuedCellEdits) cloudData = applyPendingCellWrites(cloudData, latestRemote, pendingCellSnapshot);
                     delete cloudData.syncInfo;
                     lastSeenRemoteMarker = remoteSyncMarker(remote);
-                    lastRemoteRevision = revision;
                     setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                    persistGlobalSyncFingerprint(cloudData);
+                    persistRemoteSyncCursors();
+                    persistLocalData();
+                    refreshTrackerUI();
+                    updateOverviewEventNotice();
+                } else if (storageChanged) {
+                    const delta = await fetchRemoteChanges(previousStorageRevision, getCloudConfig());
+                    if (syncInProgress || window.__pantheonVersionWriteBusy || unsavedCloudChanges) {
+                        lastRemoteRecordRevision = previousRecordRevision;
+                        lastCharacterStorageRevision = previousStorageRevision;
+                        return false;
+                    }
+                    if (delta.fullSnapshotRequired === true) {
+                        const remote = await fetchRemoteRecord(getCloudConfig());
+                        const latestRemote = normalizeData(remote);
+                        cloudData = hasQueuedCellEdits ? mergeData(cloudData, latestRemote) : latestRemote;
+                        cloudData = restoreRemoteCellsForPendingWrites(cloudData, latestRemote, pendingCellSnapshot);
+                        if (hasQueuedCellEdits) cloudData = applyPendingCellWrites(cloudData, latestRemote, pendingCellSnapshot);
+                        delete cloudData.syncInfo;
+                        lastSeenRemoteMarker = remoteSyncMarker(remote);
+                        setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                    } else {
+                        const changedRows = applyCharacterStorageDelta(delta);
+                        lastCharacterStorageRevision = Number(delta.metadata?.characterStorageRevision) || lastCharacterStorageRevision;
+                        if (changedRows) {
+                            delete cloudData.syncInfo;
+                            setLastSeenGlobalSignature(getGlobalImpactSignature(cloudData));
+                        }
+                    }
+                    persistGlobalSyncFingerprint(cloudData);
+                    persistRemoteSyncCursors();
                     persistLocalData();
                     refreshTrackerUI();
                     updateOverviewEventNotice();
                 }
+                lastRemoteRevision = revision;
+                persistRemoteSyncCursors();
+                persistGlobalSyncFingerprint(cloudData);
                 if(isTrackerPageCurrentlyVisible()){
                     const pendingNames = getPendingCellCharacterNames();
                     const failedSave = Object.values(pendingCellWrites).find(item => item.retryable === false && item.lastError);
@@ -6851,6 +7106,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
                 return true;
             }catch(error){
+                // Preserve the old cursors when delta/full application fails, so the same
+                // unprocessed server changes are retried on the next poll.
+                lastRemoteRecordRevision = previousRecordRevision;
+                lastCharacterStorageRevision = previousStorageRevision;
                 if(isTrackerPageCurrentlyVisible())setTrackerLiveSyncNote('error','Could not check · retrying automatically');
                 return false;
             }finally{
@@ -7084,13 +7343,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     }
                     persistPendingCellWrites();
                 }
-                const pendingSnapshot = clonePendingCellWrites();
-                const latest = normalizeData(await fetchRemoteRecord());
-                cloudData = restoreRemoteCellsForPendingWrites(latest, latest, pendingSnapshot);
-                if (Object.keys(pendingSnapshot).length) cloudData = applyPendingCellWrites(cloudData, latest, pendingSnapshot);
-                lastRemoteRevision = await fetchRemoteRevision();
-                persistLocalData();
-                refreshTrackerUI();
+                // This endpoint is only a one-time schema/migration readiness check.
+                // The normal startup sync below performs the single required full snapshot;
+                // doing another full read here doubled the expensive hydration query on admin login.
+                characterStorageReady = true;
                 updateAdminModeUI();
                 if (payload.migratedNow === true) {
                     schedulePendingCellRetry();
@@ -12271,7 +12527,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r02';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r03';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13000,7 +13256,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r02';
+  const CURRENT_BUILD = '1.6.9-r03';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

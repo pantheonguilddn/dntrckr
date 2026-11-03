@@ -27,8 +27,13 @@ export async function ensureCharacterStorageSchema(env) {
     `CREATE TABLE IF NOT EXISTS character_completion_timing (character_key TEXT NOT NULL, week_key TEXT NOT NULL, task_key TEXT NOT NULL, task_name TEXT NOT NULL DEFAULT '', state TEXT NOT NULL CHECK (state IN ('open','done')), at INTEGER NOT NULL, owner_key TEXT NOT NULL DEFAULT '', PRIMARY KEY (character_key, week_key, task_key))`,
     `CREATE INDEX IF NOT EXISTS idx_character_timing_week ON character_completion_timing(week_key)`,
     `CREATE INDEX IF NOT EXISTS idx_character_timing_character_at ON character_completion_timing(character_key, at)`,
+    `CREATE INDEX IF NOT EXISTS idx_character_timing_at ON character_completion_timing(at)`,
+    `CREATE TABLE IF NOT EXISTS tracker_storage_changes (change_type TEXT NOT NULL CHECK (change_type IN ('cell','timing','full','feed')), character_key TEXT NOT NULL DEFAULT '', task_key TEXT NOT NULL DEFAULT '', week_key TEXT NOT NULL DEFAULT '', revision INTEGER NOT NULL, PRIMARY KEY (change_type, character_key, task_key, week_key))`,
+    `CREATE INDEX IF NOT EXISTS idx_tracker_storage_changes_type_revision ON tracker_storage_changes(change_type, revision)`,
     `CREATE TABLE IF NOT EXISTS tracker_storage_meta (id INTEGER PRIMARY KEY CHECK (id = 1), migration_complete INTEGER NOT NULL DEFAULT 0 CHECK (migration_complete IN (0,1)), migration_in_progress INTEGER NOT NULL DEFAULT 0 CHECK (migration_in_progress IN (0,1)), migration_lock_until INTEGER NOT NULL DEFAULT 0, migration_lock_token TEXT NOT NULL DEFAULT '', schema_version INTEGER NOT NULL DEFAULT 1, revision INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL DEFAULT 0, migration_at INTEGER NOT NULL DEFAULT 0, directory_signature TEXT NOT NULL DEFAULT '', analytics_tracking_enabled INTEGER NOT NULL DEFAULT 0 CHECK (analytics_tracking_enabled IN (0,1)), analytics_history_cleared_at INTEGER NOT NULL DEFAULT 0)`,
     `INSERT OR IGNORE INTO tracker_storage_meta (id, migration_complete, migration_in_progress, migration_lock_until, schema_version, revision, updated_at, migration_at) VALUES (1,0,0,0,1,0,0,0)`,
+    `INSERT OR IGNORE INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision) SELECT 'full', '', '', '', revision FROM tracker_storage_meta WHERE id = 1`,
+    `INSERT OR IGNORE INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision) SELECT 'feed', '', '', '', revision FROM tracker_storage_meta WHERE id = 1`,
     `CREATE TABLE IF NOT EXISTS tracker_legacy_backups (id TEXT PRIMARY KEY, name TEXT NOT NULL DEFAULT '', record_json TEXT NOT NULL, source_updated_at INTEGER NOT NULL DEFAULT 0, backed_up_at INTEGER NOT NULL)`
   ];
   await db.batch(ddl.map(sql => db.prepare(sql)));
@@ -179,6 +184,12 @@ export async function hydrateCharacterProgress(env, record) {
   let state;
   try { state = await getCharacterStorageState(env); } catch (_) { return record; }
   if (Number(state?.migration_complete) !== 1) return record;
+  Object.defineProperty(record, '__pantheonCharacterStorageUpdatedAt', {
+    value: Number(state?.updated_at) || 0, configurable: true, enumerable: false
+  });
+  Object.defineProperty(record, '__pantheonCharacterStorageRevision', {
+    value: Number(state?.revision) || 0, configurable: true, enumerable: false
+  });
   const cellRows = await env.PANTHEON_DB.prepare(`
     SELECT o.character_name, c.task_key, c.task_name, c.state, c.note, c.updated_at, c.device_id, t.task_name AS definition_name
     FROM character_task_cells c
@@ -233,9 +244,23 @@ export async function syncCharacterStorageSettings(env, record, now = Date.now()
 }
 
 export async function bumpCharacterStorageRevision(env, at = Date.now()) {
-  await env.PANTHEON_DB.prepare(`
-    UPDATE tracker_storage_meta
-    SET revision = revision + 1, updated_at = CASE WHEN ? > updated_at THEN ? ELSE updated_at + 1 END
-    WHERE id = 1
-  `).bind(at, at).run();
+  // Ownership/index changes affect the labels or visibility of the aggregate view,
+  // so they intentionally invalidate the next incremental poll into a full snapshot.
+  await env.PANTHEON_DB.batch([
+    env.PANTHEON_DB.prepare(`
+      UPDATE tracker_storage_meta
+      SET revision = revision + 1, updated_at = CASE WHEN ? > updated_at THEN ? ELSE updated_at + 1 END
+      WHERE id = 1
+    `).bind(at, at),
+    env.PANTHEON_DB.prepare(`
+      INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+      SELECT 'full', '', '', '', revision FROM tracker_storage_meta WHERE id = 1
+      ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
+    `),
+    env.PANTHEON_DB.prepare(`
+      INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+      SELECT 'feed', '', '', '', revision FROM tracker_storage_meta WHERE id = 1
+      ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
+    `)
+  ]);
 }

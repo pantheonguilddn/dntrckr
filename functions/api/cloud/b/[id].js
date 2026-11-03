@@ -2,7 +2,7 @@ import { getRecord, jsonResponse, resolveRecordId, storeRecord } from '../../../
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../../_utils/compact.js';
 import { registrationWriteViolation, repairBootstrapAdminOwnerLinks, resolveDiscordOwnerMember } from '../../../_utils/registration-guard.js';
 import { denyNonAdminRevisionJournalAccess } from '../../../_utils/admin-tool-access.js';
-import { getCharacterStorageState, hydrateCharacterProgress, isCharacterStorageMigrationBusy, syncCharacterIndexes, syncCharacterStorageSettings } from '../../../_utils/character-storage.js';
+import { getCharacterStorageState, isCharacterStorageMigrationBusy, syncCharacterIndexes, syncCharacterStorageSettings } from '../../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const LEDGER_OWNER_NAMES = new Set(['bio', 'cheean', 'cho']);
@@ -281,15 +281,17 @@ export async function onRequestPut(context) {
           catch (error) { return jsonResponse({ code:'OWNER_INDEX_REFRESH_FAILED', retryable:true, message:`Tracker settings were saved, but the player ownership index needs a retry: ${String(error?.message || error).slice(0,180)}` }, 503); }
         }
         try { await syncCharacterStorageSettings(env, savedDecoded, savedAt); } catch (_) {}
+        // Character cells and completion timing live in their own tables. Do not
+        // rescan those tables just to acknowledge a global/settings write; clients
+        // retain their last snapshot and receive subsequent cell changes via /changes.
         try {
-          const storageState = await getCharacterStorageState(env);
-          if (Number(storageState?.migration_complete) === 1) {
-            const hydrated = await hydrateCharacterProgress(env, decodePantheonCompactRecord(recordToStore));
-            responseRecord = hasLedgerAccess(context.data?.session, hydrated) ? encodePantheonCompactRecord(hydrated) : redactLedgerRecord(hydrated);
-          }
-        } catch (_) { /* The committed settings response remains available; next live read will reconcile. */ }
+          const committed = decodePantheonCompactRecord(recordToStore);
+          responseRecord = hasLedgerAccess(context.data?.session, committed)
+            ? encodePantheonCompactRecord(committed)
+            : redactLedgerRecord(committed);
+        } catch (_) { /* The committed response remains available in its original form. */ }
       }
-      return jsonResponse({ metadata: { id: requestedId, name: current.name, private: true, updatedAt: savedAt }, record: responseRecord });
+      return jsonResponse({ metadata: { id: requestedId, name: current.name, private: true, updatedAt: savedAt, recordUpdatedAt:savedAt }, record: responseRecord });
     }
     // Another writer changed the row between SELECT and UPDATE. Re-read and merge again.
   }

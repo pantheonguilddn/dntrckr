@@ -79,9 +79,15 @@ export async function onRequestPost(context) {
   if (invalid) return jsonResponse({ code:'TASK_NOT_CONFIGURED', retryable:false, message:`Task "${invalid.taskName}" is no longer in the current Tracker categories. Refresh the Tracker before editing it.` },400);
 
   const now = Date.now();
-  const statements = cleanEdits.map((edit, index) => {
+  const statements = [env.PANTHEON_DB.prepare(`
+    UPDATE tracker_storage_meta
+    SET revision = revision + 1,
+        updated_at = CASE WHEN ? > updated_at THEN ? ELSE updated_at + 1 END
+    WHERE id = 1 AND migration_complete = 1
+  `).bind(now, now)];
+  cleanEdits.forEach((edit, index) => {
     const stamp = now + index;
-    return env.PANTHEON_DB.prepare(`
+    statements.push(env.PANTHEON_DB.prepare(`
       INSERT INTO character_task_cells (character_key, task_key, task_name, state, note, updated_at, device_id)
       VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(character_key, task_key) DO UPDATE SET
@@ -90,8 +96,16 @@ export async function onRequestPost(context) {
         note = excluded.note,
         updated_at = CASE WHEN excluded.updated_at > character_task_cells.updated_at THEN excluded.updated_at ELSE character_task_cells.updated_at + 1 END,
         device_id = excluded.device_id
-    `).bind(charKey, edit.taskKey, edit.taskName, edit.state, edit.note, stamp, String(session.discordId).slice(0,120));
+    `).bind(charKey, edit.taskKey, edit.taskName, edit.state, edit.note, stamp, String(session.discordId).slice(0,120)));
   });
+  const cellLogSelect = cleanEdits.map((_, index) => `${index ? 'UNION ALL ' : ''}SELECT ? AS task_key`).join(' ');
+  statements.push(env.PANTHEON_DB.prepare(`
+    INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+    SELECT 'cell', ?, edits.task_key, '', meta.revision
+    FROM (${cellLogSelect}) AS edits CROSS JOIN tracker_storage_meta AS meta
+    WHERE meta.id = 1
+    ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
+  `).bind(charKey, ...cleanEdits.map(edit => edit.taskKey)));
 
   // Preserve the existing per-character timing evidence, but store it separately as well.
   const timingInput = Array.isArray(body?.timing) ? body.timing.slice(0,40) : [];
@@ -120,16 +134,27 @@ export async function onRequestPost(context) {
           owner_key = excluded.owner_key
       `).bind(charKey, item.weekKey, item.edit.taskKey, item.edit.taskName, item.state, now + cleanEdits.length + i, String(owner.member_id || owner.owner_name || '').slice(0,120)));
     }
+    if (allowedTiming.length) {
+      const timingLogSelect = allowedTiming.map((_, index) => `${index ? 'UNION ALL ' : ''}SELECT ? AS task_key, ? AS week_key`).join(' ');
+      const timingLogBindings = allowedTiming.flatMap(item => [item.edit.taskKey, item.weekKey]);
+      statements.push(env.PANTHEON_DB.prepare(`
+        INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+        SELECT 'timing', ?, edits.task_key, edits.week_key, meta.revision
+        FROM (${timingLogSelect}) AS edits CROSS JOIN tracker_storage_meta AS meta
+        WHERE meta.id = 1
+        ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
+      `).bind(charKey, ...timingLogBindings));
+    }
   }
+  // A singleton feed marker lets the server detect writes from older deployments
+  // that incremented the storage revision but did not emit incremental change entries.
+  statements.push(env.PANTHEON_DB.prepare(`
+    INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
+    SELECT 'feed', '', '', '', revision FROM tracker_storage_meta WHERE id = 1
+    ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
+  `));
   // Keep each character's own timing history bounded without scanning the guild table.
   statements.push(env.PANTHEON_DB.prepare('DELETE FROM character_completion_timing WHERE character_key = ? AND at < ?').bind(charKey, now - 90 * 24 * 60 * 60 * 1000));
-  statements.push(env.PANTHEON_DB.prepare(`
-    UPDATE tracker_storage_meta
-    SET revision = revision + 1,
-        updated_at = CASE WHEN ? > updated_at THEN ? ELSE updated_at + 1 END
-    WHERE id = 1 AND migration_complete = 1
-  `).bind(now + cleanEdits.length + timingInput.length, now + cleanEdits.length + timingInput.length));
-
   try {
     // D1 batches execute as a transaction. The affected rows are limited to this character.
     await env.PANTHEON_DB.batch(statements);

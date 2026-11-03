@@ -39,10 +39,12 @@ export async function onRequestGet(context) {
     const resolvedId = await resolveRecordId(env, requestedId);
     let decoded = decodePantheonCompactRecord(packed);
     if (resolvedId === MAIN_ID) decoded = await hydrateCharacterProgress(env, decoded);
+    const characterStorageUpdatedAt = Number(decoded?.__pantheonCharacterStorageUpdatedAt) || 0;
+    const characterStorageRevision = Number(decoded?.__pantheonCharacterStorageRevision) || 0;
     const session = context.data?.session;
     const responseRecord = resolvedId === MAIN_ID
       ? (hasLedgerAccess(session, decoded) ? encodePantheonCompactRecord(decoded) : redactLedgerRecord(decoded))
       : packed;
-    return jsonResponse({ metadata: { id: requestedId, name: row.name, private: true, updatedAt: row.updated_at }, record: responseRecord });
+    return jsonResponse({ metadata: { id: requestedId, name: row.name, private: true, updatedAt: row.updated_at, recordUpdatedAt:Number(row.updated_at)||0, characterStorageUpdatedAt, characterStorageRevision }, record: responseRecord });
   } catch (_) { return jsonResponse({ message: 'Stored record is corrupt.' }, 500); }
 }
