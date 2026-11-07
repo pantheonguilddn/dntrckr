@@ -4619,7 +4619,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         async function flushPendingCellWritesForCharacter(charName, options = {}) {
             const name = String(charName || '').trim();
             if (!name || pendingCellSyncBusy.has(name)) return false;
-            const snapshotEntries = pendingCellEntriesForCharacter(name);
+            // A reset can queue more tasks for one character than the API's atomic
+            // batch ceiling. Send 40 at a time and continue after each acknowledged chunk.
+            const snapshotEntries = pendingCellEntriesForCharacter(name).slice(0, 40);
             if (!snapshotEntries.length) return true;
             if (!hasCloudConfig()) {
                 updatePendingCellStatus('Saved locally only · connect to the shared Tracker to publish these changes');
@@ -4664,7 +4666,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (stillPending.length) {
                     const permanent = stillPending.find(([,item]) => item.retryable === false)?.[1];
                     updatePendingCellStatus(`${name}: ${stillPending.length} edit${stillPending.length === 1 ? '' : 's'} not confirmed${permanent?.lastError ? ` · ${permanent.lastError}` : ' · awaiting confirmation'}`);
-                    schedulePendingCellRetry(name);
+                    // Newer/unattempted entries are the next chunk, not a failed save.
+                    // Send them promptly; only back off when the exact attempted edits failed.
+                    const hasUnsentOrNewer = stillPending.some(([key,item]) => {
+                        const prior = snapshot[key];
+                        return !prior || Number(item.updatedAt) !== Number(prior.updatedAt) || item.state !== prior.state || item.note !== prior.note;
+                    });
+                    if (hasUnsentOrNewer) schedulePendingCellCharacterSave(name, 35);
+                    else schedulePendingCellRetry(name);
                 } else if (getPendingCellCharacterNames().length) {
                     updatePendingCellStatus();
                 } else {
@@ -4698,7 +4707,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             } finally {
                 pendingCellSyncBusy.delete(name);
                 const newer = pendingCellEntriesForCharacter(name);
-                if (newer.length && !pendingCellRetryTimers.has(name) && !pendingCellDebounceTimers.has(name)) {
+                if (newer.some(([,item]) => item.retryable !== false) && !pendingCellRetryTimers.has(name) && !pendingCellDebounceTimers.has(name)) {
                     schedulePendingCellCharacterSave(name, 35);
                 }
             }

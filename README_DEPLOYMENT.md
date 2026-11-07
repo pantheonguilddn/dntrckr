@@ -1,12 +1,11 @@
-# Deploy Pantheon Tools v1.6.9-r03
+# Deploy Pantheon Tools v1.6.9-r04
 
-1. Back up the currently deployed Pages files and export the existing D1 database before rollout.
-2. Upload the complete contents of this ZIP to the existing Cloudflare Pages project, preserving the `functions/` directory structure.
-3. Keep the existing `PANTHEON_DB` D1 binding, Discord/OAuth settings, and all environment variables unchanged.
-4. Do not delete/recreate the D1 database, clear browser storage, or delete Tracker records. The new change-feed table and index are provisioned idempotently by the existing authenticated administrator Player Storage startup endpoint. No manual SQL is required for the normal deployment flow.
-5. After deployment, sign in as the administrator first. Let the Player Storage readiness check complete. This creates the additive change-feed table/index and its initial safety markers. Then test with one or two members before asking the entire guild to refresh.
-6. The first r03 launch on each browser/device performs one full snapshot to establish that browser's local revision cursor and cache fingerprint. Subsequent unchanged startups use a lightweight revision check; character-only changes use the indexed incremental feed.
-7. Verify: login; personal Tracker; read-only Universal View; checkbox save acknowledgement; a second account receiving the change; browser restart; a shared settings/roster change; Extra Dungeons default-N/A behavior; Bounty Board claim-row protection; Team Builder and other core tools.
-8. In Cloudflare D1 Query Insights, compare the full `character_task_cells` hydration query and the full `character_completion_timing` hydration query. Both should become uncommon and correspond primarily to first snapshots or intentional full invalidations. Check Rows Read over a normal guild-usage period.
+1. Deploy the complete ZIP to the existing Cloudflare Pages project, preserving the `functions/` paths.
+2. Keep the current `PANTHEON_DB` D1 binding, Discord OAuth configuration, and environment variables.
+3. Do not delete/recreate D1, reset its tables, or clear browser/site storage. No database migration is required for r04.
+4. Ask the member/browser that first encountered the reset error to reload Pantheon from the same browser profile. This lets its saved pending queue resume and submit the reset edits in chunks.
+5. Wait for the character save indicator to confirm completion before closing that browser. Do not repeat the weekly reset manually while the queue is still pending.
+6. Test one character with several task changes, then one full reset queue. Confirm Universal View receives the changes from another account.
+7. In D1 Query Insights, confirm the character-cell save request no longer produces `too many terms in compound SELECT`.
 
-This release is locally validated only. It has not been deployed to the live Pages project, exercised against the live D1 database, or tested in a real multi-account browser session. Do not treat the expected reduction as a measured production result until Cloudflare metrics confirm it.
+This package has local syntax and SQLite regression validation only. It has not been deployed to or tested against the live Cloudflare D1 database.

@@ -18,8 +18,11 @@ export async function onRequestPost(context) {
   try { body = await request.json(); } catch (_) { return jsonResponse({ message:'Invalid JSON body.' },400); }
   const character = String(body?.character || '').trim().slice(0,40);
   const charKey = characterKey(character);
-  const edits = Array.isArray(body?.edits) ? body.edits.slice(0,40) : [];
+  const edits = Array.isArray(body?.edits) ? body.edits : [];
   if (!character || !charKey || !edits.length) return jsonResponse({ message:'A character and at least one task edit are required.' },400);
+  // Keep each atomic write batch bounded. The browser splits large reset queues into
+  // batches of 40; reject oversized legacy clients rather than silently truncating edits.
+  if (edits.length > 40) return jsonResponse({ code:'CELL_BATCH_TOO_LARGE', retryable:false, message:'This save contains too many task edits for one request. Refresh Pantheon to send the retained changes in smaller batches.' },413);
   const cleanEdits = [];
   const seenTasks = new Set();
   for (const raw of edits) {
@@ -98,14 +101,18 @@ export async function onRequestPost(context) {
         device_id = excluded.device_id
     `).bind(charKey, edit.taskKey, edit.taskName, edit.state, edit.note, stamp, String(session.discordId).slice(0,120)));
   });
-  const cellLogSelect = cleanEdits.map((_, index) => `${index ? 'UNION ALL ' : ''}SELECT ? AS task_key`).join(' ');
+  // D1 enforces a small compound-SELECT term limit. Do not generate one UNION ALL
+  // branch per task: a weekly reset can update dozens of cells at once. Expand a JSON
+  // array with json_each(), which is a single SELECT regardless of batch length.
+  const cellKeysJson = JSON.stringify(cleanEdits.map(edit => edit.taskKey));
   statements.push(env.PANTHEON_DB.prepare(`
     INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
-    SELECT 'cell', ?, edits.task_key, '', meta.revision
-    FROM (${cellLogSelect}) AS edits CROSS JOIN tracker_storage_meta AS meta
+    SELECT 'cell', ?, CAST(changed.value AS TEXT), '', meta.revision
+    FROM json_each(?) AS changed
+    CROSS JOIN tracker_storage_meta AS meta
     WHERE meta.id = 1
     ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
-  `).bind(charKey, ...cleanEdits.map(edit => edit.taskKey)));
+  `).bind(charKey, cellKeysJson));
 
   // Preserve the existing per-character timing evidence, but store it separately as well.
   const timingInput = Array.isArray(body?.timing) ? body.timing.slice(0,40) : [];
@@ -135,15 +142,18 @@ export async function onRequestPost(context) {
       `).bind(charKey, item.weekKey, item.edit.taskKey, item.edit.taskName, item.state, now + cleanEdits.length + i, String(owner.member_id || owner.owner_name || '').slice(0,120)));
     }
     if (allowedTiming.length) {
-      const timingLogSelect = allowedTiming.map((_, index) => `${index ? 'UNION ALL ' : ''}SELECT ? AS task_key, ? AS week_key`).join(' ');
-      const timingLogBindings = allowedTiming.flatMap(item => [item.edit.taskKey, item.weekKey]);
+      const timingLogJson = JSON.stringify(allowedTiming.map(item => ({ taskKey:item.edit.taskKey, weekKey:item.weekKey })));
       statements.push(env.PANTHEON_DB.prepare(`
         INSERT INTO tracker_storage_changes (change_type, character_key, task_key, week_key, revision)
-        SELECT 'timing', ?, edits.task_key, edits.week_key, meta.revision
-        FROM (${timingLogSelect}) AS edits CROSS JOIN tracker_storage_meta AS meta
+        SELECT 'timing', ?,
+               CAST(json_extract(changed.value, '$.taskKey') AS TEXT),
+               CAST(json_extract(changed.value, '$.weekKey') AS TEXT),
+               meta.revision
+        FROM json_each(?) AS changed
+        CROSS JOIN tracker_storage_meta AS meta
         WHERE meta.id = 1
         ON CONFLICT(change_type, character_key, task_key, week_key) DO UPDATE SET revision = excluded.revision
-      `).bind(charKey, ...timingLogBindings));
+      `).bind(charKey, timingLogJson));
     }
   }
   // A singleton feed marker lets the server detect writes from older deployments
