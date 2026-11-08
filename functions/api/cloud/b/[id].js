@@ -8,6 +8,7 @@ const MAIN_ID = 'pantheon-main';
 const LEDGER_OWNER_NAMES = new Set(['bio', 'cheean', 'cho']);
 const CELL_STATES = new Set(['open', 'done', 'excluded', 'marked', 'reset']);
 function obj(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+function arr(value) { return Array.isArray(value) ? value : []; }
 function normalizedCell(value) {
   if (!value || typeof value !== 'object') return null;
   return {
