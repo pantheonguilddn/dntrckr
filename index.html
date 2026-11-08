@@ -5334,46 +5334,89 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         async function toggleAdminView() {
             if (!isPantheonAdmin()) return;
             const turningOff = isAdminModeActive();
-            // When leaving Admin View, all administrator edits must be acknowledged first.
-            // When entering it, keep any existing member-mode queue intact, switch modes, and
-            // then retry it under the explicit administrator permission.
-            try {
-                if (turningOff && Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
-                    await flushPendingCellWrites();
-                    if (Object.keys(pendingCellWrites || {}).length) {
-                        alert('Admin View remains enabled because one or more character edits are not yet confirmed by the server. Use Sync Changes and retry before turning Admin View off. Your current page and tracker view will be preserved.');
-                        return;
-                    }
-                }
-                // Commit ordinary settings using the current permission mode before changing it.
-                if (unsavedCloudChanges && typeof forceSync === 'function') {
-                    await forceSync(false);
-                    if (unsavedCloudChanges) {
-                        alert('The shared settings save is still unconfirmed. Admin View was not changed so no pending edit is stranded.');
-                        return;
-                    }
-                }
-            } catch (error) {
-                alert('The shared save could not be confirmed. Admin View was not changed: ' + String(error?.message || error));
-                return;
-            }
-            if (turningOff) {
-                if (isAdminViewAsActive()) exitAdminViewAs();
-                adminModeEnabled = false;
-                adminViewAsMemberId = '';
-                clearAdminPreviewReadOnly();
-                // Turning off administrator permissions must not change the selected
-                // Personal/Universal filter or navigate away from the current page.
-                const viewLabel = isPersonalView ? 'Personal View' : 'Universal View';
-                setStatus(`🟢 Admin View disabled · ${viewLabel} remains selected. Other members’ trackers are read-only.`);
-            } else {
+            const hasQueuedSharedSave = () => !!unsavedCloudChanges
+                || (Array.isArray(pendingMemberDirectoryIntents) && pendingMemberDirectoryIntents.length > 0)
+                || !!pendingGlobalBeforeSnapshot
+                || !!pendingGlobalChangeLabel;
+
+            if (!turningOff) {
+                // Admin-owned edits can be queued while the administrator is still in
+                // Personal/Member mode. Do not try to commit those edits with member
+                // permissions before enabling Admin View: that creates a 403/deadlock
+                // where the mode needed to authorize the save can never be enabled.
+                clearTimeout(autoSyncTimer);
                 adminModeEnabled = true;
                 adminViewAsMemberId = '';
                 clearAdminPreviewReadOnly();
-                // Permission mode and tracker view are independent. Preserve the current
-                // filter exactly as the member selected it before enabling Admin View.
-                setStatus('🟡 Admin View enabled. Current page and tracker view are unchanged.');
+                updateAdminModeUI();
+                syncDataStructures();
+                refreshTrackerUI();
+                renderOverviewActivity();
+                renderAnalytics();
+                renderTeamBuilder();
+                setStatus('🟡 Admin View enabled. Confirming any queued shared settings with administrator permissions…');
+
+                // If an older request is already in flight, let it finish. The finally
+                // handler will issue the requested retry with Admin View now enabled.
+                if (syncInProgress || window.__pantheonVersionWriteBusy) {
+                    syncRequestedWhileBusy = true;
+                    setStatus('🟠 Admin View enabled · the current sync is finishing; queued shared changes will retry with administrator permissions.');
+                    return;
+                }
+
+                if (hasQueuedSharedSave() && typeof forceSync === 'function') {
+                    try {
+                        const confirmed = await forceSync(false);
+                        if (!confirmed || hasQueuedSharedSave()) {
+                            alert('Admin View is enabled, but the shared settings save is still unconfirmed. Your pending change remains on this device. Do not repeat Add Member; use Sync Changes to retry after checking the sync error.');
+                            return;
+                        }
+                    } catch (error) {
+                        alert('Admin View is enabled, but the shared save could not be confirmed. Your pending change remains on this device: ' + String(error?.message || error));
+                        return;
+                    }
+                }
+
+                if (typeof refreshSharedDataIfChanged === 'function') await refreshSharedDataIfChanged();
+                setStatus('🟢 Admin View enabled. Current page and Personal/Universal Tracker selection are unchanged.');
+                return;
             }
+
+            // Leaving Admin View is the reverse: all administrator-owned changes
+            // must be acknowledged while the administrator header is still active.
+            clearTimeout(autoSyncTimer);
+            if (Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
+                await flushPendingCellWrites();
+                if (Object.keys(pendingCellWrites || {}).length) {
+                    alert('Admin View remains enabled because one or more character edits are not yet confirmed by the server. Use Sync Changes and retry before turning Admin View off. Your current page and Tracker view will be preserved.');
+                    return;
+                }
+            }
+            if (syncInProgress || window.__pantheonVersionWriteBusy) {
+                syncRequestedWhileBusy = true;
+                alert('Admin View remains enabled while the current shared save finishes. Retry turning it off after Sync Status confirms the save.');
+                return;
+            }
+            if (hasQueuedSharedSave() && typeof forceSync === 'function') {
+                try {
+                    const confirmed = await forceSync(false);
+                    if (!confirmed || hasQueuedSharedSave()) {
+                        alert('Admin View remains enabled because the shared settings save is still unconfirmed. No pending edit was discarded. Use Sync Changes and retry before turning Admin View off.');
+                        return;
+                    }
+                } catch (error) {
+                    alert('Admin View remains enabled because the shared save could not be confirmed: ' + String(error?.message || error));
+                    return;
+                }
+            }
+
+            if (isAdminViewAsActive()) exitAdminViewAs();
+            adminModeEnabled = false;
+            adminViewAsMemberId = '';
+            clearAdminPreviewReadOnly();
+            // Turning off administrator permissions must not change the selected
+            // Personal/Universal filter or navigate away from the current page.
+            const viewLabel = isPersonalView ? 'Personal View' : 'Universal View';
             updateAdminModeUI();
             syncDataStructures();
             refreshTrackerUI();
@@ -5381,12 +5424,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             renderAnalytics();
             renderTeamBuilder();
             if (typeof refreshSharedDataIfChanged === 'function') await refreshSharedDataIfChanged();
-            // A queue left by the previous mode is never discarded. Retry it only after the
-            // selected mode is active so the API applies the corresponding ownership rule.
-            if (!turningOff && Object.keys(pendingCellWrites || {}).length && typeof flushPendingCellWrites === 'function') {
-                const confirmed = await flushPendingCellWrites();
-                if (!confirmed) setStatus('🟠 Admin View is active · some saved edits remain queued until the server confirms them.');
-            }
+            setStatus(`🟢 Admin View disabled · ${viewLabel} remains selected. Other members’ trackers are read-only.`);
         }
         function ownerCandidateNames() {
             return [pantheonDiscordUser?.personalOwnerName, pantheonDiscordUser?.label, pantheonDiscordUser?.username]
@@ -13335,7 +13373,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r08';
+  const CURRENT_BUILD = '1.6.9-r09';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -13361,12 +13399,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     try { return typeof pendingCellWrites !== 'undefined' ? Object.keys(pendingCellWrites || {}).length : 0; }
     catch (_) { return 1; }
   }
+  function pendingMemberDirectoryIntentCount() {
+    try { return typeof pendingMemberDirectoryIntents !== 'undefined' && Array.isArray(pendingMemberDirectoryIntents) ? pendingMemberDirectoryIntents.length : 0; }
+    catch (_) { return 1; }
+  }
   function isCoreSyncBusy() {
     return !!((typeof syncInProgress !== 'undefined' && syncInProgress) || window.__pantheonVersionWriteBusy);
   }
   function hasUnsentEdits() {
     try {
-      return isCoreSyncBusy() || !!(typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) || pendingCellCount() > 0;
+      return isCoreSyncBusy() || !!(typeof unsavedCloudChanges !== 'undefined' && unsavedCloudChanges) || pendingCellCount() > 0 || pendingMemberDirectoryIntentCount() > 0;
     } catch (_) { return true; }
   }
   function showUpdateNotice(message) {

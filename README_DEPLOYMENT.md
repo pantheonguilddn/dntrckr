@@ -1,12 +1,12 @@
-# Deployment instructions — Pantheon Tools v1.6.9-r08
+# Deployment instructions — Pantheon Tools v1.6.9-r09
 
-1. Deploy the complete contents of this ZIP to the existing Cloudflare Pages project. The updated `functions/api/cloud/b/[id].js` is required; do not deploy only `index.html`.
+1. Deploy the complete contents of this ZIP to the existing Cloudflare Pages project. The updated `index.html`, `version.json`, and `functions/` directory are required.
 2. Keep the existing `PANTHEON_DB` D1 binding, database, Discord OAuth variables, and all other environment settings unchanged.
 3. Do not reset D1, recreate the database, clear browser/site storage, or run another Time Travel restore.
-4. After deployment, open `https://dntrckr.pages.dev/version.json` and confirm `build` is `1.6.9-r08`.
-5. Hard-refresh with Ctrl+F5. Confirm the existing Member Roster and Universal View are visible and Sync Status no longer reports the `arr is not defined` validation error.
-6. Do not add another member until existing data visibility and synchronization are confirmed.
+4. Confirm `https://dntrckr.pages.dev/version.json` reports build `1.6.9-r09`.
+5. Hard-refresh with Ctrl+F5. Review the existing Member Roster and Universal View before attempting another new-member save.
+6. If a Member Directory save is queued, switch Admin View on once. r09 enables administrator mode before retrying the queued shared save. Do not click Add Member a second time while the earlier operation is unconfirmed.
 
-r08 is a surgical Worker hotfix for r07's missing `arr()` helper. It retains the r07 member-level roster protection and legacy Tracker projection behavior. It changes no D1 schema or task-cell data and requires no database reset.
+r09 fixes the Admin View transition deadlock that caused an administrator's queued Member Roster save to be retried with member-mode permissions and rejected with HTTP 403. The server-side ownership checks remain enabled. Pending Member Directory intents also prevent automatic update reloads until acknowledged. No D1 schema or task-cell changes are included.
 
-Local syntax, static reference, package-content, and ZIP integrity checks passed. This is not a live Cloudflare deployment or D1 test.
+Validation performed locally: source syntax, release marker, permission-order static check, and deployment ZIP integrity. This is not a live Cloudflare deployment or D1 test.
