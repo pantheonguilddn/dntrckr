@@ -4466,6 +4466,38 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
         const PENDING_CELL_WRITES_KEY = 'pantheon-pending-cell-writes-v1';
+        const PENDING_MEMBER_DIRECTORY_INTENTS_KEY = 'pantheon-pending-member-directory-intents-v1';
+        function loadPendingMemberDirectoryIntents() {
+            try {
+                const source = JSON.parse(localStorage.getItem(PENDING_MEMBER_DIRECTORY_INTENTS_KEY) || '[]');
+                return (Array.isArray(source) ? source : []).filter(item => item && typeof item === 'object' &&
+                    ['add','upsert','remove'].includes(String(item.op || '')) && String(item.intentId || '')).slice(-50);
+            } catch (_) { return []; }
+        }
+        let pendingMemberDirectoryIntents = loadPendingMemberDirectoryIntents();
+        function persistPendingMemberDirectoryIntents() {
+            try { localStorage.setItem(PENDING_MEMBER_DIRECTORY_INTENTS_KEY, JSON.stringify(pendingMemberDirectoryIntents.slice(-50))); return true; }
+            catch (_) { return false; }
+        }
+        function queueMemberDirectoryIntent(op, memberOrId) {
+            const intent = { intentId: `mdi-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`, op: String(op || '') };
+            if (op === 'remove') intent.memberId = String(memberOrId || '').trim();
+            else intent.member = JSON.parse(JSON.stringify(memberOrId || {}));
+            if ((op === 'remove' && !intent.memberId) || (op !== 'remove' && !intent.member?.id)) return false;
+            pendingMemberDirectoryIntents.push(intent);
+            pendingMemberDirectoryIntents = pendingMemberDirectoryIntents.slice(-50);
+            persistPendingMemberDirectoryIntents();
+            return true;
+        }
+        function clonePendingMemberDirectoryIntents() {
+            try { return JSON.parse(JSON.stringify(pendingMemberDirectoryIntents || [])); } catch (_) { return []; }
+        }
+        function acknowledgePendingMemberDirectoryIntents(sent) {
+            const ids = new Set((Array.isArray(sent) ? sent : []).map(item => String(item?.intentId || '')).filter(Boolean));
+            if (!ids.size) return;
+            pendingMemberDirectoryIntents = pendingMemberDirectoryIntents.filter(item => !ids.has(String(item.intentId || '')));
+            persistPendingMemberDirectoryIntents();
+        }
         function loadPendingCellWrites() {
             try {
                 const source = JSON.parse(localStorage.getItem(PENDING_CELL_WRITES_KEY) || '{}');
@@ -5155,7 +5187,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const rosterId = existing?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, '');
                 member.trackerRosterId = rosterId;
                 member.color = normalizeColor(member.color || existing?.color || '#7aa2f7');
-                const trackedNames = (member.characterProfiles || []).filter(profile => profile.trackerEnabled && profile.name).map(profile => profile.name);
+                // Preserve the existing Tracker roster for untouched directory entries.
+                // Older records can contain normalized trackerEnabled:false values even
+                // though the character was already registered in Tracker. The server-side
+                // member intent decides opt-outs for the one member actually being edited.
+                const trackedNames = (member.characterProfiles || []).filter(profile => profile.name && (
+                    profile.trackerEnabled === true || (existing?.characters || []).some(name => String(name).trim().toLowerCase() === String(profile.name).trim().toLowerCase())
+                )).map(profile => profile.name);
                 return { id: rosterId, name: member.name.slice(0, 30), color: member.color, characters: trackedNames };
             });
             data.settings.memberDirectory = members;
@@ -5177,6 +5215,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const rosters = normalizeRosters(settings.rosters);
             let members = normalizeMemberDirectory(settings.memberDirectory);
             const jobs = safeObject(settings.characterJobs);
+            const originalMemberIds = new Set(members.map(member => String(member.id || '')));
             let migrated = false;
             if (version < 1) {
                 // One-time migration: bring the legacy Tracker roster into the directory,
@@ -5216,6 +5255,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 migrated = true;
             }
             settings.memberDirectory = normalizeMemberDirectory(members);
+            if (migrated) settings.memberDirectory.forEach(member => {
+                queueMemberDirectoryIntent(originalMemberIds.has(String(member.id || '')) ? 'upsert' : 'add', member);
+            });
             projectTrackerRostersFromMemberDirectory(data, false);
             return migrated;
         }
@@ -6888,8 +6930,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         cloudData = candidate;
                         const resetChangesBeforeSync = checkAutoResets();
                         candidate = cloudData;
+                        const memberDirectoryIntentsSent = clonePendingMemberDirectoryIntents();
                         const hasPendingVersionIntent = !!pendingGlobalBeforeSnapshot || !!pendingGlobalChangeLabel;
-                        if (!hasPendingVersionIntent && globalSyncSnapshot(candidate) === globalSyncSnapshot(remote)) {
+                        if (!hasPendingVersionIntent && !memberDirectoryIntentsSent.length && globalSyncSnapshot(candidate) === globalSyncSnapshot(remote)) {
                             // No shared/global changes exist. Do not issue a PUT that bumps
                             // data_records.updated_at and causes every member to refresh.
                             candidate = restoreRemoteCellsForPendingWrites(candidate, remote, pendingCellWrites);
@@ -6924,7 +6967,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         // D1 cell revision before its compare-and-swap write.
                         const cellWriteIntents=Object.values(pendingWritesSent).slice(0,5000).map(patch=>({charName:String(patch.charName||'').slice(0,40),taskName:String(patch.taskName||'').slice(0,140),state:String(patch.state||'open'),note:String(patch.note||'').slice(0,40)}));
                         if(cellWriteIntents.length)send.cellWriteIntents=cellWriteIntents;
-                        const res=await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)},15000);if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Update failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
+                        if(memberDirectoryIntentsSent.length)send.memberDirectoryIntents=memberDirectoryIntentsSent;
+                        const res=await fetchWithTimeout(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)},15000);if(!res.ok){const detail=await res.text().catch(()=> '');let message=detail;try{const parsed=JSON.parse(detail);message=String(parsed.message||parsed.error||detail);if(parsed.code==='MEMBER_DIRECTORY_REFRESH_REQUIRED')message='The server protected the guild roster from a stale browser copy. Reload Pantheon Tools before making another Member Roster change.';}catch(_){}throw new Error(`Update failed (${res.status})${message?`: ${message.slice(0,300)}`:''}`);}
                         const responsePayload=await res.json();
                         const latest=normalizeData(responsePayload.record||await fetchRemoteRecord(config));
                         const preservedCells = safeObject(cloudData.cells);
@@ -6949,6 +6993,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             const cellAck = acknowledgePendingCellWrites(latest, pendingWritesSent);
                             const cellWriteConflicts = cellAck.mismatches.length;
                             cloudData=latest;
+                            acknowledgePendingMemberDirectoryIntents(memberDirectoryIntentsSent);
                             if (Object.keys(pendingCellWrites).length) cloudData = applyPendingCellWrites(cloudData, latest, pendingCellWrites);
                             delete cloudData.syncInfo;setLastSeenGlobalSignature(getGlobalImpactSignature(latest));persistGlobalSyncFingerprint(cloudData);persistRemoteSyncCursors(config);clearPendingGlobalChange();
                             // Global/settings save confirmation is independent of per-character
@@ -10728,6 +10773,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 member.profileConfirmedAt = Date.now();
             }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === own.id);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             applyDiscordIdentityDefaults();
@@ -10754,6 +10801,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!member) return alert('That member no longer exists. Edit the Member Roster instead.');
             member.color = color;
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI(); triggerAutoSync();
@@ -10778,6 +10827,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!member || !profile) return alert('That character was already changed on another device. Refresh the roster.');
             profile.trackerEnabled = false;
             cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
+            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI();
@@ -10797,6 +10848,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 : profile);
             member.characters = member.characterProfiles.map(profile => profile.name);
             cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
+            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             return true;
@@ -10813,6 +10866,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!member) return alert('That member no longer exists in Member Roster.');
             member.characterProfiles = member.characterProfiles.map(profile => ({ ...profile, trackerEnabled: false }));
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI(); triggerAutoSync();
@@ -11188,12 +11243,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             cloudData.settings.characterJobs[name] = { job, updatedAt: Date.now(), deviceId };
             const directoryEntries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             let directoryClassUpdated = false;
+            const updatedMembers = [];
             directoryEntries.forEach(member => {
                 const profile = member.characterProfiles.find(item => item.name.trim().toLowerCase() === name.trim().toLowerCase());
-                if (profile && profile.job !== job) { profile.job = job; directoryClassUpdated = true; }
+                if (profile && profile.job !== job) { profile.job = job; directoryClassUpdated = true; updatedMembers.push(member); }
             });
             if (directoryClassUpdated) {
                 cloudData.settings.memberDirectory = normalizeMemberDirectory(directoryEntries);
+                updatedMembers.forEach(member => {
+                    const updated = cloudData.settings.memberDirectory.find(item => item.id === member.id);
+                    if (updated) queueMemberDirectoryIntent('upsert', updated);
+                });
                 touchMemberDirectorySettings();
                 projectTrackerRostersFromMemberDirectory(cloudData, true);
             }
@@ -12248,6 +12308,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const keep = (Array.isArray(characterNames) ? characterNames : []).map(value => String(value || '').trim().slice(0, 40)).filter(Boolean);
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             let entry = entries.find(member => member.name.trim().toLowerCase() === name.toLowerCase());
+            const entryAlreadyExisted = !!entry;
             let changed = false;
             if (!entry) {
                 entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: [], characterProfiles: [], trackerRosterId: '', color: '#7aa2f7', note: '' };
@@ -12264,6 +12325,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             });
             if (changed) {
                 cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+                const updatedEntry = cloudData.settings.memberDirectory.find(member => member.id === entry.id);
+                if (updatedEntry) queueMemberDirectoryIntent(entryAlreadyExisted ? 'upsert' : 'add', updatedEntry);
                 touchMemberDirectorySettings();
             }
             projectTrackerRostersFromMemberDirectory(cloudData, true);
@@ -12408,6 +12471,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (!stillExists) delete cloudData.settings.characterJobs[removed.name];
             }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            const updatedEntry = cloudData.settings.memberDirectory.find(member => member.id === initialEntry.id);
+            if (updatedEntry) queueMemberDirectoryIntent('upsert', updatedEntry);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI();
@@ -12491,6 +12556,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 });
             }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            const savedDirectoryEntry = cloudData.settings.memberDirectory.find(item => item.id === entry.id);
+            if (savedDirectoryEntry) queueMemberDirectoryIntent(editingMemberDirectoryId ? 'upsert' : 'add', savedDirectoryEntry);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             applyDiscordIdentityDefaults();
@@ -12507,6 +12574,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any opted-in characters will also be removed from Tracker and Team Builder.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Remove member and characters: ${member.name}`))) return;
             cloudData.settings.memberDirectory = entries.filter(item => item.id !== id);
+            queueMemberDirectoryIntent('remove', id);
             const remaining = cloudData.settings.memberDirectory.flatMap(item => item.characterProfiles || []);
             member.characters.forEach(characterName => { if (!remaining.some(profile => profile.name.toLowerCase() === characterName.toLowerCase())) delete cloudData.settings.characterJobs[characterName]; });
             touchMemberDirectorySettings();
@@ -12916,6 +12984,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 }
             });
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
+            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === own.id);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             applyDiscordIdentityDefaults();
@@ -13265,7 +13335,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r05';
+  const CURRENT_BUILD = '1.6.9-r07';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
