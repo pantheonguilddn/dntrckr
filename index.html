@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r03</title>
+    <title>Pantheon Tools v1.6.9-r10</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r03</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r10</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r03:</strong> Character progress now synchronizes incrementally, unchanged startup syncs no longer rewrite the shared record, and settings saves no longer re-read every character cell. This reduces D1 row reads while preserving per-character save acknowledgements.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r10:</strong> Member Roster saves are now scoped to the member and character change being made. Existing Tracker registrations are preserved across legacy migrations and metadata updates; only explicitly unchecked characters are unregistered.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4479,10 +4479,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             try { localStorage.setItem(PENDING_MEMBER_DIRECTORY_INTENTS_KEY, JSON.stringify(pendingMemberDirectoryIntents.slice(-50))); return true; }
             catch (_) { return false; }
         }
-        function queueMemberDirectoryIntent(op, memberOrId) {
+        function queueMemberDirectoryIntent(op, memberOrId, options = {}) {
             const intent = { intentId: `mdi-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`, op: String(op || '') };
             if (op === 'remove') intent.memberId = String(memberOrId || '').trim();
-            else intent.member = JSON.parse(JSON.stringify(memberOrId || {}));
+            else {
+                intent.member = JSON.parse(JSON.stringify(memberOrId || {}));
+                // Presence of this array marks a current-client, deliberate member save.
+                // An empty array means preserve every prior Tracker opt-in. Only named
+                // characters represent explicit opt-outs.
+                const optOuts = Array.isArray(options?.trackerOptOutNames) ? options.trackerOptOutNames : [];
+                intent.trackerOptOutNames = [...new Set(optOuts.map(name => String(name || '').normalize('NFKC').trim().slice(0, 40)).filter(Boolean))].slice(0, 100);
+                intent.characterRosterChanged = options?.characterRosterChanged === true;
+            }
             if ((op === 'remove' && !intent.memberId) || (op !== 'remove' && !intent.member?.id)) return false;
             pendingMemberDirectoryIntents.push(intent);
             pendingMemberDirectoryIntents = pendingMemberDirectoryIntents.slice(-50);
@@ -5181,19 +5189,27 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!data?.settings) return;
             const oldRosters = normalizeRosters(data.settings.rosters);
             const members = normalizeMemberDirectory(data.settings.memberDirectory);
+            const pendingOptOutsByMember = new Map();
+            (pendingMemberDirectoryIntents || []).forEach(intent => {
+                if (!['add', 'upsert'].includes(String(intent?.op || '')) || !intent?.member?.id || intent.characterRosterChanged !== true) return;
+                pendingOptOutsByMember.set(String(intent.member.id), new Set((Array.isArray(intent.trackerOptOutNames) ? intent.trackerOptOutNames : []).map(name => String(name || '').normalize('NFKC').trim().toLowerCase()).filter(Boolean)));
+            });
             const projected = members.map(member => {
                 const existing = oldRosters.find(roster => roster.id === member.trackerRosterId)
                     || oldRosters.find(roster => roster.name.trim().toLowerCase() === member.name.trim().toLowerCase());
                 const rosterId = existing?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, '');
                 member.trackerRosterId = rosterId;
                 member.color = normalizeColor(member.color || existing?.color || '#7aa2f7');
-                // Preserve the existing Tracker roster for untouched directory entries.
-                // Older records can contain normalized trackerEnabled:false values even
-                // though the character was already registered in Tracker. The server-side
-                // member intent decides opt-outs for the one member actually being edited.
-                const trackedNames = (member.characterProfiles || []).filter(profile => profile.name && (
-                    profile.trackerEnabled === true || (existing?.characters || []).some(name => String(name).trim().toLowerCase() === String(profile.name).trim().toLowerCase())
-                )).map(profile => profile.name);
+                const explicitOptOutNames = pendingOptOutsByMember.get(String(member.id)) || new Set();
+                // Legacy false/missing flags do not revoke committed Tracker membership.
+                // Only a name explicitly unchecked in this member's current save is removed.
+                const trackedNames = (member.characterProfiles || []).filter(profile => {
+                    if (!profile.name) return false;
+                    const key = String(profile.name).normalize('NFKC').trim().toLowerCase();
+                    if (profile.trackerEnabled === true) return true;
+                    if (explicitOptOutNames.has(key)) return false;
+                    return (existing?.characters || []).some(name => String(name).normalize('NFKC').trim().toLowerCase() === key);
+                }).map(profile => profile.name);
                 return { id: rosterId, name: member.name.slice(0, 30), color: member.color, characters: trackedNames };
             });
             data.settings.memberDirectory = members;
@@ -5215,7 +5231,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const rosters = normalizeRosters(settings.rosters);
             let members = normalizeMemberDirectory(settings.memberDirectory);
             const jobs = safeObject(settings.characterJobs);
-            const originalMemberIds = new Set(members.map(member => String(member.id || '')));
+            const newlyCreatedMemberIds = new Set();
             let migrated = false;
             if (version < 1) {
                 // One-time migration: bring the legacy Tracker roster into the directory,
@@ -5225,6 +5241,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     if (!member) {
                         member = { id: `member-${String(roster.id || Date.now().toString(36)).replace(/[^a-zA-Z0-9_-]/g, '')}`, name: roster.name, characters: [], characterProfiles: [], trackerRosterId: roster.id, color: roster.color, note: '' };
                         members.push(member);
+                        newlyCreatedMemberIds.add(String(member.id || ''));
                     }
                     member.trackerRosterId = roster.id || member.trackerRosterId;
                     member.color = normalizeColor(roster.color || member.color);
@@ -5255,8 +5272,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 migrated = true;
             }
             settings.memberDirectory = normalizeMemberDirectory(members);
+            // Migration only needs to create directory entries for legacy Tracker
+            // owners that do not exist in Member Directory yet. Never enqueue every
+            // existing member as an upsert: that turns a schema migration into a bulk
+            // opt-in edit and can overwrite the existing guild Tracker projection.
             if (migrated) settings.memberDirectory.forEach(member => {
-                queueMemberDirectoryIntent(originalMemberIds.has(String(member.id || '')) ? 'upsert' : 'add', member);
+                if (newlyCreatedMemberIds.has(String(member.id || ''))) queueMemberDirectoryIntent('add', member);
             });
             projectTrackerRostersFromMemberDirectory(data, false);
             return migrated;
@@ -10788,7 +10809,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             profileConfirmationMode = 'manage';
             profileConfirmationDraft = null;
             const own = getCurrentMemberDirectoryEntry();
-            renderProfileConfirmationPrompt(own?.characterProfiles || []);
+            const ownView = own ? getMemberDirectoryView().find(member => member.id === own.id) : null;
+            renderProfileConfirmationPrompt(ownView?.characterProfiles || own?.characterProfiles || []);
             openModal('profile-confirm-modal');
         }
 
@@ -10812,7 +10834,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === own.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember, { characterRosterChanged: true });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             applyDiscordIdentityDefaults();
@@ -10866,7 +10888,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             profile.trackerEnabled = false;
             cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
             const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember, { characterRosterChanged: true, trackerOptOutNames: [initialProfile.name] });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI();
@@ -10887,7 +10909,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             member.characters = member.characterProfiles.map(profile => profile.name);
             cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
             const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember, { characterRosterChanged: true });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             return true;
@@ -10905,7 +10927,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             member.characterProfiles = member.characterProfiles.map(profile => ({ ...profile, trackerEnabled: false }));
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
+            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember, { characterRosterChanged: true, trackerOptOutNames: names });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI(); triggerAutoSync();
@@ -12364,7 +12386,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (changed) {
                 cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
                 const updatedEntry = cloudData.settings.memberDirectory.find(member => member.id === entry.id);
-                if (updatedEntry) queueMemberDirectoryIntent(entryAlreadyExisted ? 'upsert' : 'add', updatedEntry);
+                if (updatedEntry) queueMemberDirectoryIntent(entryAlreadyExisted ? 'upsert' : 'add', updatedEntry, { characterRosterChanged: true });
                 touchMemberDirectorySettings();
             }
             projectTrackerRostersFromMemberDirectory(cloudData, true);
@@ -12373,11 +12395,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getMemberDirectoryView() {
             ensureMemberRosterMaster(cloudData);
-            const rosterById = new Map(normalizeRosters(cloudData.settings.rosters).map(roster => [roster.id, roster]));
+            const rosters = normalizeRosters(cloudData.settings.rosters);
+            const rosterById = new Map(rosters.map(roster => [roster.id, roster]));
             return normalizeMemberDirectory(cloudData.settings.memberDirectory).map(member => {
-                const roster = rosterById.get(member.trackerRosterId) || normalizeRosters(cloudData.settings.rosters).find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
-                const inTracker = (member.characterProfiles || []).some(profile => profile.trackerEnabled);
-                return { ...member, color: member.color || roster?.color || '#7aa2f7', inTracker, recordId: member.id };
+                const roster = rosterById.get(member.trackerRosterId) || rosters.find(item => item.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                const trackedKeys = new Set((roster?.characters || []).map(name => String(name).normalize('NFKC').trim().toLowerCase()));
+                const characterProfiles = (member.characterProfiles || []).map(profile => ({
+                    ...profile,
+                    // The committed Tracker roster is authoritative for legacy members.
+                    trackerEnabled: profile.trackerEnabled === true || trackedKeys.has(String(profile.name).normalize('NFKC').trim().toLowerCase())
+                }));
+                const inTracker = characterProfiles.some(profile => profile.trackerEnabled);
+                return { ...member, characterProfiles, color: member.color || roster?.color || '#7aa2f7', inTracker, recordId: member.id };
             }).sort((a, b) => a.name.localeCompare(b.name));
         }
 
@@ -12476,7 +12505,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             editingMemberDirectoryOriginalName = view.name;
             document.getElementById('member-directory-name').value = record?.name || view.name;
             document.getElementById('member-directory-note').value = record?.note || view.note || '';
-            renderMemberCharacterRows(record?.characterProfiles || view.characterProfiles || []);
+            // Use the view's effective flags so legacy characters already present in
+            // Tracker appear checked. An administrator must explicitly uncheck a row
+            // to produce an opt-out; absent old flags cannot silently clear a roster.
+            renderMemberCharacterRows(view.characterProfiles || record?.characterProfiles || []);
             document.getElementById('member-directory-form-title').textContent = 'Edit member and character registrations';
             document.getElementById('member-directory-submit').textContent = 'Save changes';
             document.getElementById('member-directory-cancel').hidden = false;
@@ -12510,7 +12542,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             const updatedEntry = cloudData.settings.memberDirectory.find(member => member.id === initialEntry.id);
-            if (updatedEntry) queueMemberDirectoryIntent('upsert', updatedEntry);
+            if (updatedEntry) queueMemberDirectoryIntent('upsert', updatedEntry, { characterRosterChanged: true });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI();
@@ -12543,7 +12575,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (hasCloudConfig() && !(await prepareGlobalChange(`${editingMemberDirectoryId ? 'Update' : 'Add'} member roster entry: ${name}`))) return;
             ensureMemberRosterMaster(cloudData);
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const previousOwnedCharacters = new Set((entries.find(member => member.id === editingMemberDirectoryId)?.characterProfiles || []).map(profile => String(profile.name || '').toLowerCase()));
+            const previousEntry = editingMemberDirectoryId ? entries.find(member => member.id === editingMemberDirectoryId) : null;
+            const previousRosters = getRosters();
+            const previousTrackerRoster = previousEntry
+                ? previousRosters.find(roster => roster.id === previousEntry.trackerRosterId)
+                    || previousRosters.find(roster => roster.name.trim().toLowerCase() === previousEntry.name.trim().toLowerCase())
+                : null;
+            const explicitTrackerOptOutNames = previousEntry ? (previousTrackerRoster?.characters || []).filter(previousName => {
+                const submittedProfile = profiles.find(profile => String(profile.name).normalize('NFKC').trim().toLowerCase() === String(previousName).normalize('NFKC').trim().toLowerCase());
+                return !!submittedProfile && submittedProfile.trackerEnabled !== true;
+            }) : [];
+            const previousOwnedCharacters = new Set((previousEntry?.characterProfiles || []).map(profile => String(profile.name || '').toLowerCase()));
             const sameName = entries.find(member => member.name.toLowerCase() === name.toLowerCase() && member.id !== editingMemberDirectoryId);
             if (sameName) return alert('That member already has a Member Roster entry. Edit the existing member instead.');
             const otherMembers = entries.filter(member => member.id !== editingMemberDirectoryId);
@@ -12595,7 +12637,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             const savedDirectoryEntry = cloudData.settings.memberDirectory.find(item => item.id === entry.id);
-            if (savedDirectoryEntry) queueMemberDirectoryIntent(editingMemberDirectoryId ? 'upsert' : 'add', savedDirectoryEntry);
+            if (savedDirectoryEntry) queueMemberDirectoryIntent(
+                editingMemberDirectoryId ? 'upsert' : 'add',
+                savedDirectoryEntry,
+                { characterRosterChanged: true, trackerOptOutNames: explicitTrackerOptOutNames }
+            );
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             applyDiscordIdentityDefaults();
@@ -12642,7 +12688,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r03';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r10';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12860,7 +12906,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function renderProfileConfirmationPrompt(profileOverride = null) {
             const member = getCurrentMemberDirectoryEntry();
-            const profiles = cloneConfirmationProfiles(profileOverride || (profileConfirmationDraft?.memberId === member?.id ? profileConfirmationDraft.profiles : member?.characterProfiles || []));
+            const effectiveMember = member ? getMemberDirectoryView().find(item => item.id === member.id) : null;
+            const profiles = cloneConfirmationProfiles(profileOverride || (profileConfirmationDraft?.memberId === member?.id ? profileConfirmationDraft.profiles : effectiveMember?.characterProfiles || member?.characterProfiles || []));
             const container = document.getElementById('profile-confirm-characters');
             const intro = document.getElementById('profile-confirm-intro');
             const review = document.getElementById('profile-confirm-review');
@@ -12987,6 +13034,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 if (matched.length === 1) own = matched[0];
                 else if (matched.length > 1) { alert('Your Discord identity matches multiple Member Roster entries. Ask an administrator to resolve the duplicate before saving.'); return; }
             }
+            const ownAlreadyExisted = !!own;
             if (!own) {
                 const ownerCollision = entries.find(item => identityCompactKey(item.name) === identityCompactKey(intendedOwnerName));
                 if (ownerCollision) { alert('An existing Member Roster entry uses this owner name, but it could not be uniquely linked to your Discord account. Ask an administrator to fix the roster match.'); return; }
@@ -13004,6 +13052,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (conflict) { alert(`The IGN "${conflict.name}" is already registered to another member. Correct the name or ask an administrator to resolve the duplicate.`); return; }
 
             const previousNames = (own.characterProfiles || []).map(profile => String(profile.name || '').trim());
+            const previousOwnRoster = getRosters().find(roster => roster.id === own.trackerRosterId)
+                || getRosters().find(roster => roster.name.trim().toLowerCase() === own.name.trim().toLowerCase());
+            const explicitTrackerOptOutNames = (previousOwnRoster?.characters || []).filter(previousName => {
+                const submittedProfile = profiles.find(profile => String(profile.name).normalize('NFKC').trim().toLowerCase() === String(previousName).normalize('NFKC').trim().toLowerCase());
+                return !!submittedProfile && submittedProfile.trackerEnabled !== true;
+            });
             own.characters = profiles.map(profile => profile.name);
             own.characterProfiles = profiles.map(profile => ({ name: profile.name, job: profile.job, trackerEnabled: profile.trackerEnabled, isMain: profile.isMain }));
             own.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
@@ -13023,7 +13077,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             });
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === own.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember);
+            if (updatedMember) queueMemberDirectoryIntent(ownAlreadyExisted ? 'upsert' : 'add', updatedMember, {
+                characterRosterChanged: true,
+                trackerOptOutNames: explicitTrackerOptOutNames
+            });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             applyDiscordIdentityDefaults();
@@ -13373,7 +13430,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r09';
+  const CURRENT_BUILD = '1.6.9-r10';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

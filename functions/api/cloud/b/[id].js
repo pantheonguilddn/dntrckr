@@ -133,7 +133,7 @@ function cleanMemberIntentPayload(value) {
     isBootstrapPersonalOwner: value?.isBootstrapPersonalOwner === true
   };
 }
-function projectDirectoryRosters(members, oldRosters, explicitlyEditedMemberIds = new Set()) {
+function projectDirectoryRosters(members, oldRosters, explicitOptOutsByMember = new Map()) {
   return members.map(member => {
     const existing = oldRosters.find(roster => String(roster?.id || '') === String(member?.trackerRosterId || ''))
       || oldRosters.find(roster => ownerKey(roster?.name) === ownerKey(member?.name));
@@ -143,16 +143,18 @@ function projectDirectoryRosters(members, oldRosters, explicitlyEditedMemberIds 
       : (/^#[0-9a-f]{6}$/i.test(String(existing?.color || '')) ? String(existing.color).toLowerCase() : '#7aa2f7');
     const profiles = new Map(arr(member?.characterProfiles).map(profile => [ownerKey(profile?.name || profile?.ign), profile]));
     const names = memberNames(member);
-    const memberWasExplicitlyEdited = explicitlyEditedMemberIds.has(String(member?.id || ''));
     const previouslyTrackedNames = new Set(arr(existing?.characters).map(ownerKey));
+    const explicitOptOutNames = explicitOptOutsByMember.get(String(member?.id || '')) || new Set();
     const trackedNames = names.filter(name => {
-      const profile = profiles.get(ownerKey(name));
+      const key = ownerKey(name);
+      const profile = profiles.get(key);
       if (profile?.trackerEnabled === true) return true;
-      // An add/update intent is the only operation allowed to change that member's
-      // opt-in flags. Every other member keeps their committed Tracker roster exactly,
-      // including legacy records whose normalized profile flags are false by default.
-      if (!memberWasExplicitlyEdited && previouslyTrackedNames.has(ownerKey(name))) return true;
-      return false;
+      // Missing/false legacy flags are NOT opt-outs. Preserve the committed Tracker
+      // membership unless this member's latest explicit save names the character as
+      // intentionally unchecked. Characters removed from Member Roster are absent
+      // from `names` and therefore are naturally removed from the projection.
+      if (explicitOptOutNames.has(key)) return false;
+      return previouslyTrackedNames.has(key);
     });
     return { id: rosterId, name: String(member?.name || 'Member').slice(0, 30), color: member.color, characters: trackedNames };
   });
@@ -168,7 +170,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
   const intents = arr(rawIntents).slice(0, 50);
   const oldRosters = arr(previousSettings.rosters);
   const deletedCharacterNames = new Set();
-  const explicitlyEditedMemberIds = new Set();
+  const explicitOptOutsByMember = new Map();
   for (const raw of intents) {
     const op = String(raw?.op || '');
     if (op === 'remove') {
@@ -183,7 +185,13 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
       continue;
     }
     if (op !== 'add' && op !== 'upsert') throw new Error('Unsupported Member Roster operation. Refresh the page and retry.');
-    const member = cleanMemberIntentPayload(raw?.member);
+    // r06-r09 clients queued every legacy directory row as an upsert during migration.
+    // Those requests have no trackerOptOutNames field and may contain stale/normalized
+    // character profiles. Treat legacy upserts as migration noise, not as user edits.
+    // Current clients always send an array (including []), so intentional edits still
+    // apply and are distinguishable from these unsafe bulk migration writes.
+    if (op === 'upsert' && !Array.isArray(raw?.trackerOptOutNames)) continue;
+    let member = cleanMemberIntentPayload(raw?.member);
     const index = currentMembers.findIndex(item => String(item.id || '') === member.id);
     if (op === 'add' && index >= 0) {
       // Idempotent retry after a successful server commit whose response was lost.
@@ -195,9 +203,50 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
     const existingNames = new Set(currentMembers.filter((_, i) => i !== index).flatMap(memberNames).map(ownerKey));
     const duplicateCharacter = memberNames(member).find(name => existingNames.has(ownerKey(name)));
     if (duplicateCharacter) throw Object.assign(new Error(`The IGN ${duplicateCharacter} is already assigned to another member.`), { status: 409 });
-    explicitlyEditedMemberIds.add(member.id);
+    // Opt-outs are explicit metadata from the edited member form. An absent or
+    // legacy trackerEnabled:false flag is never interpreted as a request to untrack.
+    const characterRosterChanged = raw?.characterRosterChanged === true;
+    explicitOptOutsByMember.set(member.id, new Set(
+      (characterRosterChanged ? arr(raw?.trackerOptOutNames) : []).map(name => ownerKey(name)).filter(Boolean)
+    ));
     if (index >= 0) {
-      memberNames(currentMembers[index]).forEach(name => deletedCharacterNames.add(ownerKey(name)));
+      const committedMember = currentMembers[index];
+      memberNames(committedMember).forEach(name => deletedCharacterNames.add(ownerKey(name)));
+      if (!characterRosterChanged) {
+        // Metadata-only updates (owner color, class sync, and similar profile maintenance)
+        // must not replace the canonical character registration using a possibly
+        // stale browser snapshot. Patch safe member fields, but preserve the server's
+        // character list, Tracker opt-ins, Main flags, and ordering.
+        const priorProfiles = new Map(arr(committedMember.characterProfiles).map(profile => [ownerKey(profile?.name || profile?.ign), profile]));
+        const incomingProfiles = new Map(arr(member.characterProfiles).map(profile => [ownerKey(profile?.name || profile?.ign), profile]));
+        const preservedNames = memberNames(committedMember);
+        member = {
+          ...committedMember,
+          ...member,
+          // Only safe presentation fields are patched by a metadata-only operation.
+          // Owner identity, notes, Discord confirmation, access flags, and the
+          // character roster are changed only by their dedicated current-client flows.
+          id: String(committedMember.id || member.id),
+          name: String(committedMember.name || member.name),
+          note: String(committedMember.note || ''),
+          profileConfirmedDiscordId: String(committedMember.profileConfirmedDiscordId || ''),
+          profileConfirmedAt: Number(committedMember.profileConfirmedAt) || 0,
+          ledgerAccess: committedMember.ledgerAccess === true,
+          isBootstrapPersonalOwner: committedMember.isBootstrapPersonalOwner === true,
+          characters: preservedNames,
+          characterProfiles: preservedNames.map(name => {
+            const prior = priorProfiles.get(ownerKey(name)) || {};
+            const incoming = incomingProfiles.get(ownerKey(name)) || {};
+            return {
+              name: String(prior.name || name),
+              job: String(incoming.job || prior.job || '').slice(0, 60),
+              trackerEnabled: prior.trackerEnabled === true,
+              isMain: prior.isMain === true
+            };
+          }),
+          trackerRosterId: String(committedMember.trackerRosterId || member.trackerRosterId || '')
+        };
+      }
       currentMembers[index] = member;
     } else {
       currentMembers.push(member);
@@ -208,6 +257,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
   const jobs = { ...obj(previousSettings.characterJobs) };
   for (const raw of intents) {
     if (raw?.op === 'remove') continue;
+    if (raw?.op === 'upsert' && !Array.isArray(raw?.trackerOptOutNames)) continue;
     const member = cleanMemberIntentPayload(raw?.member);
     for (const profile of arr(member.characterProfiles)) {
       if (profile.job) jobs[profile.name] = { job: profile.job, updatedAt: Date.now(), deviceId: String(session?.discordId || '') };
@@ -221,7 +271,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
 
   next.settings = nextSettings;
   next.settings.memberDirectory = currentMembers;
-  next.settings.rosters = projectDirectoryRosters(currentMembers, oldRosters, explicitlyEditedMemberIds);
+  next.settings.rosters = projectDirectoryRosters(currentMembers, oldRosters, explicitOptOutsByMember);
   next.settings.characterJobs = jobs;
   const now = Date.now();
   next.settings.memberDirectoryUpdatedAt = now;
