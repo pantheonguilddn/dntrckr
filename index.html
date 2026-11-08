@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r10</title>
+    <title>Pantheon Tools v1.6.9-r11</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3964,9 +3964,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r10</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r11</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r10:</strong> Member Roster saves are now scoped to the member and character change being made. Existing Tracker registrations are preserved across legacy migrations and metadata updates; only explicitly unchecked characters are unregistered.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r11:</strong> Member Roster saves no longer trigger automatic task resets. Delayed daily/weekly resets now preserve cells already updated after the scheduled UTC reset boundary.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4466,7 +4466,17 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         const CLOUD_CONFIG_KEY = 'pantheon-jsonbin-config-v3';
         const DEVICE_ID_KEY = 'pantheon-device-id-v3';
         const PENDING_CELL_WRITES_KEY = 'pantheon-pending-cell-writes-v1';
+        const QUARANTINED_RESET_WRITES_KEY = 'pantheon-quarantined-reset-writes-v1';
         const PENDING_MEMBER_DIRECTORY_INTENTS_KEY = 'pantheon-pending-member-directory-intents-v1';
+        function loadQuarantinedResetWriteArchive() {
+            try { const value = JSON.parse(localStorage.getItem(QUARANTINED_RESET_WRITES_KEY) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+            catch (_) { return {}; }
+        }
+        let quarantinedResetWriteArchive = loadQuarantinedResetWriteArchive();
+        function persistQuarantinedResetWriteArchive(value = quarantinedResetWriteArchive) {
+            try { localStorage.setItem(QUARANTINED_RESET_WRITES_KEY, JSON.stringify(value || {})); return true; }
+            catch (_) { return false; }
+        }
         function loadPendingMemberDirectoryIntents() {
             try {
                 const source = JSON.parse(localStorage.getItem(PENDING_MEMBER_DIRECTORY_INTENTS_KEY) || '[]');
@@ -4577,6 +4587,54 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function getPendingCellCharacterNames() {
             return [...new Set(Object.values(pendingCellWrites).map(item => String(item.charName || '').trim()).filter(Boolean))];
         }
+        function quarantineLegacyResetBatches() {
+            // Older builds could enqueue a whole-character automatic reset as a
+            // same-second burst. Archive these edits separately, then remove them
+            // from the active retry queue so they can never be posted to D1 again.
+            const resetTaskNames = new Set([
+                ...(Array.isArray(weeklyTaskNames) ? weeklyTaskNames : []),
+                ...(Array.isArray(cloudData?.settings?.categories) ? cloudData.settings.categories
+                    .filter(category => ['Dailies','Weeklies'].includes(String(category.group || '')))
+                    .flatMap(category => Array.isArray(category.tasks) ? category.tasks : []) : [])
+            ].map(name => String(name || '').trim()).filter(Boolean));
+            const groups = new Map();
+            Object.entries(pendingCellWrites || {}).forEach(([key, item]) => {
+                if (!item) return;
+                if (!resetTaskNames.has(String(item.taskName || '').trim())) return;
+                if (!['open','excluded'].includes(String(item.state || ''))) return;
+                const stamp = Number(item.updatedAt) || 0;
+                const charName = String(item.charName || '').trim();
+                if (!stamp || !charName) return;
+                const device = String(item.deviceId || '');
+                const bucket = Math.floor(stamp / 1000);
+                const groupKey = `${charName}|${device}|${bucket}`;
+                if (!groups.has(groupKey)) groups.set(groupKey, []);
+                groups.get(groupKey).push(key);
+            });
+            const keysToArchive = [...groups.values()].filter(keys => keys.length >= 8).flat();
+            if (!keysToArchive.length) return 0;
+            const nextArchive = { ...quarantinedResetWriteArchive };
+            const quarantinedAt = Date.now();
+            keysToArchive.forEach(key => {
+                const item = pendingCellWrites[key];
+                if (!item) return;
+                nextArchive[key] = {
+                    ...item,
+                    archivedAt: quarantinedAt,
+                    archiveReason: 'Same-character, same-second bulk reset-task burst from an older build; deliberately not replayed.'
+                };
+            });
+            // Never remove from the active outbox unless the separate archive was saved.
+            if (!persistQuarantinedResetWriteArchive(nextArchive)) return 0;
+            quarantinedResetWriteArchive = nextArchive;
+            keysToArchive.forEach(key => { delete pendingCellWrites[key]; });
+            persistPendingCellWrites();
+            return keysToArchive.length;
+        }
+        function hasQuarantinedResetWrites() {
+            return Object.keys(quarantinedResetWriteArchive || {}).length > 0;
+        }
+
         function resumePendingCellWritesAfterMigration() {
             if (!characterStorageReady) return;
             let changed = false;
@@ -4589,7 +4647,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 for (const item of Object.values(pendingCellWrites)) {
                     // A read-after-write mismatch is a possible same-cell conflict, not a
                     // transport outage. Keep it parked for explicit review/manual Sync.
-                    if (item.lastCode === 'ACK_MISMATCH') continue;
+                    if (item.lastCode === 'ACK_MISMATCH' || item.lastCode === 'AUTO_RESET_BATCH_QUARANTINED') continue;
                     item.retryable = true;
                     item.retryCount = 0;
                     item.lastAttemptAt = 0;
@@ -4601,7 +4659,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             // Migration-specific failures can become valid without a full page reload.
             for (const item of Object.values(pendingCellWrites)) {
-                if (['CHARACTER_STORAGE_NOT_MIGRATED','CHARACTER_STORAGE_SCHEMA_MISSING','OWNER_INDEX_REFRESH_FAILED'].includes(item.lastCode)) {
+                if (item.lastCode !== 'AUTO_RESET_BATCH_QUARANTINED' && ['CHARACTER_STORAGE_NOT_MIGRATED','CHARACTER_STORAGE_SCHEMA_MISSING','OWNER_INDEX_REFRESH_FAILED'].includes(item.lastCode)) {
                     if (item.retryable === false || Number(item.retryCount) >= 8) {
                         item.retryable = true; item.retryCount = 0; item.lastError = ''; item.lastCode = ''; item.lastStatus = 0; changed = true;
                     }
@@ -4661,8 +4719,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!name || pendingCellSyncBusy.has(name)) return false;
             // A reset can queue more tasks for one character than the API's atomic
             // batch ceiling. Send 40 at a time and continue after each acknowledged chunk.
-            const snapshotEntries = pendingCellEntriesForCharacter(name).slice(0, 40);
-            if (!snapshotEntries.length) return true;
+            const allEntries = pendingCellEntriesForCharacter(name);
+            const snapshotEntries = allEntries.filter(([,item]) => item.lastCode !== 'AUTO_RESET_BATCH_QUARANTINED').slice(0, 40);
+            if (!snapshotEntries.length) {
+                const held = allEntries.filter(([,item]) => item.lastCode === 'AUTO_RESET_BATCH_QUARANTINED').length;
+                if (held) updatePendingCellStatus(`${name}: ${held} suspected old automatic-reset edits were archived locally and will not be re-sent`);
+                return held === 0;
+            }
             if (!hasCloudConfig()) {
                 updatePendingCellStatus('Saved locally only · connect to the shared Tracker to publish these changes');
                 return false;
@@ -4779,6 +4842,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function applyPendingCellWrites(candidate, remote, pendingSnapshot) {
             Object.values(pendingSnapshot || {}).forEach(patch => {
+                if (patch?.lastCode === 'AUTO_RESET_BATCH_QUARANTINED') return;
                 if (!patch?.charName || !patch?.taskName || !['open','done','excluded','marked','reset'].includes(patch.state)) return;
                 ensureCellMap(candidate, patch.charName);
                 const current = normalizeCellRecord(candidate.cells[patch.charName]?.[patch.taskName]) || { state:'open', note:'', updatedAt:0, deviceId:'' };
@@ -6531,8 +6595,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const startupCachedRecordRevision = lastRemoteRecordRevision;
             const startupCachedStorageRevision = lastCharacterStorageRevision;
             syncDataStructures();
+            const heldLegacyResetEdits = quarantineLegacyResetBatches();
             getLocalTeamBuilderState();
             refreshTrackerUI();
+            if (heldLegacyResetEdits) setStatus(`🟠 ${heldLegacyResetEdits} suspected old automatic-reset edits were archived on this device and will not be re-sent`);
             if (!hasCloudConfig()) return setStatus('⚪ Local mode — click Cloud Setup');
 
             // IMPORTANT: provision/migrate owner-scoped storage before any whole-record sync
@@ -6581,8 +6647,21 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!startupRevisionChecked) {
                 try { await fetchRemoteRevision(getCloudConfig()); } catch (_) { /* D1 timestamps remain authoritative if clock calibration is temporarily unavailable. */ }
             }
+            if (heldLegacyResetEdits) {
+                try {
+                    const authoritative = normalizeData(await fetchRemoteRecord(getCloudConfig()));
+                    cloudData.cells = cloneDataObject(safeObject(authoritative.cells));
+                    cloudData.completionTiming = normalizeCompletionTiming(authoritative.completionTiming, cloudData.settings?.analyticsHistoryClearedAt || 0);
+                    cloudData = applyPendingCellWrites(cloudData, authoritative, pendingCellWrites);
+                    persistLocalData();
+                    refreshTrackerUI();
+                    setStatus(`🟠 ${heldLegacyResetEdits} suspected old reset edits were archived locally · current D1 progress reloaded`);
+                } catch (error) {
+                    setStatus(`🟠 ${heldLegacyResetEdits} suspected old reset edits are held locally · D1 progress could not be reloaded yet: ${String(error?.message || error).slice(0,140)}`);
+                }
+            }
             const localGlobalSnapshotIsUnchanged = startupRemoteCursorRestored && hasMatchingGlobalSyncFingerprint(cloudData);
-            if (localGlobalSnapshotIsUnchanged) {
+            if (localGlobalSnapshotIsUnchanged && !heldLegacyResetEdits) {
                 await synchronizeStartupFromKnownRevision(startupCachedRecordRevision, startupCachedStorageRevision);
             } else {
                 // First launch after r03 has no verified incremental cursor, or the local
@@ -6960,7 +7039,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 return Promise.resolve(false);
             }
             if (showSuccess) {
-                Object.values(pendingCellWrites).forEach(item => { item.retryCount = 0; item.lastAttemptAt = 0; item.retryable = true; item.lastError = ''; item.lastCode = ''; item.lastStatus = 0; });
+                Object.values(pendingCellWrites).forEach(item => { if (item.lastCode === 'AUTO_RESET_BATCH_QUARANTINED') return; item.retryCount = 0; item.lastAttemptAt = 0; item.retryable = true; item.lastError = ''; item.lastCode = ''; item.lastStatus = 0; });
                 persistPendingCellWrites();
                 pendingCellRetryTimers.forEach(timer => clearTimeout(timer)); pendingCellRetryTimers.clear();
             }
@@ -6987,9 +7066,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         candidate = restoreRemoteCellsForPendingWrites(candidate, remote, pendingCellWrites);
                         candidate = enforceMemberSafeSyncWrite(candidate, remote);
                         cloudData = candidate;
-                        const resetChangesBeforeSync = checkAutoResets();
-                        candidate = cloudData;
                         const memberDirectoryIntentsSent = clonePendingMemberDirectoryIntents();
+                        const isMemberDirectorySave = memberDirectoryIntentsSent.length > 0;
+                        const resetChangesBeforeSync = checkAutoResets({ deferForMemberRosterSave: isMemberDirectorySave });
+                        candidate = cloudData;
                         const hasPendingVersionIntent = !!pendingGlobalBeforeSnapshot || !!pendingGlobalChangeLabel;
                         if (!hasPendingVersionIntent && !memberDirectoryIntentsSent.length && globalSyncSnapshot(candidate) === globalSyncSnapshot(remote)) {
                             // No shared/global changes exist. Do not issue a PUT that bumps
@@ -7058,7 +7138,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                             // Global/settings save confirmation is independent of per-character
                             // cell saves, which have their own requests and acknowledgements.
                             unsavedCloudChanges = false;
-                            const resetChangesAfterRefresh = checkAutoResets();
+                            const resetChangesAfterRefresh = checkAutoResets({ deferForMemberRosterSave: isMemberDirectorySave });
                             persistLocalData();
                             if(remoteChangedSinceUI || resetChangesAfterRefresh || cellWriteConflicts) refreshTrackerUI(); else updateOverviewStatusCards();
                             applyDeveloperTextOverrides();
@@ -7917,10 +7997,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             guildRaidTimingSummaryCache = null;
         }
 
-        function setCellNote(c, t, note) {
+        function setCellNote(c, t, note, forcedTime = 0) {
             ensureCellMap(cloudData, c);
             const cur = cloudData.cells[c][t] || { state: 'open', updatedAt: 0 };
-            cloudData.cells[c][t] = { state: cur.state, note: String(note).slice(0,40), updatedAt: Math.max(Date.now(), cur.updatedAt + 1), deviceId };
+            cloudData.cells[c][t] = { state: cur.state, note: String(note).slice(0,40), updatedAt: Math.max(Number(forcedTime) || Date.now(), (Number(cur.updatedAt) || 0) + 1), deviceId };
             cloudData.updatedAt = Date.now();
             rememberPendingCellWrite(c, t);
         }
@@ -8090,11 +8170,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function updateRates() { characters.forEach(c => updateRateForCharacter(c.name)); }
 
-        function checkAutoResets() {
+        function checkAutoResets(options = {}) {
+            // A Member Roster save must never be the operation that starts a global
+            // reset. A stale marker may be reconciled on a later normal sync, where
+            // the reset routines below protect every cell updated after the boundary.
+            if (options?.deferForMemberRosterSave === true || (Array.isArray(pendingMemberDirectoryIntents) && pendingMemberDirectoryIntents.length > 0)) return false;
             let changed = false;
             const dt = getTargetResetTimeUTC(false), wt = getTargetResetTimeUTC(true);
             if (isAdminModeActive()) {
-                if (cloudData.lastDailyReset < dt) { executeDailyReset(); cloudData.lastDailyReset = dt; changed = true; }
+                if (cloudData.lastDailyReset < dt) { executeDailyReset(null, dt); cloudData.lastDailyReset = dt; changed = true; }
                 if (cloudData.lastWeeklyReset < wt) { executeWeeklyReset(wt); cloudData.lastWeeklyReset = wt; changed = true; }
                 if (changed) setAllMemberResetMarkers(cloudData.lastDailyReset, cloudData.lastWeeklyReset);
                 if (changed) persistLocalData();
@@ -8126,55 +8210,72 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 ...characters.map(c => c.name), ...Object.keys(safeObject(cloudData.cells))
             ])];
         }
-        function executeDailyReset(characterNames = null) {
-            const ts = Date.now();
+        function executeDailyReset(characterNames = null, resetAt = getTargetResetTimeUTC(false)) {
+            const boundary = Math.max(0, Number(resetAt) || 0);
             const targets = Array.isArray(characterNames) ? characterNames : getAllKnownCharacterNames();
             const dailyTasks = cloudData.settings.categories
                 .filter(category => category.group === 'Dailies')
                 .flatMap(category => (category.tasks || []).filter(task => trackBountyBoards || !isBountyBoardSlot(category, task)));
             targets.forEach(character => dailyTasks.forEach(task => {
-                const state = getCellState(character, task);
-                if (isDefaultExcludedTask(task) && state !== 'excluded') setCellState(character, task, 'excluded', ts);
-                else if (state === 'done') setCellState(character, task, 'open', ts);
+                const record = getCellRecord(character, task);
+                // Do not let a delayed/stale reset marker clear work recorded in this
+                // reset cycle. Reset only values older than the scheduled UTC boundary.
+                if ((Number(record.updatedAt) || 0) >= boundary) return;
+                const state = record.state || 'open';
+                if (isDefaultExcludedTask(task) && state !== 'excluded') setCellState(character, task, 'excluded', boundary);
+                else if (state === 'done') setCellState(character, task, 'open', boundary);
             }));
         }
 
         function executeWeeklyReset(rk = getTargetResetTimeUTC(true), characterNames = null) {
-            const k = String(rk);
+            const boundary = Math.max(0, Number(rk) || 0);
+            const k = String(boundary);
             const targets = Array.isArray(characterNames) ? characterNames : getAllKnownCharacterNames();
-            // Always preserve one compact snapshot before clearing the active week. This
-            // makes the previous-week report independent of the optional extended-analytics
-            // switch. When extended analytics is enabled, trimWeeklyArchive retains five weeks.
+            // Preserve the previous-cycle snapshot, but never overwrite it with cells
+            // already changed after this reset boundary. This makes Time Travel recovery
+            // and delayed syncs idempotent instead of treating current-week clears as
+            // the previous week's completion history.
             const existing = safeObject(cloudData.weeklyArchive[k]);
             const rates = { ...safeObject(existing.rates) }, states = { ...safeObject(existing.states) };
+            let archiveChanged = false;
             targets.forEach(name => {
+                if (Object.prototype.hasOwnProperty.call(states, name) || Object.prototype.hasOwnProperty.call(rates, name)) return;
+                const completionTasks = getCompletionTaskNames();
+                const hasPostBoundaryCell = completionTasks.some(task => (Number(getCellRecord(name, task).updatedAt) || 0) >= boundary);
+                if (hasPostBoundaryCell) return;
                 let ct = 0, dn = 0;
-                getCompletionTaskNames().forEach(task => {
+                completionTasks.forEach(task => {
                     const state = getCellState(name, task);
                     if (state !== 'excluded') { ct++; if (state === 'done') dn++; }
                 });
                 rates[name] = ct ? Math.round((dn / ct) * 100) : 0;
                 states[name] = weeklyTaskNames.map(task => { const state = getCellState(name, task); return state === 'done' ? 'd' : state === 'excluded' ? 'x' : 'm'; }).join('');
+                archiveChanged = true;
             });
-            cloudData.weeklyArchive[k] = {
-                ...existing, createdAt: Number(existing.createdAt) || Date.now(),
-                taskOrder: [...weeklyTaskNames], rates, states
-            };
+            if (archiveChanged || Object.keys(existing).length) {
+                cloudData.weeklyArchive[k] = {
+                    ...existing, createdAt: Number(existing.createdAt) || Date.now(),
+                    taskOrder: Array.isArray(existing.taskOrder) && existing.taskOrder.length ? [...existing.taskOrder] : [...weeklyTaskNames],
+                    rates, states
+                };
+            }
             trimWeeklyArchive();
-            const ts = Date.now();
             const bountyCategory = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
             const bountyTasks = new Set(bountyCategory?.tasks || []);
             targets.forEach(character => {
                 weeklyTaskNames.forEach(task => {
-                    const state = getCellState(character, task);
+                    const record = getCellRecord(character, task);
+                    if ((Number(record.updatedAt) || 0) >= boundary) return;
+                    const state = record.state || 'open';
                     if (isDefaultExcludedTask(task)) {
-                        if (state !== 'excluded') setCellState(character, task, 'excluded', ts);
-                    } else if (state !== 'open' && state !== 'excluded') setCellState(character, task, 'open', ts);
+                        if (state !== 'excluded') setCellState(character, task, 'excluded', boundary);
+                    } else if (state !== 'open' && state !== 'excluded') setCellState(character, task, 'open', boundary);
                 });
-                // Clear only this reset's characters' bounty target fields.
+                // Clear old bounty notes only. Current-cycle notes survive a delayed reset.
                 bountyTasks.forEach(task => {
-                    if (!getCellRecord(character, task).note) return;
-                    setCellNote(character, task, '');
+                    const record = getCellRecord(character, task);
+                    if ((Number(record.updatedAt) || 0) >= boundary || !record.note) return;
+                    setCellNote(character, task, '', boundary);
                     const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(character)}"][data-task="${CSS.escape(task)}"]`);
                     if (input) input.value = '';
                 });
@@ -12688,7 +12789,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r10';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r11';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13430,7 +13531,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r10';
+  const CURRENT_BUILD = '1.6.9-r11';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
