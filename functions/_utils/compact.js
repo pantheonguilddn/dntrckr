@@ -91,7 +91,8 @@ const KEY_MAP = Object.freeze({
   "extraDungeonTasksUpdatedBy": "~an",
   "defaultExcludedTasks": "~ao",
   "defaultExcludedTasksUpdatedAt": "~ap",
-  "defaultExcludedTasksUpdatedBy": "~aq"
+  "defaultExcludedTasksUpdatedBy": "~aq",
+  "classJobCatalog": "~ar"
 });
 const REVERSE = Object.freeze(Object.fromEntries(Object.entries(KEY_MAP).map(([key, alias]) => [alias, key])));
 const CELL_STATES = ['open', 'done', 'excluded', 'marked', 'reset'];

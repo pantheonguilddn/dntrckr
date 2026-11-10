@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r11</title>
+    <title>Pantheon Tools v1.6.9-r12</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3752,6 +3752,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 <button class="team-mini-btn" type="button" onclick="shareTeamBuilderAsImage()">📸 Share Setup</button>
                 <button class="btn btn-secondary" type="button" onclick="openClassSetupModal()">🎓 Configure Classes</button>
                 <button class="btn btn-weights" type="button" onclick="openRoleConfigModal()">⚙ Role Settings</button>
+                <button id="manage-class-job-catalog-btn" class="btn btn-secondary" type="button" hidden onclick="openClassJobCatalogModal()">＋ Classes / Jobs</button>
             </div>
         </div>
 
@@ -3964,9 +3965,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r11</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r12</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r11:</strong> Member Roster saves no longer trigger automatic task resets. Delayed daily/weekly resets now preserve cells already updated after the scheduled UTC reset boundary.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r12:</strong> Adds an Admin-only Class / Job Catalog on top of the r11 stable reset protections. New classes and jobs are additive; existing character registrations are left unchanged.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4021,6 +4022,36 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 <button class="btn btn-weights" type="button" onclick="saveRoleConfig()">Save Role Settings</button>
                 <button class="btn btn-secondary" type="button" onclick="resetRoleConfig()">Reset Defaults</button>
                 <button class="btn btn-secondary" type="button" onclick="closeModal('role-config-modal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin-only additive Class / Job Catalog. Existing character registrations are never rewritten here. -->
+    <div class="modal-overlay hidden" id="class-job-catalog-modal" role="dialog" aria-label="Manage Class and Job Catalog">
+        <div class="modal-card wide-modal">
+            <h3>＋ Manage Classes &amp; Jobs</h3>
+            <div class="modal-note">Add a new base class, then add its basic job or later specializations. New entries become available in Member Roster, character registration, Class Setup, and Team Builder. This tool only adds catalog choices; it does not change any existing character registration or assignment.</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0 16px;">
+                <section class="card" style="margin:0;padding:14px;">
+                    <h4 style="margin:0 0 10px;">1. Add Base Class</h4>
+                    <label style="display:block;font-size:.82rem;color:var(--pt-muted,#9ba2b0);margin-bottom:6px;">Class name</label>
+                    <input id="class-catalog-new-class" type="text" maxlength="48" placeholder="e.g. Lancea" style="width:100%;box-sizing:border-box;">
+                    <button class="btn btn-cloud" type="button" style="margin-top:10px;" onclick="addClassCatalogEntry()">Add Base Class</button>
+                </section>
+                <section class="card" style="margin:0;padding:14px;">
+                    <h4 style="margin:0 0 10px;">2. Add Job under a Class</h4>
+                    <label style="display:block;font-size:.82rem;color:var(--pt-muted,#9ba2b0);margin-bottom:6px;">Job name</label>
+                    <input id="class-catalog-new-job" type="text" maxlength="48" placeholder="e.g. Lancer" style="width:100%;box-sizing:border-box;">
+                    <label style="display:block;font-size:.82rem;color:var(--pt-muted,#9ba2b0);margin:10px 0 6px;">Base class</label>
+                    <select id="class-catalog-job-class" class="builder-select" style="width:100%;"></select>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.84rem;"><input id="class-catalog-job-basic" type="checkbox" checked> Mark as basic job</label>
+                    <button class="btn btn-cloud" type="button" style="margin-top:10px;" onclick="addJobCatalogEntry()">Add Job</button>
+                </section>
+            </div>
+            <div id="class-job-catalog-status" class="modal-note" aria-live="polite"></div>
+            <div id="class-job-catalog-list" class="role-config-scroll"></div>
+            <div class="modal-actions" style="justify-content:flex-end;">
+                <button class="btn btn-secondary" type="button" onclick="closeModal('class-job-catalog-modal')">Close</button>
             </div>
         </div>
     </div>
@@ -4909,7 +4940,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         };
         const JOB_ORDER = Object.keys(JOB_DATABASE);
         const CLASS_ORDER = [...new Set(JOB_ORDER.map(job => JOB_DATABASE[job].className))];
-        const RAID_POSITION_OPTIONS = ['DPS', 'Heal', 'Tank', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility'];
+        const RAID_POSITION_OPTIONS = ['DPS', 'Heal', 'Tank', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility', 'Unassigned'];
         const DPS_TYPE_OPTIONS = ['', 'Physical', 'Magical'];
         const SECONDARY_ROLE_OPTIONS = ['DPS', 'Heal', 'Tank', 'Provoke', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility', 'Support'];
 
@@ -4935,6 +4966,72 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             damageType: JOB_DATABASE[job].damageType || '',
             secondaryRoles: deriveDefaultSecondaryRoles(job)
         }]));
+
+        // Keep the original r11 class/job maps intact. Admin additions are stored separately
+        // and appended at runtime, so old registrations keep their original job strings.
+        const BUILTIN_JOB_ORDER = [...JOB_ORDER];
+        const BUILTIN_CLASS_ORDER = [...CLASS_ORDER];
+        const BUILTIN_JOB_KEYS = new Set(BUILTIN_JOB_ORDER.map(value => value.toLocaleLowerCase()));
+        const BUILTIN_CLASS_KEYS = new Set(BUILTIN_CLASS_ORDER.map(value => value.toLocaleLowerCase()));
+
+        function normalizeClassJobCatalog(value) {
+            const source = safeObject(value);
+            const classes = [], classSeen = new Set(BUILTIN_CLASS_KEYS);
+            (Array.isArray(source.classes) ? source.classes : []).slice(0, 100).forEach(raw => {
+                const name = String(typeof raw === 'string' ? raw : raw?.name || '').trim().slice(0, 48);
+                const key = name.toLocaleLowerCase();
+                if (!name || classSeen.has(key)) return;
+                classSeen.add(key); classes.push(name);
+            });
+            const availableClasses = new Set([...CLASS_ORDER, ...classes].map(value => String(value).toLocaleLowerCase()));
+            const jobs = [], jobSeen = new Set(BUILTIN_JOB_KEYS);
+            (Array.isArray(source.jobs) ? source.jobs : []).slice(0, 300).forEach(raw => {
+                const item = safeObject(raw);
+                const name = String(item.name || '').trim().slice(0, 48);
+                const className = String(item.className || '').trim().slice(0, 48);
+                const key = name.toLocaleLowerCase();
+                if (!name || !className || jobSeen.has(key) || !availableClasses.has(className.toLocaleLowerCase())) return;
+                jobSeen.add(key);
+                jobs.push({ name, className, basicJob: item.basicJob === true });
+            });
+            return {
+                classes,
+                jobs,
+                updatedAt: Number(source.updatedAt) || 0,
+                updatedBy: String(source.updatedBy || '').slice(0, 100)
+            };
+        }
+
+        function resetRuntimeClassJobCatalog() {
+            JOB_ORDER.filter(job => !BUILTIN_JOB_KEYS.has(job.toLocaleLowerCase())).forEach(job => { delete JOB_DATABASE[job]; delete DEFAULT_JOB_PROFILES[job]; });
+            JOB_ORDER.splice(0, JOB_ORDER.length, ...BUILTIN_JOB_ORDER);
+            CLASS_ORDER.splice(0, CLASS_ORDER.length, ...BUILTIN_CLASS_ORDER);
+        }
+
+        function applyClassJobCatalog(value) {
+            const catalog = normalizeClassJobCatalog(value);
+            catalog.classes.forEach(className => {
+                if (!CLASS_ORDER.some(existing => existing.toLocaleLowerCase() === className.toLocaleLowerCase())) CLASS_ORDER.push(className);
+            });
+            catalog.jobs.forEach(item => {
+                if (!JOB_DATABASE[item.name]) {
+                    JOB_DATABASE[item.name] = { className: item.className, role: '', raidPosition: 'Unassigned', damageType: '' };
+                    JOB_ORDER.push(item.name);
+                    DEFAULT_JOB_PROFILES[item.name] = { className: item.className, raidPosition: 'Unassigned', damageType: '', secondaryRoles: [] };
+                }
+            });
+            return catalog;
+        }
+
+        function mergeClassJobCatalog(localValue, remoteValue) {
+            const local = normalizeClassJobCatalog(localValue), remote = normalizeClassJobCatalog(remoteValue);
+            const classes = [...new Map([...local.classes, ...remote.classes].map(name => [name.toLocaleLowerCase(), name])).values()];
+            const jobMap = new Map();
+            const orderedSources = local.updatedAt <= remote.updatedAt ? [local, remote] : [remote, local];
+            orderedSources.forEach(catalog => catalog.jobs.forEach(item => jobMap.set(item.name.toLocaleLowerCase(), item)));
+            const newest = local.updatedAt > remote.updatedAt ? local : remote;
+            return normalizeClassJobCatalog({ classes, jobs: [...jobMap.values()], updatedAt: Math.max(local.updatedAt, remote.updatedAt), updatedBy: newest.updatedBy });
+        }
 
         // Per-slot class filters are UI-only. A selected class narrows the Character dropdown;
         // selecting a character automatically sets the class to that character's class.
@@ -5184,7 +5281,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 weeklyArchive: {},
                 completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, classJobCatalog: { classes: [], jobs: [], updatedAt: 0, updatedBy: '' }, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -5380,6 +5477,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const admin = isPantheonAdmin();
             const active = isAdminModeActive();
             const adminToolsVisible = active && !isAdminViewAsActive();
+            const classCatalogButton = document.getElementById('manage-class-job-catalog-btn');
+            if (classCatalogButton) classCatalogButton.hidden = !adminToolsVisible;
             const personalName = String(getAuthenticatedMemberDirectoryEntry()?.name || 'Personal');
             const toggle = document.getElementById('admin-view-toggle-btn');
             if (toggle) {
@@ -6030,7 +6129,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
             updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
-            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an', defaultExcludedTasks:'~ao', defaultExcludedTasksUpdatedAt:'~ap', defaultExcludedTasksUpdatedBy:'~aq'
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an', defaultExcludedTasks:'~ao', defaultExcludedTasksUpdatedAt:'~ap', defaultExcludedTasksUpdatedBy:'~aq', classJobCatalog:'~ar'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -6118,6 +6217,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (source.syncInfo && typeof source.syncInfo === 'object') norm.syncInfo = { operationId:String(source.syncInfo.operationId || ''), by:String(source.syncInfo.by || ''), at:Number(source.syncInfo.at) || 0 };
 
             const sets = safeObject(source.settings);
+            norm.settings.classJobCatalog = applyClassJobCatalog(sets.classJobCatalog);
             norm.settings.uiTextOverrides = Object.fromEntries(Object.entries(safeObject(sets.uiTextOverrides)).slice(0,300).map(([key,value]) => [String(key).slice(0,600), String(value ?? '').slice(0,2000)]));
             norm.settings.uiTextOverridesUpdatedAt = Number(sets.uiTextOverridesUpdatedAt) || 0;
             norm.settings.uiTextOverridesUpdatedBy = String(sets.uiTextOverridesUpdatedBy || '');
@@ -6291,6 +6391,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function mergeData(localRecord, remoteRecord) {
+            // Register the union of both additive catalogs before normalizing either side.
+            // This prevents a character assignment created on one device from being
+            // mistaken for an unknown job by an older cached catalog on the other.
+            const rawLocal = safeObject(decodePantheonCompactRecord(localRecord));
+            const rawRemote = safeObject(decodePantheonCompactRecord(remoteRecord));
+            const unionCatalog = mergeClassJobCatalog(rawLocal.settings?.classJobCatalog, rawRemote.settings?.classJobCatalog);
+            applyClassJobCatalog(unionCatalog);
             const local = normalizeData(localRecord);
             const remote = normalizeData(remoteRecord);
             const merged = createEmptyData();
@@ -6392,6 +6499,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const rSrc = (lrTime > rrTime || (lrTime === rrTime && String(local.settings.rosterUpdatedBy) >= String(remote.settings.rosterUpdatedBy))) ? local.settings : remote.settings;
             merged.settings.rosters = cloneRosters(rSrc.rosters);
             merged.settings.rosterUpdatedAt = rSrc.rosterUpdatedAt; merged.settings.rosterUpdatedBy = rSrc.rosterUpdatedBy;
+
+            merged.settings.classJobCatalog = mergeClassJobCatalog(local.settings.classJobCatalog, remote.settings.classJobCatalog);
+            applyClassJobCatalog(merged.settings.classJobCatalog);
 
             const lmdTime = Number(local.settings.memberDirectoryUpdatedAt) || 0, rmdTime = Number(remote.settings.memberDirectoryUpdatedAt) || 0;
             const mdSrc = (lmdTime > rmdTime || (lmdTime === rmdTime && String(local.settings.memberDirectoryUpdatedBy) >= String(remote.settings.memberDirectoryUpdatedBy))) ? local.settings : remote.settings;
@@ -6726,26 +6836,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const categories = cloneCategories(settings.categories || []).map(c => ({ id:c.id, group:c.group, name:c.name, color:c.color, tasks:[...c.tasks] }));
             const characterJobs = normalizeCharacterJobs(settings.characterJobs || {});
             const jobProfiles = normalizeJobProfiles(settings.jobProfiles || {});
+            const classJobCatalog = normalizeClassJobCatalog(settings.classJobCatalog || {});
             const lootWeights = {};
             Object.keys(settings.lootWeights || {}).sort().forEach(k => { lootWeights[k] = clampWeight(settings.lootWeights[k]); });
             const defaultExcludedTasks = [...new Map((Array.isArray(settings.defaultExcludedTasks) ? settings.defaultExcludedTasks : []).map(value => String(value || '').trim()).filter(Boolean).map(value => [value.toLocaleLowerCase(), value])).values()].sort((a,b) => a.localeCompare(b));
-            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), lootWeights, defaultExcludedTasks, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
+            return { rosters, categories, characterJobs: Object.fromEntries(Object.keys(characterJobs).sort().map(k => [k, characterJobs[k]])), jobProfiles: Object.fromEntries(Object.keys(jobProfiles).sort().map(k => [k, jobProfiles[k]])), classJobCatalog, lootWeights, defaultExcludedTasks, splitPartyMechanic: !!settings.teamBuilder?.splitPartyMechanic };
         }
         function getGlobalImpactSignature(data = cloudData) { return JSON.stringify(getGlobalImpactSnapshot(data)); }
         function sameValue(a,b){try{return JSON.stringify(a===undefined?null:a)===JSON.stringify(b===undefined?null:b);}catch(e){return false;}}
         function mapById(items){const map=new Map();for(const item of Array.isArray(items)?items:[])if(item?.id)map.set(String(item.id),item);return map;}
         function diffObjectMaps(beforeObj,afterObj){const out=[],b=safeObject(beforeObj),a=safeObject(afterObj);for(const key of [...new Set([...Object.keys(b),...Object.keys(a)])].sort()){const bv=Object.prototype.hasOwnProperty.call(b,key)?b[key]:null,av=Object.prototype.hasOwnProperty.call(a,key)?a[key]:null;if(!sameValue(bv,av))out.push({key,before:cloneDataObject(bv),after:cloneDataObject(av)});}return out;}
         function diffGlobalImpact(before,after){
-            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],lootWeights:[],defaultExcludedTasks:null,splitPartyMechanic:null};
+            const b=safeObject(before),a=safeObject(after),patch={rosters:[],categories:[],characterJobs:[],jobProfiles:[],classJobCatalog:null,lootWeights:[],defaultExcludedTasks:null,splitPartyMechanic:null};
             const bR=mapById(b.rosters),aR=mapById(a.rosters);for(const id of [...new Set([...bR.keys(),...aR.keys()])].sort()){const bv=bR.has(id)?bR.get(id):null,av=aR.has(id)?aR.get(id):null;if(!sameValue(bv,av))patch.rosters.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             const bC=mapById(b.categories),aC=mapById(a.categories);for(const id of [...new Set([...bC.keys(),...aC.keys()])].sort()){const bv=bC.has(id)?bC.get(id):null,av=aC.has(id)?aC.get(id):null;if(!sameValue(bv,av))patch.categories.push({id,before:cloneDataObject(bv),after:cloneDataObject(av)});}
             patch.characterJobs=diffObjectMaps(b.characterJobs,a.characterJobs);patch.jobProfiles=diffObjectMaps(b.jobProfiles,a.jobProfiles);
+            if(!sameValue(b.classJobCatalog||{classes:[],jobs:[]},a.classJobCatalog||{classes:[],jobs:[]}))patch.classJobCatalog={before:normalizeClassJobCatalog(b.classJobCatalog),after:normalizeClassJobCatalog(a.classJobCatalog)};
             const bW=safeObject(b.lootWeights),aW=safeObject(a.lootWeights);for(const key of [...new Set([...Object.keys(bW),...Object.keys(aW)])].sort()){const bv=Object.prototype.hasOwnProperty.call(bW,key)?bW[key]:null,av=Object.prototype.hasOwnProperty.call(aW,key)?aW[key]:null;if(!sameValue(bv,av))patch.lootWeights.push({key,before:bv,after:av});}
             if(!sameValue(b.defaultExcludedTasks||[],a.defaultExcludedTasks||[]))patch.defaultExcludedTasks={before:[...(b.defaultExcludedTasks||[])],after:[...(a.defaultExcludedTasks||[])]};
             if(b.splitPartyMechanic!==a.splitPartyMechanic)patch.splitPartyMechanic={before:!!b.splitPartyMechanic,after:!!a.splitPartyMechanic};
             return patch;
         }
-        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.lootWeights?.length&&!p.defaultExcludedTasks&&!p.splitPartyMechanic);}
+        function patchIsEmpty(p){return !p||(!p.rosters?.length&&!p.categories?.length&&!p.characterJobs?.length&&!p.jobProfiles?.length&&!p.classJobCatalog&&!p.lootWeights?.length&&!p.defaultExcludedTasks&&!p.splitPartyMechanic);}
 
         function normalizeRevisionEntry(entry){
             if(!entry||!entry.id)return null;
@@ -6755,6 +6867,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 categories:Array.isArray(p.categories)?p.categories.map(x=>({id:String(x.id||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.id):[],
                 characterJobs:Array.isArray(p.characterJobs)?p.characterJobs.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
                 jobProfiles:Array.isArray(p.jobProfiles)?p.jobProfiles.map(x=>({key:String(x.key||''),before:cloneDataObject(x.before),after:cloneDataObject(x.after)})).filter(x=>x.key):[],
+                classJobCatalog:p.classJobCatalog&&typeof p.classJobCatalog==='object'?{before:normalizeClassJobCatalog(p.classJobCatalog.before),after:normalizeClassJobCatalog(p.classJobCatalog.after)}:null,
                 lootWeights:Array.isArray(p.lootWeights)?p.lootWeights.map(x=>({key:String(x.key||''),before:x.before==null?null:Number(x.before),after:x.after==null?null:Number(x.after)})).filter(x=>x.key):[],
                 defaultExcludedTasks:p.defaultExcludedTasks&&typeof p.defaultExcludedTasks==='object'?{before:Array.isArray(p.defaultExcludedTasks.before)?p.defaultExcludedTasks.before.map(String):[],after:Array.isArray(p.defaultExcludedTasks.after)?p.defaultExcludedTasks.after.map(String):[]}:null,
                 splitPartyMechanic:p.splitPartyMechanic&&typeof p.splitPartyMechanic==='object'?{before:!!p.splitPartyMechanic.before,after:!!p.splitPartyMechanic.after}:null
@@ -6782,6 +6895,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             for(const item of p?.categories||[]){const b=item.before,a=item.after;if(!b&&a){labels.push(`Added dungeon category ${a.name}`);continue;}if(b&&!a){labels.push(`Removed dungeon category ${b.name}`);continue;}if(b&&a){const bt=new Set(b.tasks||[]),at=new Set(a.tasks||[]),added=[...(at)].filter(x=>!bt.has(x)),removed=[...(bt)].filter(x=>!at.has(x));if(added.length===1)labels.push(`Added dungeon task ${added[0]} to ${a.name}`);else if(removed.length===1)labels.push(`Removed dungeon task ${removed[0]} from ${b.name}`);else labels.push(`Updated dungeon category ${a.name}`);}}
             for(const item of p?.characterJobs||[]){const b=item.before,a=item.after;if(!b&&a)labels.push(`Set Job for ${item.key} to ${a.job||'Unassigned'}`);else if(b&&!a)labels.push(`Cleared Job for ${item.key}`);else labels.push(`Changed Job for ${item.key} to ${a?.job||'Unassigned'}`);}
             if(p?.jobProfiles?.length)labels.push('Updated Job / Role settings');
+            if(p?.classJobCatalog)labels.push('Updated Class / Job Catalog');
             if(p?.lootWeights?.length)labels.push('Updated Loot Weights');
             if(p?.defaultExcludedTasks)labels.push('Updated default N/A dungeon tasks');
             if(p?.splitPartyMechanic)labels.push(`Set Split Party Mechanic ${p.splitPartyMechanic.after?'ON':'OFF'}`);
@@ -6897,6 +7011,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(p.categories?.length){html+='<h4 style="margin:14px 0 8px;">Dungeon Categories</h4>';for(const item of p.categories){const b=item.before,a=item.after;const name=b?.name||a?.name||item.id;html+=`<div style="padding:10px;border:1px solid #414555;border-radius:8px;margin:8px 0;background:#1b1c23;"><strong>${escapeHTML(name)}</strong><div style="margin-top:6px;color:#b8beca;font-size:.82rem;">Before: ${escapeHTML((b?.tasks||[]).join(', ')||'none')}<br>After: ${escapeHTML((a?.tasks||[]).join(', ')||'none')}</div><div class="modal-actions" style="margin-top:8px;justify-content:flex-end;"><button class="btn btn-secondary" type="button" onclick="recoverCategoryFromRevision('${escapeHTML(entry.id)}','${escapeHTML(item.id)}','before')">Recover Before</button><button class="btn btn-secondary" type="button" onclick="recoverCategoryFromRevision('${escapeHTML(entry.id)}','${escapeHTML(item.id)}','after')">Recover After</button></div></div>`;}}
             if(p.characterJobs?.length)html+=`<h4 style="margin:14px 0 8px;">Character Jobs</h4><div style="color:#b8beca;font-size:.82rem;">${p.characterJobs.map(x=>`${escapeHTML(x.key)}: ${escapeHTML(x.before?.job||'none')} → ${escapeHTML(x.after?.job||'none')}`).join('<br>')}</div>`;
             if(p.jobProfiles?.length)html+='<h4 style="margin:14px 0 8px;">Role Settings</h4><div style="color:#b8beca;font-size:.82rem;">'+p.jobProfiles.length+' profile change(s)</div>';
+            if(p.classJobCatalog){const b=p.classJobCatalog.before||{},a=p.classJobCatalog.after||{};const addedClasses=(a.classes||[]).filter(x=>!(b.classes||[]).some(y=>y.toLowerCase()===x.toLowerCase()));const addedJobs=(a.jobs||[]).filter(x=>!(b.jobs||[]).some(y=>y.name.toLowerCase()===x.name.toLowerCase()));html+=`<h4 style="margin:14px 0 8px;">Class / Job Catalog</h4><div style="color:#b8beca;font-size:.82rem;">Classes added: ${escapeHTML(addedClasses.join(', ')||'none')}<br>Jobs added: ${escapeHTML(addedJobs.map(x=>`${x.name} (${x.className}${x.basicJob?', basic job':''})`).join(', ')||'none')}</div>`;}
             if(p.lootWeights?.length)html+='<h4 style="margin:14px 0 8px;">Loot Weights</h4><div style="color:#b8beca;font-size:.82rem;">'+p.lootWeights.length+' weight change(s)</div>';
             if(p.defaultExcludedTasks)html+=`<h4 style="margin:14px 0 8px;">Tasks excluded by default</h4><div style="color:#b8beca;font-size:.82rem;">Before: ${escapeHTML((p.defaultExcludedTasks.before||[]).join(', ')||'none')}<br>After: ${escapeHTML((p.defaultExcludedTasks.after||[]).join(', ')||'none')}</div>`;
             if(p.splitPartyMechanic)html+=`<h4 style="margin:14px 0 8px;">Split Party Mechanic</h4><div style="color:#b8beca;">${p.splitPartyMechanic.before?'ON':'OFF'} → ${p.splitPartyMechanic.after?'ON':'OFF'}</div>`;
@@ -6913,6 +7028,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if(Array.isArray(p.categories)){for(const item of p.categories){const value=direction==='before'?item.before:item.after;data.settings.categories=cloneCategories(data.settings.categories||[]).filter(c=>c.id!==item.id);if(value)data.settings.categories.push(cloneDataObject(value));}data.settings.categories=normalizeCategories(data.settings.categories);data.settings.categoriesUpdatedAt=now;data.settings.categoriesUpdatedBy=deviceId;}
             if(Array.isArray(p.characterJobs)){const jobs=normalizeCharacterJobs(data.settings.characterJobs||{});for(const item of p.characterJobs){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete jobs[item.key];else jobs[item.key]=cloneDataObject(value);}data.settings.characterJobs=normalizeCharacterJobs(jobs);}
             if(Array.isArray(p.jobProfiles)){const prof=normalizeJobProfiles(data.settings.jobProfiles||{});for(const item of p.jobProfiles){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete prof[item.key];else prof[item.key]=cloneDataObject(value);}data.settings.jobProfiles=normalizeJobProfiles(prof);data.settings.jobProfilesUpdatedAt=now;data.settings.jobProfilesUpdatedBy=deviceId;}
+            if(p.classJobCatalog){data.settings.classJobCatalog=normalizeClassJobCatalog(direction==='before'?p.classJobCatalog.before:p.classJobCatalog.after);resetRuntimeClassJobCatalog();applyClassJobCatalog(data.settings.classJobCatalog);data.settings.jobProfiles=normalizeJobProfiles(data.settings.jobProfiles||{});}
             if(Array.isArray(p.lootWeights)){data.settings.lootWeights={...DEFAULT_LOOT_WEIGHTS,...data.settings.lootWeights};for(const item of p.lootWeights){const value=direction==='before'?item.before:item.after;if(value===null||value===undefined)delete data.settings.lootWeights[item.key];else data.settings.lootWeights[item.key]=clampWeight(value);}data.settings.lootWeightUpdatedAt={...safeObject(data.settings.lootWeightUpdatedAt)};for(const item of p.lootWeights)data.settings.lootWeightUpdatedAt[item.key]=now;}
             if(p.defaultExcludedTasks){data.settings.defaultExcludedTasks=[...(direction==='before'?p.defaultExcludedTasks.before:p.defaultExcludedTasks.after)||[]];data.settings.defaultExcludedTasksUpdatedAt=now;data.settings.defaultExcludedTasksUpdatedBy=deviceId;}
             if(p.splitPartyMechanic){data.settings.teamBuilder=data.settings.teamBuilder||createEmptyTeamBuilder();data.settings.teamBuilder.splitPartyMechanic=direction==='before'?!!p.splitPartyMechanic.before:!!p.splitPartyMechanic.after;data.settings.teamBuilder.splitPartyUpdatedAt=now;data.settings.teamBuilder.splitPartyUpdatedBy=deviceId;}
@@ -6924,6 +7040,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             for(const item of p.categories||[]){const cur=(data.settings.categories||[]).find(c=>c.id===item.id)||null;check(`Category ${item.id}`,cur,direction==='before'?item.after:item.before);}
             const jobs=safeObject(data.settings.characterJobs);for(const item of p.characterJobs||[]){check(`Job ${item.key}`,Object.prototype.hasOwnProperty.call(jobs,item.key)?jobs[item.key]:undefined,direction==='before'?item.after:item.before);}
             const prof=safeObject(data.settings.jobProfiles);for(const item of p.jobProfiles||[]){check(`Profile ${item.key}`,Object.prototype.hasOwnProperty.call(prof,item.key)?prof[item.key]:undefined,direction==='before'?item.after:item.before);}
+            if(p.classJobCatalog)check('Class / Job Catalog',normalizeClassJobCatalog(data.settings.classJobCatalog),direction==='before'?p.classJobCatalog.after:p.classJobCatalog.before);
             const weights=safeObject(data.settings.lootWeights);for(const item of p.lootWeights||[]){check(`Loot weight ${item.key}`,Object.prototype.hasOwnProperty.call(weights,item.key)?weights[item.key]:undefined,direction==='before'?item.after:item.before);}
             if(p.defaultExcludedTasks)check('Default N/A task list',data.settings.defaultExcludedTasks||[],direction==='before'?p.defaultExcludedTasks.after:p.defaultExcludedTasks.before);
             if(p.splitPartyMechanic)check('Split Party Mechanic',!!data.settings.teamBuilder?.splitPartyMechanic,direction==='before'?!!p.splitPartyMechanic.after:!!p.splitPartyMechanic.before);return conflicts;
@@ -6935,6 +7052,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             window.__pantheonVersionWriteBusy=true;clearTimeout(autoSyncTimer);
             try{
                 const config=getCloudConfig(),current=normalizeData(await fetchRemoteRecord(config));const journal=await fetchRevisionJournal(getRevisionBinId());const entry=(Array.isArray(journal.revisions)?journal.revisions:[]).map(normalizeRevisionEntry).find(e=>e?.id===id);if(!entry||!entry.patch)throw new Error('This entry is a savepoint marker and cannot be undone directly.');
+                if(entry.patch.classJobCatalog){
+                    const currentCatalog=normalizeClassJobCatalog(current.settings.classJobCatalog);
+                    const targetCatalog=normalizeClassJobCatalog(entry.patch.classJobCatalog.before);
+                    const targetClasses=new Set(targetCatalog.classes.map(name=>name.toLocaleLowerCase()));
+                    const targetJobs=new Set(targetCatalog.jobs.map(item=>item.name.toLocaleLowerCase()));
+                    const removedClasses=currentCatalog.classes.filter(name=>!targetClasses.has(name.toLocaleLowerCase()));
+                    const removedJobs=currentCatalog.jobs.filter(item=>!targetJobs.has(item.name.toLocaleLowerCase()));
+                    if(removedClasses.length||removedJobs.length){alert('Class / Job Catalog entries are additive and cannot be removed through version history. This keeps existing character assignments safe. No registrations or catalog entries were changed.');return;}
+                }
                 const conflicts=patchConflictsWithCurrent(current,entry.patch,'before');if(conflicts.length&&!confirm(`The affected item(s) changed after this revision (${conflicts.length} conflict${conflicts.length===1?'':'s'}).\n\nProceed anyway?`))return;
                 const beforeRestore=cloneDataObject(getGlobalImpactSnapshot(current));const restored=applyGlobalPatch(current,entry.patch,'before');const afterRestore=cloneDataObject(getGlobalImpactSnapshot(restored));restored.settings.versionControl.revisionBinId=getRevisionBinId();restored.settings.versionControl.revisionBinUpdatedAt=Date.now();restored.settings.versionControl.revisionBinUpdatedBy=deviceId;restored.settings.versionControl.history=[];restored.updatedAt=Date.now();
                 const send=fitCandidateUnderFreeLimit(restored);const res=await fetch(`${JSONBIN_ROOT}/b/${encodeURIComponent(config.binId)}`,{method:'PUT',headers:{'Content-Type':'application/json',...authHeaders(config)},body:JSON.stringify(send)});if(!res.ok){const detail=await res.text().catch(()=> '');throw new Error(`Undo failed (${res.status})${detail?`: ${detail.slice(0,300)}`:''}`);}
@@ -11431,7 +11557,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function populateRegistrationJobSelect() {
             const sel = document.getElementById('registration-job');
-            if (sel && !sel.options.length) sel.innerHTML = buildJobOptions();
+            if (!sel) return;
+            const selected = sel.value || '';
+            sel.innerHTML = buildJobOptions(selected);
         }
 
         function normalizeJobProfiles(value) {
@@ -11515,6 +11643,79 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             renderClassSetup();
             triggerAutoSync();
             closeModal('role-config-modal');
+        }
+
+        function openClassJobCatalogModal() {
+            if (!isAdminModeActive() || isAdminViewAsActive()) { alert('Class and Job Catalog management is available only in Admin View.'); return; }
+            renderClassJobCatalog();
+            openModal('class-job-catalog-modal');
+        }
+
+        function renderClassJobCatalog(preferredClassName = '') {
+            const catalog = normalizeClassJobCatalog(cloudData.settings?.classJobCatalog);
+            const classSelect = document.getElementById('class-catalog-job-class');
+            if (classSelect) {
+                const selected = classSelect.value;
+                classSelect.innerHTML = CLASS_ORDER.map(name => `<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`).join('');
+                if (preferredClassName && CLASS_ORDER.includes(preferredClassName)) classSelect.value = preferredClassName;
+                else if (CLASS_ORDER.includes(selected)) classSelect.value = selected;
+                else if (catalog.classes.length) classSelect.value = catalog.classes[0];
+            }
+            const list = document.getElementById('class-job-catalog-list');
+            if (!list) return;
+            const builtInClassSet = new Set(BUILTIN_CLASS_ORDER.map(name => name.toLocaleLowerCase()));
+            const classRows = CLASS_ORDER.map(name => {
+                const custom = !builtInClassSet.has(name.toLocaleLowerCase());
+                const jobs = [...BUILTIN_JOB_ORDER, ...catalog.jobs.map(item => item.name)].filter(job => (JOB_DATABASE[job]?.className || '') === name);
+                return `<div style="padding:10px 12px;border-bottom:1px solid var(--pt-border,#394252);"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><strong>${escapeHTML(name)}</strong><span class="team-badge ${custom ? 'position' : ''}">${custom ? 'Added class' : 'Built-in class'}</span></div><div style="margin-top:6px;color:var(--pt-muted,#9ba2b0);font-size:.8rem;">${jobs.length ? jobs.map(job => { const info = catalog.jobs.find(item => item.name === job); return `${escapeHTML(job)}${info?.basicJob ? ' · Basic job' : ''}`; }).join('　•　') : 'No jobs listed yet'}</div></div>`;
+            }).join('');
+            list.innerHTML = `<div style="border:1px solid var(--pt-border,#394252);border-radius:10px;overflow:hidden;"><div style="padding:10px 12px;background:var(--pt-card,#242a35);font-weight:800;">Available Classes &amp; Jobs</div>${classRows}</div>`;
+            const status = document.getElementById('class-job-catalog-status');
+            if (status) status.textContent = `${CLASS_ORDER.length} classes · ${JOB_ORDER.length} selectable jobs. New entries are additive and do not alter existing character assignments.`;
+        }
+
+        async function addClassCatalogEntry() {
+            if (!isAdminModeActive() || isAdminViewAsActive()) { alert('Only an administrator in Admin View can add classes.'); return; }
+            const input = document.getElementById('class-catalog-new-class');
+            const name = String(input?.value || '').normalize('NFKC').trim().replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 48);
+            if (!name) { alert('Enter a class name.'); return; }
+            if (CLASS_ORDER.some(value => value.toLocaleLowerCase() === name.toLocaleLowerCase())) { alert('That class already exists.'); return; }
+            if (!(await prepareGlobalChange(`Add class ${name}`))) return;
+            const catalog = normalizeClassJobCatalog(cloudData.settings?.classJobCatalog);
+            catalog.classes.push(name);
+            catalog.updatedAt = Date.now(); catalog.updatedBy = deviceId;
+            cloudData.settings.classJobCatalog = applyClassJobCatalog(catalog);
+            cloudData.updatedAt = Date.now();
+            if (input) input.value = '';
+            renderClassJobCatalog(name);
+            renderRoleConfig(); renderClassSetup(); renderTeamBuilder();
+            persistLocalData(); triggerAutoSync();
+            setStatus(`🟢 Added ${name} to the Class / Job Catalog. Existing registrations were not changed.`);
+        }
+
+        async function addJobCatalogEntry() {
+            if (!isAdminModeActive() || isAdminViewAsActive()) { alert('Only an administrator in Admin View can add jobs.'); return; }
+            const input = document.getElementById('class-catalog-new-job');
+            const classSelect = document.getElementById('class-catalog-job-class');
+            const name = String(input?.value || '').normalize('NFKC').trim().replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 48);
+            const className = String(classSelect?.value || '').trim();
+            const basicJob = document.getElementById('class-catalog-job-basic')?.checked === true;
+            if (!name) { alert('Enter a job name.'); return; }
+            if (!CLASS_ORDER.includes(className)) { alert('Choose an existing base class first.'); return; }
+            if (JOB_ORDER.some(value => value.toLocaleLowerCase() === name.toLocaleLowerCase())) { alert('That job already exists.'); return; }
+            if (!(await prepareGlobalChange(`Add ${basicJob ? 'basic job' : 'job'} ${name}`))) return;
+            const catalog = normalizeClassJobCatalog(cloudData.settings?.classJobCatalog);
+            catalog.jobs.push({ name, className, basicJob });
+            catalog.updatedAt = Date.now(); catalog.updatedBy = deviceId;
+            cloudData.settings.classJobCatalog = applyClassJobCatalog(catalog);
+            cloudData.settings.jobProfiles = normalizeJobProfiles(cloudData.settings.jobProfiles);
+            cloudData.updatedAt = Date.now();
+            if (input) input.value = '';
+            renderClassJobCatalog();
+            renderRoleConfig(); renderClassSetup(); renderTeamBuilder();
+            populateRegistrationJobSelect();
+            persistLocalData(); triggerAutoSync();
+            setStatus(`🟢 Added ${name} under ${className}. Existing registrations were not changed.`);
         }
 
         async function resetRoleConfig() {
@@ -12789,7 +12990,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r11';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r12';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13432,7 +13633,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             }
             if (['welcome-modal','profile-confirm-modal','salary-modal','help-modal'].includes(id)) setTimeout(maybeOpenWeeklyReportAfterReset, 80);
         }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); closeModal('guild-social-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal('cloud-modal'); closeModal('weights-modal'); closeModal('scholar-modal'); closeModal('salary-modal'); closeModal('help-modal'); closeModal('class-setup-modal'); closeModal('role-config-modal'); closeModal('class-job-catalog-modal'); closeModal('version-history-modal'); closeModal('revision-detail-modal'); closeModal('guild-social-modal'); toggleSideMenu(false); closeRegistrationPage(); closeDungeonPage(); } });
     </script>
 
 <script>
@@ -13531,7 +13732,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r11';
+  const CURRENT_BUILD = '1.6.9-r12';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

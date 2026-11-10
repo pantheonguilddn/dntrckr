@@ -365,6 +365,38 @@ export async function onRequestPut(context) {
         // Group-run timing is shared learning data. Merge it independently so members' whole-record
         // syncs cannot erase another member's timestamps. A newer history-clear marker always wins.
         next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};
+        const adminOverride = context.data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
+        // The Class / Job Catalog is append-only and administrator-owned. Member syncs,
+        // stale pre-catalog clients, and older admin tabs cannot erase committed entries.
+        const previousCatalog = obj(previous?.settings?.classJobCatalog);
+        const incomingCatalog = obj(next.settings.classJobCatalog);
+        if (!adminOverride || !Object.prototype.hasOwnProperty.call(next.settings, 'classJobCatalog')) {
+          next.settings.classJobCatalog = previous?.settings?.classJobCatalog || { classes: [], jobs: [], updatedAt: 0, updatedBy: '' };
+        } else {
+          const classMap = new Map();
+          for (const raw of [...(Array.isArray(previousCatalog.classes) ? previousCatalog.classes : []), ...(Array.isArray(incomingCatalog.classes) ? incomingCatalog.classes : [])]) {
+            const name = String(typeof raw === 'string' ? raw : raw?.name || '').trim().slice(0, 48);
+            if (name && !classMap.has(name.toLocaleLowerCase()) && classMap.size < 100) classMap.set(name.toLocaleLowerCase(), name);
+          }
+          // Built-in r11 classes are valid parents too (for example Silver Hunter under Archer).
+          const allowedClasses = new Set(['Academic', 'Archer', 'Assassin', 'Cleric', 'Kali', 'Sorceress', 'Warrior', ...classMap.values()].map(name => name.toLocaleLowerCase()));
+          const jobMap = new Map();
+          for (const raw of [...(Array.isArray(previousCatalog.jobs) ? previousCatalog.jobs : []), ...(Array.isArray(incomingCatalog.jobs) ? incomingCatalog.jobs : [])]) {
+            const item = obj(raw);
+            const name = String(item.name || '').trim().slice(0, 48);
+            const className = String(item.className || '').trim().slice(0, 48);
+            const key = name.toLocaleLowerCase();
+            if (!name || !className || !allowedClasses.has(className.toLocaleLowerCase()) || jobMap.has(key) || jobMap.size >= 300) continue;
+            jobMap.set(key, { name, className, basicJob: item.basicJob === true });
+          }
+          const newerCatalog = Number(incomingCatalog.updatedAt) >= Number(previousCatalog.updatedAt) ? incomingCatalog : previousCatalog;
+          next.settings.classJobCatalog = {
+            classes: [...classMap.values()],
+            jobs: [...jobMap.values()],
+            updatedAt: Math.max(Number(previousCatalog.updatedAt) || 0, Number(incomingCatalog.updatedAt) || 0),
+            updatedBy: String(newerCatalog.updatedBy || '').slice(0, 100)
+          };
+        }
         // Extra Dungeon classification is controlled only by the authenticated Admin Console API.
         // Preserve the committed server value even when a member or older admin tab submits a stale snapshot.
         next.settings.extraDungeonTasks = Array.isArray(previous?.settings?.extraDungeonTasks) ? previous.settings.extraDungeonTasks : [];
@@ -385,7 +417,6 @@ export async function onRequestPut(context) {
         if (!separateCharacterStorage) next.completionTiming = mergeCompletionTimingRecords(previous?.completionTiming, next.completionTiming, timingClearAt);
         else next.completionTiming = obj(previous?.completionTiming);
 
-        const adminOverride = context.data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
         const memberDirectoryIntents = Array.isArray(incomingRecord?.memberDirectoryIntents)
           ? incomingRecord.memberDirectoryIntents.slice(0, 50) : [];
         if (memberDirectoryIntents.length) {
