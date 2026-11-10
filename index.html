@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r11</title>
+    <title>Pantheon Tools v1.6.9-r12</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -635,6 +635,21 @@
         .role-config-table { width:100%; border-collapse:collapse; min-width:980px; }
         .role-config-table th { position:sticky; top:0; z-index:2; padding:9px 8px; background:#20222a; color:#9ba2b1; border-bottom:1px solid #3c3f49; font-size:.65rem; text-transform:uppercase; letter-spacing:.08em; text-align:left; }
         .role-config-table td { padding:8px; border-bottom:1px solid #333640; font-size:.73rem; text-align:left; vertical-align:top; }
+        .role-catalog-manager { margin:12px 0 14px; padding:12px; border:1px solid #3b3f4b; border-radius:9px; background:#1d2029; }
+        .role-catalog-manager h4 { margin:0 0 9px; color:#e8d3a0; font-size:.78rem; letter-spacing:.04em; text-transform:uppercase; }
+        .role-catalog-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+        .role-catalog-card { min-width:0; padding:10px; border:1px solid #343947; border-radius:8px; background:#242833; }
+        .role-catalog-card strong { display:block; margin-bottom:7px; font-size:.72rem; color:#e7eaf1; }
+        .role-catalog-controls { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+        .role-catalog-controls input,.role-catalog-controls select { flex:1 1 110px; width:100%; min-width:0; min-height:32px; padding:6px 8px; border:1px solid #484e5d; border-radius:6px; background:#171a22; color:#edf0f5; font:inherit; font-size:.7rem; }
+        .role-catalog-controls button { min-height:32px; padding:6px 10px; border:1px solid #897347; border-radius:6px; background:#3b3429; color:#f0d69c; font-weight:800; font-size:.68rem; cursor:pointer; }
+        .role-catalog-flags { display:flex; flex-wrap:wrap; gap:9px; margin:7px 0; color:#bfc6d3; font-size:.65rem; }
+        .role-catalog-flags label { display:flex; gap:5px; align-items:center; }
+        .role-catalog-chip-list { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; max-height:72px; overflow:auto; }
+        .role-catalog-chip { display:inline-flex; align-items:baseline; gap:5px; padding:4px 7px; border:1px solid #464c59; border-radius:99px; background:#1a1d25; color:#dce1eb; font-size:.62rem; }
+        .role-catalog-chip small { color:#9da6b6; font-size:.56rem; }
+        .role-catalog-chip.custom { border-color:#8c7445; background:#302a20; }
+        @media(max-width:900px) { .role-catalog-grid { grid-template-columns:1fr; } }
         .role-config-table tbody tr:last-child td { border-bottom:0; }
         .role-config-select { width:100%; box-sizing:border-box; padding:7px 8px; border:1px solid #494d59; border-radius:7px; background:#191b22; color:#edf0f3; font:inherit; font-size:.72rem; }
         .role-check-wrap { display:flex; flex-wrap:wrap; gap:5px; max-width:580px; }
@@ -3964,9 +3979,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r11</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r12</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r11:</strong> Member Roster saves no longer trigger automatic task resets. Delayed daily/weekly resets now preserve cells already updated after the scheduled UTC reset boundary.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r12:</strong> Administrators can add base classes, jobs / specializations, and primary or secondary role tags from Team Builder Role Settings. Silver Hunter is preloaded under Archer. Catalog entries share through the existing settings record; no D1 schema change is required.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4011,6 +4026,28 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         <div class="modal-card wide-modal role-config-modal">
             <h3>⚙ Team Builder Role Settings</h3>
             <div class="modal-note">Customize the Team Builder's job metadata without editing the code. <b>Raid Position</b> is the primary assignment. <b>Secondary Roles</b> are lower-priority capabilities used when checking party coverage. Changes are shared with the guild.</div>
+            <section class="role-catalog-manager" aria-label="Class and role catalog manager">
+                <h4>Guild Class &amp; Role Catalog</h4>
+                <div class="role-catalog-grid">
+                    <div class="role-catalog-card">
+                        <strong>Add a Base Class</strong>
+                        <div class="role-catalog-controls"><input id="role-catalog-class-name" type="text" maxlength="48" placeholder="e.g. New class"><button type="button" onclick="addCatalogClass()">＋ Add Class</button></div>
+                        <div class="role-catalog-chip-list" id="role-catalog-class-list"></div>
+                    </div>
+                    <div class="role-catalog-card">
+                        <strong>Add a Job / Specialization</strong>
+                        <div class="role-catalog-controls"><input id="role-catalog-job-name" type="text" maxlength="48" placeholder="e.g. Silver Hunter"><select id="role-catalog-job-class" aria-label="Base class"></select><button type="button" onclick="addCatalogJob()">＋ Add Job</button></div>
+                        <div class="role-catalog-chip-list" id="role-catalog-job-list"></div>
+                    </div>
+                    <div class="role-catalog-card">
+                        <strong>Add a Role / Capability</strong>
+                        <div class="role-catalog-controls"><input id="role-catalog-role-name" type="text" maxlength="48" placeholder="e.g. Shield Break"><button type="button" onclick="addCatalogRole()">＋ Add Role</button></div>
+                        <div class="role-catalog-flags"><label><input id="role-catalog-role-primary" type="checkbox" checked> Primary position</label><label><input id="role-catalog-role-secondary" type="checkbox" checked> Secondary capability</label></div>
+                        <div class="role-catalog-chip-list" id="role-catalog-role-list"></div>
+                    </div>
+                </div>
+                <div class="modal-note" style="margin:9px 0 0;">New entries are saved with the Job / Role settings below and shared with the guild. Existing character assignments are preserved.</div>
+            </section>
             <div class="role-config-scroll">
                 <table class="role-config-table">
                     <thead><tr><th>Job</th><th>Class</th><th>Raid Position</th><th>DPS Type</th><th>Secondary Roles</th></tr></thead>
@@ -4907,11 +4944,49 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             'Destroyer':     { className: 'Warrior',    role: 'Utility / Tank / DPS / Highlander', raidPosition: 'Highlander', damageType: 'Physical' },
             'Dark Avenger':  { className: 'Warrior',    role: 'DPS / Highlander',             raidPosition: 'DPS', damageType: 'Physical' }
         };
+        // Guild-managed extensions live inside jobProfiles.__catalog__ so they use the existing shared settings and revision journal.
+        // Silver Hunter is preloaded under Archer; damage type / secondary tags remain configurable by administrators.
+        const DEFAULT_JOB_CATALOG = {
+            classes: [],
+            jobs: { 'Silver Hunter': { className: 'Archer', raidPosition: 'DPS', damageType: '', secondaryRoles: [] } },
+            roles: []
+        };
         const JOB_ORDER = Object.keys(JOB_DATABASE);
         const CLASS_ORDER = [...new Set(JOB_ORDER.map(job => JOB_DATABASE[job].className))];
         const RAID_POSITION_OPTIONS = ['DPS', 'Heal', 'Tank', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility'];
         const DPS_TYPE_OPTIONS = ['', 'Physical', 'Magical'];
         const SECONDARY_ROLE_OPTIONS = ['DPS', 'Heal', 'Tank', 'Provoke', 'Debuff', 'Mobility', 'Beyond Time', 'Highlander', 'Utility', 'Support'];
+
+        function cleanCatalogName(value, max = 48) { return String(value || '').trim().replace(/\s+/g, ' ').slice(0, max); }
+        function normalizeJobCatalog(value) {
+            const source = safeObject(value), defaults = DEFAULT_JOB_CATALOG;
+            const classes = [...new Set([...(Array.isArray(defaults.classes) ? defaults.classes : []), ...(Array.isArray(source.classes) ? source.classes : [])].map(v => cleanCatalogName(v)).filter(Boolean))].slice(0, 100);
+            const jobs = JSON.parse(JSON.stringify(defaults.jobs || {}));
+            Object.entries(safeObject(source.jobs)).slice(0, 150).forEach(([rawName, raw]) => {
+                const name = cleanCatalogName(rawName); if (!name || JOB_DATABASE[name]) return;
+                const item = safeObject(raw), className = cleanCatalogName(item.className); if (!className) return;
+                jobs[name] = {
+                    className,
+                    raidPosition: cleanCatalogName(item.raidPosition) || 'DPS',
+                    damageType: DPS_TYPE_OPTIONS.includes(item.damageType) ? item.damageType : '',
+                    secondaryRoles: [...new Set((Array.isArray(item.secondaryRoles) ? item.secondaryRoles : []).map(v => cleanCatalogName(v)).filter(Boolean))].slice(0, 30)
+                };
+            });
+            const roles = [];
+            const seen = new Set([...RAID_POSITION_OPTIONS, ...SECONDARY_ROLE_OPTIONS].map(v => v.toLowerCase()));
+            (Array.isArray(source.roles) ? source.roles : []).slice(0, 100).forEach(raw => {
+                const item = safeObject(raw), name = cleanCatalogName(item.name);
+                if (!name || seen.has(name.toLowerCase()) || (!item.primary && !item.secondary)) return;
+                seen.add(name.toLowerCase()); roles.push({ name, primary: item.primary === true, secondary: item.secondary === true });
+            });
+            return { classes, jobs, roles };
+        }
+        function getCurrentJobCatalog() { return normalizeJobCatalog(cloudData?.settings?.jobProfiles?.__catalog__ || DEFAULT_JOB_CATALOG); }
+        function getJobOrder(catalog = getCurrentJobCatalog()) { return [...new Set([...JOB_ORDER, ...Object.keys(catalog.jobs || {})])]; }
+        function getClassOrder(catalog = getCurrentJobCatalog()) { return [...new Set([...CLASS_ORDER, ...(catalog.classes || []), ...Object.values(catalog.jobs || {}).map(job => cleanCatalogName(job.className)).filter(Boolean)])]; }
+        function getRaidPositionOptions(catalog = getCurrentJobCatalog()) { return [...new Set([...RAID_POSITION_OPTIONS, ...(catalog.roles || []).filter(role => role.primary).map(role => role.name)])]; }
+        function getSecondaryRoleOptions(catalog = getCurrentJobCatalog()) { return [...new Set([...SECONDARY_ROLE_OPTIONS, ...(catalog.roles || []).filter(role => role.secondary).map(role => role.name)])]; }
+        function getCatalogJobMeta(job, catalog = getCurrentJobCatalog()) { return catalog.jobs?.[job] || null; }
 
         // Default secondary-role configuration. The first/primary responsibility is Raid Position.
         // Secondary roles are lower-priority capabilities used by Team Builder composition checks.
@@ -4986,8 +5061,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const source = safeObject(value), out = {};
             Object.entries(source).forEach(([name, rec]) => {
                 if (!name) return;
-                if (typeof rec === 'string') out[name] = { job: JOB_DATABASE[rec] ? rec : '', updatedAt: 0, deviceId: '' };
-                else out[name] = { job: JOB_DATABASE[String(rec?.job || '')] ? String(rec.job) : '', updatedAt: Number(rec?.updatedAt) || 0, deviceId: String(rec?.deviceId || '') };
+                if (typeof rec === 'string') out[name] = { job: cleanCatalogName(rec, 80), updatedAt: 0, deviceId: '' };
+                else out[name] = { job: cleanCatalogName(rec?.job, 80), updatedAt: Number(rec?.updatedAt) || 0, deviceId: String(rec?.deviceId || '') };
             });
             return out;
         }
@@ -5184,7 +5259,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 weeklyArchive: {},
                 completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, jobProfiles: normalizeJobProfiles({}), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -5230,7 +5305,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     const profile = profileByName.get(charName.toLowerCase()) || {};
                     return {
                         name: charName,
-                        job: JOB_ORDER.includes(String(profile.job || '')) ? String(profile.job) : '',
+                        job: cleanCatalogName(profile.job, 80),
                         trackerEnabled: profile.trackerEnabled === true,
                         isMain: profile.isMain === true
                     };
@@ -5314,7 +5389,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         if (!key) return;
                         if (!member.characters.some(name => name.trim().toLowerCase() === key)) member.characters.push(characterName);
                         const profile = member.characterProfiles.find(item => item.name.trim().toLowerCase() === key);
-                        const knownJob = JOB_ORDER.includes(jobs[characterName]?.job) ? jobs[characterName].job : (profile?.job || '');
+                        const knownJob = cleanCatalogName(jobs[characterName]?.job || profile?.job, 80);
                         if (profile) { profile.name = characterName; profile.job = knownJob; profile.trackerEnabled = true; }
                         else member.characterProfiles.push({ name: characterName, job: knownJob, trackerEnabled: true });
                     });
@@ -5326,7 +5401,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     member.characterProfiles = member.characters.map(characterName => {
                         const previous = member.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterName.trim().toLowerCase()) || {};
                         const isLegacyTracked = !!roster?.characters.some(name => name.trim().toLowerCase() === characterName.trim().toLowerCase());
-                        const knownJob = JOB_ORDER.includes(previous.job) ? previous.job : (JOB_ORDER.includes(jobs[characterName]?.job) ? jobs[characterName].job : '');
+                        const knownJob = cleanCatalogName(previous.job || jobs[characterName]?.job, 80);
                         return { name: characterName, job: knownJob, trackerEnabled: previous.trackerEnabled === true || isLegacyTracked, isMain: previous.isMain === true };
                     });
                 });
@@ -7702,6 +7777,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function refreshTrackerUI() {
             syncDataStructures();
+            populateRegistrationJobSelect();
             const visible = id => { const el = document.getElementById(id); return !!el && !el.classList.contains('hidden-page'); };
             const modalOpen = id => { const el = document.getElementById(id); return !!el && !el.classList.contains('hidden'); };
             if (visible('tracker-page')) {
@@ -10929,7 +11005,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!member) { alert('Your roster could not be refreshed. Reload the page and try again.'); return; }
             member.characterProfiles = member.characterProfiles.map(profile => ({ ...profile, trackerEnabled: true }));
             member.characters = member.characterProfiles.map(profile => profile.name);
-            if (pantheonDiscordUser?.id && member.characterProfiles.some(profile => profile.isMain) && member.characterProfiles.every(profile => JOB_ORDER.includes(profile.job))) {
+            if (pantheonDiscordUser?.id && member.characterProfiles.some(profile => profile.isMain) && member.characterProfiles.every(profile => getJobOrder().includes(profile.job))) {
                 member.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
                 member.profileConfirmedAt = Date.now();
             }
@@ -11389,14 +11465,14 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 for (const member of members) {
                     const profiles = Array.isArray(member?.characterProfiles) ? member.characterProfiles : [];
                     const profile = profiles.find(item => String(item?.name || item?.ign || '').trim().toLowerCase() === key);
-                    if (profile && JOB_ORDER.includes(String(profile.job || ''))) return String(profile.job);
+                    if (profile && cleanCatalogName(profile.job, 80)) return String(profile.job);
                 }
             }
             return cloudData.settings.characterJobs?.[name]?.job || '';
         }
 
         async function setCharacterJob(name, job) {
-            if (!JOB_DATABASE[job]) return;
+            if (!getJobOrder().includes(job)) return;
             const current = getCharacterJob(name);
             if (current === job) return;
             if (!(await prepareGlobalChange(`Set Job for ${name}`))) return;
@@ -11426,32 +11502,49 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
 
         function buildJobOptions(selected = '') {
-            return '<option value="">Select Job...</option>' + JOB_ORDER.map(job => `<option value="${escapeHTML(job)}" ${job === selected ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
+            return '<option value="">Select Job...</option>' + getJobOrder().map(job => `<option value="${escapeHTML(job)}" ${job === selected ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
         }
 
         function populateRegistrationJobSelect() {
             const sel = document.getElementById('registration-job');
-            if (sel && !sel.options.length) sel.innerHTML = buildJobOptions();
+            if (!sel) return;
+            const current = sel.value || '';
+            sel.innerHTML = buildJobOptions(current);
+            if ([...sel.options].some(option => option.value === current)) sel.value = current;
         }
 
         function normalizeJobProfiles(value) {
-            const source = safeObject(value), out = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES));
-            for (const job of JOB_ORDER) {
-                const rec = safeObject(source[job]);
-                if (!rec || !Object.keys(rec).length) continue;
-                if (typeof rec.className === 'string' && CLASS_ORDER.includes(rec.className)) out[job].className = rec.className;
-                if (typeof rec.raidPosition === 'string' && RAID_POSITION_OPTIONS.includes(rec.raidPosition)) out[job].raidPosition = rec.raidPosition;
+            const source = safeObject(value), catalog = normalizeJobCatalog(source.__catalog__ || DEFAULT_JOB_CATALOG);
+            const defaults = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES));
+            Object.entries(catalog.jobs || {}).forEach(([job, meta]) => {
+                defaults[job] = {
+                    className: meta.className,
+                    raidPosition: meta.raidPosition || 'DPS',
+                    damageType: meta.damageType || '',
+                    secondaryRoles: Array.isArray(meta.secondaryRoles) ? [...meta.secondaryRoles] : []
+                };
+            });
+            const out = JSON.parse(JSON.stringify(defaults));
+            for (const job of [...new Set([...JOB_ORDER, ...Object.keys(catalog.jobs || {})])]) {
+                const rec = safeObject(source[job]); if (!Object.keys(rec).length) continue;
+                if (typeof rec.className === 'string' && getClassOrder(catalog).includes(rec.className)) out[job].className = rec.className;
+                if (typeof rec.raidPosition === 'string' && getRaidPositionOptions(catalog).includes(rec.raidPosition)) out[job].raidPosition = rec.raidPosition;
                 if (typeof rec.damageType === 'string' && DPS_TYPE_OPTIONS.includes(rec.damageType)) out[job].damageType = rec.damageType;
-                if (Array.isArray(rec.secondaryRoles)) out[job].secondaryRoles = [...new Set(rec.secondaryRoles.map(String).filter(r => SECONDARY_ROLE_OPTIONS.includes(r)))];
+                if (Array.isArray(rec.secondaryRoles)) out[job].secondaryRoles = [...new Set(rec.secondaryRoles.map(String).filter(role => getSecondaryRoleOptions(catalog).includes(role)))];
             }
+            out.__catalog__ = catalog;
             return out;
         }
 
         function getJobMeta(job) {
-            if (!job || !JOB_DATABASE[job]) return null;
-            const profile = cloudData.settings?.jobProfiles?.[job] || DEFAULT_JOB_PROFILES[job];
+            if (!job) return null;
+            const catalog = getCurrentJobCatalog();
+            const base = JOB_DATABASE[job] || catalog.jobs?.[job];
+            if (!base) return null;
+            const profile = cloudData.settings?.jobProfiles?.[job] || normalizeJobProfiles({ __catalog__: catalog })[job];
+            if (!profile) return null;
             return {
-                ...JOB_DATABASE[job],
+                ...base,
                 className: profile.className,
                 raidPosition: profile.raidPosition,
                 damageType: profile.damageType || '',
@@ -11471,60 +11564,122 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             cloudData.updatedAt = Date.now();
         }
 
-        function buildRoleCheckboxes(job) {
-            const meta = getJobMeta(job) || DEFAULT_JOB_PROFILES[job];
-            const selected = new Set(meta?.secondaryRoles || []);
-            return SECONDARY_ROLE_OPTIONS.map(role => `<label class="role-check"><input type="checkbox" data-role-job="${escapeHTML(job)}" data-role-name="${escapeHTML(role)}" ${selected.has(role) ? 'checked' : ''}><span>${escapeHTML(role)}</span></label>`).join('');
+        let roleConfigDraftCatalog = null;
+        let roleConfigDraftProfiles = null;
+        function getRoleConfigDraftCatalog() { return normalizeJobCatalog(roleConfigDraftCatalog || getCurrentJobCatalog()); }
+        function getRoleConfigDraftProfiles() { return roleConfigDraftProfiles || normalizeJobProfiles(cloudData.settings.jobProfiles); }
+
+        function captureRoleConfigFormIntoDraft() {
+            if (!roleConfigDraftProfiles) return;
+            document.querySelectorAll('[data-job-field][data-job]').forEach(el => {
+                const job = el.dataset.job, field = el.dataset.jobField;
+                if (!roleConfigDraftProfiles[job]) roleConfigDraftProfiles[job] = { className: getRoleConfigDraftCatalog().jobs?.[job]?.className || 'Archer', raidPosition: 'DPS', damageType: '', secondaryRoles: [] };
+                roleConfigDraftProfiles[job][field] = el.value;
+            });
+            getJobOrder(getRoleConfigDraftCatalog()).forEach(job => {
+                if (!roleConfigDraftProfiles[job]) roleConfigDraftProfiles[job] = { className: getRoleConfigDraftCatalog().jobs?.[job]?.className || 'Archer', raidPosition: 'DPS', damageType: '', secondaryRoles: [] };
+                roleConfigDraftProfiles[job].secondaryRoles = [...document.querySelectorAll(`input[data-role-job="${CSS.escape(job)}"][data-role-name]`)]
+                    .filter(input => input.checked).map(input => input.dataset.roleName);
+            });
         }
 
-        function openRoleConfigModal() { renderRoleConfig(); openModal('role-config-modal'); }
+        function buildRoleCheckboxes(job, meta, catalog) {
+            const selected = new Set(meta?.secondaryRoles || []);
+            return getSecondaryRoleOptions(catalog).map(role => `<label class="role-check"><input type="checkbox" data-role-job="${escapeHTML(job)}" data-role-name="${escapeHTML(role)}" ${selected.has(role) ? 'checked' : ''}><span>${escapeHTML(role)}</span></label>`).join('');
+        }
+
+        function openRoleConfigModal() {
+            if (getAdminViewAsMember()) { alert('Exit the read-only member preview before opening Job / Role settings.'); return; }
+            roleConfigDraftCatalog = getCurrentJobCatalog();
+            roleConfigDraftProfiles = normalizeJobProfiles(cloudData.settings.jobProfiles);
+            renderRoleConfig(); openModal('role-config-modal');
+        }
+
+        function renderRoleCatalogManager() {
+            const catalog = getRoleConfigDraftCatalog();
+            const classSelect = document.getElementById('role-catalog-job-class');
+            if (classSelect) { const prior = classSelect.value; classSelect.innerHTML = getClassOrder(catalog).map(name => `<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`).join(''); classSelect.value = getClassOrder(catalog).includes(prior) ? prior : (getClassOrder(catalog)[0] || 'Archer'); }
+            const classes = document.getElementById('role-catalog-class-list');
+            if (classes) classes.innerHTML = getClassOrder(catalog).map(name => `<span class="role-catalog-chip">${escapeHTML(name)}</span>`).join('');
+            const jobs = document.getElementById('role-catalog-job-list');
+            if (jobs) jobs.innerHTML = getJobOrder(catalog).map(name => `<span class="role-catalog-chip ${JOB_DATABASE[name] ? 'built-in' : 'custom'}">${escapeHTML(name)} <small>${escapeHTML((roleConfigDraftProfiles?.[name]?.className || catalog.jobs?.[name]?.className || JOB_DATABASE[name]?.className || ''))}</small></span>`).join('');
+            const roles = document.getElementById('role-catalog-role-list');
+            if (roles) {
+                const base = [...new Set([...getRaidPositionOptions(catalog), ...getSecondaryRoleOptions(catalog)])];
+                roles.innerHTML = base.map(name => { const custom = catalog.roles.find(item => item.name === name); return `<span class="role-catalog-chip ${custom ? 'custom' : 'built-in'}">${escapeHTML(name)} <small>${custom ? [custom.primary ? 'Primary' : '', custom.secondary ? 'Secondary' : ''].filter(Boolean).join(' + ') : 'Built-in'}</small></span>`; }).join('');
+            }
+        }
+
+        function addCatalogClass() {
+            captureRoleConfigFormIntoDraft();
+            const input = document.getElementById('role-catalog-class-name'), name = cleanCatalogName(input?.value);
+            if (!name) return alert('Enter a class name first.');
+            const catalog = getRoleConfigDraftCatalog();
+            if (getClassOrder(catalog).some(item => item.toLowerCase() === name.toLowerCase())) return alert('That class already exists.');
+            catalog.classes.push(name); roleConfigDraftCatalog = catalog; if (input) input.value = ''; renderRoleConfig();
+        }
+
+        function addCatalogJob() {
+            captureRoleConfigFormIntoDraft();
+            const input = document.getElementById('role-catalog-job-name'), name = cleanCatalogName(input?.value), className = document.getElementById('role-catalog-job-class')?.value || '';
+            if (!name || !className) return alert('Enter a job name and choose its base class.');
+            const catalog = getRoleConfigDraftCatalog();
+            if (getJobOrder(catalog).some(item => item.toLowerCase() === name.toLowerCase())) return alert('That job already exists.');
+            catalog.jobs[name] = { className, raidPosition: getRaidPositionOptions(catalog).includes('DPS') ? 'DPS' : getRaidPositionOptions(catalog)[0], damageType: '', secondaryRoles: [] };
+            roleConfigDraftCatalog = catalog;
+            roleConfigDraftProfiles = normalizeJobProfiles({ ...roleConfigDraftProfiles, __catalog__: catalog });
+            if (input) input.value = ''; renderRoleConfig();
+        }
+
+        function addCatalogRole() {
+            captureRoleConfigFormIntoDraft();
+            const input = document.getElementById('role-catalog-role-name'), name = cleanCatalogName(input?.value);
+            const primary = !!document.getElementById('role-catalog-role-primary')?.checked;
+            const secondary = !!document.getElementById('role-catalog-role-secondary')?.checked;
+            if (!name) return alert('Enter a role name first.');
+            if (!primary && !secondary) return alert('Choose whether this role can be a primary position, a secondary capability, or both.');
+            const catalog = getRoleConfigDraftCatalog();
+            const existing = [...getRaidPositionOptions(catalog), ...getSecondaryRoleOptions(catalog)].some(item => item.toLowerCase() === name.toLowerCase());
+            if (existing) return alert('That role already exists.');
+            catalog.roles.push({ name, primary, secondary }); roleConfigDraftCatalog = catalog;
+            if (input) input.value = ''; renderRoleConfig();
+        }
 
         function renderRoleConfig() {
             const list = document.getElementById('role-config-list');
             if (!list) return;
-            list.innerHTML = JOB_ORDER.map(job => {
-                const meta = getJobMeta(job) || DEFAULT_JOB_PROFILES[job];
+            const catalog = getRoleConfigDraftCatalog(), profiles = getRoleConfigDraftProfiles();
+            list.innerHTML = getJobOrder(catalog).map(job => {
+                const meta = profiles[job] || { className: catalog.jobs?.[job]?.className || JOB_DATABASE[job]?.className || 'Archer', raidPosition: 'DPS', damageType: '', secondaryRoles: [] };
                 return `<tr>
                     <td><strong>${escapeHTML(job)}</strong></td>
-                    <td><select class="role-config-select" data-job-field="className" data-job="${escapeHTML(job)}">${CLASS_ORDER.map(c => `<option value="${escapeHTML(c)}" ${c === meta.className ? 'selected' : ''}>${escapeHTML(c)}</option>`).join('')}</select></td>
-                    <td><select class="role-config-select" data-job-field="raidPosition" data-job="${escapeHTML(job)}">${RAID_POSITION_OPTIONS.map(r => `<option value="${escapeHTML(r)}" ${r === meta.raidPosition ? 'selected' : ''}>${escapeHTML(r)}</option>`).join('')}</select></td>
+                    <td><select class="role-config-select" data-job-field="className" data-job="${escapeHTML(job)}">${getClassOrder(catalog).map(c => `<option value="${escapeHTML(c)}" ${c === meta.className ? 'selected' : ''}>${escapeHTML(c)}</option>`).join('')}</select></td>
+                    <td><select class="role-config-select" data-job-field="raidPosition" data-job="${escapeHTML(job)}">${getRaidPositionOptions(catalog).map(r => `<option value="${escapeHTML(r)}" ${r === meta.raidPosition ? 'selected' : ''}>${escapeHTML(r)}</option>`).join('')}</select></td>
                     <td><select class="role-config-select" data-job-field="damageType" data-job="${escapeHTML(job)}">${DPS_TYPE_OPTIONS.map(d => `<option value="${escapeHTML(d)}" ${d === (meta.damageType || '') ? 'selected' : ''}>${d || '—'}</option>`).join('')}</select></td>
-                    <td><div class="role-check-wrap">${buildRoleCheckboxes(job)}</div></td>
+                    <td><div class="role-check-wrap">${buildRoleCheckboxes(job, meta, catalog)}</div></td>
                 </tr>`;
             }).join('');
+            renderRoleCatalogManager();
         }
 
         async function saveRoleConfig() {
-            const next = normalizeJobProfiles(cloudData.settings.jobProfiles);
-            document.querySelectorAll('[data-job-field][data-job]').forEach(el => {
-                const job = el.dataset.job, field = el.dataset.jobField;
-                if (!next[job]) next[job] = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES[job]));
-                next[job][field] = el.value;
-            });
-            JOB_ORDER.forEach(job => {
-                if (!next[job]) next[job] = JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES[job]));
-                next[job].secondaryRoles = [...document.querySelectorAll(`input[data-role-job="${CSS.escape(job)}"][data-role-name]`)]
-                    .filter(input => input.checked).map(input => input.dataset.roleName);
-            });
-            if (JSON.stringify(normalizeJobProfiles(cloudData.settings.jobProfiles)) === JSON.stringify(normalizeJobProfiles(next))) {
-                closeModal('role-config-modal'); return;
-            }
-            if (!(await prepareGlobalChange('Update Job / Role settings'))) return;
+            captureRoleConfigFormIntoDraft();
+            const next = normalizeJobProfiles({ ...roleConfigDraftProfiles, __catalog__: roleConfigDraftCatalog || getCurrentJobCatalog() });
+            const current = normalizeJobProfiles(cloudData.settings.jobProfiles);
+            if (JSON.stringify(current) === JSON.stringify(next)) { closeModal('role-config-modal'); roleConfigDraftCatalog = null; roleConfigDraftProfiles = null; return; }
+            if (!(await prepareGlobalChange('Update Class / Job / Role catalog'))) return;
             updateJobProfiles(next);
-            renderTeamBuilder();
-            renderClassSetup();
-            triggerAutoSync();
-            closeModal('role-config-modal');
+            renderTeamBuilder(); renderClassSetup(); triggerAutoSync();
+            closeModal('role-config-modal'); roleConfigDraftCatalog = null; roleConfigDraftProfiles = null;
         }
 
         async function resetRoleConfig() {
-            if (!confirm('Reset all Job role settings to the built-in defaults?')) return;
+            if (!confirm('Reset job role assignments to built-in defaults? Custom classes, jobs, and roles will be kept.')) return;
             if (!(await prepareGlobalChange('Reset Job / Role settings'))) return;
-            updateJobProfiles(DEFAULT_JOB_PROFILES);
-            renderRoleConfig();
-            renderTeamBuilder();
-            renderClassSetup();
-            triggerAutoSync();
+            const catalog = getCurrentJobCatalog();
+            updateJobProfiles(normalizeJobProfiles({ __catalog__: catalog }));
+            roleConfigDraftCatalog = getCurrentJobCatalog(); roleConfigDraftProfiles = normalizeJobProfiles(cloudData.settings.jobProfiles);
+            renderRoleConfig(); renderTeamBuilder(); renderClassSetup(); triggerAutoSync();
         }
 
         function getUnassignedJobCharacters() { return allRegisteredCharacters().filter(c => !getCharacterJob(c.name)); }
@@ -11656,7 +11811,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function getClassCounts(teamKey = '', slotIndex = -1) {
             const counts = {};
-            CLASS_ORDER.forEach(c => counts[c] = 0);
+            getClassOrder().forEach(c => counts[c] = 0);
             getTeamBuilderRosterCharacters().forEach(c => {
                 const meta = getJobMeta(getCharacterJob(c.name));
                 if (meta?.className && counts[meta.className] !== undefined) counts[meta.className]++;
@@ -11672,7 +11827,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function setTeamClassFilter(teamKey, index, className) {
             if (!teamClassFilters[teamKey]) teamClassFilters[teamKey] = Array(8).fill('');
-            teamClassFilters[teamKey][index] = CLASS_ORDER.includes(className) ? className : '';
+            teamClassFilters[teamKey][index] = getClassOrder().includes(className) ? className : '';
             const current = getTeamState(teamKey).slots[index]?.character || '';
             if (current) {
                 const currentMeta = getJobMeta(getCharacterJob(current));
@@ -11690,7 +11845,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function buildTeamClassOptions(teamKey, slotIndex, currentChar) {
             const selectedClass = getSlotClassFilter(teamKey, slotIndex, currentChar);
             const options = [`<option value="">Any Class</option>`];
-            CLASS_ORDER.forEach(className => {
+            getClassOrder().forEach(className => {
                 options.push(`<option value="${escapeHTML(className)}" ${className === selectedClass ? 'selected' : ''}>${escapeHTML(className)}</option>`);
             });
             return options.join('');
@@ -11808,11 +11963,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function buildTeamSummary(teamKey) {
             const team = getTeamState(teamKey);
-            const counts = { DPS:0, Heal:0, Tank:0, Utility:0, Support:0, Debuff:0, Mobility:0, 'Beyond Time':0, Highlander:0, Provoke:0 };
+            const counts = Object.fromEntries([...new Set([...getRaidPositionOptions(), ...getSecondaryRoleOptions()])].map(role => [role, 0]));
             team.slots.slice(0, getActiveTeamSize()).map(s => s.character).filter(Boolean).forEach(name => {
                 const meta = getJobMeta(getCharacterJob(name));
                 if (!meta) return;
-                SECONDARY_ROLE_OPTIONS.forEach(role => { if (jobHasRole(meta, role) && counts[role] !== undefined) counts[role]++; });
+                [...new Set([...getRaidPositionOptions(), ...getSecondaryRoleOptions()])].forEach(role => { if (jobHasRole(meta, role)) counts[role] = (counts[role] || 0) + 1; });
             });
             return counts;
         }
@@ -11850,7 +12005,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         function buildCombinedTeamSummary() {
             const a = buildTeamSummary('team1'), b = buildTeamSummary('team2');
-            const keys = ['DPS','Heal','Tank','Utility','Support','Debuff','Mobility','Beyond Time','Highlander','Provoke'];
+            const keys = [...new Set([...getRaidPositionOptions(), ...getSecondaryRoleOptions()])];
             const out = {};
             keys.forEach(k => out[k] = (a[k] || 0) + (b[k] || 0));
             return out;
@@ -11869,7 +12024,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const el = document.getElementById(`${teamKey}-summary`), fill = document.getElementById(`${teamKey}-filled`), sub = document.getElementById(`${teamKey}-sub`);
             if (!el || !fill) return;
             const team = getTeamState(teamKey), size = getActiveTeamSize(), members = team.slots.slice(0, size).filter(s => s.character).length, c = buildTeamSummary(teamKey);
-            const items = [['DPS',c.DPS],['Heal',c.Heal],['Tank',c.Tank],['Utility',c.Utility],['Support',c.Support],['Debuff',c.Debuff],['Mobility',c.Mobility],['Beyond Time',c['Beyond Time']],['Highlander',c.Highlander]];
+            const standard = ['DPS','Heal','Tank','Utility','Support','Debuff','Mobility','Beyond Time','Highlander'];
+            const items = [...standard.map(k => [k, c[k] || 0]), ...[...new Set([...getRaidPositionOptions(), ...getSecondaryRoleOptions()])].filter(k => !standard.includes(k)).map(k => [k, c[k] || 0])];
             el.innerHTML = '<span class="summary-label">Coverage:</span>' + items.map(([k,v]) => `<span class="team-summary-pill ${v ? '' : 'empty'}">${escapeHTML(k)} ${v}</span>`).join('');
             fill.textContent = `${members} / ${size}`;
             let warnings = getTeamCompositionMessages(teamKey);
@@ -12480,7 +12636,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const key = characterName.toLowerCase();
                 if (!entry.characters.some(value => value.toLowerCase() === key) && entry.characters.length < 100) {
                     entry.characters.push(characterName);
-                    entry.characterProfiles.push({ name: characterName, job: JOB_ORDER.includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: false, isMain: false });
+                    entry.characterProfiles.push({ name: characterName, job: getJobOrder().includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: false, isMain: false });
                     changed = true;
                 }
             });
@@ -12671,7 +12827,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const key = profile.name.toLowerCase();
                 if (localNames.has(key)) return alert(`The IGN ${profile.name} appears more than once. Each character must be listed only once.`);
                 localNames.add(key);
-                if (!JOB_ORDER.includes(profile.job)) return alert(`Choose a Class / Job for ${profile.name}.`);
+                if (!getJobOrder().includes(profile.job)) return alert(`Choose a Class / Job for ${profile.name}.`);
             }
             if (hasCloudConfig() && !(await prepareGlobalChange(`${editingMemberDirectoryId ? 'Update' : 'Add'} member roster entry: ${name}`))) return;
             ensureMemberRosterMaster(cloudData);
@@ -12789,7 +12945,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r11';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r12';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -12966,7 +13122,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function memberHasValidMainDesignation(member) {
             const profiles = member?.characterProfiles || [];
-            return profiles.length > 0 && profiles.filter(profile => profile.isMain).length === 1 && profiles.every(profile => JOB_ORDER.includes(profile.job));
+            return profiles.length > 0 && profiles.filter(profile => profile.isMain).length === 1 && profiles.every(profile => getJobOrder().includes(profile.job));
         }
         function collectProfileConfirmationDraft() {
             const container = document.getElementById('profile-confirm-characters');
@@ -12988,7 +13144,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const key = profile.name.toLocaleLowerCase();
                 if (seen.has(key)) return `The IGN "${profile.name}" appears more than once. Each character must be listed only once.`;
                 seen.add(key);
-                if (!JOB_ORDER.includes(profile.job)) return `Choose a Class / Job for ${profile.name}.`;
+                if (!getJobOrder().includes(profile.job)) return `Choose a Class / Job for ${profile.name}.`;
             }
             if (profiles.filter(profile => profile.isMain).length !== 1) return 'Choose exactly one Main character.';
             return '';
@@ -13026,7 +13182,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     ? 'No characters are registered yet. Add an entry below, select its Class / Job, choose your Main character, and decide whether it should appear in Tracker. All registered characters will also be available in Team Builder.'
                     : 'Your account does not have registered characters yet. Add an entry below, select its Class / Job, and choose exactly one Main character before using the personal Tracker.');
             if (container) container.innerHTML = profiles.length ? profiles.map((profile, index) => {
-                const jobOptions = '<option value="">Select Class / Job…</option>' + JOB_ORDER.map(job => `<option value="${escapeHTML(job)}" ${job === profile.job ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
+                const jobOptions = '<option value="">Select Class / Job…</option>' + getJobOrder().map(job => `<option value="${escapeHTML(job)}" ${job === profile.job ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
                 return `<div class="profile-confirm-character" data-profile-index="${index}" data-profile-new="${profile.isNewDraft ? 'true' : 'false'}">
                     <div class="profile-confirm-character-info">
                         <div class="profile-confirm-character-main">
@@ -13531,7 +13687,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r11';
+  const CURRENT_BUILD = '1.6.9-r12';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
