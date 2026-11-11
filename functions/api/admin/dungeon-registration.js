@@ -1,6 +1,6 @@
 import { getRecord, jsonResponse, requireAdmin } from '../../_utils/auth.js';
 import { decodePantheonCompactRecord, encodePantheonCompactRecord } from '../../_utils/compact.js';
-import { isCharacterStorageMigrationBusy } from '../../_utils/character-storage.js';
+import { getCharacterStorageState, isCharacterStorageMigrationBusy, taskKey } from '../../_utils/character-storage.js';
 
 const MAIN_ID = 'pantheon-main';
 const clean = (value, limit) => String(value ?? '').trim().slice(0, limit);
@@ -9,6 +9,37 @@ const uniqueTasks = categories => [...new Set((Array.isArray(categories) ? categ
 
 const slug = value => String(value || '').toLocaleLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 100);
 const normalizeMatch = value => String(value || '').toLocaleLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
+
+// A dungeon registered through this dedicated API updates the canonical shared
+// categories directly. Unlike a legacy whole-record write, it does not pass through
+// the normal category-change hook in /api/cloud/b/[id].js. Keep the separate D1 task
+// allowlist in step with the newly committed category without rebuilding or touching
+// the character-owner index (which would be an unnecessary roster-wide operation).
+async function ensureTrackerTaskDefinition(env, taskName) {
+  let state;
+  try { state = await getCharacterStorageState(env); }
+  catch (_) { return { ok:true, skipped:true }; } // Player-storage schema not installed yet.
+  if (Number(state?.migration_complete) !== 1) return { ok:true, skipped:true };
+
+  const key = taskKey(taskName);
+  if (!key) return { ok:false, error:'The task name produced an empty Tracker key.' };
+  try {
+    await env.PANTHEON_DB.prepare(`
+      INSERT INTO tracker_task_definitions (task_key, task_name, active, updated_at)
+      VALUES (?, ?, 1, ?)
+      ON CONFLICT(task_key) DO UPDATE SET
+        task_name = excluded.task_name,
+        active = 1,
+        updated_at = CASE
+          WHEN excluded.updated_at > tracker_task_definitions.updated_at THEN excluded.updated_at
+          ELSE tracker_task_definitions.updated_at + 1
+        END
+    `).bind(key, taskName, Date.now()).run();
+    return { ok:true, skipped:false };
+  } catch (error) {
+    return { ok:false, error:String(error?.message || error).slice(0,220) };
+  }
+}
 function ensureActivityProfile(settings, taskName) {
   const profiles = Array.isArray(settings.activityReferenceProfiles) ? settings.activityReferenceProfiles.map(item => ({ ...item })) : [];
   const target = normalizeMatch(taskName);
@@ -125,6 +156,13 @@ export async function onRequestPost(context) {
       if (defaultExclusionChanged) defaultExcludedTasks.push(taskName);
       if (extraDungeonChanged) extraDungeonTasks.push(taskName);
       if (!categoriesChanged && !profilesChanged && !defaultExclusionChanged && !extraDungeonChanged) {
+        // Idempotent registration also repairs a task definition missed by an earlier
+        // successful category commit, so admins can safely retry without creating a duplicate.
+        const taskIndex = await ensureTrackerTaskDefinition(context.env, taskName);
+        if (!taskIndex.ok) return jsonResponse({
+          code:'TASK_INDEX_REFRESH_FAILED', retryable:true, alreadyRegistered:true,
+          error:`${taskName} is already in the shared Tracker categories, but its character-storage task index could not be refreshed. Re-open Dungeon Registration and retry. ${taskIndex.error}`
+        }, 503);
         return jsonResponse({
           ok: true,
           alreadyRegistered: true,
@@ -177,6 +215,14 @@ export async function onRequestPost(context) {
       ).bind(recordJson, now, result.row.id, result.row.record_json).run();
       const changes = Number(update?.meta?.changes ?? update?.changes ?? 0);
       if (changes < 1) continue;
+
+      // The category record is durable at this point. Update only the new task's
+      // allowlist row; never rescan/rewrite member ownership or character registrations.
+      const taskIndex = await ensureTrackerTaskDefinition(context.env, taskName);
+      if (!taskIndex.ok) return jsonResponse({
+        code:'TASK_INDEX_REFRESH_FAILED', retryable:true, categorySaved:true,
+        error:`${taskName} was registered in the shared categories, but the Tracker task index could not be refreshed. Re-open Dungeon Registration and register the same task again to complete the index update. ${taskIndex.error}`
+      }, 503);
 
       try {
         await context.env.PANTHEON_DB.prepare(

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r12</title>
+    <title>Pantheon Tools v1.6.9-r13</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -2687,7 +2687,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   -webkit-text-fill-color: var(--pt-text) !important;
 }
 </style>
-<style id="pantheon-r12-activity-value-recommendations">
+<style id="pantheon-r13-activity-value-recommendations">
 .analytics-personalization-note{grid-column:1/-1;box-sizing:border-box;border:1px solid var(--pt-border,#444);border-radius:8px;background:var(--pt-surface-soft,#30303b);color:var(--pt-muted,#b7bdcc);padding:8px 10px;font-size:.69rem;line-height:1.5;}
 .analytics-personalization-note strong{color:var(--pt-text,#fff);font-weight:800;}
 .analytics-fit-note{display:block;margin-top:3px;color:var(--pt-muted,#a7afc2);font-size:.67rem;line-height:1.4;}
@@ -3965,9 +3965,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r12</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r13</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r12:</strong> Adds an Admin-only Class / Job Catalog on top of the r11 stable reset protections. New classes and jobs are additive; existing character registrations are left unchanged.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r13:</strong> Fixes Dungeon Registration so a newly added task is also activated in the separate Tracker task index. Retains the r11-based Class / Job Catalog.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -12990,7 +12990,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r12';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r13';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13732,7 +13732,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r12';
+  const CURRENT_BUILD = '1.6.9-r13';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
