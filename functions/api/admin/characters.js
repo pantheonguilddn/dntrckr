@@ -7,16 +7,13 @@ const VALID_JOBS = new Set(['Adept','Physician','Gear Master','Shooting Star','S
 const cleanProfile = profile => ({
   name: String(profile?.name || '').trim().slice(0, 40),
   job: String(profile?.job || '').trim().slice(0, 60),
-  trackerEnabled: profile?.trackerEnabled === true,
+  trackerEnabled: true,
   isMain: profile?.isMain === true
 });
 function serializeMembers(record) {
   const settings = record?.settings || {};
-  const rosters = Array.isArray(settings.rosters) ? settings.rosters : [];
   const jobs = settings.characterJobs && typeof settings.characterJobs === 'object' ? settings.characterJobs : {};
   return (Array.isArray(settings.memberDirectory) ? settings.memberDirectory : []).map(member => {
-    const roster = rosters.find(item => String(item?.id || '') === String(member?.trackerRosterId || ''))
-      || rosters.find(item => String(item?.name || '').trim().toLocaleLowerCase() === String(member?.name || '').trim().toLocaleLowerCase());
     const rawProfiles = Array.isArray(member?.characterProfiles) ? member.characterProfiles : [];
     const profileByName = new Map(rawProfiles.map(profile => [String(profile?.name || profile?.ign || '').trim().toLocaleLowerCase(), profile]));
     const names = Array.isArray(member?.characters) ? member.characters.map(item => String(typeof item === 'object' ? (item?.name || item?.ign || '') : item || '').trim()).filter(Boolean) : [];
@@ -29,7 +26,7 @@ function serializeMembers(record) {
       profileConfirmedDiscordId: String(member?.profileConfirmedDiscordId || ''),
       characterProfiles: characterNames.map(name => {
         const profile = profileByName.get(name.toLocaleLowerCase()) || {};
-        const trackerEnabled = profile.trackerEnabled === true || (Array.isArray(roster?.characters) && roster.characters.some(character => String(character).toLocaleLowerCase() === name.toLocaleLowerCase()));
+        const trackerEnabled = true;
         return cleanProfile({ name, job: profile.job || jobs[name]?.job || '', trackerEnabled, isMain: profile.isMain === true });
       })
     };
@@ -121,7 +118,7 @@ export async function onRequestPut(context) {
       const rosterId = String(existing?.id || item?.trackerRosterId || `member-roster-${String(item.id || '').replace(/[^a-zA-Z0-9_-]/g, '')}`);
       item.trackerRosterId = rosterId;
       item.color = /^#[0-9a-f]{6}$/i.test(String(item.color || '')) ? String(item.color).toLowerCase() : (existing?.color || '#7aa2f7');
-      return { id: rosterId, name: String(item.name || 'Member').slice(0, 30), color: item.color, characters: (item.characterProfiles || []).filter(profile => profile.trackerEnabled).map(profile => profile.name) };
+      return { id: rosterId, name: String(item.name || 'Member').slice(0, 30), color: item.color, characters: (item.characterProfiles || []).map(profile => profile.name) };
     });
     settings.rosters = projectedRosters;
     settings.rosterUpdatedAt = now;

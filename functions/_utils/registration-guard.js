@@ -32,7 +32,7 @@ function memberProjection(member) {
       return {
         name,
         job: VALID_JOBS.has(String(profile.job || '')) ? String(profile.job) : '',
-        trackerEnabled: profile.trackerEnabled === true,
+        trackerEnabled: true,
         isMain: profile.isMain === true
       };
     })

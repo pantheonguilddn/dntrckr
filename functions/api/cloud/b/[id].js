@@ -114,13 +114,13 @@ function cleanMemberIntentPayload(value) {
     profileByName.set(ownerKey(profileName), {
       name: profileName,
       job: String(raw?.job || '').trim().slice(0, 60),
-      trackerEnabled: raw?.trackerEnabled === true,
+      trackerEnabled: true,
       isMain: raw?.isMain === true
     });
   }
   const names = [...new Set([...memberNames(value), ...[...profileByName.values()].map(profile => profile.name)])].slice(0, 100);
   const characterProfiles = names.map(characterName => profileByName.get(ownerKey(characterName)) || {
-    name: characterName, job: '', trackerEnabled: false, isMain: false
+    name: characterName, job: '', trackerEnabled: true, isMain: false
   });
   return {
     id, name, characters: names, characterProfiles,
@@ -133,31 +133,23 @@ function cleanMemberIntentPayload(value) {
     isBootstrapPersonalOwner: value?.isBootstrapPersonalOwner === true
   };
 }
-function projectDirectoryRosters(members, oldRosters, explicitOptOutsByMember = new Map()) {
-  return members.map(member => {
+function projectDirectoryRosters(members, oldRosters) {
+  const matchedRosters = new Set();
+  const projected = members.map(member => {
     const existing = oldRosters.find(roster => String(roster?.id || '') === String(member?.trackerRosterId || ''))
       || oldRosters.find(roster => ownerKey(roster?.name) === ownerKey(member?.name));
+    if (existing) matchedRosters.add(existing);
     const rosterId = String(existing?.id || member?.trackerRosterId || `member-roster-${String(member?.id || '').replace(/[^a-zA-Z0-9_-]/g, '')}`);
     member.trackerRosterId = rosterId;
     member.color = /^#[0-9a-f]{6}$/i.test(String(member?.color || '')) ? String(member.color).toLowerCase()
       : (/^#[0-9a-f]{6}$/i.test(String(existing?.color || '')) ? String(existing.color).toLowerCase() : '#7aa2f7');
-    const profiles = new Map(arr(member?.characterProfiles).map(profile => [ownerKey(profile?.name || profile?.ign), profile]));
     const names = memberNames(member);
-    const previouslyTrackedNames = new Set(arr(existing?.characters).map(ownerKey));
-    const explicitOptOutNames = explicitOptOutsByMember.get(String(member?.id || '')) || new Set();
-    const trackedNames = names.filter(name => {
-      const key = ownerKey(name);
-      const profile = profiles.get(key);
-      if (profile?.trackerEnabled === true) return true;
-      // Missing/false legacy flags are NOT opt-outs. Preserve the committed Tracker
-      // membership unless this member's latest explicit save names the character as
-      // intentionally unchecked. Characters removed from Member Roster are absent
-      // from `names` and therefore are naturally removed from the projection.
-      if (explicitOptOutNames.has(key)) return false;
-      return previouslyTrackedNames.has(key);
-    });
-    return { id: rosterId, name: String(member?.name || 'Member').slice(0, 30), color: member.color, characters: trackedNames };
+    // Tracker membership follows Member Roster membership. A registered character
+    // is always tracked; only removing it from Member Roster unregisters it.
+    return { id: rosterId, name: String(member?.name || 'Member').slice(0, 30), color: member.color, characters: names };
   });
+  for (const roster of oldRosters) if (!matchedRosters.has(roster)) projected.push(roster);
+  return projected;
 }
 function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminOverride) {
   const previousSettings = obj(previous?.settings);
@@ -170,7 +162,6 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
   const intents = arr(rawIntents).slice(0, 50);
   const oldRosters = arr(previousSettings.rosters);
   const deletedCharacterNames = new Set();
-  const explicitOptOutsByMember = new Map();
   for (const raw of intents) {
     const op = String(raw?.op || '');
     if (op === 'remove') {
@@ -203,12 +194,8 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
     const existingNames = new Set(currentMembers.filter((_, i) => i !== index).flatMap(memberNames).map(ownerKey));
     const duplicateCharacter = memberNames(member).find(name => existingNames.has(ownerKey(name)));
     if (duplicateCharacter) throw Object.assign(new Error(`The IGN ${duplicateCharacter} is already assigned to another member.`), { status: 409 });
-    // Opt-outs are explicit metadata from the edited member form. An absent or
-    // legacy trackerEnabled:false flag is never interpreted as a request to untrack.
+    // Tracker participation is automatic for every registered character.
     const characterRosterChanged = raw?.characterRosterChanged === true;
-    explicitOptOutsByMember.set(member.id, new Set(
-      (characterRosterChanged ? arr(raw?.trackerOptOutNames) : []).map(name => ownerKey(name)).filter(Boolean)
-    ));
     if (index >= 0) {
       const committedMember = currentMembers[index];
       memberNames(committedMember).forEach(name => deletedCharacterNames.add(ownerKey(name)));
@@ -240,7 +227,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
             return {
               name: String(prior.name || name),
               job: String(incoming.job || prior.job || '').slice(0, 60),
-              trackerEnabled: prior.trackerEnabled === true,
+              trackerEnabled: true,
               isMain: prior.isMain === true
             };
           }),
@@ -271,7 +258,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
 
   next.settings = nextSettings;
   next.settings.memberDirectory = currentMembers;
-  next.settings.rosters = projectDirectoryRosters(currentMembers, oldRosters, explicitOptOutsByMember);
+  next.settings.rosters = projectDirectoryRosters(currentMembers, oldRosters);
   next.settings.characterJobs = jobs;
   const now = Date.now();
   next.settings.memberDirectoryUpdatedAt = now;

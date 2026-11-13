@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r13</title>
+    <title>Pantheon Tools v1.6.9-r14</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -761,6 +761,7 @@
         .member-character-row input[type=text],.member-character-row select { width:100%; min-width:0; box-sizing:border-box; min-height:34px; padding:7px 8px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
         .member-character-opt-in { display:flex!important; flex-direction:row!important; align-items:center; gap:7px!important; min-height:34px; line-height:1.35; cursor:pointer; }
         .member-character-opt-in input { flex:0 0 auto; margin:0; accent-color:#7aa2f7; }
+        .member-character-auto-tracked,.profile-confirm-auto-tracked{display:flex;align-items:center;min-height:34px;color:#4ba978;font-size:11px;font-weight:800;white-space:nowrap;}
         .member-character-row-remove { width:30px; height:32px; border:1px solid #424653; border-radius:7px; background:#191b22; color:#ff9292; font-size:1rem; cursor:pointer; }
         .member-directory-field { display:flex; flex-direction:column; gap:6px; color:#bfc5d2; font-size:.68rem; font-weight:800; }
         .member-directory-field input { width:100%; min-width:0; box-sizing:border-box; min-height:36px; padding:8px 9px; border:1px solid #474b58; border-radius:7px; background:#191b22; color:#e8ebf0; font:inherit; font-weight:500; }
@@ -2687,7 +2688,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
   -webkit-text-fill-color: var(--pt-text) !important;
 }
 </style>
-<style id="pantheon-r13-activity-value-recommendations">
+<style id="pantheon-r14-activity-value-recommendations">
 .analytics-personalization-note{grid-column:1/-1;box-sizing:border-box;border:1px solid var(--pt-border,#444);border-radius:8px;background:var(--pt-surface-soft,#30303b);color:var(--pt-muted,#b7bdcc);padding:8px 10px;font-size:.69rem;line-height:1.5;}
 .analytics-personalization-note strong{color:var(--pt-text,#fff);font-weight:800;}
 .analytics-fit-note{display:block;margin-top:3px;color:var(--pt-muted,#a7afc2);font-size:.67rem;line-height:1.4;}
@@ -3679,7 +3680,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 </div>
             </section>
             <section class="overview-panel overview-completion-panel">
-                <div class="overview-panel-heading"><div><h2>Character Completion</h2><p>See which opted-in characters are on pace and which may need attention.</p></div><span class="overview-panel-kicker" id="overview-completion-sort-label">WEEK START</span></div>
+                <div class="overview-panel-heading"><div><h2>Character Completion</h2><p>See which registered characters are on pace and which may need attention.</p></div><span class="overview-panel-kicker" id="overview-completion-sort-label">WEEK START</span></div>
                 <div id="overview-character-completion" class="overview-character-completion" aria-live="polite">
                     <div class="activity-insight-empty">Your character completion details will appear here after your registered characters are loaded.</div>
                 </div>
@@ -3829,7 +3830,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         </div>
 
         <div class="team-builder-bottom">
-            <strong>How it works:</strong> Characters come from Member Roster. Every registered character is available in Team Builder; the Tracker checkbox only controls Tracker participation. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
+            <strong>How it works:</strong> Characters come from Member Roster. Every registered character automatically appears in both Tracker and Team Builder. Once their Job is configured, the builder automatically fills their Job, Raid Position, and DPS side. Mobility and other secondary roles can be adjusted in Role Settings. Use the Class dropdown to narrow the character list, or pick a character first and its Class will be filled automatically. <b>Allow same owner</b> lets one player pilot multiple different characters anywhere in the builder when needed; the same character is never allowed twice.
         </div>
     </main>
 
@@ -3887,22 +3888,22 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
     <main id="member-roster-page" class="app-page hidden-page">
         <div class="team-builder-header">
-            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p id="member-roster-description">A shared guild member directory. Add everyone here. Every registered character is available in Team Builder; choose separately which characters should appear in Tracker.</p></div>
+            <div><h2>👥 Member Roster <button class="mini-help" type="button" title="Member Roster guide" onclick="openHelpModal('member-roster')">?</button></h2><p id="member-roster-description">A shared guild member directory. Add everyone here. Every registered character is automatically included in Tracker and Team Builder.</p></div>
             <div class="builder-header-actions"><span class="local-only-badge">SHARED WHEN CLOUD IS CONNECTED</span></div>
         </div>
         <section class="member-directory-panel">
             <h3 id="member-directory-form-title">Add a guild member</h3>
-            <p>Member Roster is the master list. Add each character's exact IGN and Class / Job here. Every registered character is available in Team Builder; opt in only the characters whose progress should appear in Tracker.</p>
+            <p>Member Roster is the master list. Add each character's exact IGN and Class / Job here. Every registered character automatically appears in Tracker and Team Builder.</p>
             <form id="member-directory-form" class="member-directory-form" onsubmit="saveMemberDirectoryForm(event)">
                 <label class="member-directory-field">Member / owner name<input id="member-directory-name" type="text" maxlength="60" placeholder="Discord / owner name" required></label>
                 <label class="member-directory-field">Role / notes (optional)<input id="member-directory-note" type="text" maxlength="160" placeholder="e.g. Returning member, raid lead"></label>
-                <div class="member-character-editor-block"><div class="member-character-editor-heading"><strong>Character IGNs and classes</strong><button class="btn btn-secondary" type="button" onclick="addMemberCharacterRow()">＋ Add Character</button></div><div class="member-directory-note">Each character needs a Class / Job. Leave the Tracker checkbox off for characters that should not be tracked; they will still be available in Team Builder.</div><div id="member-character-editor" class="member-character-editor"></div></div>
+                <div class="member-character-editor-block"><div class="member-character-editor-heading"><strong>Character IGNs and classes</strong><button class="btn btn-secondary" type="button" onclick="addMemberCharacterRow()">＋ Add Character</button></div><div class="member-directory-note">Each character needs a Class / Job. All registered characters are automatically included in Tracker.</div><div id="member-character-editor" class="member-character-editor"></div></div>
                 <div class="member-directory-actions"><button id="member-directory-submit" class="btn btn-roster" type="submit">Add member</button><button id="member-directory-cancel" class="btn btn-secondary" type="button" onclick="resetMemberDirectoryForm()" hidden>Cancel edit</button></div>
             </form>
         </section>
         <div class="member-directory-toolbar"><input id="member-directory-search" class="card-wiki-stat-search member-directory-search" type="search" placeholder="Search members, characters, or notes…" oninput="renderMemberDirectory()" autocomplete="off"><span id="member-directory-count" class="member-directory-count"></span></div>
         <section id="member-directory-list" class="member-directory-list" aria-live="polite"></section>
-        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the master source of truth for members, character IGNs, and classes. Check <b>Include in Tracker</b> only for characters whose progress should appear in Tracker. Every registered character is available in Team Builder regardless of this checkbox. Changes sync when Cloud is connected.</div>
+        <div class="team-builder-bottom" style="margin-top:14px;"><strong>How it works:</strong> Member Roster is the master source of truth for members, character IGNs, and classes. All registered characters are automatically included in Tracker and Team Builder. Changes sync when Cloud is connected.</div>
     </main>
 
     <div class="modal-overlay hidden" id="card-wiki-batches-modal" role="dialog" aria-modal="true" aria-label="Manage Card Batches">
@@ -3965,9 +3966,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r13</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r14</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r13:</strong> Fixes Dungeon Registration so a newly added task is also activated in the separate Tracker task index. Retains the r11-based Class / Job Catalog.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r14:</strong> Fixes Dungeon Registration so a newly added task is also activated in the separate Tracker task index. Retains the r11-based Class / Job Catalog.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4209,13 +4210,13 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     </section>
                     <section class="help-topic" data-help-topic="registration">
                         <h4>Tracker Registration</h4>
-                        <p>Member Roster is the master list for member names, character IGNs, and Classes / Jobs. Register characters by editing their owner in Member Roster. All registered characters appear in Team Builder; only characters checked for <b>Include in Tracker</b> appear in Tracker.</p>
+                        <p>Member Roster is the master list for member names, character IGNs, and Classes / Jobs. Register characters by editing their owner in Member Roster. All registered characters automatically appear in both Tracker and Team Builder.</p>
                         <div class="help-step"><b>1.</b> Open <b>Member Roster</b> and add or edit the member.</div>
                         <div class="help-step"><b>2.</b> Add each character's exact in-game name and select its <b>Class / Job</b>.</div>
-                        <div class="help-step"><b>3.</b> Check <b>Include in Tracker</b> for characters whose progress should be tracked.</div>
-                        <div class="help-step"><b>4.</b> Save the member. Tracker uses only opted-in characters, while Team Builder uses all registered characters.</div>
-                        <p>Use this panel to adjust Tracker roster colors and order or remove a character from Tracker. Removing it here keeps the IGN and class in Member Roster, so it remains available in Team Builder.</p>
-                        <div class="help-callout"><b>Guild-wide setting:</b> member directory and tracker opt-in changes affect connected clients after cloud sync.</div>
+                        <div class="help-step"><b>3.</b> Save the registration. Every registered character is automatically tracked.</div>
+                        <div class="help-step"><b>4.</b> The character appears in Tracker and Team Builder automatically.</div>
+                        <p>Use this panel to adjust Tracker roster colors and order. To unregister a character, remove it from Member Roster; this also removes it from Team Builder.</p>
+                        <div class="help-callout"><b>Guild-wide setting:</b> Member Roster changes affect connected clients after cloud sync. Every registered character is included automatically.</div>
                     </section>
                     <section class="help-topic" data-help-topic="dungeons">
                         <h4>Dungeon Registration</h4>
@@ -4277,18 +4278,18 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     </section>
                     <section class="help-topic" data-help-topic="member-roster">
                         <h4>Member Roster</h4>
-                        <p>Member Roster is the guild's master directory and the source of truth for member names, character IGNs, character Classes / Jobs, and opt-in status. Add every guild member here whether or not they use the tracker.</p>
+                        <p>Member Roster is the guild's master directory and the source of truth for member names, character IGNs, and character Classes / Jobs. Every registered character is automatically included in Tracker. Add every guild member here whether or not they use the tracker.</p>
                         <h5>Add members and characters</h5>
-                        <p>Add a member, then use <b>Add Character</b> to enter each exact IGN and select its Class / Job. Every registered character is available in Team Builder. Check <b>Include in Tracker</b> only when its progress should appear in Tracker; unchecked characters remain registered without a tracker entry.</p>
-                        <p>Use <b>Edit member</b> to update the name, notes, character IGNs, classes, or opt-in settings. The per-character × button removes that character profile from the master directory; the member stays listed. Removing a character also removes its tracker entry and Team Builder eligibility.</p>
-                        <h5>Enable personal tracking</h5>
-                        <p>Use the <b>Include in Tracker</b> checkbox for each of your own characters. A character left unchecked remains available in Team Builder but will not appear in Tracker. Use the empty-state action in Tracker to start tracking registered characters, or use <b>Add More Characters</b> to extend your own registration.</p>
+                        <p>Add a member, then use <b>Add Character</b> to enter each exact IGN and select its Class / Job. Every registered character automatically appears in Tracker and Team Builder.</p>
+                        <p>Use <b>Edit member</b> to update the name, notes, character IGNs, and classes. The per-character × button removes that character profile from the master directory; the member stays listed. Removing a character also removes its tracker entry and Team Builder eligibility.</p>
+                        <h5>Automatic Tracker inclusion</h5>
+                        <p>Your registered characters are automatically included in Tracker. Use <b>Add More Characters</b> to extend your own registration.</p>
                         <p>On first login, confirm that your IGN, Class / Job, and Main designation are accurate. Administrators manage guild-wide registration and can correct a Main designation when needed. If an administrator changes your registration, Pantheon asks you to confirm it again at your next login.</p>
-                        <p>When Cloud is configured, member names, IGNs, classes, Main designations, and opt-in states are shared with the guild. Card Database data and card batches are not part of that sync.</p>
+                        <p>When Cloud is configured, member names, IGNs, classes, and Main designations are shared with the guild. Card Database data and card batches are not part of that sync.</p>
                     </section>
                     <section class="help-topic" data-help-topic="team-builder">
                         <h4>Team Builder</h4>
-                        <p>Team Builder uses every character registered in Member Roster, regardless of Tracker opt-in. The member list, character IGNs, and Classes / Jobs originate in Member Roster; the <b>Include in Tracker</b> checkbox controls Tracker participation only.</p>
+                        <p>Team Builder and Tracker both use every character registered in Member Roster. The member list, character IGNs, and Classes / Jobs originate in Member Roster.</p>
                         <h5>Set each character's Job</h5>
                         <p>Choose the Class / Job in Member Roster when adding or editing a character. The Team Builder's class configuration uses the same Job mapping, and class changes are written back to the master character profile to keep the two views consistent. The Class dropdown can also narrow the eligible character list.</p>
                         <h5>Choose a Party Format</h5>
@@ -4417,11 +4418,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="roster-modal" role="dialog">
         <div class="modal-card wide-modal">
             <h3>🧾 Tracker Registration</h3>
-            <div class="modal-note">Member Roster is the source of truth for member names, character IGNs, and Class / Job. Add or edit characters there and check <b>Include in Tracker</b> only when a character should appear in Tracker. This panel is for arranging and managing already registered characters; all registered characters remain available in Team Builder.</div>
+            <div class="modal-note">Member Roster is the source of truth for member names, character IGNs, and Class / Job. Every registered character is automatically included in Tracker and Team Builder. This panel is for arranging and managing already registered characters.</div>
             <div class="registration-layout">
                 <section class="registration-panel">
                     <h4>Add or register characters</h4>
-                    <p style="color:#aaa;font-size:.82rem;line-height:1.5;">Characters are added to the Member Roster first so the IGN, class, and tracker opt-in stay together in one record.</p>
+                    <p style="color:#aaa;font-size:.82rem;line-height:1.5;">Characters are added to the Member Roster first so the IGN and Class / Job stay together in one record.</p>
                     <button class="btn btn-roster" type="button" onclick="closeModal('roster-modal'); showAppPage('member-roster'); document.getElementById('member-directory-form')?.scrollIntoView({behavior:'smooth',block:'start'});">Open Member Roster</button>
                 </section>
                 <section class="registration-panel">
@@ -4526,9 +4527,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             else {
                 intent.member = JSON.parse(JSON.stringify(memberOrId || {}));
                 // Presence of this array marks a current-client, deliberate member save.
-                // An empty array means preserve every prior Tracker opt-in. Only named
-                // characters represent explicit opt-outs.
-                const optOuts = Array.isArray(options?.trackerOptOutNames) ? options.trackerOptOutNames : [];
+                // Kept for compatibility with older server handlers; registered characters
+                // are now always included in Tracker.
+                const optOuts = []; // Registered characters cannot be opted out of Tracker.
                 intent.trackerOptOutNames = [...new Set(optOuts.map(name => String(name || '').normalize('NFKC').trim().slice(0, 40)).filter(Boolean))].slice(0, 100);
                 intent.characterRosterChanged = options?.characterRosterChanged === true;
             }
@@ -5328,7 +5329,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     return {
                         name: charName,
                         job: JOB_ORDER.includes(String(profile.job || '')) ? String(profile.job) : '',
-                        trackerEnabled: profile.trackerEnabled === true,
+                        trackerEnabled: true,
                         isMain: profile.isMain === true
                     };
                 });
@@ -5350,29 +5351,20 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!data?.settings) return;
             const oldRosters = normalizeRosters(data.settings.rosters);
             const members = normalizeMemberDirectory(data.settings.memberDirectory);
-            const pendingOptOutsByMember = new Map();
-            (pendingMemberDirectoryIntents || []).forEach(intent => {
-                if (!['add', 'upsert'].includes(String(intent?.op || '')) || !intent?.member?.id || intent.characterRosterChanged !== true) return;
-                pendingOptOutsByMember.set(String(intent.member.id), new Set((Array.isArray(intent.trackerOptOutNames) ? intent.trackerOptOutNames : []).map(name => String(name || '').normalize('NFKC').trim().toLowerCase()).filter(Boolean)));
-            });
+            const matchedRosters = new Set();
             const projected = members.map(member => {
                 const existing = oldRosters.find(roster => roster.id === member.trackerRosterId)
                     || oldRosters.find(roster => roster.name.trim().toLowerCase() === member.name.trim().toLowerCase());
+                if (existing) matchedRosters.add(existing);
                 const rosterId = existing?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, '');
                 member.trackerRosterId = rosterId;
                 member.color = normalizeColor(member.color || existing?.color || '#7aa2f7');
-                const explicitOptOutNames = pendingOptOutsByMember.get(String(member.id)) || new Set();
-                // Legacy false/missing flags do not revoke committed Tracker membership.
-                // Only a name explicitly unchecked in this member's current save is removed.
-                const trackedNames = (member.characterProfiles || []).filter(profile => {
-                    if (!profile.name) return false;
-                    const key = String(profile.name).normalize('NFKC').trim().toLowerCase();
-                    if (profile.trackerEnabled === true) return true;
-                    if (explicitOptOutNames.has(key)) return false;
-                    return (existing?.characters || []).some(name => String(name).normalize('NFKC').trim().toLowerCase() === key);
-                }).map(profile => profile.name);
+                // Every character in Member Roster is automatically included in Tracker.
+                const trackedNames = (member.characterProfiles || []).map(profile => profile.name).filter(Boolean);
                 return { id: rosterId, name: member.name.slice(0, 30), color: member.color, characters: trackedNames };
             });
+            // Keep legacy roster groups that have not yet been linked to a Member Roster owner.
+            oldRosters.forEach(roster => { if (!matchedRosters.has(roster)) projected.push(roster); });
             data.settings.memberDirectory = members;
             data.settings.rosters = normalizeRosters(projected);
             if (updateTimestamps) {
@@ -5424,7 +5416,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         const previous = member.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterName.trim().toLowerCase()) || {};
                         const isLegacyTracked = !!roster?.characters.some(name => name.trim().toLowerCase() === characterName.trim().toLowerCase());
                         const knownJob = JOB_ORDER.includes(previous.job) ? previous.job : (JOB_ORDER.includes(jobs[characterName]?.job) ? jobs[characterName].job : '');
-                        return { name: characterName, job: knownJob, trackerEnabled: previous.trackerEnabled === true || isLegacyTracked, isMain: previous.isMain === true };
+                        return { name: characterName, job: knownJob, trackerEnabled: true, isMain: previous.isMain === true };
                     });
                 });
                 settings.memberRosterMasterVersion = 1;
@@ -5436,7 +5428,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             // Migration only needs to create directory entries for legacy Tracker
             // owners that do not exist in Member Directory yet. Never enqueue every
             // existing member as an upsert: that turns a schema migration into a bulk
-            // opt-in edit and can overwrite the existing guild Tracker projection.
+            // registration edit and can overwrite the existing guild Tracker projection.
             if (migrated) settings.memberDirectory.forEach(member => {
                 if (newlyCreatedMemberIds.has(String(member.id || ''))) queueMemberDirectoryIntent('add', member);
             });
@@ -5465,7 +5457,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const profileByName = new Map(profiles.flatMap(member => (member.characterProfiles || []).map(profile => [identityMatchKey(profile.name), { ...profile, ownerName: member.name }])));
             return normalizeRosters(rosters).flatMap(r => r.characters.map(name => {
                 const profile = profileByName.get(identityMatchKey(name));
-                return { name, color: r.color, rosterId: r.id, rosterName: profile?.ownerName || r.name, isMain: profile?.isMain === true, trackerEnabled: profile?.trackerEnabled === true };
+                return { name, color: r.color, rosterId: r.id, rosterName: profile?.ownerName || r.name, isMain: profile?.isMain === true, trackerEnabled: true };
             }));
         }
 
@@ -5702,7 +5694,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!member) return [];
             const roster = normalizeRosters(cloudData.settings?.rosters).find(item => item.id === member.trackerRosterId);
             if (roster) return [...roster.characters];
-            return (member.characterProfiles || []).filter(profile => profile.trackerEnabled === true).map(profile => profile.name).filter(Boolean);
+            return (member.characterProfiles || []).map(profile => profile.name).filter(Boolean);
         }
         function setAllMemberResetMarkers(daily, weekly) {
             const markers = { ...safeObject(cloudData.settings.memberResetMarkers) };
@@ -7897,10 +7889,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const addButton = document.getElementById('tracker-empty-add-btn');
                 if (title) title.textContent = profiles.length ? (tracked.length ? 'No characters in this view' : 'Your tracker is empty') : 'Register your characters to get started';
                 if (message) message.textContent = profiles.length
-                    ? (tracked.length ? 'This view has no active tracking characters. Add characters or switch to your personal roster.' : 'Your characters are registered, but none are opted into Tracker yet. They remain available in Team Builder; start tracking them whenever you are ready.')
-                    : 'You have no characters registered yet. Add your IGN and class, choose your Main character, and then start tracking daily and weekly progress.';
-                if (startButton) startButton.hidden = profiles.length === 0 || tracked.length > 0;
-                if (startButton && profiles.length > 0 && tracked.length === 0) startButton.textContent = 'Start Tracking Registered Characters';
+                    ? (tracked.length ? 'This view has no active tracking characters. Add characters or switch to your personal roster.' : 'Your registered characters are automatically included in Tracker. Refresh your Member Roster if they are missing.')
+                    : 'You have no characters registered yet. Add your IGN and Class / Job and choose your Main character to start tracking daily and weekly progress.';
+                if (startButton) startButton.hidden = true;
+                
                 if (addButton) addButton.textContent = profiles.length ? '＋ Add More Characters' : 'Register My Characters';
                 if (addCharactersButton) addCharactersButton.hidden = true;
                 return;
@@ -9570,7 +9562,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const esc = value => escapeHTML(String(value ?? ''));
             const owner = getCurrentMemberDirectoryEntry();
             const enabledNames = owner
-                ? (owner.characterProfiles || []).filter(profile => profile.trackerEnabled && profile.name).map(profile => profile.name)
+                ? (owner.characterProfiles || []).filter(profile => profile.name).map(profile => profile.name)
                 : [];
             const uniqueNames = [...new Map(enabledNames.map(name => [String(name).trim().toLocaleLowerCase(), String(name).trim()])).values()].filter(Boolean);
             const tasks = typeof getCompletionTaskNames === 'function' ? getCompletionTaskNames() : [];
@@ -9673,16 +9665,16 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const shownPriorities = priorities.slice(0, 5);
             if (summary) {
                 const stats = [
-                    { label:'Tracked characters', value:String(metrics.length), detail: main ? `Main: ${main.name}` : 'Characters opted into Tracker' },
+                    { label:'Tracked characters', value:String(metrics.length), detail: main ? `Main: ${main.name}` : 'Registered characters' },
                     { label:'Weekly completion', value:average === null ? '—' : `${average}%`, detail: totalEligible ? `${totalDone} of ${totalEligible} eligible tasks · ${pace.label}` : `No eligible weekly tasks · ${pace.label}` },
                     { label:'Still open', value:String(totalPending), detail: 'Bounty Boards are excluded' }
                 ];
                 summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
             }
             if (!owner || metrics.length === 0) {
-                const noData = `<div class="activity-insight-empty">${owner ? `No characters are currently opted into Tracker for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add or opt in your characters in Member Roster to see weekly progress and helpful reminders here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
+                const noData = `<div class="activity-insight-empty">${owner ? `No registered characters were found for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add your characters in Member Roster to see weekly progress and helpful reminders here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
                 if (cont) cont.innerHTML = noData;
-                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Weekly progress appears here after you opt a character into Tracker. Other members' rosters and progress are not shown.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
+                if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Weekly progress appears here for your registered characters. Other members' rosters and progress are not shown.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
             let insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(getDeadlineMode(pace).label)}</span></div>`;
@@ -9759,7 +9751,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         }
         function getPlanCharacters() {
             const owner = getCurrentMemberDirectoryEntry();
-            if (owner) return (owner.characterProfiles || []).filter(profile => String(profile.name || '').trim()).map(profile => ({ name: profile.name.trim(), isMain: profile.isMain === true, trackerEnabled: profile.trackerEnabled === true }));
+            if (owner) return (owner.characterProfiles || []).filter(profile => String(profile.name || '').trim()).map(profile => ({ name: profile.name.trim(), isMain: profile.isMain === true, trackerEnabled: true }));
             if (isAdminViewAsActive()) return [];
             // Universal admins should not receive a misleading full-guild time estimate. Use only the currently visible tracker roster if no owner context exists.
             return characters.map(char => ({ name:char.name, isMain:char.isMain === true, trackerEnabled:true }));
@@ -9832,7 +9824,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const focus = signals.filter(item => item.isMain || item.regular || item.emerging).slice(0,3);
             const focusText = focus.length ? focus.map(item => `${escapeHTML(item.name)}${item.isMain ? ' (Main)' : ''}`).join(' · ') : 'No clear priority yet';
             const chips = signals.slice(0, Math.min(8, signals.length)).map(item => {
-                const status = item.reviewNA ? 'Review activity' : item.checkTicks ? 'Check weekly ticks' : item.checkWeeklyLog ? 'No recorded activity' : item.isMain ? 'Main' : item.regular ? 'Regular secondary' : item.emerging ? 'Recent activity' : item.trackerEnabled ? 'Not enough data' : 'Tracker off';
+                const status = item.reviewNA ? 'Review activity' : item.checkTicks ? 'Check weekly ticks' : item.checkWeeklyLog ? 'No recorded activity' : item.isMain ? 'Main' : item.regular ? 'Regular secondary' : item.emerging ? 'Recent activity' : item.trackerEnabled ? 'Not enough data' : 'No registration';
                 const rate = item.currentRate === null ? '—' : `${item.currentRate}%`;
                 const trendText = item.trend === null ? '' : item.trend > 0 ? `Completion +${item.trend} pts` : item.trend < 0 ? `Completion −${Math.abs(item.trend)} pts` : 'Completion steady';
                 const weeklyText = item.currentEligible ? `${item.currentDone}/${item.currentEligible} weekly tasks` : 'No eligible weekly tasks';
@@ -10998,8 +10990,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             });
             list.innerHTML = rosters.length ? rosters.map(r => {
                 const member = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(entry => entry.trackerRosterId === r.id || identityMatchKey(entry.name) === identityMatchKey(r.name));
-                const adminControls = isAdminModeActive() ? `<input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button><button class="btn btn-secondary" type="button" onclick="removeRosterGroup('${escapeHTML(r.id)}')">Unregister All</button>` : '';
-                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span>${adminControls}</div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="${isAdminModeActive() ? 'true' : 'false'}" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}${(isAdminModeActive() || canManageMemberRecord(member)) ? `<button type="button" onclick="removeCharacterFromRoster('${escapeHTML(r.id)}', '${escapeHTML(c)}')" title="Opt out of your character from Tracker while keeping it in Member Roster">×</button>` : ''}</span>`).join('') : '<div style="color:#aaa;">No characters opted in.</div>'}</div></div>`;
+                const adminControls = isAdminModeActive() ? `<input type="color" data-roster-color="${escapeHTML(r.id)}" value="${r.color}" aria-label="Header color for ${escapeHTML(r.name)}"><button class="btn btn-roster" type="button" onclick="saveRosterGroup('${escapeHTML(r.id)}')">Save Color</button>` : '';
+                return `<div class="roster-editor-card"><div class="roster-editor-head" style="border-top:4px solid ${r.color};"><span class="roster-name-input" style="display:flex;align-items:center;padding:8px 10px;">${escapeHTML(r.name)}</span>${adminControls}</div><div class="character-chip-list" data-drag-list="roster" data-parent-id="${escapeHTML(r.id)}">${r.characters.length ? r.characters.map((c, i) => `<span class="character-chip" draggable="${isAdminModeActive() ? 'true' : 'false'}" data-type="roster" data-parent="${escapeHTML(r.id)}" data-index="${i}">${escapeHTML(c)}</span>`).join('') : '<div style="color:#aaa;">No registered characters.</div>'}</div></div>`;
             }).join('') : (isAdminModeActive() ? '<div style="color:var(--pt-muted);">Add a member in Member Roster first.</div>' : '<div style="color:var(--pt-muted);">No roster is linked to this Discord account yet. Register your own characters in Member Roster or ask an administrator to link your account.</div>');
             if (isAdminModeActive()) attachDragDropListeners();
         }
@@ -11046,7 +11038,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!own) { openMyCharacterRegistration(); return; }
             if (!own.characterProfiles?.length) { openMyCharacterRegistration(); return; }
             if (own.characterProfiles.every(profile => profile.trackerEnabled)) {
-                alert('All of your registered characters are already opted into Tracker.');
+                alert('All registered characters are automatically included in Tracker.');
                 return;
             }
             if (hasCloudConfig() && !(await prepareGlobalChange(`Start tracking registered characters for ${own.name}`))) return;
@@ -11074,7 +11066,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             closeModal('roster-modal');
             showAppPage('member-roster');
             document.getElementById('member-directory-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            alert('Add the IGN, Class / Job, and Tracker opt-in from Member Roster. Tracker Registration no longer creates a separate source record.');
+            alert('Add the IGN and Class / Job from Member Roster. Registered characters are automatically included in Tracker.');
         }
 
         async function saveRosterGroup(id) {
@@ -11094,32 +11086,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             refreshTrackerUI(); triggerAutoSync();
         }
-        async function removeCharacterFromRoster(id, n) {
-            const roster = findRoster(id); if (!roster) return;
-            if (!isAdminModeActive()) {
-                const owner = normalizeMemberDirectory(cloudData.settings.memberDirectory).find(member => member.trackerRosterId === roster.id || identityMatchKey(member.name) === identityMatchKey(roster.name));
-                if (!canManageMemberRecord(owner)) { alert('You can only unregister characters in your own roster.'); return; }
-            }
-            const ownerKey = roster.name.trim().toLowerCase();
-            const characterKey = String(n || '').trim().toLowerCase();
-            const initialMembers = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const initialMember = initialMembers.find(member => member.name.trim().toLowerCase() === ownerKey || member.trackerRosterId === id);
-            const initialProfile = initialMember?.characterProfiles.find(profile => profile.name.trim().toLowerCase() === characterKey);
-            if (!initialMember || !initialProfile) return alert('That character is no longer in Member Roster. Refresh and try again.');
-            if (!confirm(`Remove ${initialProfile.name} from Tracker? Its IGN and Class / Job will remain in Member Roster and it will stay available in Team Builder.`)) return;
-            if (hasCloudConfig() && !(await prepareGlobalChange(`Unregister ${initialProfile.name} from Tracker`))) return;
-            const members = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const member = members.find(item => item.id === initialMember.id);
-            const profile = member?.characterProfiles.find(item => item.name.trim().toLowerCase() === characterKey);
-            if (!member || !profile) return alert('That character was already changed on another device. Refresh the roster.');
-            profile.trackerEnabled = false;
-            cloudData.settings.memberDirectory = normalizeMemberDirectory(members);
-            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember, { characterRosterChanged: true, trackerOptOutNames: [initialProfile.name] });
-            touchMemberDirectorySettings();
-            projectTrackerRostersFromMemberDirectory(cloudData, true);
-            refreshTrackerUI();
-            triggerAutoSync();
+        async function removeCharacterFromRoster() {
+            alert('All registered characters are automatically included in Tracker. Remove a character from Member Roster only if it should be fully unregistered.');
         }
 
         function syncTrackedRosterOrderToMemberDirectory(roster) {
@@ -11141,25 +11109,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             projectTrackerRostersFromMemberDirectory(cloudData, true);
             return true;
         }
-        async function removeRosterGroup(id) {
-            const roster = findRoster(id); if (!roster) return;
-            if (!isAdminModeActive()) { alert('Only a Pantheon administrator can unregister an entire roster.'); return; }
-            const names = [...roster.characters];
-            if (!names.length) return alert('This member has no opted-in characters to unregister. The member itself remains in Member Roster.');
-            if (!confirm(`Remove all ${names.length} character(s) owned by ${roster.name} from Tracker? Their IGNs and classes will remain in Member Roster and they will stay available in Team Builder.`)) return;
-            if (hasCloudConfig() && !(await prepareGlobalChange(`Unregister all tracking characters for ${roster.name}`))) return;
-            const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
-            const member = entries.find(item => item.trackerRosterId === id || item.name.trim().toLowerCase() === roster.name.trim().toLowerCase());
-            if (!member) return alert('That member no longer exists in Member Roster.');
-            member.characterProfiles = member.characterProfiles.map(profile => ({ ...profile, trackerEnabled: false }));
-            cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
-            const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === member.id);
-            if (updatedMember) queueMemberDirectoryIntent('upsert', updatedMember, { characterRosterChanged: true, trackerOptOutNames: names });
-            touchMemberDirectorySettings();
-            projectTrackerRostersFromMemberDirectory(cloudData, true);
-            refreshTrackerUI(); triggerAutoSync();
+        async function removeRosterGroup() {
+            alert('All registered characters are automatically included in Tracker. Remove individual registrations from Member Roster only when they should be fully unregistered.');
         }
-        
+
         function getCategories() { return cloudData.settings.categories; }
         function findCategory(id) { return getCategories().find(c => c.id === id); }
         function touchCategorySettings() { cloudData.settings.categoriesUpdatedAt = Date.now(); cloudData.settings.categoriesUpdatedBy = deviceId; cloudData.updatedAt = Date.now(); }
@@ -11503,7 +11456,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     color: member.color || roster?.color || '#7aa2f7',
                     rosterId: roster?.id || member.trackerRosterId || `member-roster-${member.id}`.replace(/[^a-zA-Z0-9_-]/g, ''),
                     rosterName: member.name,
-                    trackerEnabled: profile.trackerEnabled === true,
+                    trackerEnabled: true,
                     isMain: profile.isMain === true
                 }));
             });
@@ -12681,7 +12634,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const key = characterName.toLowerCase();
                 if (!entry.characters.some(value => value.toLowerCase() === key) && entry.characters.length < 100) {
                     entry.characters.push(characterName);
-                    entry.characterProfiles.push({ name: characterName, job: JOB_ORDER.includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: false, isMain: false });
+                    entry.characterProfiles.push({ name: characterName, job: JOB_ORDER.includes(cloudData.settings.characterJobs[characterName]?.job) ? cloudData.settings.characterJobs[characterName].job : '', trackerEnabled: true, isMain: false });
                     changed = true;
                 }
             });
@@ -12705,9 +12658,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 const characterProfiles = (member.characterProfiles || []).map(profile => ({
                     ...profile,
                     // The committed Tracker roster is authoritative for legacy members.
-                    trackerEnabled: profile.trackerEnabled === true || trackedKeys.has(String(profile.name).normalize('NFKC').trim().toLowerCase())
+                    trackerEnabled: true
                 }));
-                const inTracker = characterProfiles.some(profile => profile.trackerEnabled);
+                const inTracker = characterProfiles.length > 0;
                 return { ...member, characterProfiles, color: member.color || roster?.color || '#7aa2f7', inTracker, recordId: member.id };
             }).sort((a, b) => a.name.localeCompare(b.name));
         }
@@ -12715,12 +12668,12 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function renderMemberCharacterRows(profiles = []) {
             const container = document.getElementById('member-character-editor');
             if (!container) return;
-            const rows = profiles.length ? profiles : [{ name: '', job: '', trackerEnabled: false, isMain: false }];
+            const rows = profiles.length ? profiles : [{ name: '', job: '', trackerEnabled: true, isMain: false }];
             container.innerHTML = rows.map((profile, index) => `<div class="member-character-row" data-member-character-row>
                 <label>Character IGN<input class="member-character-ign" type="text" maxlength="40" value="${escapeHTML(profile.name || '')}" placeholder="Exact in-game name" autocomplete="off"></label>
                 <label>Class / Job<select class="member-character-job">${buildJobOptions(profile.job || '')}</select></label>
                 <label class="member-character-main"><input class="member-character-is-main" type="radio" name="member-main-character" ${profile.isMain ? 'checked' : ''}><span>Main character</span></label>
-                <label class="member-character-opt-in"><input class="member-character-tracker" type="checkbox" ${profile.trackerEnabled ? 'checked' : ''}><span>Include in Tracker</span></label>
+                <span class="member-character-auto-tracked">Automatically tracked</span>
                 <button class="member-character-row-remove" type="button" data-remove-member-character-row title="Remove this row" aria-label="Remove character row">×</button>
             </div>`).join('');
         }
@@ -12730,11 +12683,11 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const rows = [...container.querySelectorAll('[data-member-character-row]')].map(row => ({
                 name: row.querySelector('.member-character-ign')?.value || '',
                 job: row.querySelector('.member-character-job')?.value || '',
-                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked,
+                trackerEnabled: true,
                 isMain: !!row.querySelector('.member-character-is-main')?.checked
             }));
             if (profile) rows.push(profile);
-            else rows.push({ name: '', job: '', trackerEnabled: false, isMain: false });
+            else rows.push({ name: '', job: '', trackerEnabled: true, isMain: false });
             renderMemberCharacterRows(rows);
             const inputs = container.querySelectorAll('.member-character-ign');
             inputs[inputs.length - 1]?.focus();
@@ -12743,7 +12696,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return [...(document.querySelectorAll('#member-character-editor [data-member-character-row]'))].map(row => ({
                 name: String(row.querySelector('.member-character-ign')?.value || '').trim().slice(0, 40),
                 job: String(row.querySelector('.member-character-job')?.value || ''),
-                trackerEnabled: !!row.querySelector('.member-character-tracker')?.checked,
+                trackerEnabled: true,
                 isMain: !!row.querySelector('.member-character-is-main')?.checked
             })).filter(profile => profile.name);
         }
@@ -12761,27 +12714,27 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (memberForm) memberForm.hidden = isAdminViewAsActive();
             const memberDescription = document.getElementById('member-roster-description');
             if (memberDescription) memberDescription.textContent = isAdminViewAsActive()
-                ? 'Read-only preview of this member’s registered characters, Main designation, and Tracker opt-ins.'
+                ? 'Read-only preview of this member’s registered characters, all automatically included in Tracker.'
                 : isAdminModeActive()
-                ? 'Shared guild directory. Manage member records and choose which characters appear in Tracker. All registered characters remain available in Team Builder.'
+                ? 'Shared guild directory. Manage member records and character details. All registered characters appear in Tracker and Team Builder.'
                 : 'Your verified Discord account can manage only its own characters. You cannot register, edit, or remove another member’s roster.';
             if (memberHeading && !isAdminModeActive() && !editingMemberDirectoryId) memberHeading.textContent = getCurrentMemberDirectoryEntry() ? 'Manage your characters' : 'Register your own characters';
             const characterCount = members.reduce((sum, member) => sum + (member.characters || []).length, 0);
-            const trackingCount = members.reduce((sum, member) => sum + (member.characterProfiles || []).filter(profile => profile.trackerEnabled).length, 0);
+            const trackingCount = characterCount;
             const count = document.getElementById('member-directory-count');
-            if (count) count.textContent = `${members.length} members · ${characterCount} characters · ${trackingCount} opted in to Tracker`;
+            if (count) count.textContent = `${members.length} members · ${characterCount} characters · ${trackingCount} tracked automatically`;
             list.innerHTML = members.length ? members.map(member => {
                 const characterChips = (member.characterProfiles || []).map(profile => {
-                    const tracked = profile.trackerEnabled;
+                    const tracked = true;
                     const status = tracked ? 'TRACKING' : 'NOT TRACKED';
                     const statusClass = tracked ? 'is-tracked' : 'is-directory';
                     const jobLabel = profile.job || 'Class not set';
-                    const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Not tracked; still available in Team Builder'}`;
-                    return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main" title="Main character" aria-label="Main character">★</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster and unregister it if enabled" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
+                    const title = `${profile.name} · ${jobLabel} · ${profile.isMain ? 'Main character · ' : ''}${tracked ? 'Included in Tracker' : 'Included in Tracker'}`;
+                    return `<span class="member-directory-char${profile.isMain ? ' is-main-character' : ''}" title="${escapeHTML(title)}"><span class="member-directory-char-label">${escapeHTML(profile.name)} ${profile.isMain ? '<small class="profile-confirm-main" title="Main character" aria-label="Main character">★</small>' : ''}<small style="color:var(--pt-muted);">· ${escapeHTML(jobLabel)}</small></span><span class="member-directory-char-status ${statusClass}">${status}</span><button class="member-directory-char-remove" type="button" data-member-character-remove="${escapeHTML(profile.name)}" data-member-owner="${escapeHTML(member.name)}" title="Remove ${escapeHTML(profile.name)} from Member Roster, Tracker, and Team Builder" aria-label="Remove ${escapeHTML(profile.name)} from ${escapeHTML(member.name)}">×</button></span>`;
                 }).join('');
                 const removeMemberButton = isAdminModeActive() && !isAdminViewAsActive() ? `<button class="btn btn-secondary" type="button" data-member-remove="${escapeHTML(member.recordId || '')}" title="Remove member and all of their character entries">Remove member</button>` : '';
                 const directoryActions = isAdminViewAsActive() ? '' : `<div class="member-directory-actions"><button class="btn btn-secondary" type="button" data-member-add-character="${escapeHTML(member.name)}">Add character</button><button class="btn btn-secondary" type="button" data-member-edit="${escapeHTML(member.name)}" data-member-record="${escapeHTML(member.recordId || '')}">${isAdminModeActive() ? 'Edit member' : 'Edit my characters'}</button>${removeMemberButton}</div>`;
-                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Has tracked characters' : 'No tracked characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div>${directoryActions}</div><div class="member-directory-chars-title">Character IGNs / classes / tracker opt-in</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN, choose its class, and decide whether it should be tracked.</div>'}</article>`;
+                return `<article class="member-directory-card" style="border-top:3px solid ${normalizeColor(member.color)}"><div class="member-directory-card-head"><div style="min-width:0"><h3 class="member-directory-name">${escapeHTML(member.name)}</h3><div class="member-directory-meta"><span class="member-directory-badge">${member.inTracker ? 'Registered characters tracked' : 'No registered characters'}</span>${member.characters.length ? `<span class="member-directory-badge">${member.characters.length} character${member.characters.length === 1 ? '' : 's'}</span>` : ''}</div>${member.note ? `<div class="member-directory-note">${escapeHTML(member.note)}</div>` : ''}</div>${directoryActions}</div><div class="member-directory-chars-title">Registered characters · automatically tracked</div>${member.characterProfiles.length ? `<div class="member-directory-chars">${characterChips}</div>` : '<div class="member-directory-note">No characters listed yet. Use Add character to enter an IGN and choose its class. All registered characters are automatically tracked.</div>'}</article>`;
             }).join('') : `<div class="member-directory-empty">${isAdminModeActive() ? 'No members match that search. Add a member above; character entries are optional.' : (getCurrentMemberDirectoryEntry() ? 'No characters or notes match that search.' : 'Your roster has not been created yet. Use the form above to register your own characters.')}</div>`;
         }
         function resetMemberDirectoryForm() {
@@ -12911,7 +12864,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                 entry = { id: `member-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`, name, characters: profiles.map(profile => profile.name), characterProfiles: profiles, trackerRosterId: '', color: '#7aa2f7', note, profileConfirmedDiscordId: (isCurrentUserEntry && currentDiscordId && profiles.length && profiles.filter(profile => profile.isMain).length === 1) ? currentDiscordId : '', profileConfirmedAt: (isCurrentUserEntry && currentDiscordId && profiles.length && profiles.filter(profile => profile.isMain).length === 1) ? Date.now() : 0 };
                 entries.push(entry);
             }
-            // Keep class selections in the shared Job map. The master profile stores opt-in state;
+            // Keep class selections in the shared Job map. The master profile stores registered characters;
             // the Tracker roster is only a projection of checked character profiles.
             const currentProfileNames = new Set(profiles.map(profile => profile.name.toLowerCase()));
             if (previousOwnerName) {
@@ -12957,7 +12910,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (!isAdminModeActive()) { alert('Only a Pantheon administrator can remove a member record. You can remove individual characters from your own roster.'); return; }
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const member = entries.find(item => item.id === id);
-            if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any opted-in characters will also be removed from Tracker and Team Builder.`)) return;
+            if (!member || !confirm(`Remove ${member.name} and all ${member.characters.length} character entries from Member Roster? Any registered characters will also be removed from Tracker and Team Builder.`)) return;
             if (hasCloudConfig() && !(await prepareGlobalChange(`Remove member and characters: ${member.name}`))) return;
             cloudData.settings.memberDirectory = entries.filter(item => item.id !== id);
             queueMemberDirectoryIntent('remove', id);
@@ -12990,7 +12943,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r13';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r14';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13160,7 +13113,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return (Array.isArray(profiles) ? profiles : []).map(profile => ({
                 name: String(profile?.name || '').trim(),
                 job: String(profile?.job || ''),
-                trackerEnabled: profile?.trackerEnabled === true,
+                trackerEnabled: true,
                 isMain: profile?.isMain === true,
                 isNewDraft: profile?.isNewDraft === true
             }));
@@ -13175,7 +13128,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             return [...container.querySelectorAll('.profile-confirm-character[data-profile-index]')].map(row => ({
                 name: String(row.querySelector('[data-confirm-ign]')?.value || '').trim().slice(0, 40),
                 job: String(row.querySelector('[data-confirm-job]')?.value || ''),
-                trackerEnabled: row.querySelector('[data-confirm-tracker]')?.checked === true,
+                trackerEnabled: true,
                 isMain: row.querySelector('[data-confirm-main]')?.checked === true,
                 isNewDraft: row.dataset.profileNew === 'true'
             }));
@@ -13221,10 +13174,10 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (title) title.textContent = manageMode ? 'Manage Your Characters' : 'Confirm Your Character Registration';
             if (intro) intro.textContent = profiles.length
                 ? (manageMode
-                    ? 'Add characters, correct IGNs, change Class / Job, choose your Main, and opt each character into Tracker when appropriate. Use the arrows to set the order shown in Tracker. All registered characters remain available in Team Builder. Saving updates the shared Member Roster and Tracker.'
-                    : 'Check your characters below. You can add characters, correct each IGN, change the Class / Job, choose your Main, decide which characters should be tracked, and reorder them. Saving updates the shared Member Roster and Tracker.')
+                    ? 'Add characters, correct IGNs, change Class / Job, choose your Main, and Tracker automatically includes all registered characters. Use the arrows to set the order shown in Tracker. All registered characters remain available in Team Builder. Saving updates the shared Member Roster and Tracker.'
+                    : 'Check your characters below. You can add characters, correct each IGN, change the Class / Job, choose your Main, and reorder them. Every registered character is automatically included in Tracker. Saving updates the shared Member Roster and Tracker.')
                 : (manageMode
-                    ? 'No characters are registered yet. Add an entry below, select its Class / Job, choose your Main character, and decide whether it should appear in Tracker. All registered characters will also be available in Team Builder.'
+                    ? 'No characters are registered yet. Add an entry below, select its Class / Job, and choose your Main character. The new character will automatically appear in Tracker and Team Builder.'
                     : 'Your account does not have registered characters yet. Add an entry below, select its Class / Job, and choose exactly one Main character before using the personal Tracker.');
             if (container) container.innerHTML = profiles.length ? profiles.map((profile, index) => {
                 const jobOptions = '<option value="">Select Class / Job…</option>' + JOB_ORDER.map(job => `<option value="${escapeHTML(job)}" ${job === profile.job ? 'selected' : ''}>${escapeHTML(job)}</option>`).join('');
@@ -13237,7 +13190,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         <div class="profile-confirm-job-row"><label for="profile-confirm-job-${index}">CLASS / JOB</label><select id="profile-confirm-job-${index}" class="profile-confirm-job-select" data-confirm-job aria-label="Class or job for ${escapeHTML(profile.name || 'new character')}">${jobOptions}</select></div>
                     </div>
                     <div class="profile-confirm-character-controls">
-                        <label class="profile-confirm-track-choice"><input type="checkbox" data-confirm-tracker ${profile.trackerEnabled ? 'checked' : ''}><span>Track this character</span></label>
+                        <span class="profile-confirm-auto-tracked">Automatically included in Tracker</span>
                         <div class="profile-confirm-order" aria-label="Reorder ${escapeHTML(profile.name || 'new character')}"><button type="button" onclick="moveOwnCharacterPrompt(${index},-1)" ${index === 0 ? 'disabled' : ''} title="Move up" aria-label="Move ${escapeHTML(profile.name || 'new character')} up">↑</button><button type="button" onclick="moveOwnCharacterPrompt(${index},1)" ${index === profiles.length - 1 ? 'disabled' : ''} title="Move down" aria-label="Move ${escapeHTML(profile.name || 'new character')} down">↓</button></div>
                         ${profile.isNewDraft ? `<button class="profile-confirm-remove-draft" type="button" onclick="removeOwnCharacterPromptRow(${index})" title="Remove this unsaved entry">Remove entry</button>` : ''}
                     </div>
@@ -13253,7 +13206,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
         function addOwnCharacterPromptRow() {
             const draft = collectProfileConfirmationDraft();
             const hasMain = draft.some(profile => profile.isMain);
-            draft.push({ name: '', job: '', trackerEnabled: false, isMain: !hasMain, isNewDraft: true });
+            draft.push({ name: '', job: '', trackerEnabled: true, isMain: !hasMain, isNewDraft: true });
             renderProfileConfirmationPrompt(draft);
             const index = draft.length - 1;
             const row = document.querySelector(`#profile-confirm-characters .profile-confirm-character[data-profile-index="${index}"]`);
@@ -13365,7 +13318,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             own.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
             own.profileConfirmedAt = Date.now();
 
-            // Keep IGN, Class / Job, Main, track opt-in, and user-defined ordering together
+            // Keep IGN, Class / Job, Main, and user-defined ordering together
             // in the canonical shared Member Roster. Tracker rosters are projections of it.
             if (!cloudData.settings.characterJobs) cloudData.settings.characterJobs = {};
             profiles.forEach(profile => { cloudData.settings.characterJobs[profile.name] = { job: profile.job, updatedAt: Date.now(), deviceId }; });
@@ -13732,7 +13685,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r13';
+  const CURRENT_BUILD = '1.6.9-r14';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

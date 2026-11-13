@@ -184,7 +184,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
       <a class="tool-launcher-link" href="/#tracker" target="_blank" rel="noopener">Tracker<small>Open the task board in your Personal View.</small></a>
       <a class="tool-launcher-link" href="/#team-builder" target="_blank" rel="noopener">Team Builder<small>Build parties and inspect role coverage.</small></a>
       <a class="tool-launcher-link" href="/#card-wiki" target="_blank" rel="noopener">Card Database<small>Search card stats and build options.</small></a>
-      <a class="tool-launcher-link" href="/#member-roster" target="_blank" rel="noopener">Member Roster<small>Manage owner registrations and character opt-ins.</small></a>
+      <a class="tool-launcher-link" href="/#member-roster" target="_blank" rel="noopener">Member Roster<small>Manage owner registrations and character details.</small></a>
       <a class="tool-launcher-link" href="/#salary-calculator" target="_blank" rel="noopener">Salary Calculator<small>Calculate and split party income.</small></a>
       <a class="tool-launcher-link" href="/#ledger" target="_blank" rel="noopener">Ledger<small>Available only to the authorized Ledger accounts.</small></a>
       <a class="tool-launcher-link" href="/#sync-now" target="_blank" rel="noopener">Sync Now<small>Request an immediate shared-data refresh.</small></a>
@@ -198,7 +198,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
   </section>
   <section class="card" id="character-admin-panel">
     <h2>3. Character registration &amp; Main designation</h2>
-    <p>Admin-only controls for every member’s registered IGNs, class / job, tracking opt-in, and Main designation. Changing a registration requires that member to confirm their details again at their next login.</p>
+    <p>Admin-only controls for every member’s registered IGNs, class / job, and Main designation. All registered characters are automatically included in Tracker. Changing a registration requires that member to confirm their details again at their next login.</p>
     <div class="character-admin-toolbar"><button class="btn" type="button" id="refresh-character-list">Refresh character registrations</button><span class="hint" id="character-admin-count">Loading registrations…</span></div>
     <div id="character-admin-status" class="character-admin-status hidden"></div>
     <div id="character-admin-list" class="list"></div>
@@ -206,7 +206,7 @@ html[data-pantheon-theme] #allowlist-list .btn.danger:hover:not(:disabled) { bac
   <section class="card" id="owner-audit-panel">
     <h2>4. Player ownership audit</h2>
     <p>Manage which enabled Discord account is linked to every Member Roster entry. You can assign, replace, or clear a link. These actions only change account ownership; character registrations and saved progress are preserved.</p>
-    <div class="actions"><button class="btn" type="button" id="refresh-owner-audit">Refresh ownership audit</button><button class="btn" type="button" id="repair-bootstrap-owner-links" hidden>Repair my Admin / Personal identity link</button><button class="btn" type="button" id="refresh-owner-index">Rebuild ownership index</button></div>
+    <div class="actions"><button class="btn" type="button" id="refresh-owner-audit">Refresh ownership audit</button><button class="btn" type="button" id="repair-bootstrap-owner-links" hidden>Repair my Admin / Personal identity link</button><button class="btn" type="button" id="refresh-owner-index">Rebuild ownership index</button><button class="btn primary" type="button" id="track-all-registered">Track all registered characters</button></div>
     <div id="owner-audit-status" class="status hidden"></div>
     <div id="owner-audit-summary" class="owner-audit-summary"></div>
     <div id="owner-audit-list" class="list"></div>
@@ -258,7 +258,7 @@ function adminCharacterRow(profile={},memberId=''){
     <label class="field">IGN<input data-admin-ign maxlength="40" value="${escapeHtml(profile.name||'')}" placeholder="In-game name"></label>
     <label class="field">Class / Job<select data-admin-job>${characterJobOptions(profile.job||'')}</select></label>
     <label class="admin-main-choice"><input type="radio" name="admin-main-${escapeHtml(memberId)}" data-admin-main ${profile.isMain?'checked':''}> Main</label>
-    <label class="admin-track-choice"><input type="checkbox" data-admin-tracking ${profile.trackerEnabled?'checked':''}> Track</label>
+    <span class="admin-track-choice" style="color:var(--good);font-weight:800">TRACKING</span>
     <button class="admin-remove-character" type="button" data-remove-admin-character aria-label="Remove character">×</button>
   </div>`;
 }
@@ -316,7 +316,7 @@ function renderOwnerAudit(data){
   if(!members.length){list.innerHTML='<div class="owner-audit-issues">No Member Roster owners were found.</div>';return;}
   list.innerHTML=members.map(member=>{
     const discordText=member.discordId?`${escapeHtml(member.discordId)}${member.discordLabel?` · ${escapeHtml(member.discordLabel)}`:''}`:'No confirmed Discord ID';
-    const chars=(member.characters||[]).map(character=>`<span class="owner-audit-character">${escapeHtml(character.name)}<small>${escapeHtml(character.job||'Class not set')} · ${character.trackerEnabled?'Tracker enabled':'Team Builder only'}</small></span>`).join('')||'<span class="owner-audit-detail">No characters registered</span>';
+    const chars=(member.characters||[]).map(character=>`<span class="owner-audit-character">${escapeHtml(character.name)}<small>${escapeHtml(character.job||'Class not set')} · <b style="color:var(--good)">TRACKING</b></small></span>`).join('')||'<span class="owner-audit-detail">No characters registered</span>';
     const duplicateNames=(member.duplicateCharacterNames||[]).map(item=>`${escapeHtml(item.name)} also appears under ${(item.owners||[]).filter(owner=>owner.memberId!==member.memberId).map(owner=>escapeHtml(owner.name)).join(', ')}`).join('; ');
     const indexDetail=(member.indexProblems||[]).length?`Index mismatch: ${member.indexProblems.map(escapeHtml).join(', ')}`:'';
     let action='';
@@ -334,7 +334,7 @@ function renderOwnerAudit(data){
     if(member.issueCode==='duplicate-discord-link') action+='<div class="owner-audit-detail">This Discord ID is attached to more than one roster owner. Assign the correct unique account to each person, then refresh the audit.</div>';
     if(member.issueCode==='duplicate-character-ign') action+='<div class="owner-audit-detail">Resolve the duplicated IGN in the Character Registrations section. Do not use account linking to move a character between owners.</div>';
     const duplicateIgnGuidance=duplicateNames?'<div class="owner-audit-detail">Keep each duplicated IGN only under its actual owner. In section 3, remove the duplicate registration from the incorrect owner, then rebuild the ownership index. Existing task cells remain attached to the retained IGN; do not rename the character as a shortcut.</div>':'';
-    return `<article class="owner-audit-card"><div class="owner-audit-head"><div><div class="owner-audit-name">${escapeHtml(member.memberName)}</div><div class="owner-audit-meta">Member ID: ${escapeHtml(member.memberId)} · ${member.characterCount} registered · ${member.trackerCharacterCount} opted into Tracker</div><div class="owner-audit-meta">${discordText}</div></div><span class="owner-audit-badge ${ownerAuditBadgeClass(member.issueCode)}">${escapeHtml(member.issueLabel)}</span></div><div class="owner-audit-characters">${chars}</div>${duplicateNames?`<div class="owner-audit-issues">Duplicate IGN: ${duplicateNames}</div>`:''}${duplicateIgnGuidance}${indexDetail?`<div class="owner-audit-issues">${indexDetail}</div>`:''}${action}</article>`;
+    return `<article class="owner-audit-card"><div class="owner-audit-head"><div><div class="owner-audit-name">${escapeHtml(member.memberName)}</div><div class="owner-audit-meta">Member ID: ${escapeHtml(member.memberId)} · ${member.characterCount} registered · ${member.trackerCharacterCount} tracked automatically</div><div class="owner-audit-meta">${discordText}</div></div><span class="owner-audit-badge ${ownerAuditBadgeClass(member.issueCode)}">${escapeHtml(member.issueLabel)}</span></div><div class="owner-audit-characters">${chars}</div>${duplicateNames?`<div class="owner-audit-issues">Duplicate IGN: ${duplicateNames}</div>`:''}${duplicateIgnGuidance}${indexDetail?`<div class="owner-audit-issues">${indexDetail}</div>`:''}${action}</article>`;
   }).join('');
 }
 async function refreshOwnerAudit(){
@@ -360,7 +360,7 @@ $('owner-audit-list')?.addEventListener('click',async event=>{
     const account=ownerAuditSnapshot?.enabledAccounts?.find(item=>item.discordId===discordId);
     const existingDiscordId=String(ownerAuditSnapshot?.members?.find(item=>item.memberId===memberId)?.discordId||'');
     const replaces=existingDiscordId && existingDiscordId!==discordId?` This replaces the current Discord ID ${existingDiscordId} for this member.`:'';
-    if(!confirm(`Assign ${account?.label||discordId} (${discordId}) to Member Roster owner ${memberName}? This account will be able to edit only this owner's Tracker-enabled characters.${replaces} Character registrations and saved progress will not be moved or deleted.`))return;
+    if(!confirm(`Assign ${account?.label||discordId} (${discordId}) to Member Roster owner ${memberName}? This account will be able to edit only this owner's registered characters.${replaces} Character registrations and saved progress will not be moved or deleted.`))return;
     linkButton.disabled=true;
     try{await postOwnerAuditAction({action:'link',memberId,discordId});setStatus('owner-audit-status',`Discord account linked to ${memberName}. Character progress was preserved.`,'ok');await refreshOwnerAudit();await refreshCharacterAdmin();}
     catch(error){setStatus('owner-audit-status',error.message,'error');}
@@ -376,6 +376,17 @@ $('owner-audit-list')?.addEventListener('click',async event=>{
     catch(error){setStatus('owner-audit-status',error.message,'error');}
     finally{clearButton.disabled=false;}
   }
+});
+$('track-all-registered')?.addEventListener('click',async event=>{
+  const button=event.currentTarget;
+  if(!confirm('Include EVERY character currently registered in Member Roster in Tracker? This will restore Tracker visibility for registered characters, including any task progress and completion history already saved in cloud storage. Existing character cells, notes, and timing history will not be reset or deleted. Characters will remain tracked automatically unless removed from Member Roster.'))return;
+  button.disabled=true;
+  try{
+    const result=await postOwnerAuditAction({action:'track-all-registered'});
+    setStatus('owner-audit-status',`Tracking enabled for ${result.characterCount||0} registered characters across ${result.memberCount||0} members. ${result.previouslyUntracked||0} previously untracked character(s) restored. ${result.historyPreserved?'Existing cloud task cells and timing history were preserved.':''}`,'ok');
+    await refreshOwnerAudit();await refreshCharacterAdmin();
+  }catch(error){setStatus('owner-audit-status',error.message,'error');}
+  finally{button.disabled=false;}
 });
 $('refresh-owner-audit')?.addEventListener('click',refreshOwnerAudit);
 $('refresh-owner-index')?.addEventListener('click',async event=>{
@@ -395,7 +406,7 @@ $('repair-bootstrap-owner-links')?.addEventListener('click',async event=>{
 });
 function collectAdminCharacters(card){
   const rows=[...card.querySelectorAll('[data-admin-character-row]')];
-  return rows.map(row=>({name:row.querySelector('[data-admin-ign]')?.value.trim()||'',job:row.querySelector('[data-admin-job]')?.value||'',isMain:!!row.querySelector('[data-admin-main]')?.checked,trackerEnabled:!!row.querySelector('[data-admin-tracking]')?.checked})).filter(profile=>profile.name);
+  return rows.map(row=>({name:row.querySelector('[data-admin-ign]')?.value.trim()||'',job:row.querySelector('[data-admin-job]')?.value||'',isMain:!!row.querySelector('[data-admin-main]')?.checked,trackerEnabled:true})).filter(profile=>profile.name);
 }
 $('character-admin-list')?.addEventListener('click',async event=>{
   const card=event.target.closest('[data-admin-owner-card]');if(!card)return;

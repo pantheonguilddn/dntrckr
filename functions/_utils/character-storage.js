@@ -59,10 +59,6 @@ export async function isCharacterStorageMigrationBusy(env) {
 export function buildCharacterIndex(record) {
   const settings = obj(record?.settings);
   const members = arr(settings.memberDirectory);
-  const rosterNames = new Map();
-  for (const roster of arr(settings.rosters)) {
-    for (const name of arr(roster?.characters)) rosterNames.set(characterKey(name), true);
-  }
 
   const charOwners = new Map();
   const ownerMembers = new Map();
@@ -80,18 +76,16 @@ export function buildCharacterIndex(record) {
       ...arr(member?.characters).map(value => typeof value === 'object' ? (value?.name || value?.ign || '') : value),
       ...arr(member?.characterProfiles).map(profile => profile?.name || profile?.ign || '')
     ].map(value => String(value || '').trim().slice(0, 40)).filter(Boolean));
-    const profiles = new Map(arr(member?.characterProfiles).map(profile => [characterKey(profile?.name || profile?.ign), profile]));
     for (const name of names) {
       const key = characterKey(name);
       if (!key) continue;
-      const profile = profiles.get(key) || {};
       const row = {
         characterKey: key,
         characterName: name,
         memberId,
         ownerName,
         ownerDiscordId: discordId,
-        trackerEnabled: profile.trackerEnabled === true || rosterNames.has(key) ? 1 : 0,
+        trackerEnabled: 1,
         active: 1
       };
       const existing = charOwners.get(key);

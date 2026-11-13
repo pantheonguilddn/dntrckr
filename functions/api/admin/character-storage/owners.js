@@ -15,7 +15,7 @@ const cleanName = value => String(value || '').normalize('NFKC').trim().slice(0,
 const ownerIdOf = member => String(member?.id || member?.name || '').trim().slice(0, 120);
 const labelKey = value => String(value || '').normalize('NFKC').trim().toLocaleLowerCase();
 
-function memberCharacters(member, trackerRosterKeys = new Set()) {
+function memberCharacters(member) {
   const profiles = new Map();
   for (const profile of arr(member?.characterProfiles)) {
     const name = cleanName(profile?.name || profile?.ign).slice(0, 40);
@@ -33,7 +33,7 @@ function memberCharacters(member, trackerRosterKeys = new Set()) {
   return [...names.entries()].filter(([key, name]) => key && name).map(([key, name]) => ({
     characterKey: key,
     name,
-    trackerEnabled: profiles.get(key)?.trackerEnabled === true || trackerRosterKeys.has(key),
+    trackerEnabled: true,
     job: String(profiles.get(key)?.job || '').slice(0, 40),
     isMain: profiles.get(key)?.isMain === true
   }));
@@ -52,6 +52,145 @@ async function readMainRecord(env) {
   return { row, record };
 }
 
+async function enableAllRegisteredCharacters(env, session) {
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const { row, record } = await readMainRecord(env);
+    const settings = record.settings;
+    const members = arr(settings.memberDirectory);
+    const oldRosters = arr(settings.rosters);
+    const jobs = obj(settings.characterJobs);
+    const projectedRosters = [];
+    const matchedRosterObjects = new Set();
+    let characterCount = 0;
+    let previouslyUntracked = 0;
+
+    for (const member of members) {
+      const memberId = ownerIdOf(member);
+      const ownerName = cleanName(member?.name);
+      if (!memberId || !ownerName) continue;
+      const existingRoster = oldRosters.find(roster => String(roster?.id || '') === String(member?.trackerRosterId || ''))
+        || oldRosters.find(roster => labelKey(roster?.name) === labelKey(ownerName));
+      if (existingRoster) matchedRosterObjects.add(existingRoster);
+
+      const priorProfiles = arr(member.characterProfiles);
+      const profileByKey = new Map(priorProfiles.map(profile => [characterKey(profile?.name || profile?.ign), profile]));
+      const names = [];
+      const addName = value => {
+        const name = cleanName(typeof value === 'object' ? (value?.name || value?.ign) : value).slice(0, 40);
+        const key = characterKey(name);
+        if (name && key && !names.some(existing => characterKey(existing) === key)) names.push(name);
+      };
+      arr(member.characters).forEach(addName);
+      priorProfiles.forEach(profile => addName(profile?.name || profile?.ign));
+      // A legacy Tracker-only roster is still a registration source. Keep those IGNs
+      // and their existing task cells visible rather than dropping them during repair.
+      arr(existingRoster?.characters).forEach(addName);
+
+      const profiles = names.map(name => {
+        const key = characterKey(name);
+        const prior = profileByKey.get(key) || {};
+        if (prior.trackerEnabled !== true && !(arr(existingRoster?.characters).some(value => characterKey(value) === key))) previouslyUntracked++;
+        return {
+          ...prior,
+          name,
+          job: String(prior.job || jobs[name]?.job || '').slice(0, 60),
+          trackerEnabled: true,
+          isMain: prior.isMain === true
+        };
+      });
+      member.characters = names;
+      member.characterProfiles = profiles;
+      const rosterId = String(existingRoster?.id || member.trackerRosterId || `member-roster-${memberId.replace(/[^a-zA-Z0-9_-]/g, '')}`);
+      member.trackerRosterId = rosterId;
+      member.color = /^#[0-9a-f]{6}$/i.test(String(member.color || '')) ? String(member.color).toLowerCase()
+        : (/^#[0-9a-f]{6}$/i.test(String(existingRoster?.color || '')) ? String(existingRoster.color).toLowerCase() : '#7aa2f7');
+      projectedRosters.push({ id:rosterId, name:ownerName.slice(0,30), color:member.color, characters:names });
+      characterCount += names.length;
+    }
+
+    const duplicateOwners = new Map();
+    for (const member of members) {
+      for (const rawName of arr(member?.characters)) {
+        const name = cleanName(typeof rawName === 'object' ? (rawName?.name || rawName?.ign) : rawName).slice(0,40);
+        const key = characterKey(name);
+        if (!key) continue;
+        if (!duplicateOwners.has(key)) duplicateOwners.set(key, []);
+        duplicateOwners.get(key).push(cleanName(member?.name));
+      }
+    }
+    const duplicates = [...duplicateOwners.entries()].filter(([, owners]) => owners.length > 1);
+    if (duplicates.length) {
+      throw new Error(`Cannot enable all characters safely until duplicate IGNs are resolved: ${duplicates.slice(0,8).map(([key])=>key).join(', ')}. No changes were made.`);
+    }
+
+    // Preserve legacy rosters that do not yet have a Member Roster owner.
+    for (const roster of oldRosters) {
+      if (matchedRosterObjects.has(roster)) continue;
+      projectedRosters.push(roster);
+    }
+
+    settings.memberDirectory = members;
+    settings.rosters = projectedRosters;
+    const now = Date.now();
+    settings.memberDirectoryUpdatedAt = now;
+    settings.memberDirectoryUpdatedBy = String(session?.discordId || 'admin');
+    settings.rosterUpdatedAt = now;
+    settings.rosterUpdatedBy = String(session?.discordId || 'admin');
+    record.updatedAt = now;
+
+    const packed = JSON.stringify(encodePantheonCompactRecord(record));
+    const saved = await env.PANTHEON_DB.prepare(`
+      UPDATE data_records SET record_json = ?, updated_at = ?
+      WHERE id = ? AND record_json = ?
+    `).bind(packed, now, MAIN_ID, String(row.record_json)).run();
+    if (Number(saved?.meta?.changes) !== 1) continue;
+
+    // Re-enable / create only the registered owners. Existing owner-link columns are
+    // deliberately left untouched; only tracker_enabled / active are updated. The
+    // character_task_cells and character_completion_timing tables are never written.
+    const ownerRows = await env.PANTHEON_DB.prepare('SELECT character_key FROM character_owners').all();
+    const existingOwnerKeys = new Set((ownerRows.results || []).map(item => String(item.character_key || '')));
+    const discordOwners = new Map();
+    for (const member of members) {
+      const discordId = String(member?.profileConfirmedDiscordId || '').trim();
+      if (!discordId) continue;
+      discordOwners.set(discordId, (discordOwners.get(discordId) || 0) + 1);
+    }
+    const statements = [];
+    for (const member of members) {
+      const memberId = ownerIdOf(member);
+      const ownerName = cleanName(member?.name);
+      const discordId = String(member?.profileConfirmedDiscordId || '').trim();
+      const safeDiscordId = discordId && discordOwners.get(discordId) === 1 ? discordId : '';
+      for (const profile of arr(member?.characterProfiles)) {
+        const characterName = cleanName(profile?.name || profile?.ign).slice(0,40);
+        const key = characterKey(characterName);
+        if (!key || !memberId || !ownerName) continue;
+        if (existingOwnerKeys.has(key)) {
+          statements.push(env.PANTHEON_DB.prepare(`
+            UPDATE character_owners SET tracker_enabled = 1, active = 1, updated_at = ?
+            WHERE character_key = ?
+          `).bind(now,key));
+        } else {
+          statements.push(env.PANTHEON_DB.prepare(`
+            INSERT INTO character_owners (character_key, character_name, member_id, owner_name, owner_discord_id, tracker_enabled, active, updated_at)
+            VALUES (?, ?, ?, ?, ?, 1, 1, ?)
+            ON CONFLICT(character_key) DO UPDATE SET tracker_enabled = 1, active = 1, updated_at = excluded.updated_at
+          `).bind(key,characterName,memberId,ownerName,safeDiscordId,now));
+        }
+      }
+    }
+    for (let offset = 0; offset < statements.length; offset += 80) await env.PANTHEON_DB.batch(statements.slice(offset, offset + 80));
+    await bumpCharacterStorageRevision(env, now);
+    await env.PANTHEON_DB.prepare(`
+      INSERT INTO audit_events (actor_discord_id, action, target_discord_id, created_at, details_json)
+      VALUES (?, 'track-all-registered-characters', '', ?, ?)
+    `).bind(String(session?.discordId || ''), now, JSON.stringify({ memberCount:members.length, characterCount, previouslyUntracked })).run();
+    return { memberCount:members.length, characterCount, previouslyUntracked, historyPreserved:true };
+  }
+  throw new Error('The shared Member Roster changed repeatedly while enabling tracking. No bulk tracking change was committed; refresh and retry.');
+}
+
 async function buildAudit(env, record, session) {
   const [ownerResult, allowlistResult] = await Promise.all([
     env.PANTHEON_DB.prepare(`
@@ -68,7 +207,6 @@ async function buildAudit(env, record, session) {
   ]);
 
   const memberDirectory = arr(record?.settings?.memberDirectory);
-  const trackerRosterKeys = new Set(arr(record?.settings?.rosters).flatMap(roster => arr(roster?.characters).map(characterKey)).filter(Boolean));
   const enabledAccounts = (allowlistResult.results || []).filter(row => Number(row.enabled) === 1).map(row => ({
     discordId: String(row.discord_id || ''),
     label: String(row.label || ''),
@@ -83,7 +221,7 @@ async function buildAudit(env, record, session) {
     const memberId = ownerIdOf(member);
     const name = cleanName(member?.name);
     const discordId = String(member?.profileConfirmedDiscordId || '').trim();
-    const characters = memberCharacters(member, trackerRosterKeys);
+    const characters = memberCharacters(member);
     if (discordId) {
       if (!idOwners.has(discordId)) idOwners.set(discordId, []);
       idOwners.get(discordId).push({ memberId, name });
@@ -110,7 +248,7 @@ async function buildAudit(env, record, session) {
       }));
     const indexProblems = member.characters.filter(character => {
       const row = ownerRows.get(character.characterKey);
-      return !row || Number(row.active) !== 1 || String(row.member_id || '') !== member.memberId || String(row.owner_discord_id || '') !== member.discordId;
+      return !row || Number(row.active) !== 1 || Number(row.tracker_enabled) !== 1 || String(row.member_id || '') !== member.memberId || String(row.owner_discord_id || '') !== member.discordId;
     }).map(character => character.name);
 
     let issueCode = 'linked';
@@ -310,6 +448,11 @@ export async function onRequestPost(context) {
       const stats = await syncCharacterIndexes(context.env, record, Date.now(), true);
       await bumpCharacterStorageRevision(context.env, Date.now());
       return jsonResponse({ ok:true, action, ...stats });
+    }
+
+    if (action === 'track-all-registered') {
+      const result = await enableAllRegisteredCharacters(context.env, session);
+      return jsonResponse({ ok:true, action, ...result });
     }
 
     if (action === 'repair-bootstrap-admin-links') {
