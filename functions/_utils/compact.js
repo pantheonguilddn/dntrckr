@@ -92,7 +92,9 @@ const KEY_MAP = Object.freeze({
   "defaultExcludedTasks": "~ao",
   "defaultExcludedTasksUpdatedAt": "~ap",
   "defaultExcludedTasksUpdatedBy": "~aq",
-  "classJobCatalog": "~ar"
+  "classJobCatalog": "~ar",
+  "discordLinkArchivedAt": "~as",
+  "discordLinkArchivedBy": "~at"
 });
 const REVERSE = Object.freeze(Object.fromEntries(Object.entries(KEY_MAP).map(([key, alias]) => [alias, key])));
 const CELL_STATES = ['open', 'done', 'excluded', 'marked', 'reset'];

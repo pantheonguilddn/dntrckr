@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r14</title>
+    <title>Pantheon Tools v1.6.9-r15</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3966,9 +3966,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r14</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r15</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r14:</strong> Fixes Dungeon Registration so a newly added task is also activated in the separate Tracker task index. Retains the r11-based Class / Job Catalog.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r15:</strong> Makes registered characters automatic Tracker entries, adds archiving for former members’ inactive Discord links, and preserves existing cloud progress.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5341,6 +5341,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                     note: String(member?.note || '').trim().slice(0, 160),
                     profileConfirmedDiscordId: String(member?.profileConfirmedDiscordId || ''),
                     profileConfirmedAt: Number(member?.profileConfirmedAt) || 0,
+                    discordLinkArchivedAt: Number(member?.discordLinkArchivedAt) || 0,
+                    discordLinkArchivedBy: String(member?.discordLinkArchivedBy || ''),
                     ledgerAccess: member?.ledgerAccess === true,
                     isBootstrapPersonalOwner: member?.isBootstrapPersonalOwner === true
                 };
@@ -6121,7 +6123,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             owner:'~6', formatUpdatedAt:'~7', splitPartyUpdatedAt:'~8', splitPartyMechanic:'~9', slots:'~!', character:'~@',
             runType:'~#', runTypeUpdatedAt:'~$', runTypeUpdatedBy:'~%', formatUpdatedBy:'~^', splitPartyUpdatedBy:'~&',
             updatedBy:'~*', lastSeenAt:'~(', lastSeenBy:'~)', value:'~_', logsUpdatedAt:'~+', logsUpdatedBy:'~=',
-            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an', defaultExcludedTasks:'~ao', defaultExcludedTasksUpdatedAt:'~ap', defaultExcludedTasksUpdatedBy:'~aq', classJobCatalog:'~ar'
+            memberRosterMasterVersion:'~af', trackerRosterId:'~ag', characterProfiles:'~ah', trackerEnabled:'~ai', job:'~aj', memberResetMarkers:'~ak', extraDungeonTasks:'~al', extraDungeonTasksUpdatedAt:'~am', extraDungeonTasksUpdatedBy:'~an', defaultExcludedTasks:'~ao', defaultExcludedTasksUpdatedAt:'~ap', defaultExcludedTasksUpdatedBy:'~aq', classJobCatalog:'~ar', discordLinkArchivedAt:'~as', discordLinkArchivedBy:'~at'
         });
         const PANTHEON_WIRE_KEY_REVERSE = Object.freeze(Object.fromEntries(Object.entries(PANTHEON_WIRE_KEY_MAP).map(([key, alias]) => [alias, key])));
         const PANTHEON_CELL_STATES = ['open','done','excluded','marked','reset'];
@@ -12831,15 +12833,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             ensureMemberRosterMaster(cloudData);
             const entries = normalizeMemberDirectory(cloudData.settings.memberDirectory);
             const previousEntry = editingMemberDirectoryId ? entries.find(member => member.id === editingMemberDirectoryId) : null;
-            const previousRosters = getRosters();
-            const previousTrackerRoster = previousEntry
-                ? previousRosters.find(roster => roster.id === previousEntry.trackerRosterId)
-                    || previousRosters.find(roster => roster.name.trim().toLowerCase() === previousEntry.name.trim().toLowerCase())
-                : null;
-            const explicitTrackerOptOutNames = previousEntry ? (previousTrackerRoster?.characters || []).filter(previousName => {
-                const submittedProfile = profiles.find(profile => String(profile.name).normalize('NFKC').trim().toLowerCase() === String(previousName).normalize('NFKC').trim().toLowerCase());
-                return !!submittedProfile && submittedProfile.trackerEnabled !== true;
-            }) : [];
             const previousOwnedCharacters = new Set((previousEntry?.characterProfiles || []).map(profile => String(profile.name || '').toLowerCase()));
             const sameName = entries.find(member => member.name.toLowerCase() === name.toLowerCase() && member.id !== editingMemberDirectoryId);
             if (sameName) return alert('That member already has a Member Roster entry. Edit the existing member instead.');
@@ -12895,7 +12888,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (savedDirectoryEntry) queueMemberDirectoryIntent(
                 editingMemberDirectoryId ? 'upsert' : 'add',
                 savedDirectoryEntry,
-                { characterRosterChanged: true, trackerOptOutNames: explicitTrackerOptOutNames }
+                { characterRosterChanged: true }
             );
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
@@ -12943,7 +12936,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r14';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r15';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13307,14 +13300,8 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             if (conflict) { alert(`The IGN "${conflict.name}" is already registered to another member. Correct the name or ask an administrator to resolve the duplicate.`); return; }
 
             const previousNames = (own.characterProfiles || []).map(profile => String(profile.name || '').trim());
-            const previousOwnRoster = getRosters().find(roster => roster.id === own.trackerRosterId)
-                || getRosters().find(roster => roster.name.trim().toLowerCase() === own.name.trim().toLowerCase());
-            const explicitTrackerOptOutNames = (previousOwnRoster?.characters || []).filter(previousName => {
-                const submittedProfile = profiles.find(profile => String(profile.name).normalize('NFKC').trim().toLowerCase() === String(previousName).normalize('NFKC').trim().toLowerCase());
-                return !!submittedProfile && submittedProfile.trackerEnabled !== true;
-            });
             own.characters = profiles.map(profile => profile.name);
-            own.characterProfiles = profiles.map(profile => ({ name: profile.name, job: profile.job, trackerEnabled: profile.trackerEnabled, isMain: profile.isMain }));
+            own.characterProfiles = profiles.map(profile => ({ name: profile.name, job: profile.job, trackerEnabled: true, isMain: profile.isMain }));
             own.profileConfirmedDiscordId = String(pantheonDiscordUser.id);
             own.profileConfirmedAt = Date.now();
 
@@ -13333,8 +13320,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             cloudData.settings.memberDirectory = normalizeMemberDirectory(entries);
             const updatedMember = cloudData.settings.memberDirectory.find(item => item.id === own.id);
             if (updatedMember) queueMemberDirectoryIntent(ownAlreadyExisted ? 'upsert' : 'add', updatedMember, {
-                characterRosterChanged: true,
-                trackerOptOutNames: explicitTrackerOptOutNames
+                characterRosterChanged: true
             });
             touchMemberDirectorySettings();
             projectTrackerRostersFromMemberDirectory(cloudData, true);
@@ -13685,7 +13671,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r14';
+  const CURRENT_BUILD = '1.6.9-r15';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

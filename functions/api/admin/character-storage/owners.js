@@ -231,6 +231,8 @@ async function buildAudit(env, record, session) {
       characterOwners.get(character.characterKey).push({ memberId, name, characterName: character.name });
     }
     return { memberId, name, discordId, characters,
+      discordLinkArchivedAt: Number(member?.discordLinkArchivedAt) || 0,
+      discordLinkArchivedBy: String(member?.discordLinkArchivedBy || '').trim(),
       isBootstrapPersonalOwner: member?.isBootstrapPersonalOwner === true,
       ledgerAccess: member?.ledgerAccess === true
     };
@@ -301,6 +303,8 @@ async function buildAudit(env, record, session) {
       memberId: member.memberId,
       memberName: member.name,
       discordId: member.discordId,
+      discordLinkArchivedAt: member.discordLinkArchivedAt,
+      discordLinkArchivedBy: member.discordLinkArchivedBy,
       discordLabel: String(allowlisted?.label || ''),
       discordRole: String(allowlisted?.role || ''),
       discordAccountEnabled: Number(allowlisted?.enabled) === 1,
@@ -324,7 +328,8 @@ async function buildAudit(env, record, session) {
 
   const activeRows = (ownerResult.results || []).filter(row => Number(row.active) === 1);
   const orphanRows = (ownerResult.results || []).filter(row => Number(row.active) !== 1 && !String(row.member_id || '').trim());
-  const linkedCharacterCount = activeRows.filter(row => {
+  const archivedMemberIds = new Set(parsedMembers.filter(member => member.discordLinkArchivedAt > 0).map(member => member.memberId));
+  const isVerifiedLinkedRow = row => {
     const member = parsedMembers.find(item => item.memberId === String(row.member_id || ''));
     const discordId = String(row.owner_discord_id || '');
     const accounts = idOwners.get(discordId) || [];
@@ -332,8 +337,12 @@ async function buildAudit(env, record, session) {
     const duplicateIgn = (characterOwners.get(String(row.character_key || '')) || []).length > 1;
     return !!discordId && !!member && member.discordId === discordId && accounts.length === 1 &&
       !!allowlisted && Number(allowlisted.enabled) === 1 && !duplicateIgn;
-  }).length;
-  const unlinkedCharacterCount = Math.max(0, activeRows.length - linkedCharacterCount);
+  };
+  const linkedCharacterCount = activeRows.filter(isVerifiedLinkedRow).length;
+  const archivedCharacterCount = activeRows.filter(row => archivedMemberIds.has(String(row.member_id || ''))).length;
+  const unlinkedCharacterCount = activeRows.filter(row =>
+    !archivedMemberIds.has(String(row.member_id || '')) && !isVerifiedLinkedRow(row)
+  ).length;
   const duplicateDiscordIds = [...idOwners.entries()].filter(([, owners]) => owners.length > 1).map(([discordId, owners]) => ({ discordId, owners }));
   const duplicateCharacterNames = [...characterOwners.entries()].filter(([, owners]) => owners.length > 1).map(([characterKey, owners]) => ({
     characterKey,
@@ -346,26 +355,40 @@ async function buildAudit(env, record, session) {
     ownerName: String(row.owner_name || '')
   }));
 
+  const archivedMembers = members.filter(member => Number(member.discordLinkArchivedAt) > 0).map(member => ({
+    memberId: member.memberId,
+    memberName: member.memberName,
+    discordId: member.discordId,
+    discordLabel: member.discordLabel,
+    discordLinkArchivedAt: member.discordLinkArchivedAt,
+    discordLinkArchivedBy: member.discordLinkArchivedBy,
+    characterCount: member.characterCount
+  }));
+  const activeMembers = members.filter(member => Number(member.discordLinkArchivedAt) <= 0);
+
   return {
     migrationComplete: true,
     counts: {
-      memberCount: members.length,
+      memberCount: activeMembers.length,
+      archivedAccountLinkCount: archivedMembers.length,
+      archivedCharacterCount,
       characterCount: activeRows.length,
       linkedCharacters: linkedCharacterCount,
       unlinkedCharacterCount,
-      ownersMissingDiscord: members.filter(member => member.issueCode === 'missing-discord-confirmation').length,
-      ownersWithDuplicateDiscord: members.filter(member => member.issueCode === 'duplicate-discord-link').length,
-      ownersWithUnapprovedDiscord: members.filter(member => member.issueCode === 'discord-account-not-enabled').length,
-      ownersWithDuplicateCharacterNames: members.filter(member => member.duplicateCharacterNames.length > 0).length,
-      ownersWithStaleIndex: members.filter(member => member.indexProblems.length > 0).length,
-      bootstrapIdentityOnWrongOwner: members.filter(member => member.issueCode === 'bootstrap-admin-id-on-wrong-owner').length,
-      bootstrapPersonalOwnerMismatch: members.filter(member => member.issueCode === 'bootstrap-personal-owner-mismatch').length,
+      ownersMissingDiscord: activeMembers.filter(member => member.issueCode === 'missing-discord-confirmation').length,
+      ownersWithDuplicateDiscord: activeMembers.filter(member => member.issueCode === 'duplicate-discord-link').length,
+      ownersWithUnapprovedDiscord: activeMembers.filter(member => member.issueCode === 'discord-account-not-enabled').length,
+      ownersWithDuplicateCharacterNames: activeMembers.filter(member => member.duplicateCharacterNames.length > 0).length,
+      ownersWithStaleIndex: activeMembers.filter(member => member.indexProblems.length > 0).length,
+      bootstrapIdentityOnWrongOwner: activeMembers.filter(member => member.issueCode === 'bootstrap-admin-id-on-wrong-owner').length,
+      bootstrapPersonalOwnerMismatch: activeMembers.filter(member => member.issueCode === 'bootstrap-personal-owner-mismatch').length,
       duplicateDiscordIdCount: duplicateDiscordIds.length,
       duplicateCharacterNameCount: duplicateCharacterNames.length,
       legacyOrphanCharacterCount: orphanRows.length,
       ownerIndexOrphanCount: ownerIndexOrphans.length
     },
-    members,
+    members: activeMembers,
+    archivedMembers,
     duplicateDiscordIds,
     duplicateCharacterNames,
     legacyOrphans: orphanRows.map(row => ({ characterName:String(row.character_name || ''), cellsPreserved:true })),
@@ -410,6 +433,65 @@ async function commitMemberDirectoryChange(env, session, mutate, action, details
     }
   }
   throw new Error('The Member Roster changed repeatedly while saving. No ownership link was changed; refresh the audit and retry.');
+}
+
+async function commitAccountLinkArchiveChange(env, session, memberId, archive) {
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const { row, record } = await readMainRecord(env);
+    const members = arr(record.settings.memberDirectory);
+    const matches = members.filter(member => ownerIdOf(member) === String(memberId));
+    if (matches.length !== 1) throw new Error(matches.length ? 'The selected member ID is duplicated in Member Roster. Resolve that duplicate first.' : 'The selected Member Roster owner no longer exists. Refresh the audit and try again.');
+    const member = matches[0];
+    const currentArchivedAt = Number(member.discordLinkArchivedAt) || 0;
+    if (archive && currentArchivedAt > 0) return { changed:false };
+    if (!archive && currentArchivedAt <= 0) return { changed:false };
+
+    if (archive) {
+      const bootstrapId = String(env?.BOOTSTRAP_ADMIN_DISCORD_ID || '').trim();
+      const personalOwner = String(env?.BOOTSTRAP_ADMIN_PERSONAL_OWNER_NAME || 'Cho').trim();
+      const linkedDiscordId = String(member.profileConfirmedDiscordId || '').trim();
+      const isBootstrapOwner = member.isBootstrapPersonalOwner === true ||
+        (!!bootstrapId && linkedDiscordId === bootstrapId && labelKey(member.name) === labelKey(personalOwner));
+      if (isBootstrapOwner) throw new Error('The protected bootstrap administrator personal-owner link cannot be archived.');
+      if (linkedDiscordId) {
+        const account = await env.PANTHEON_DB.prepare(
+          'SELECT enabled FROM allowed_users WHERE discord_id = ? LIMIT 1'
+        ).bind(linkedDiscordId).first();
+        if (Number(account?.enabled) === 1) {
+          throw new Error('This member still has an enabled Discord account. Clear or replace that link instead of archiving it.');
+        }
+      }
+    }
+
+    const now = Date.now();
+    member.discordLinkArchivedAt = archive ? now : 0;
+    member.discordLinkArchivedBy = archive ? String(session?.discordId || 'admin') : '';
+    record.settings.memberDirectoryUpdatedAt = now;
+    record.settings.memberDirectoryUpdatedBy = String(session?.discordId || 'admin');
+    record.settings.memberRosterMasterVersion = Math.max(1, Number(record.settings.memberRosterMasterVersion) || 0) + 1;
+    record.updatedAt = now;
+    const packed = JSON.stringify(encodePantheonCompactRecord(record));
+    const saved = await env.PANTHEON_DB.prepare(`
+      UPDATE data_records SET record_json = ?, updated_at = ?
+      WHERE id = ? AND record_json = ?
+    `).bind(packed, now, MAIN_ID, String(row.record_json)).run();
+    if (Number(saved?.meta?.changes) !== 1) continue;
+
+    // This is audit-only metadata. Do not rewrite character_owners or bump the
+    // task-progress storage revision; registered characters and their history stay intact.
+    await env.PANTHEON_DB.prepare(`
+      INSERT INTO audit_events (actor_discord_id, action, target_discord_id, created_at, details_json)
+      VALUES (?, ?, ?, ?, ?)
+    `).bind(
+      String(session?.discordId || ''),
+      archive ? 'archive-member-discord-link' : 'restore-member-discord-link',
+      String(member.profileConfirmedDiscordId || ''),
+      now,
+      JSON.stringify({ memberId, memberName:String(member.name || ''), characterCount:memberCharacters(member).length })
+    ).run();
+    return { changed:true, archived:archive, memberName:String(member.name || ''), characterCount:memberCharacters(member).length };
+  }
+  throw new Error('The Member Roster changed repeatedly while archiving the account link. Refresh and retry.');
 }
 
 export async function onRequestGet(context) {
@@ -480,6 +562,10 @@ export async function onRequestPost(context) {
     }
 
     if (!memberId) return jsonResponse({ error:'A Member Roster owner is required.' }, 400);
+    if (action === 'archive-link' || action === 'restore-link') {
+      const result = await commitAccountLinkArchiveChange(context.env, session, memberId, action === 'archive-link');
+      return jsonResponse({ ok:true, action, ...result, historyPreserved:true });
+    }
     if (action === 'clear-link') {
       const expectedDiscordId = String(body.expectedDiscordId || '').trim();
       const result = await commitMemberDirectoryChange(context.env, session, (record, member) => {

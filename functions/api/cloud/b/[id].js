@@ -129,6 +129,8 @@ function cleanMemberIntentPayload(value) {
     note: String(value?.note || '').trim().slice(0, 160),
     profileConfirmedDiscordId: String(value?.profileConfirmedDiscordId || '').trim().slice(0, 80),
     profileConfirmedAt: Number(value?.profileConfirmedAt) || 0,
+    discordLinkArchivedAt: Number(value?.discordLinkArchivedAt) || 0,
+    discordLinkArchivedBy: String(value?.discordLinkArchivedBy || '').trim().slice(0, 80),
     ledgerAccess: value?.ledgerAccess === true,
     isBootstrapPersonalOwner: value?.isBootstrapPersonalOwner === true
   };
@@ -234,6 +236,10 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
           trackerRosterId: String(committedMember.trackerRosterId || member.trackerRosterId || '')
         };
       }
+      // Archiving is an Admin Console operation. Ordinary browser roster saves,
+      // including legacy clients that do not know these fields, cannot unarchive it.
+      member.discordLinkArchivedAt = Number(committedMember.discordLinkArchivedAt) || 0;
+      member.discordLinkArchivedBy = String(committedMember.discordLinkArchivedBy || '');
       currentMembers[index] = member;
     } else {
       currentMembers.push(member);
