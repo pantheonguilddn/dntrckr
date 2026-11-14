@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r16</title>
+    <title>Pantheon Tools v1.6.9-r17</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3966,9 +3966,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r16</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r17</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r16:</strong> Fixes member-side roster sync so saving your own profile cannot rewrite another member’s roster. Registered characters remain automatic Tracker entries, and former members’ inactive Discord links can still be archived.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r17:</strong> Fixes the weekly reset so previous-week Bounty Board text clears even when the bounty row status is also reset. Notes entered after the reset boundary are preserved. The r16 member-side roster sync fix, automatic Tracker inclusion, and account-link archive controls remain included.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -8383,6 +8383,15 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
             const bountyCategory = cloudData.settings.categories.find(cat => cat.name.toLowerCase().includes('bounty'));
             const bountyTasks = new Set(bountyCategory?.tasks || []);
             targets.forEach(character => {
+                // Capture which bounty notes belong to the previous cycle BEFORE changing
+                // bounty-row states. Resetting a marked/done bounty row advances its cell
+                // timestamp to the boundary; checking that timestamp afterward would
+                // mistake our own status reset for a current-cycle edit and leave the text.
+                // A note whose original timestamp is at/after the boundary is retained.
+                const oldBountyNotes = new Set([...bountyTasks].filter(task => {
+                    const record = getCellRecord(character, task);
+                    return (Number(record.updatedAt) || 0) < boundary && !!String(record.note || '').trim();
+                }));
                 weeklyTaskNames.forEach(task => {
                     const record = getCellRecord(character, task);
                     if ((Number(record.updatedAt) || 0) >= boundary) return;
@@ -8391,10 +8400,9 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
                         if (state !== 'excluded') setCellState(character, task, 'excluded', boundary);
                     } else if (state !== 'open' && state !== 'excluded') setCellState(character, task, 'open', boundary);
                 });
-                // Clear old bounty notes only. Current-cycle notes survive a delayed reset.
-                bountyTasks.forEach(task => {
-                    const record = getCellRecord(character, task);
-                    if ((Number(record.updatedAt) || 0) >= boundary || !record.note) return;
+                // Clear only notes captured as previous-cycle data. Current-cycle notes
+                // survive a delayed reset, even if a status-only reset also touched the row.
+                oldBountyNotes.forEach(task => {
                     setCellNote(character, task, '', boundary);
                     const input = document.querySelector(`input.bounty-input[data-char="${CSS.escape(character)}"][data-task="${CSS.escape(task)}"]`);
                     if (input) input.value = '';
@@ -12936,7 +12944,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r16';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r17';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13671,7 +13679,7 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r16';
+  const CURRENT_BUILD = '1.6.9-r17';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
