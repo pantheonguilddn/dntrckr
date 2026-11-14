@@ -135,9 +135,19 @@ function cleanMemberIntentPayload(value) {
     isBootstrapPersonalOwner: value?.isBootstrapPersonalOwner === true
   };
 }
-function projectDirectoryRosters(members, oldRosters) {
+function projectDirectoryRosters(members, oldRosters, onlyMemberIds = null) {
   const matchedRosters = new Set();
-  const projected = members.map(member => {
+  const projected = [];
+  const restrictedIds = onlyMemberIds === null ? null : new Set([...onlyMemberIds].map(value => String(value || '')));
+
+  for (const member of members) {
+    const memberId = String(member?.id || '');
+    // A normal member save may reconcile only that member's own Tracker roster.
+    // Projecting every directory entry here used to rewrite legacy roster contents
+    // belonging to unrelated members, which the authorization guard correctly rejected
+    // with a 403. Admin Console operations may still request a complete projection.
+    if (restrictedIds && !restrictedIds.has(memberId)) continue;
+
     const existing = oldRosters.find(roster => String(roster?.id || '') === String(member?.trackerRosterId || ''))
       || oldRosters.find(roster => ownerKey(roster?.name) === ownerKey(member?.name));
     if (existing) matchedRosters.add(existing);
@@ -148,8 +158,10 @@ function projectDirectoryRosters(members, oldRosters) {
     const names = memberNames(member);
     // Tracker membership follows Member Roster membership. A registered character
     // is always tracked; only removing it from Member Roster unregisters it.
-    return { id: rosterId, name: String(member?.name || 'Member').slice(0, 30), color: member.color, characters: names };
-  });
+    projected.push({ id: rosterId, name: String(member?.name || 'Member').slice(0, 30), color: member.color, characters: names });
+  }
+  // Retain all unrelated and legacy rosters byte-for-byte. Do not silently repair
+  // another member's roster as a side effect of the current member's profile save.
   for (const roster of oldRosters) if (!matchedRosters.has(roster)) projected.push(roster);
   return projected;
 }
@@ -164,6 +176,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
   const intents = arr(rawIntents).slice(0, 50);
   const oldRosters = arr(previousSettings.rosters);
   const deletedCharacterNames = new Set();
+  const touchedMemberIds = new Set();
   for (const raw of intents) {
     const op = String(raw?.op || '');
     if (op === 'remove') {
@@ -196,6 +209,7 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
     const existingNames = new Set(currentMembers.filter((_, i) => i !== index).flatMap(memberNames).map(ownerKey));
     const duplicateCharacter = memberNames(member).find(name => existingNames.has(ownerKey(name)));
     if (duplicateCharacter) throw Object.assign(new Error(`The IGN ${duplicateCharacter} is already assigned to another member.`), { status: 409 });
+    touchedMemberIds.add(member.id);
     // Tracker participation is automatic for every registered character.
     const characterRosterChanged = raw?.characterRosterChanged === true;
     if (index >= 0) {
@@ -264,7 +278,9 @@ function applyMemberDirectoryIntents(previous, next, rawIntents, session, adminO
 
   next.settings = nextSettings;
   next.settings.memberDirectory = currentMembers;
-  next.settings.rosters = projectDirectoryRosters(currentMembers, oldRosters);
+  // Admin Mode can reconcile every Member Roster projection. A member save is
+  // deliberately scoped to the specific member IDs present in its approved intents.
+  next.settings.rosters = projectDirectoryRosters(currentMembers, oldRosters, adminOverride ? null : touchedMemberIds);
   next.settings.characterJobs = jobs;
   const now = Date.now();
   next.settings.memberDirectoryUpdatedAt = now;

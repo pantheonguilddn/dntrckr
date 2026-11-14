@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-echo Deploying Pantheon Tools v1.6.9-r15 to the existing dntrckr Cloudflare Pages project.
+echo Deploying Pantheon Tools v1.6.9-r16 to the existing dntrckr Cloudflare Pages project.
 echo Make sure you have run "npx wrangler login" at least once.
 echo.
 npx wrangler pages deploy . --project-name=dntrckr
