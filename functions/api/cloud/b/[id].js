@@ -375,6 +375,23 @@ export async function onRequestPut(context) {
         // syncs cannot erase another member's timestamps. A newer history-clear marker always wins.
         next.settings = next.settings && typeof next.settings === 'object' ? next.settings : {};
         const adminOverride = context.data?.session?.role === 'admin' && request.headers.get('X-Pantheon-Admin-Mode') === '1';
+        // Guild Hub background is a shared visual preference. Only an authenticated
+        // administrator in Admin View can change it; ordinary member syncs always keep
+        // the server's committed style, even when their browser has a stale local copy.
+        const allowedGuildHubBackgrounds = new Set(['pantheon','wing','aurora','constellation','flow','orbit','minimal']);
+        const previousHubBackground = String(previous?.settings?.guildHubBackground || 'pantheon');
+        const previousHubBackgroundAt = Number(previous?.settings?.guildHubBackgroundUpdatedAt) || 0;
+        const incomingHubBackground = String(next.settings.guildHubBackground || '');
+        const incomingHubBackgroundAt = Number(next.settings.guildHubBackgroundUpdatedAt) || 0;
+        if (adminOverride && allowedGuildHubBackgrounds.has(incomingHubBackground) && incomingHubBackgroundAt > previousHubBackgroundAt) {
+          next.settings.guildHubBackground = incomingHubBackground;
+          next.settings.guildHubBackgroundUpdatedAt = incomingHubBackgroundAt;
+          next.settings.guildHubBackgroundUpdatedBy = String(context.data?.session?.discordId || '').slice(0, 100);
+        } else {
+          next.settings.guildHubBackground = allowedGuildHubBackgrounds.has(previousHubBackground) ? previousHubBackground : 'pantheon';
+          next.settings.guildHubBackgroundUpdatedAt = previousHubBackgroundAt;
+          next.settings.guildHubBackgroundUpdatedBy = String(previous?.settings?.guildHubBackgroundUpdatedBy || '');
+        }
         // The Class / Job Catalog is append-only and administrator-owned. Member syncs,
         // stale pre-catalog clients, and older admin tabs cannot erase committed entries.
         const previousCatalog = obj(previous?.settings?.classJobCatalog);

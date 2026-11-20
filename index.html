@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r37</title>
+    <title>Pantheon Tools v1.6.9-r38</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4360,9 +4360,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r37</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r38</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r37:</strong> The Pantheon emblem background now fades smoothly into the Guild Hub card with theme-matched gradients and a soft ambient glow, avoiding a visible image edge.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r38:</strong> The Guild Hub now uses a slow, theme-aware smoke swirl instead of the yellow accent haze. Background selection is a shared admin-only setting.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -5704,7 +5704,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 weeklyArchive: {},
                 completionTiming: {},
                 scholarship: { cheean: { logs: {} }, bio: { logs: {} }, idontheal: { logs: {} } },
-                settings: { uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, classJobCatalog: { classes: [], jobs: [], updatedAt: 0, updatedBy: '' }, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
+                settings: { guildHubBackground: 'pantheon', guildHubBackgroundUpdatedAt: 0, guildHubBackgroundUpdatedBy: '', uiTextOverrides: {}, uiTextOverridesUpdatedAt: 0, uiTextOverridesUpdatedBy: '', analyticsTrackingEnabled: false, analyticsTrackingUpdatedAt: 0, analyticsTrackingUpdatedBy: '', analyticsHistoryClearedAt: 0, analyticsHistoryClearedBy: '', rateUpEvents: createDefaultRateUpEvents(), rateUpEventsUpdatedAt: 0, rateUpEventsUpdatedBy: '', lootWeights: { ...DEFAULT_LOOT_WEIGHTS }, lootWeightUpdatedAt: {}, rosters: [], rosterUpdatedAt: 0, rosterUpdatedBy: '', memberDirectory: [], memberDirectoryUpdatedAt: 0, memberDirectoryUpdatedBy: '', memberRosterMasterVersion: 0, memberResetMarkers: {}, categories: [], categoriesUpdatedAt: 0, categoriesUpdatedBy: '', characterJobs: {}, classJobCatalog: { classes: [], jobs: [], updatedAt: 0, updatedBy: '' }, jobProfiles: JSON.parse(JSON.stringify(DEFAULT_JOB_PROFILES)), jobProfilesUpdatedAt: 0, jobProfilesUpdatedBy: '', activityReferenceProfiles: [], activityReferenceProfilesUpdatedAt: 0, activityReferenceProfilesUpdatedBy: '', extraDungeonTasks: [], extraDungeonTasksUpdatedAt: 0, extraDungeonTasksUpdatedBy: '', defaultExcludedTasks: [], defaultExcludedTasksUpdatedAt: 0, defaultExcludedTasksUpdatedBy: '', teamBuilder: createEmptyTeamBuilder(), versionControl: { lastCheckpointAt: 0, lastCheckpointBy: '', lastCheckpointLabel: '', lastCheckpointKind: '', lastVersionedWriteAt: 0, lastGlobalSignature: '', globalBaselineSignature: '', revisionBinId: '', revisionBinUpdatedAt: 0, revisionBinUpdatedBy: '', versioningEnabled: true, history: [] } },
                 lastDailyReset: getTargetResetTimeUTC(false),
                 lastWeeklyReset: getTargetResetTimeUTC(true),
                 updatedAt: 0
@@ -5930,6 +5930,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             const editNameButton = document.getElementById('overview-edit-name');
             if (editNameButton) editNameButton.hidden = !getAuthenticatedMemberDirectoryEntry() || isAdminViewAsActive();
             if (!adminToolsVisible) document.body.classList.remove('drawer-open');
+            try { window.dispatchEvent(new Event('pantheon-admin-mode-changed')); } catch (_) {}
         }
         async function toggleAdminView() {
             if (!isPantheonAdmin()) return;
@@ -6636,6 +6637,10 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             if (source.syncInfo && typeof source.syncInfo === 'object') norm.syncInfo = { operationId:String(source.syncInfo.operationId || ''), by:String(source.syncInfo.by || ''), at:Number(source.syncInfo.at) || 0 };
 
             const sets = safeObject(source.settings);
+            const hubBackgroundOptions = new Set(['pantheon','wing','aurora','constellation','flow','orbit','minimal']);
+            norm.settings.guildHubBackground = hubBackgroundOptions.has(String(sets.guildHubBackground || '')) ? String(sets.guildHubBackground) : 'pantheon';
+            norm.settings.guildHubBackgroundUpdatedAt = Number(sets.guildHubBackgroundUpdatedAt) || 0;
+            norm.settings.guildHubBackgroundUpdatedBy = String(sets.guildHubBackgroundUpdatedBy || '');
             norm.settings.classJobCatalog = applyClassJobCatalog(sets.classJobCatalog);
             norm.settings.uiTextOverrides = Object.fromEntries(Object.entries(safeObject(sets.uiTextOverrides)).slice(0,300).map(([key,value]) => [String(key).slice(0,600), String(value ?? '').slice(0,2000)]));
             norm.settings.uiTextOverridesUpdatedAt = Number(sets.uiTextOverridesUpdatedAt) || 0;
@@ -6756,7 +6761,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 return data;
             } catch (e) { return createEmptyData(); }
         }
-        function persistLocalData() { cloudData.schemaVersion = APP_SCHEMA_VERSION; cloudData.updatedAt = Date.now(); localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(cloudData)); }
+        function persistLocalData() { cloudData.schemaVersion = APP_SCHEMA_VERSION; cloudData.updatedAt = Date.now(); localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(cloudData)); try { window.dispatchEvent(new Event('pantheon-cloud-data-persisted')); } catch (_) {} }
         // Cloudflare edition: every authorized member uses the same server-managed D1 records.
         // No JSONBin key is stored in browsers. The same-origin session cookie authenticates API calls.
         const PANTHEON_MAIN_RECORD_ID = 'pantheon-main';
@@ -6824,6 +6829,16 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             const local = normalizeData(localRecord);
             const remote = normalizeData(remoteRecord);
             const merged = createEmptyData();
+
+            // Guild Hub appearance is a shared admin-owned preference. Resolve it by its
+            // own timestamp so a member's stale browser cache cannot reset the guild design.
+            const lHubAt = Number(local.settings.guildHubBackgroundUpdatedAt) || 0;
+            const rHubAt = Number(remote.settings.guildHubBackgroundUpdatedAt) || 0;
+            const hubSrc = lHubAt > rHubAt || (lHubAt === rHubAt && String(local.settings.guildHubBackgroundUpdatedBy || '') > String(remote.settings.guildHubBackgroundUpdatedBy || '')) ? local.settings : remote.settings;
+            const allowedHubBackgrounds = new Set(['pantheon','wing','aurora','constellation','flow','orbit','minimal']);
+            merged.settings.guildHubBackground = allowedHubBackgrounds.has(String(hubSrc.guildHubBackground || '')) ? String(hubSrc.guildHubBackground) : 'pantheon';
+            merged.settings.guildHubBackgroundUpdatedAt = Math.max(lHubAt, rHubAt);
+            merged.settings.guildHubBackgroundUpdatedBy = String(hubSrc.guildHubBackgroundUpdatedBy || '');
 
             // Shared Rate-Up settings are admin-owned. Resolve them by their own timestamp,
             // rather than allowing an older browser cache to reset a newer schedule.
@@ -13613,7 +13628,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r37';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r38';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14353,7 +14368,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r37';
+  const CURRENT_BUILD = '1.6.9-r38';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14591,28 +14606,48 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    header.innerHTML=`<div><div class="pantheon-r20-page-kicker">GUILD WORKSPACE / OVERVIEW</div><h1 class="pantheon-r20-page-title" id="r20-welcome-title">Welcome back.</h1><p class="pantheon-r20-page-sub">Your guild at a glance. Review last week's results and this week's remaining bounty work.</p></div><div class="pantheon-r20-head-actions"><button type="button" class="btn" id="r20-compact-toggle">Compact view</button></div>`;
    const hero=document.createElement('section');hero.className='pantheon-r20-hero';hero.setAttribute('aria-label','Pantheon guild hub');
    hero.innerHTML=`<div class="pantheon-r20-hero-copy"><div class="pantheon-r20-page-kicker">PANTHEON GUILD HUB</div><h2>One place for the whole guild.</h2><p>Character registrations, weekly progress, party planning, and guild resources in one shared workspace.</p><div class="pantheon-r20-hero-meta"><span class="pantheon-r20-meta-tag">SEA · Guild workspace</span><span class="pantheon-r20-meta-tag">Shared roster</span><span class="pantheon-r20-meta-tag">Weekly cycle active</span></div></div>`;
-   // Each browser can choose its own Guild Hub decoration. This preference is intentionally local-only.
-   const hubBackgroundKey='pantheon-guild-hub-background-v1';
+   // Guild Hub background is a shared admin-owned preference stored in the existing
+   // settings object. Members see the committed choice but cannot change it.
    const hubBackgroundOptions=['pantheon','wing','aurora','constellation','flow','orbit','minimal'];
    let hubBackground='pantheon';
-   try{
-     let saved=localStorage.getItem(hubBackgroundKey);
-     // r33's default was Wing facets. Promote that default to the uploaded Pantheon emblem,
-     // while preserving an explicitly chosen alternative background style.
-     if(saved==='wing'){saved='pantheon';localStorage.setItem(hubBackgroundKey,saved);}
-     if(hubBackgroundOptions.includes(saved))hubBackground=saved;
-   }catch(_){}
-   hero.dataset.hubBackground=hubBackground;
    const hubBackgroundControl=document.createElement('div');
    hubBackgroundControl.className='pantheon-hub-background-control';
-   hubBackgroundControl.innerHTML=`<label for="pantheon-hub-background-select">Card background</label><select id="pantheon-hub-background-select" aria-label="Choose Guild Hub card background"><option value="pantheon">Pantheon emblem</option><option value="wing">Wing facets</option><option value="aurora">Aurora glow</option><option value="constellation">Constellation</option><option value="flow">Flow lines</option><option value="orbit">Orbit rings</option><option value="minimal">Minimal</option></select>`;
+   hubBackgroundControl.innerHTML=`<span class="pantheon-hub-background-label">Guild Hub appearance</span><label for="pantheon-hub-background-select">Background</label><select id="pantheon-hub-background-select" aria-label="Choose shared Guild Hub card background"><option value="pantheon">Pantheon emblem</option><option value="wing">Wing facets</option><option value="aurora">Aurora glow</option><option value="constellation">Constellation</option><option value="flow">Flow lines</option><option value="orbit">Orbit rings</option><option value="minimal">Minimal</option></select><span class="pantheon-hub-background-admin-note">Admin View only · shared with guild</span>`;
    const hubBackgroundSelect=hubBackgroundControl.querySelector('select');
-   hubBackgroundSelect.value=hubBackground;
+   function canEditGuildHubBackground(){
+     try{return typeof isAdminModeActive==='function' && isAdminModeActive() && !(typeof isAdminViewAsActive==='function' && isAdminViewAsActive());}
+     catch(_){return false;}
+   }
+   function applyGuildHubBackground(value){
+     const next=hubBackgroundOptions.includes(String(value||''))?String(value):'pantheon';
+     hubBackground=next;hero.dataset.hubBackground=next;
+     if(hubBackgroundSelect)hubBackgroundSelect.value=next;
+   }
+   function syncGuildHubBackground(){
+     const saved=cloudData?.settings?.guildHubBackground;
+     applyGuildHubBackground(saved);
+     const canEdit=canEditGuildHubBackground();
+     hubBackgroundControl.hidden=!canEdit;
+     hubBackgroundSelect.disabled=!canEdit;
+     hubBackgroundControl.setAttribute('aria-hidden',String(!canEdit));
+   }
+   syncGuildHubBackground();
    hubBackgroundSelect.addEventListener('change',()=>{
+     if(!canEditGuildHubBackground()){
+       syncGuildHubBackground();
+       return;
+     }
      const next=hubBackgroundOptions.includes(hubBackgroundSelect.value)?hubBackgroundSelect.value:'pantheon';
-     hero.dataset.hubBackground=next;
-     try{localStorage.setItem(hubBackgroundKey,next);}catch(_){}
+     cloudData.settings.guildHubBackground=next;
+     cloudData.settings.guildHubBackgroundUpdatedAt=Math.max(Date.now(),Number(cloudData.settings.guildHubBackgroundUpdatedAt)||0)+1;
+     cloudData.settings.guildHubBackgroundUpdatedBy=String(pantheonDiscordUser?.id||'admin');
+     applyGuildHubBackground(next);
+     if(typeof triggerAutoSync==='function')triggerAutoSync();
    });
+   window.addEventListener('pantheon-admin-mode-changed',syncGuildHubBackground);
+   window.addEventListener('pantheon-cloud-data-persisted',syncGuildHubBackground);
+   // Soft smoke is a decorative layer, not part of the uploaded emblem asset.
+   const hubSmoke=document.createElement('span');hubSmoke.className='pantheon-hub-smoke';hubSmoke.setAttribute('aria-hidden','true');hero.appendChild(hubSmoke);
    // The selector is inserted only after the hero is attached to the Overview DOM.
    const stats=document.createElement('section');stats.className='pantheon-r20-stat-grid pantheon-r22-stat-grid';stats.setAttribute('aria-label','Previous week and bounty statistics');
    const specs=[
@@ -15493,6 +15528,88 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   .pantheon-hub-background-control select{min-width:0!important;max-width:58%!important;flex:0 1 58%!important}
   .pantheon-r20-hero[data-hub-background="pantheon"]::before{width:70%!important;background-size:auto 92%!important;background-position:right center!important;opacity:.68!important}
   .pantheon-r20-hero[data-hub-background="pantheon"]::after{background:radial-gradient(ellipse at 84% 50%,color-mix(in srgb,var(--r20-accent) 5%,transparent),transparent 70%),linear-gradient(90deg,color-mix(in srgb,var(--r20-panel2) 28%,transparent),transparent 78%)!important;opacity:.9!important}
+}
+</style>
+
+
+<style id="pantheon-r38-admin-owned-smoke-background">
+/* The old accent radial haze could read as a yellow smear in some themes. Replace it
+   with restrained, slow-moving smoke that borrows each theme's own palette. */
+.pantheon-r20-hero[data-hub-background="pantheon"]::after{
+  background:
+    linear-gradient(90deg,var(--r20-panel2) 0%,color-mix(in srgb,var(--r20-panel2) 92%,transparent) 18%,color-mix(in srgb,var(--r20-panel) 54%,transparent) 42%,transparent 76%),
+    linear-gradient(0deg,color-mix(in srgb,var(--r20-panel) 26%,transparent),transparent 25%,transparent 76%,color-mix(in srgb,var(--r20-panel2) 18%,transparent))!important;
+  opacity:.82!important;
+}
+.pantheon-r20-hero[data-hub-background="pantheon"] .pantheon-r20-hero-copy{z-index:2!important}
+.pantheon-hub-smoke{
+  --hub-smoke-a:rgba(148,166,194,.22);
+  --hub-smoke-b:rgba(111,132,165,.16);
+  --hub-smoke-c:rgba(191,201,218,.12);
+  position:absolute!important;z-index:1!important;pointer-events:none!important;
+  top:4%!important;right:5%!important;width:52%!important;height:92%!important;
+  display:none;overflow:visible!important;opacity:.72!important;
+  filter:blur(9px)!important;mix-blend-mode:screen!important;
+}
+.pantheon-r20-hero[data-hub-background="pantheon"]>.pantheon-hub-smoke{display:block!important}
+.pantheon-hub-smoke::before,.pantheon-hub-smoke::after{
+  content:""!important;position:absolute!important;inset:7% 2%!important;display:block!important;
+  border:0!important;border-radius:48% 52% 58% 42%!important;box-shadow:none!important;
+  background:
+    conic-gradient(from 190deg at 52% 48%,transparent 0deg,color-mix(in srgb,var(--hub-smoke-a) 72%,transparent) 48deg,transparent 94deg,color-mix(in srgb,var(--hub-smoke-b) 88%,transparent) 148deg,transparent 218deg,color-mix(in srgb,var(--hub-smoke-c) 84%,transparent) 282deg,transparent 360deg),
+    radial-gradient(ellipse at 67% 38%,var(--hub-smoke-a) 0%,transparent 48%),
+    radial-gradient(ellipse at 38% 67%,var(--hub-smoke-b) 0%,transparent 54%)!important;
+  -webkit-mask-image:radial-gradient(ellipse at 58% 50%,#000 0%,rgba(0,0,0,.82) 38%,rgba(0,0,0,.34) 60%,transparent 82%)!important;
+  mask-image:radial-gradient(ellipse at 58% 50%,#000 0%,rgba(0,0,0,.82) 38%,rgba(0,0,0,.34) 60%,transparent 82%)!important;
+  filter:blur(19px)!important;opacity:.48!important;
+  animation:pantheon-smoke-melt 46s ease-in-out infinite alternate!important;
+}
+.pantheon-hub-smoke::after{
+  inset:16% 12% 1% 4%!important;border-radius:62% 38% 47% 53%!important;
+  background:
+    conic-gradient(from 35deg at 55% 55%,transparent 0deg,color-mix(in srgb,var(--hub-smoke-b) 80%,transparent) 54deg,transparent 118deg,color-mix(in srgb,var(--hub-smoke-c) 74%,transparent) 196deg,transparent 260deg,color-mix(in srgb,var(--hub-smoke-a) 74%,transparent) 315deg,transparent 360deg),
+    radial-gradient(ellipse at 46% 43%,var(--hub-smoke-c) 0%,transparent 50%)!important;
+  filter:blur(25px)!important;opacity:.38!important;
+  animation:pantheon-smoke-drift 62s ease-in-out infinite alternate!important;
+}
+@keyframes pantheon-smoke-melt{
+  0%{transform:translate3d(2%,1%,0) rotate(-8deg) scale(.96,.92);opacity:.26}
+  45%{transform:translate3d(-2%,-2%,0) rotate(7deg) scale(1.06,1.02);opacity:.52}
+  100%{transform:translate3d(-5%,3%,0) rotate(17deg) scale(.98,1.08);opacity:.20}
+}
+@keyframes pantheon-smoke-drift{
+  0%{transform:translate3d(2%,4%,0) rotate(14deg) scale(.92,1.04);opacity:.18}
+  50%{transform:translate3d(-3%,-2%,0) rotate(-8deg) scale(1.08,.92);opacity:.42}
+  100%{transform:translate3d(1%,-5%,0) rotate(-22deg) scale(.96,1.12);opacity:.16}
+}
+:root[data-pantheon-theme="light"] .pantheon-hub-smoke{
+  --hub-smoke-a:rgba(101,139,190,.24);--hub-smoke-b:rgba(127,159,204,.18);--hub-smoke-c:rgba(175,198,228,.18);
+  mix-blend-mode:soft-light!important;opacity:.66!important;
+}
+:root[data-pantheon-theme="eye-comfort"] .pantheon-hub-smoke{
+  --hub-smoke-a:rgba(127,145,121,.20);--hub-smoke-b:rgba(157,165,137,.16);--hub-smoke-c:rgba(188,185,157,.13);
+  mix-blend-mode:soft-light!important;opacity:.58!important;
+}
+:root[data-pantheon-theme="pastel"] .pantheon-hub-smoke{
+  --hub-smoke-a:rgba(158,145,205,.24);--hub-smoke-b:rgba(137,164,213,.20);--hub-smoke-c:rgba(205,178,220,.16);
+  mix-blend-mode:soft-light!important;opacity:.67!important;
+}
+:root[data-pantheon-theme="dark"] .pantheon-hub-smoke{mix-blend-mode:screen!important;opacity:.62!important}
+.pantheon-hub-background-control[hidden]{display:none!important}
+.pantheon-hub-background-control{
+  width:100%!important;max-width:none!important;justify-content:flex-end!important;
+  flex-wrap:wrap!important;margin:0 0 14px!important;padding:7px 10px!important;
+}
+.pantheon-hub-background-label{font-size:10px!important;font-weight:850!important;letter-spacing:.06em!important;text-transform:uppercase!important;color:var(--r20-text)!important;margin-right:auto!important}
+.pantheon-hub-background-admin-note{font-size:9px!important;color:var(--r20-muted)!important;white-space:nowrap!important}
+@media(max-width:620px){
+  .pantheon-hub-background-control{justify-content:space-between!important;gap:6px!important}
+  .pantheon-hub-background-label{width:100%!important}
+  .pantheon-hub-background-admin-note{width:100%!important;white-space:normal!important}
+  .pantheon-hub-smoke{right:1%!important;width:62%!important;opacity:.54!important;filter:blur(12px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .pantheon-hub-smoke::before,.pantheon-hub-smoke::after{animation:none!important;opacity:.18!important;transform:none!important}
 }
 </style>
 

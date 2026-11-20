@@ -93,6 +93,9 @@ const KEY_MAP = Object.freeze({
   "defaultExcludedTasksUpdatedAt": "~ap",
   "defaultExcludedTasksUpdatedBy": "~aq",
   "classJobCatalog": "~ar",
+  "guildHubBackground": "~au",
+  "guildHubBackgroundUpdatedAt": "~av",
+  "guildHubBackgroundUpdatedBy": "~aw",
   "discordLinkArchivedAt": "~as",
   "discordLinkArchivedBy": "~at"
 });
