@@ -13770,7 +13770,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r50';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r51';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14510,7 +14510,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r50'; // Keep in sync with PANTHEON_TOOLS_VERSION and /version.json.
+  const CURRENT_BUILD = '1.6.9-r51'; // Keep in sync with PANTHEON_TOOLS_VERSION and /version.json.
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -15755,8 +15755,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 }
 </style>
 
-<style id="pantheon-r50-tracker-focus-guide">
-/* Balanced, theme-aware inversion for the selected dungeon label/category and character column. */
+<style id="pantheon-r51-tracker-focus-guide">
+/* Theme-aware Focus Guide: full inversion on labels/header/footer, faint wash through the selected task column. */
 :root[data-pantheon-theme="dark"]{
   --tracker-guide-inverse-bg:#eef3ff;
   --tracker-guide-inverse-ink:#18233a;
@@ -15801,9 +15801,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   --tracker-guide-check:#f1d8ff;
   --tracker-guide-column-wash:rgba(157,126,184,.15);
 }
-/* Fully invert the matching dungeon label/category, selected IGN header,
-   every cell in that character's column (including main-character/status cells),
-   and that character's Weekly Completion Rate cell. */
+/* Fully invert only the matching dungeon label/category, selected IGN header,
+   and the matching Weekly Completion Rate cell. Task cells between the two column
+   endpoints use the faint, status-preserving vertical path below. */
 :root[data-pantheon-theme] #dn-tracker td.task-name.tracker-guide-row-cell,
 :root[data-pantheon-theme] #dn-tracker td.col-category.tracker-guide-row-cell,
 :root[data-pantheon-theme] #dn-tracker #header-row th.char-col.tracker-guide-column,
@@ -15817,37 +15817,26 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   box-shadow:inset 0 1px var(--tracker-guide-inverse-border,#9cb4e8),inset 0 -1px var(--tracker-guide-inverse-border,#9cb4e8)!important;
   text-shadow:none!important;
 }
-/* Apply the same complete inverse to all task cells in the selected column.
-   Double-ID specificity intentionally outranks the legacy main-character and
-   done/marked/reset/excluded status rules that otherwise restore their fills. */
-#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column{
-  background:var(--tracker-guide-inverse-bg,#253651)!important;
-  background-color:var(--tracker-guide-inverse-bg,#253651)!important;
-  background-image:none!important;
-  color:var(--tracker-guide-inverse-ink,#fff)!important;
-  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
-  border-left:2px solid var(--tracker-guide-inverse-border,#91a7d8)!important;
-  border-right:2px solid var(--tracker-guide-inverse-border,#91a7d8)!important;
-  text-shadow:none!important;
+/* The cells between the IGN header and completion footer are a faint vertical guide,
+   not an inversion. A translucent inset overlay preserves done/marked/reset/N/A fills,
+   main-character styling, checkbox colors, and existing cell text. */
+#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column-path:not(.tracker-guide-cell){
+  box-shadow:inset 0 0 0 9999px var(--tracker-guide-column-wash,rgba(117,151,215,.14))!important;
 }
-#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column *{
-  color:var(--tracker-guide-inverse-ink,#fff)!important;
-  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
-  text-shadow:none!important;
+/* Keep the main-character side rails visible while applying the same faint column wash. */
+#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column-path.is-main-character:not(.tracker-guide-cell){
+  box-shadow:inset 2px 0 rgba(212,172,66,.72),inset -2px 0 rgba(212,172,66,.72),inset 0 0 0 9999px var(--tracker-guide-column-wash,rgba(117,151,215,.14))!important;
 }
-#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column input[type="checkbox"]{
-  accent-color:var(--tracker-guide-check,#d7e5ff)!important;
-  filter:none!important;
+/* Marked/reset cells keep their status outline above the faint vertical wash. */
+#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column-path.marked:not(.tracker-guide-cell),
+#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column-path.reset:not(.tracker-guide-cell){
+  box-shadow:inset 0 0 0 1px var(--pt-accent),inset 0 0 0 9999px var(--tracker-guide-column-wash,rgba(117,151,215,.14))!important;
 }
-#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column .bounty-input{
-  background:color-mix(in srgb,var(--tracker-guide-inverse-bg,#253651) 82%,#000)!important;
-  color:var(--tracker-guide-inverse-ink,#fff)!important;
-  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
-  border-color:var(--tracker-guide-inverse-border,#91a7d8)!important;
-}
-#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column .bounty-input::placeholder{
-  color:var(--tracker-guide-inverse-muted,#e6edff)!important;
-  -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
+/* If a main-character cell is also marked/reset, retain both the gold side rails
+   and its status outline above the translucent column wash. */
+#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column-path.is-main-character.marked:not(.tracker-guide-cell),
+#dn-tracker #tracker-body td.interactive-cell.tracker-guide-column-path.is-main-character.reset:not(.tracker-guide-cell){
+  box-shadow:inset 2px 0 rgba(212,172,66,.72),inset -2px 0 rgba(212,172,66,.72),inset 0 0 0 1px var(--pt-accent),inset 0 0 0 9999px var(--tracker-guide-column-wash,rgba(117,151,215,.14))!important;
 }
 #dn-tracker #footer-row th.char-col.tracker-guide-column{
   background:var(--tracker-guide-inverse-bg,#253651)!important;
@@ -15861,7 +15850,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 }
 /* Non-selected character cells on the active dungeon row keep their existing status
    colors, with only a faint theme-accent overlay to guide the eye across the row. */
-#dn-tracker td.interactive-cell.tracker-guide-row-soft-cell:not(.tracker-guide-column):not(.tracker-guide-cell){
+#dn-tracker td.interactive-cell.tracker-guide-row-soft-cell:not(.tracker-guide-column-path):not(.tracker-guide-cell){
   background-image:linear-gradient(
     color-mix(in srgb,var(--pt-accent) 14%,transparent),
     color-mix(in srgb,var(--pt-accent) 14%,transparent)
@@ -15869,7 +15858,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   border-top-color:color-mix(in srgb,var(--pt-accent) 24%,var(--pt-border))!important;
   border-bottom-color:color-mix(in srgb,var(--pt-accent) 24%,var(--pt-border))!important;
 }
-/* Task/category labels, IGN header, selected task column, and completion footer use the inverse palette. */
+/* Task/category labels, selected IGN header, and completion footer use the inverse palette. */
 :root[data-pantheon-theme] #dn-tracker td.task-name.tracker-guide-row-cell *,
 :root[data-pantheon-theme] #dn-tracker td.col-category.tracker-guide-row-cell *,
 :root[data-pantheon-theme] #dn-tracker #header-row th.char-col.tracker-guide-column *,
@@ -15882,23 +15871,6 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 #dn-tracker #header-row th.char-col.tracker-guide-column .tracker-char-star{
   color:var(--tracker-guide-inverse-muted,#e6edff)!important;
   -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
-}
-/* Native checkboxes and bounty text fields remain readable on the inverted path. */
-#dn-tracker td.interactive-cell.tracker-guide-row-cell input[type="checkbox"],
-#dn-tracker td.interactive-cell.tracker-guide-column input[type="checkbox"]{
-  accent-color:var(--tracker-guide-check,#d7e5ff)!important;
-  filter:none!important;
-}
-#dn-tracker td.interactive-cell.tracker-guide-row-cell .bounty-input{
-  background:color-mix(in srgb,var(--tracker-guide-inverse-bg,#253651) 72%,#000)!important;
-  color:var(--tracker-guide-inverse-ink,#fff)!important;
-  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
-  border-color:var(--tracker-guide-inverse-border,#9cb4e8)!important;
-}
-#dn-tracker td.interactive-cell.tracker-guide-row-cell .bounty-input::placeholder{
-  color:var(--tracker-guide-inverse-muted,#e6edff)!important;
-  -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
-  opacity:.9!important;
 }
 /* Exact intersection is brighter, heavier, and visually distinct from the rest of the path. */
 #dn-tracker #tracker-body td.interactive-cell.tracker-guide-cell{
@@ -15927,19 +15899,19 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 }
 </style>
 
-<script id="pantheon-r50-tracker-focus-guide-runtime">
+<script id="pantheon-r51-tracker-focus-guide-runtime">
 (() => {
   const table = document.getElementById('dn-tracker');
   const tbody = document.getElementById('tracker-body');
   const wrap = document.getElementById('tracker-table-wrap');
-  if (!table || !tbody || !wrap || tbody.dataset.r49FocusGuideBound === '1') return;
-  tbody.dataset.r49FocusGuideBound = '1';
+  if (!table || !tbody || !wrap || tbody.dataset.r51FocusGuideBound === '1') return;
+  tbody.dataset.r51FocusGuideBound = '1';
 
   let pinned = false;
   let currentCell = null;
   function clearClasses() {
-    table.querySelectorAll('.tracker-guide-row,.tracker-guide-row-cell,.tracker-guide-row-soft-cell,.tracker-guide-column,.tracker-guide-cell').forEach(node => {
-      node.classList.remove('tracker-guide-row','tracker-guide-row-cell','tracker-guide-row-soft-cell','tracker-guide-column','tracker-guide-cell');
+    table.querySelectorAll('.tracker-guide-row,.tracker-guide-row-cell,.tracker-guide-row-soft-cell,.tracker-guide-column,.tracker-guide-column-path,.tracker-guide-cell').forEach(node => {
+      node.classList.remove('tracker-guide-row','tracker-guide-row-cell','tracker-guide-row-soft-cell','tracker-guide-column','tracker-guide-column-path','tracker-guide-cell');
     });
     currentCell = null;
   }
@@ -15967,7 +15939,12 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
       });
     }
     if (charName) {
-      table.querySelectorAll('td.interactive-cell[data-char],#header-row th.char-col[data-char],#footer-row th.char-col[data-char]').forEach(node => {
+      // Task cells between the IGN and completion footer receive only a faint path.
+      table.querySelectorAll('#tracker-body td.interactive-cell[data-char]').forEach(node => {
+        if (node.dataset.char === charName) node.classList.add('tracker-guide-column-path');
+      });
+      // The IGN header and matching Weekly Completion Rate cell receive full inversion.
+      table.querySelectorAll('#header-row th.char-col[data-char],#footer-row th.char-col[data-char]').forEach(node => {
         if (node.dataset.char === charName) node.classList.add('tracker-guide-column');
       });
     }
