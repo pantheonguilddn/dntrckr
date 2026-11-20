@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r21</title>
+    <title>Pantheon Tools v1.6.9-r23</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4180,9 +4180,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r21</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r23</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r21:</strong> Separates the Weekly Tracker and Bounty Board into dedicated tabs, moves Guild Forum and Salary Calculator to the side rail, and streamlines the account area and compact view. No tracking data or sync behavior is changed.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r23:</strong> Refines the Overview to show the five requested previous-week and bounty metrics, expands account space, standardizes Tracker tabs, and retunes Clean, Eye Comfort, and Pastel palettes. Guild Forum and Salary Calculator remain full workspace pages. No tracking data or sync behavior is changed.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -13162,7 +13162,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r21';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r23';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13673,6 +13673,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 tracker: document.getElementById('tracker-page'),
                 'team-builder': document.getElementById('team-builder-page'),
                 'card-wiki': document.getElementById('card-wiki-page'),
+                'guild-forum': document.getElementById('guild-forum-page'),
+                salary: document.getElementById('salary-page'),
                 'member-roster': document.getElementById('member-roster-page')
             };
             if (!pages[page]) page = 'tracker';
@@ -13695,7 +13697,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             if (page === 'team-builder') { populateTeamBuilderRosterFilter(); renderTeamBuilder(); history.replaceState(null, '', '#team-builder'); }
             else if (page === 'card-wiki') { initCardWiki(); history.replaceState(null, '', '#card-wiki'); }
             else if (page === 'member-roster') { renderMemberDirectory(); history.replaceState(null, '', '#member-roster'); }
-            else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster') history.replaceState(null, '', location.pathname + location.search);
+            else if (page === 'guild-forum') { history.replaceState(null, '', '#guild-forum'); if (typeof loadGuildForum === 'function') loadGuildForum(true); }
+            else if (page === 'salary') { history.replaceState(null, '', '#salary-calculator'); }
+            else if (location.hash === '#team-builder' || location.hash === '#card-wiki' || location.hash === '#member-roster' || location.hash === '#guild-forum' || location.hash === '#salary-calculator') history.replaceState(null, '', location.pathname + location.search);
             if (isAdminViewAsActive()) applyAdminPreviewReadOnly();
             startDeadlineModeRefresh();
             setTimeout(maybeOpenWeeklyReportAfterReset, 150);
@@ -13723,7 +13727,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             else if (route === '#version-history') { showAppPage('overview'); openVersionHistoryModal(); }
             else if (route === '#sync-now') { showAppPage('overview'); forceSync(true); }
             else if (route === '#landing-settings') { showAppPage('overview'); openLandingSettings(); }
-            else if (route === '#salary-calculator') { showAppPage('overview'); openSalaryModal(); }
+            else if (route === '#salary-calculator') { openSalaryModal(); }
+            else if (route === '#guild-forum') showAppPage('guild-forum');
             else if (route === '#ledger') { showAppPage('overview'); openScholarModal(); }
             else if (route === '#help') { showAppPage('overview'); openHelpModal('start'); }
             else if (route === '#team-builder') showAppPage('team-builder');
@@ -13897,7 +13902,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r21';
+  const CURRENT_BUILD = '1.6.9-r23';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14040,8 +14045,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="team-builder-page" title="Team Builder" aria-label="Team Builder"><span aria-hidden="true">⚔</span></button>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="card-wiki-page" title="Card Database" aria-label="Card Database"><span aria-hidden="true">◇</span></button>
   <div class="pantheon-r21-rail-divider" aria-hidden="true"></div>
-  <button class="pantheon-r20-rail-link" type="button" data-r21-action="forum" title="Guild Forum" aria-label="Guild Forum"><span aria-hidden="true">☷</span></button>
-  <button class="pantheon-r20-rail-link" type="button" data-r21-action="salary" title="Salary Calculator" aria-label="Salary Calculator"><span aria-hidden="true">▤</span></button>
+  <button class="pantheon-r20-rail-link" type="button" data-r20-page="guild-forum-page" title="Guild Forum" aria-label="Guild Forum"><span aria-hidden="true">☷</span></button>
+  <button class="pantheon-r20-rail-link" type="button" data-r20-page="salary-page" title="Salary Calculator" aria-label="Salary Calculator"><span aria-hidden="true">▤</span></button>
   <div class="pantheon-r21-rail-divider" aria-hidden="true"></div>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="member-roster-page" title="Member Roster" aria-label="Member Roster"><span aria-hidden="true">♙</span></button>
   <div class="pantheon-r20-rail-spacer"></div>
@@ -14056,8 +14061,6 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    syncRail();
  }));
  rail.querySelector('[data-r20-help]').addEventListener('click',()=>{if(typeof window.openHelpModal==='function')window.openHelpModal('start');});
- rail.querySelector('[data-r21-action="forum"]').addEventListener('click',()=>{if(typeof window.openGuildForum==='function')window.openGuildForum();});
- rail.querySelector('[data-r21-action="salary"]').addEventListener('click',()=>{if(typeof window.openSalaryModal==='function')window.openSalaryModal();});
  function syncRail(){
    const active=$$('.app-page').find(page=>!page.classList.contains('hidden-page'));
    rail.querySelectorAll('[data-r20-page]').forEach(button=>{
@@ -14127,21 +14130,24 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    search.addEventListener('input',updateRoster);tools.querySelectorAll('[data-r20-filter]').forEach(button=>button.addEventListener('click',()=>{activeFilter=button.dataset.r20Filter;tools.querySelectorAll('[data-r20-filter]').forEach(other=>other.setAttribute('aria-pressed',String(other===button)));updateRoster();}));
    new MutationObserver(updateRoster).observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});updateRoster();
  }
- // Overview now uses the reference mockup's page-header → hero → 4 stats → 2-panel composition.
+ // Overview: keep the approved page composition, but make the five requested KPIs authoritative.
  const overview=$('#overview-page');
  if(overview&&!overview.querySelector('.pantheon-r20-hero')){
-   const summary=$('#overview-insights-summary');
-   const statValue=(label)=>{const item=$$('.activity-insight-stat',summary||document).find(row=>$('.activity-insight-stat small',row)?.textContent?.toLowerCase().includes(label.toLowerCase()));return item?$('.activity-insight-stat strong',item)?.textContent?.trim()||'—':'—';};
-   const statDetail=(label)=>{const item=$$('.activity-insight-stat',summary||document).find(row=>$('.activity-insight-stat small',row)?.textContent?.toLowerCase().includes(label.toLowerCase()));return item?$('.activity-insight-stat span',item)?.textContent?.trim()||'':'No data yet';};
    const header=document.createElement('header');header.className='pantheon-r20-page-header';
-   header.innerHTML=`<div><div class="pantheon-r20-page-kicker">GUILD WORKSPACE / OVERVIEW</div><h1 class="pantheon-r20-page-title" id="r20-welcome-title">Welcome back.</h1><p class="pantheon-r20-page-sub">Your guild at a glance. Pick up where you left off, review progress, and keep your roster coordinated.</p></div><div class="pantheon-r20-head-actions"><button type="button" class="btn" id="r20-compact-toggle">Compact view</button><button type="button" class="btn btn-primary" id="r20-open-tracker">Open Tracker ↗</button></div>`;
+   header.innerHTML=`<div><div class="pantheon-r20-page-kicker">GUILD WORKSPACE / OVERVIEW</div><h1 class="pantheon-r20-page-title" id="r20-welcome-title">Welcome back.</h1><p class="pantheon-r20-page-sub">Your guild at a glance. Review last week's results and this week's remaining bounty work.</p></div><div class="pantheon-r20-head-actions"><button type="button" class="btn" id="r20-compact-toggle">Compact view</button><button type="button" class="btn btn-primary" id="r20-open-tracker">Open Tracker ↗</button></div>`;
    const hero=document.createElement('section');hero.className='pantheon-r20-hero';hero.setAttribute('aria-label','Pantheon guild hub');
-   hero.innerHTML=`<div class="pantheon-r20-hero-copy"><div class="pantheon-r20-page-kicker">PANTHEON GUILD HUB</div><h2>One place for the whole guild.</h2><p>Keep character registrations, weekly tasks, team compositions, and card references together without getting in the way of the game.</p><div class="pantheon-r20-hero-meta"><span class="pantheon-r20-meta-tag">SEA · Guild workspace</span><span class="pantheon-r20-meta-tag">Shared roster</span><span class="pantheon-r20-meta-tag">Weekly cycle active</span></div></div><div class="pantheon-r20-hero-side"><div class="pantheon-r20-week-widget"><div class="pantheon-r20-week-label">WEEKLY TRACKER</div><div class="pantheon-r20-week-number" id="r20-week-percent">—</div><div class="pantheon-r20-week-desc" id="r20-week-detail">Your weekly completion</div><div class="pantheon-r20-week-track"><span id="r20-week-bar"></span></div></div></div>`;
-   const stats=document.createElement('section');stats.className='pantheon-r20-stat-grid';stats.setAttribute('aria-label','Guild statistics');
-   const specs=[['Registered characters','♙','r20-stat-characters','Your registered characters'],['Online now','●','r20-stat-online','Presence updates live'],['Weekly tasks','▦','r20-stat-weekly','Eligible tasks completed'],['Bounty targets','⌖','r20-stat-bounties','Six target slots']];
-   stats.innerHTML=specs.map(([label,icon,id,foot])=>`<div class="pantheon-r20-stat-card"><div class="pantheon-r20-stat-top">${label}<span class="pantheon-r20-stat-icon">${icon}</span></div><div class="pantheon-r20-stat-value" id="${id}">—</div><div class="pantheon-r20-stat-foot">${foot}</div></div>`).join('');
+   hero.innerHTML=`<div class="pantheon-r20-hero-copy"><div class="pantheon-r20-page-kicker">PANTHEON GUILD HUB</div><h2>One place for the whole guild.</h2><p>Character registrations, weekly progress, party planning, and guild resources in one shared workspace.</p><div class="pantheon-r20-hero-meta"><span class="pantheon-r20-meta-tag">SEA · Guild workspace</span><span class="pantheon-r20-meta-tag">Shared roster</span><span class="pantheon-r20-meta-tag">Weekly cycle active</span></div></div>`;
+   const stats=document.createElement('section');stats.className='pantheon-r20-stat-grid pantheon-r22-stat-grid';stats.setAttribute('aria-label','Previous week and bounty statistics');
+   const specs=[
+     ['Registered Characters','♙','r22-stat-characters','Characters on your registered roster'],
+     ['Previous Completion Rate','↗','r22-stat-completion','Previous completed week · trend vs earlier week'],
+     ['Outlier Character','↘','r22-stat-outlier','Lowest completion in the previous week'],
+     ['Most Completed Character','★','r22-stat-most','Highest completion in the previous week'],
+     ['Remaining Bounties Undone','⌖','r22-stat-bounties','Open bounty slots across your characters']
+   ];
+   stats.innerHTML=specs.map(([label,icon,id,foot])=>`<div class="pantheon-r20-stat-card pantheon-r22-stat-card"><div class="pantheon-r20-stat-top"><span>${label}</span><span class="pantheon-r20-stat-icon" aria-hidden="true">${icon}</span></div><div class="pantheon-r20-stat-value" id="${id}">—</div><div class="pantheon-r20-stat-foot" id="${id}-detail">${foot}</div></div>`).join('');
    const panels=$('.overview-bottom-grid',overview);const activity=$('.overview-activity-panel',overview);const completion=$('.overview-completion-panel',overview);
-   const content=document.createElement('section');content.className='pantheon-r20-content-grid';content.setAttribute('aria-label','Guild activity and character completion');
+   const content=document.createElement('section');content.className='pantheon-r20-content-grid';content.setAttribute('aria-label','Activity insights and character completion');
    if(activity)content.appendChild(activity);if(completion)content.appendChild(completion);
    const originalHead=$('.overview-dashboard-head-r2',overview);const sectionTitle=$('.overview-section-title',overview);const toolsGrid=$('.overview-tools-grid',overview);
    if(originalHead){originalHead.hidden=true;originalHead.setAttribute('aria-hidden','true');}
@@ -14150,17 +14156,93 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    const name=$('#overview-profile-name');
    const syncWelcome=()=>{const value=name?.textContent?.trim();$('#r20-welcome-title').textContent=value&&value!=='Pantheon Member'?`Welcome back, ${value}.`:'Welcome back.';};
    if(name)new MutationObserver(syncWelcome).observe(name,{childList:true,subtree:true,characterData:true});syncWelcome();
-   $('#r20-open-tracker').addEventListener('click',()=>{if(typeof window.showAppPage==='function')window.showAppPage('tracker');syncRail();});
-   $('#r20-compact-toggle').addEventListener('click',()=>{document.body.classList.toggle('pantheon-r20-compact');const on=document.body.classList.contains('pantheon-r20-compact');$('#r20-compact-toggle').textContent=on?'Comfortable view':'Compact view';});
-   function updateStats(){
-     const chars=statValue('Tracked characters');const weekly=statValue('Weekly completion');const weeklyFoot=statDetail('Weekly completion');
-     $('#r20-stat-characters').textContent=chars;$('#r20-stat-weekly').textContent=weekly;
-     const users=$$('.online-presence-user',list||document);const online=users.filter(user=>!user.classList.contains('is-offline')).length;$('#r20-stat-online').textContent=String(online);
-     $('#r20-stat-bounties').textContent='06';$('#r20-week-percent').textContent=weekly;$('#r20-week-detail').textContent=weeklyFoot||'Weekly completion';
-     const n=parseInt(String(weekly).replace(/[^0-9-]/g,''),10);$('#r20-week-bar').style.width=Number.isFinite(n)?`${Math.max(0,Math.min(100,n))}%`:'0%';
+   $('#r20-open-tracker').addEventListener('click',()=>{if(typeof window.showAppPage==='function')window.showAppPage('tracker');});
+   $('#r20-compact-toggle').addEventListener('click',()=>{document.body.classList.toggle('pantheon-r20-compact');const on=document.body.classList.contains('pantheon-r20-compact');$('#r20-compact-toggle').textContent=on?'Full labels':'Compact labels';});
+   const summary=$('#overview-insights-summary');
+   function readSnapshotCharacter(archive,charName){
+     if(!archive||typeof archive!=='object')return null;
+     const fallbackOrder=typeof weeklyTaskNames!=='undefined'&&Array.isArray(weeklyTaskNames)?weeklyTaskNames:[];
+     const order=Array.isArray(archive.taskOrder)&&archive.taskOrder.length?archive.taskOrder:fallbackOrder;
+     const codes=String(archive.states?.[charName]||'');let done=0,eligible=0;
+     order.forEach((task,index)=>{
+       if((typeof isBountyTask==='function'&&isBountyTask(task))||(typeof isExtraDungeonExcludedFromCalculations==='function'&&isExtraDungeonExcludedFromCalculations(task)))return;
+       const code=codes[index]||'';
+       if(code==='d'){done++;eligible++;}else if(code==='m'){eligible++;}
+     });
+     // Legacy archives may have a saved rate without the compact state string.
+     // Preserve that rate for display, but keep its task count unknown rather than
+     // misrepresenting it as zero completed tasks.
+     if(!codes && archive.rates && Object.prototype.hasOwnProperty.call(archive.rates,charName) && Number.isFinite(Number(archive.rates[charName])))return {done:null,eligible:null,rate:Number(archive.rates[charName])};
+     return {done,eligible,rate:eligible?Math.round(done/eligible*100):null};
    }
-   if(summary)new MutationObserver(updateStats).observe(summary,{childList:true,subtree:true,characterData:true});
-   if(list)new MutationObserver(updateStats).observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});updateStats();
+   function previousWeekData(){
+     const owner=typeof getCurrentMemberDirectoryEntry==='function'?getCurrentMemberDirectoryEntry():null;
+     const names=[...new Map((owner?.characterProfiles||[]).filter(p=>p?.name).map(p=>[String(p.name).trim().toLocaleLowerCase(),String(p.name).trim()])).values()].filter(Boolean);
+     const archives=Object.entries(safeObject(cloudData?.weeklyArchive)).filter(([,a])=>a&&typeof a==='object').sort((a,b)=>Number(a[0])-Number(b[0]));
+     const latest=archives.length?archives[archives.length-1][1]:null;
+     const prior=archives.length>1?archives[archives.length-2][1]:null;
+     const validRate=x=>x&&x.rate!==null&&x.rate!==undefined&&Number.isFinite(Number(x.rate));
+     const rows=latest?names.map(name=>({name,...(readSnapshotCharacter(latest,name)||{})})).filter(validRate):[];
+     const summarize=archive=>{
+       if(!archive)return null;let done=0,eligible=0;const rates=[];
+       names.forEach(name=>{const x=readSnapshotCharacter(archive,name);if(!validRate(x))return;rates.push({name,rate:Number(x.rate),done:x.done!==null&&x.done!==undefined&&Number.isFinite(Number(x.done))?Number(x.done):null,eligible:x.eligible!==null&&x.eligible!==undefined&&Number.isFinite(Number(x.eligible))?Number(x.eligible):null});if(x.done!==null&&x.done!==undefined&&x.eligible!==null&&x.eligible!==undefined&&Number.isFinite(Number(x.done))&&Number.isFinite(Number(x.eligible))){done+=Number(x.done);eligible+=Number(x.eligible);}});
+       const rate=eligible?Math.round(done/eligible*100):(rates.length?Math.round(rates.reduce((n,x)=>n+x.rate,0)/rates.length):null);
+       return {rate,rows:rates};
+     };
+     return {names,rows,current:summarize(latest),previous:summarize(prior)};
+   }
+   function setStat(id,value,detail,trend=''){
+     const valueEl=$('#'+id),detailEl=$('#'+id+'-detail');
+     if(valueEl)valueEl.textContent=value;
+     if(detailEl){detailEl.textContent=detail;detailEl.dataset.trend=trend;detailEl.classList.toggle('is-up',trend==='up');detailEl.classList.toggle('is-down',trend==='down');detailEl.classList.toggle('is-neutral',trend==='neutral');}
+   }
+   function updateStats(){
+     let data;
+     try{data=previousWeekData();}catch(_){data={names:[],rows:[],current:null,previous:null};}
+     setStat('r22-stat-characters',String(data.names.length),data.names.length===1?'1 registered character':'Registered characters');
+     if(data.current?.rate!==null&&data.current?.rate!==undefined){
+       let trend='neutral',detail='Previous completed week';
+       if(data.previous?.rate!==null&&data.previous?.rate!==undefined){
+         const delta=data.current.rate-data.previous.rate;
+         trend=delta>0?'up':delta<0?'down':'neutral';
+         detail=delta>0?`↑ Up ${delta} pts vs prior week`:delta<0?`↓ Down ${Math.abs(delta)} pts vs prior week`:'→ Unchanged vs prior week';
+       } else detail='Previous completed week · no earlier week to compare';
+       setStat('r22-stat-completion',`${data.current.rate}%`,detail,trend);
+     } else setStat('r22-stat-completion','—','No previous-week snapshot yet');
+     if(data.rows.length>=2){
+       const byRate=[...data.rows].sort((a,b)=>a.rate-b.rate||a.name.localeCompare(b.name));
+       const low=byRate[0],lowTies=byRate.filter(x=>x.rate===low.rate),spread=byRate[byRate.length-1].rate-low.rate;
+       if(spread===0)setStat('r22-stat-outlier','No outlier','All characters had the same completion rate');
+       else setStat('r22-stat-outlier',lowTies.length>1?`${lowTies.length} tied`:low.name,`${low.rate}% completion · lowest`,'down');
+       const countRows=data.rows.filter(x=>Number.isFinite(x.done));
+       const ranked=countRows.length?countRows:[...data.rows];
+       const completed=x=>Number.isFinite(x.done)?x.done:x.rate;
+       const topValue=Math.max(...ranked.map(completed));
+       const topRows=ranked.filter(x=>completed(x)===topValue).sort((a,b)=>a.name.localeCompare(b.name));
+       const top=topRows[0];
+       const label=topRows.length>1?`${top.name} +${topRows.length-1}`:top.name;
+       const detail=Number.isFinite(top.done)?`${top.done} tasks completed · ${top.rate}%`:`${top.rate}% completion · highest available rate`;
+       setStat('r22-stat-most',label,detail,'up');
+     } else if(data.rows.length===1){
+       setStat('r22-stat-outlier','—','Need at least two characters to identify an outlier');
+       const only=data.rows[0];setStat('r22-stat-most',only.name,Number.isFinite(only.done)?`${only.done} tasks completed · ${only.rate}%`:`${only.rate}% completion · only character`);
+     } else {
+       setStat('r22-stat-outlier','—','No previous-week character data');
+       setStat('r22-stat-most','—','No previous-week character data');
+     }
+     const bountyTasks=(cloudData?.settings?.categories||[]).filter(cat=>/bounty/i.test(String(cat?.name||''))).flatMap(cat=>Array.isArray(cat.tasks)?cat.tasks:[]);
+     let undone=0,total=0;
+     data.names.forEach(name=>bountyTasks.forEach(task=>{
+       const state=typeof getCellState==='function'?getCellState(name,task):'open';
+       if(state==='excluded')return;
+       total++;
+       if(state!=='done')undone++;
+     }));
+     setStat('r22-stat-bounties',String(undone),`${undone} undone of ${total} eligible bounty slots`);
+   }
+   window.__pantheonR22UpdateOverviewStats=updateStats;
+   [summary,$('#overview-activity'),$('#overview-character-completion')].filter(Boolean).forEach(node=>new MutationObserver(updateStats).observe(node,{childList:true,subtree:true,characterData:true}));
+   updateStats();
  }
  // Weekly Tracker and Bounty Board are separate views. Weekly is always the first/default view.
  const trackerForTabs=$('#tracker-page');
@@ -14270,6 +14352,211 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
  .pantheon-r20-user-chip{max-width:none!important;padding-left:8px!important}
  .pantheon-r21-tracker-tab{font-size:10px}
 }
+</style>
+
+
+<script id="pantheon-r22-full-pages-and-metrics">
+(function(){
+ 'use strict';
+ if(window.__pantheonR22Ready)return;window.__pantheonR22Ready=true;
+ const $=(s,r=document)=>r.querySelector(s);
+ const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+ const workspace=$('#pantheon-r20-workspace');
+ const rail=$('.pantheon-r20-nav-rail');
+ if(!workspace||!rail)return;
+ const forumPanel=$('#guild-forum-panel');
+ if(forumPanel&&!$('#guild-forum-page')){
+   const page=document.createElement('main');page.id='guild-forum-page';page.className='app-page hidden-page';
+   const header=document.createElement('header');header.className='pantheon-r20-page-header';
+   header.innerHTML='<div><div class="pantheon-r20-page-kicker">GUILD WORKSPACE / COMMUNITY</div><h1 class="pantheon-r20-page-title">Guild Forum</h1><p class="pantheon-r20-page-sub">Guild achievements, dungeon reports, party calls, notices, and conversations.</p></div>';
+   page.appendChild(header);forumPanel.hidden=false;forumPanel.classList.add('pantheon-r22-forum-page-panel');page.appendChild(forumPanel);workspace.appendChild(page);
+ }
+ const salaryOverlay=$('#salary-modal');
+ if(salaryOverlay&&!$('#salary-page')){
+   const modalCard=$('.modal-card',salaryOverlay);
+   const page=document.createElement('main');page.id='salary-page';page.className='app-page hidden-page';
+   const header=document.createElement('header');header.className='pantheon-r20-page-header';
+   header.innerHTML='<div><div class="pantheon-r20-page-kicker">GUILD WORKSPACE / PARTY TOOLS</div><h1 class="pantheon-r20-page-title">Salary Calculator</h1><p class="pantheon-r20-page-sub">Split party income after the salary holder cut and Seal Stamp compensation.</p></div>';
+   page.appendChild(header);
+   if(modalCard){
+     const legacyTitle=$('h3',modalCard);if(legacyTitle)legacyTitle.remove();
+     modalCard.classList.remove('modal-card');modalCard.classList.add('pantheon-r22-salary-card');
+     const note=$('.modal-note',modalCard);if(note)note.remove();
+     const closeButton=$('.modal-actions button:last-child',modalCard);
+     if(closeButton){closeButton.textContent='Back to Overview';closeButton.setAttribute('onclick',"showAppPage('overview')");}
+     page.appendChild(modalCard);
+   }
+   workspace.appendChild(page);salaryOverlay.replaceChildren();
+ }
+ const baseShow=window.showAppPage;
+ function updateRail(){
+   const active=$$('.app-page').find(page=>!page.classList.contains('hidden-page'));
+   rail.querySelectorAll('[data-r20-page]').forEach(button=>{
+     const on=!!active&&button.getAttribute('data-r20-page')===active.id;
+     button.classList.toggle('is-active',on);button.setAttribute('aria-current',on?'page':'false');
+   });
+ }
+ if(typeof baseShow==='function'&&!baseShow.__pantheonR22Wrapped){
+   const wrapped=function(page){
+     if(page==='guild-forum'||page==='salary'){
+       const target=$('#'+(page==='guild-forum'?'guild-forum-page':'salary-page'));
+       if(!target)return baseShow('overview');
+       $$('.app-page').forEach(el=>el.classList.toggle('hidden-page',el!==target));
+       if(page==='guild-forum'){
+         const profile=$('#guild-social-profile-panel');if(profile)profile.hidden=true;
+         if(forumPanel)forumPanel.hidden=false;
+         if(typeof loadGuildForum==='function')loadGuildForum(true);
+         history.replaceState(null,'','#guild-forum');
+       }else history.replaceState(null,'','#salary-calculator');
+       if(typeof refreshSharedDataIfChanged==='function')refreshSharedDataIfChanged().catch(()=>{});
+       if(typeof window.__pantheonCheckReleaseNow==='function')window.__pantheonCheckReleaseNow();
+       if(typeof startDeadlineModeRefresh==='function')startDeadlineModeRefresh();
+       updateRail();return;
+     }
+     const forumPage=$('#guild-forum-page'),salaryPage=$('#salary-page');
+     if(forumPage)forumPage.classList.add('hidden-page');if(salaryPage)salaryPage.classList.add('hidden-page');
+     const result=baseShow(page);updateRail();
+     if(page==='overview'&&typeof window.__pantheonR22UpdateOverviewStats==='function')window.__pantheonR22UpdateOverviewStats();
+     return result;
+   };
+   wrapped.__pantheonR22Wrapped=true;window.showAppPage=wrapped;
+ }
+ const shellObserver=new MutationObserver(updateRail);shellObserver.observe(workspace,{subtree:true,attributes:true,attributeFilter:['class']});updateRail();
+ window.openSalaryModal=function(){
+   const income=$('#calc-income'),stamps=$('#calc-stamps');
+   if(income)income.value='';if(stamps)stamps.value='';
+   if(typeof calculateSalary==='function')calculateSalary();
+   window.showAppPage('salary');
+ };
+ window.openGuildForum=function(){
+   const profile=$('#guild-social-profile-panel');if(profile)profile.hidden=true;
+   if(forumPanel)forumPanel.hidden=false;
+   window.showAppPage('guild-forum');
+ };
+ const originalOpenProfile=window.openMemberProfile;
+ if(typeof originalOpenProfile==='function'&&!originalOpenProfile.__pantheonR22Wrapped){
+   const wrappedProfile=function(id){const result=originalOpenProfile(id);if(forumPanel)forumPanel.hidden=false;return result;};
+   wrappedProfile.__pantheonR22Wrapped=true;window.openMemberProfile=wrappedProfile;
+ }
+})();
+</script>
+<style id="pantheon-r22-polish">
+.brand-area:before{display:none!important;content:none!important}
+.controls{gap:12px!important;padding-left:22px!important;padding-right:22px!important}
+.brand-area{min-width:190px!important;flex:0 1 220px!important;gap:8px!important}
+.brand-copy{min-width:0!important}.control-actions{gap:9px!important;flex:1 1 auto!important;min-width:0!important}
+.topbar-player{flex:0 1 auto!important;min-width:max-content!important;gap:7px!important}
+.pantheon-r20-view-pill{flex:0 0 auto!important;min-width:0!important}
+.pantheon-r20-view-pill #mode-toggle-btn{min-width:116px!important;padding-left:12px!important;padding-right:12px!important;text-align:center!important}
+.pantheon-r20-view-pill #mode-toggle-btn:after{content:'Personal View'!important}
+.pantheon-r20-view-pill #mode-toggle-btn:not(.personal-active):after{content:'Universal View'!important}
+.pantheon-r20-view-pill #roster-filter{min-width:126px!important}
+.pantheon-r20-user-chip{max-width:330px!important;min-width:220px!important;flex:0 1 330px!important;gap:10px!important;padding-left:13px!important}
+.pantheon-r20-user-copy{min-width:145px!important;max-width:220px!important;flex:1 1 190px!important}
+.pantheon-r20-user-copy strong{max-width:220px!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.2!important}
+.pantheon-r20-user-copy small{max-width:220px!important;white-space:nowrap!important}.pantheon-r20-account-edit{flex:0 0 auto!important}
+@media(max-width:1450px){.controls{gap:8px!important;padding-left:14px!important;padding-right:14px!important}.brand-area{min-width:145px!important;flex-basis:165px!important}.pantheon-r20-user-chip{min-width:190px!important;max-width:270px!important;flex-basis:270px!important}.pantheon-r20-user-copy{min-width:125px!important;max-width:180px!important}.pantheon-r20-user-copy strong,.pantheon-r20-user-copy small{max-width:180px!important}.pantheon-r20-view-pill #mode-toggle-btn{min-width:108px!important}}
+@media(max-width:1100px){.controls{height:auto!important;min-height:72px!important;align-items:center!important;flex-wrap:wrap!important;padding-top:8px!important;padding-bottom:8px!important}.brand-area{flex:1 1 170px!important;min-width:0!important}.control-actions{flex:1 1 100%!important;justify-content:space-between!important;flex-wrap:wrap!important}.topbar-player{min-width:0!important}.pantheon-r20-user-chip{flex:0 1 260px!important;min-width:190px!important}}
+@media(max-width:760px){.pantheon-r20-user-copy{display:grid!important;min-width:90px!important;max-width:125px!important}.pantheon-r20-user-copy strong,.pantheon-r20-user-copy small{max-width:125px!important}.pantheon-r20-user-chip{flex:0 1 170px!important;min-width:140px!important;max-width:170px!important}.pantheon-r20-view-pill #mode-toggle-btn{min-width:104px!important}}
+.pantheon-r20-hero{grid-template-columns:minmax(0,1fr)!important}
+.pantheon-r20-stat-grid.pantheon-r22-stat-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important}
+.pantheon-r22-stat-card{min-width:0!important;display:flex!important;flex-direction:column!important;min-height:112px!important}
+.pantheon-r22-stat-card .pantheon-r20-stat-top{gap:7px!important;align-items:flex-start!important;line-height:1.35!important;font-size:10px!important;font-weight:750!important;color:var(--r20-muted)!important}
+.pantheon-r22-stat-card .pantheon-r20-stat-top>span:first-child{min-width:0;max-width:calc(100% - 32px)}
+.pantheon-r22-stat-card .pantheon-r20-stat-value{font-size:clamp(17px,1.5vw,23px)!important;line-height:1.2!important;overflow-wrap:anywhere!important;word-break:normal!important;white-space:normal!important}
+.pantheon-r22-stat-card .pantheon-r20-stat-value#r22-stat-outlier,.pantheon-r22-stat-card .pantheon-r20-stat-value#r22-stat-most{font-size:clamp(13px,1.1vw,18px)!important;letter-spacing:-.02em!important}
+.pantheon-r22-stat-card .pantheon-r20-stat-foot{font-size:9px!important;line-height:1.4!important;margin-top:auto!important;padding-top:7px!important}
+.pantheon-r22-stat-card .pantheon-r20-stat-foot.is-up{color:var(--r20-good)!important;font-weight:800!important}.pantheon-r22-stat-card .pantheon-r20-stat-foot.is-down{color:var(--r20-red)!important;font-weight:800!important}.pantheon-r22-stat-card .pantheon-r20-stat-foot.is-neutral{color:var(--r20-muted)!important}
+@media(max-width:1350px){.pantheon-r20-stat-grid.pantheon-r22-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.pantheon-r20-stat-grid.pantheon-r22-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:480px){.pantheon-r20-stat-grid.pantheon-r22-stat-grid{grid-template-columns:minmax(0,1fr)!important}}
+.guild-forum-page-panel{display:flex!important;flex-direction:column!important;min-height:0!important;overflow:visible!important;gap:12px!important}
+.guild-forum-page-panel .guild-forum-feed{flex:0 1 auto!important;min-height:260px!important;max-height:calc(100vh - 360px)!important;overflow:auto!important}
+#guild-forum-page .guild-forum-toolbar{background:var(--r20-panel)!important;border-color:var(--r20-border)!important;border-radius:14px!important;padding:16px!important}
+#guild-forum-page .guild-forum-filters{display:flex!important;gap:7px!important;flex-wrap:wrap!important}#guild-forum-page .guild-forum-composer{margin:0!important}
+.pantheon-r22-salary-card{width:min(100%,980px)!important;max-width:980px!important;margin:0 auto!important;padding:22px!important;box-sizing:border-box!important;border:1px solid var(--r20-border)!important;border-radius:16px!important;background:var(--r20-panel)!important;color:var(--r20-text)!important;box-shadow:var(--r20-shadow)!important}
+#salary-page .registration-form{max-width:850px!important}#salary-page .registration-form>div{gap:14px!important}#salary-page .registration-form label{display:grid!important;gap:6px!important;color:var(--r20-muted)!important;font-size:11px!important;font-weight:700!important}
+#salary-page input{min-height:42px!important;padding:10px 12px!important;border:1px solid var(--r20-border)!important;border-radius:9px!important;background:var(--r20-panel2)!important;color:var(--r20-text)!important}
+#salary-page .salary-receipt{max-width:850px!important;margin-top:20px!important;background:var(--r20-panel2)!important;border-color:var(--r20-border)!important}#salary-page .modal-actions{justify-content:flex-start!important;flex-wrap:wrap!important;margin-top:16px!important}#salary-page .modal-actions button{min-height:40px!important}
+.pantheon-r21-tracker-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;width:100%!important;gap:8px!important;padding:6px!important}
+.pantheon-r21-tracker-tab{display:flex!important;width:100%!important;min-width:0!important;min-height:46px!important;padding:11px 16px!important;gap:10px!important;white-space:normal!important;font-size:13px!important;line-height:1.25!important;letter-spacing:0!important}
+.pantheon-r21-tracker-tab>span:last-child{min-width:0!important;white-space:normal!important;text-align:center!important;overflow-wrap:anywhere!important}.pantheon-r21-tracker-tab span[aria-hidden="true"]{flex:0 0 auto!important;font-size:15px!important}
+@media(max-width:600px){.pantheon-r21-tracker-tab{font-size:11px!important;padding:10px 8px!important;gap:6px!important}}
+:root[data-pantheon-theme="light"]{--r20-bg:#e4e9ef;--r20-bg2:#eaf0f5;--r20-panel:#f1f4f7;--r20-panel2:#e9eef3;--r20-panel3:#dfe6ed;--r20-border:#cbd5df;--r20-border2:#bbc8d5;--r20-text:#283747;--r20-muted:#5d6e80;--r20-subtle:#7c8a99;--r20-accent:#5c7898;--r20-accent2:#476889;--r20-accent-soft:#dbe5ef;--r20-good:#347d60;--r20-warn:#91682f;--r20-blue:#557ba5;--r20-red:#a64f55;--r20-shadow:0 16px 38px rgba(44,59,76,.08);color-scheme:light}
+:root[data-pantheon-theme="eye-comfort"]{--r20-bg:#eee4d6;--r20-bg2:#f1e8dc;--r20-panel:#f7efe4;--r20-panel2:#efe3d4;--r20-panel3:#e7d8c5;--r20-border:#d8c7b1;--r20-border2:#c9b69f;--r20-text:#463a30;--r20-muted:#776657;--r20-subtle:#988575;--r20-accent:#b0784a;--r20-accent2:#99623c;--r20-accent-soft:#ead8c4;--r20-good:#587753;--r20-warn:#a36b30;--r20-blue:#6e8195;--r20-red:#a65345;--r20-shadow:0 16px 38px rgba(78,55,34,.08);color-scheme:light}
+:root[data-pantheon-theme="pastel"]{--r20-bg:#f2eafa;--r20-bg2:#f8eef8;--r20-panel:#fff8ff;--r20-panel2:#f5eafd;--r20-panel3:#eadff8;--r20-border:#dfcde9;--r20-border2:#cfb6e1;--r20-text:#493854;--r20-muted:#796586;--r20-subtle:#9b89a8;--r20-accent:#a47ad8;--r20-accent2:#cf77b5;--r20-accent-soft:#f2dff3;--r20-good:#55a68f;--r20-warn:#c18b54;--r20-blue:#72a9dc;--r20-red:#c56c91;--r20-shadow:0 16px 38px rgba(115,77,137,.10);color-scheme:light}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-hero{background:linear-gradient(112deg,#f4e6ff 0%,#ffeaf4 52%,#e7f2ff 100%)!important;border-color:#e2cce9!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-stat-icon{background:linear-gradient(145deg,#eadcff,#fbe1ef)!important;color:#8b61b8!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-theme-pill button[aria-pressed="true"]{background:#eadcff!important;color:#614778!important}
+:root[data-pantheon-theme="eye-comfort"] .pantheon-r20-hero{background:linear-gradient(115deg,#f4e8d7,#efe0cd)!important}
+</style>
+
+
+<style id="pantheon-r23-overview-topbar-themes">
+/* Keep the Overview's named metrics exclusive; the Activity Insights panel remains useful context. */
+#overview-page #overview-insights-summary{display:none!important}
+/* Clear the header mark while retaining the Pantheon name as the home target. */
+.brand-area:before{display:none!important;content:none!important}
+/* Give the authenticated identity a stable amount of room so the view label never truncates. */
+.controls{gap:12px!important;padding-left:22px!important;padding-right:22px!important;flex-wrap:nowrap!important}
+.brand-area{min-width:180px!important;flex:0 1 220px!important;gap:8px!important}
+.brand-copy{min-width:0!important;flex:1 1 auto!important}
+.control-actions{display:flex!important;flex:1 1 auto!important;min-width:0!important;gap:9px!important;justify-content:flex-end!important;flex-wrap:nowrap!important}
+.topbar-player{display:flex!important;flex:0 1 auto!important;min-width:0!important;gap:7px!important;white-space:nowrap!important}
+.pantheon-r20-view-pill{flex:0 0 auto!important;min-width:max-content!important}
+.pantheon-r20-view-pill #mode-toggle-btn{min-width:132px!important;padding-left:13px!important;padding-right:13px!important;text-align:center!important}
+.pantheon-r20-view-pill #mode-toggle-btn:after{content:'Personal View'!important}
+.pantheon-r20-view-pill #mode-toggle-btn:not(.personal-active):after{content:'Universal View'!important}
+.pantheon-r20-view-pill #roster-filter{min-width:126px!important;max-width:150px!important}
+.pantheon-r20-user-chip{flex:0 1 330px!important;min-width:255px!important;max-width:350px!important;gap:10px!important;padding-left:14px!important;overflow:visible!important}
+.pantheon-r20-user-copy{display:grid!important;grid-template-columns:minmax(0,1fr);min-width:165px!important;max-width:235px!important;flex:1 1 210px!important}
+.pantheon-r20-user-copy strong{max-width:none!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important;line-height:1.2!important}
+.pantheon-r20-user-copy small{max-width:none!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.25!important}
+.pantheon-r20-account-edit,.pantheon-r20-logout{flex:0 0 auto!important}
+@media(max-width:1500px){.controls{gap:8px!important;padding-left:14px!important;padding-right:14px!important}.brand-area{min-width:158px!important;flex-basis:180px!important}.pantheon-r20-user-chip{flex-basis:300px!important;min-width:235px!important;max-width:315px!important}.pantheon-r20-user-copy{min-width:145px!important;max-width:205px!important}.pantheon-r20-view-pill #mode-toggle-btn{min-width:122px!important}.pantheon-r20-view-pill #roster-filter{min-width:112px!important;max-width:130px!important}}
+@media(max-width:1180px){.controls{height:auto!important;min-height:72px!important;flex-wrap:wrap!important;padding-top:7px!important;padding-bottom:7px!important}.brand-area{flex:1 1 170px!important;min-width:150px!important}.control-actions{flex:1 1 100%!important;justify-content:space-between!important;flex-wrap:wrap!important}.topbar-player{min-width:0!important}.pantheon-r20-user-chip{flex:0 1 330px!important;min-width:235px!important;max-width:340px!important}}
+@media(max-width:760px){.controls{align-items:flex-start!important}.control-actions{row-gap:8px!important}.topbar-player{flex:1 1 100%!important;justify-content:flex-start!important;flex-wrap:wrap!important}.pantheon-r20-user-chip{flex:1 1 230px!important;min-width:205px!important;max-width:100%!important}.pantheon-r20-user-copy{min-width:120px!important;max-width:none!important}.pantheon-r20-user-copy strong,.pantheon-r20-user-copy small{max-width:none!important}}
+/* A clear, two-column Tracker section switcher with readable, consistent hit areas. */
+.pantheon-r21-tracker-tabs{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:stretch!important;width:100%!important;gap:8px!important;padding:6px!important;margin:0 0 12px!important;box-sizing:border-box!important}
+.pantheon-r21-tracker-tab{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;min-height:48px!important;padding:11px 16px!important;gap:10px!important;white-space:normal!important;font-size:13px!important;line-height:1.3!important;letter-spacing:0!important;box-sizing:border-box!important}
+.pantheon-r21-tracker-tab>span:last-child{display:block!important;min-width:0!important;white-space:nowrap!important;text-align:center!important;overflow:visible!important;word-break:normal!important}
+.pantheon-r21-tracker-tab span[aria-hidden="true"]{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 18px!important;font-size:16px!important}
+#tracker-page #dn-tracker th,#tracker-page #dn-tracker td{line-height:1.35!important}
+#tracker-page #dn-tracker th{font-size:clamp(11px,.78vw,13px)!important;padding:9px 8px!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important}
+@media(max-width:620px){.pantheon-r21-tracker-tab{min-height:46px!important;padding:9px 8px!important;gap:6px!important;font-size:12px!important}.pantheon-r21-tracker-tab span[aria-hidden="true"]{flex-basis:14px!important;font-size:14px!important}}
+/* CLEAN: muted slate-light instead of white-on-white. */
+:root[data-pantheon-theme="light"]{
+ --pt-page:#e8edf1;--pt-surface:#f0f3f5;--pt-surface-raised:#f5f7f8;--pt-surface-soft:#e1e8ed;--pt-input:#edf1f4;--pt-text:#2e3c49;--pt-muted:#596b7a;--pt-border:#c9d4dd;--pt-accent:#617c95;--pt-accent-soft:#dce6ee;--pt-hover:#e4ebf0;--pt-banner-border:#c3d0dc;--pt-positive:#3f806c;--pt-auth-bg:radial-gradient(ellipse at 14% 4%,rgba(105,137,164,.12),transparent 44%),radial-gradient(ellipse at 88% 9%,rgba(103,153,137,.08),transparent 38%),#e8edf1;--pt-card-gradient:linear-gradient(160deg,#f4f6f8,#e9eef2);--pt-notice-gradient:linear-gradient(160deg,#e5ebf0,#f2f5f7);color-scheme:light;
+ --r20-bg:#e8edf1;--r20-bg2:#edf1f4;--r20-panel:#f0f3f5;--r20-panel2:#e8edf1;--r20-panel3:#dfe6eb;--r20-border:#c9d4dd;--r20-border2:#b9c7d2;--r20-text:#2e3c49;--r20-muted:#596b7a;--r20-subtle:#778794;--r20-accent:#617c95;--r20-accent2:#4d6b85;--r20-accent-soft:#dce6ee;--r20-good:#3f806c;--r20-warn:#96703f;--r20-blue:#6485a5;--r20-red:#a9585f;--r20-shadow:0 15px 34px rgba(39,55,69,.09)
+}
+/* EYE COMFORT: warm parchment, honey, and soft walnut. */
+:root[data-pantheon-theme="eye-comfort"]{
+ --pt-page:#eee3d1;--pt-surface:#f8f0e2;--pt-surface-raised:#fcf5e9;--pt-surface-soft:#eaddc7;--pt-input:#f5ead9;--pt-text:#493a2d;--pt-muted:#78634f;--pt-border:#d8c4a7;--pt-accent:#b17a43;--pt-accent-soft:#f0dfc5;--pt-hover:#f1e4d1;--pt-banner-border:#d2bc9e;--pt-positive:#567b53;--pt-auth-bg:radial-gradient(ellipse at 12% 4%,rgba(205,151,91,.17),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(174,117,73,.10),transparent 38%),#eee3d1;--pt-card-gradient:linear-gradient(160deg,#fbf4e8,#f0e4d1);--pt-notice-gradient:linear-gradient(160deg,#f1e2cc,#faf2e4);color-scheme:light;
+ --r20-bg:#eee3d1;--r20-bg2:#f2e8da;--r20-panel:#f8f0e2;--r20-panel2:#f1e5d3;--r20-panel3:#e9dac4;--r20-border:#d8c4a7;--r20-border2:#c9b18e;--r20-text:#493a2d;--r20-muted:#78634f;--r20-subtle:#98836f;--r20-accent:#b17a43;--r20-accent2:#94602f;--r20-accent-soft:#f0dfc5;--r20-good:#567b53;--r20-warn:#a46e35;--r20-blue:#758ca0;--r20-red:#a95c4a;--r20-shadow:0 15px 34px rgba(78,53,30,.10)
+}
+/* PASTEL DREAM: cotton-candy pink, lavender skies, mint, and soft golden light. */
+:root[data-pantheon-theme="pastel"]{
+ --pt-page:#f6edff;--pt-surface:#fffaff;--pt-surface-raised:#fff8ff;--pt-surface-soft:#eee1ff;--pt-input:#fff5fc;--pt-text:#493455;--pt-muted:#755e86;--pt-border:#dfc9f0;--pt-accent:#a76bd2;--pt-accent-soft:#f0dcff;--pt-hover:#f8e9ff;--pt-banner-border:#d8bce9;--pt-positive:#4e9c88;--pt-auth-bg:radial-gradient(ellipse at 10% 5%,rgba(255,169,207,.24),transparent 42%),radial-gradient(ellipse at 88% 8%,rgba(151,192,255,.22),transparent 42%),radial-gradient(ellipse at 60% 95%,rgba(156,224,201,.16),transparent 45%),#f6edff;--pt-card-gradient:linear-gradient(145deg,#fffaff,#f5e6ff 52%,#ffedf6);--pt-notice-gradient:linear-gradient(145deg,#f3e5ff,#fff1f8);color-scheme:light;
+ --r20-bg:#f6edff;--r20-bg2:#f9f1ff;--r20-panel:#fffaff;--r20-panel2:#f5eaff;--r20-panel3:#ecdefb;--r20-border:#dfc9f0;--r20-border2:#d2b4e9;--r20-text:#493455;--r20-muted:#755e86;--r20-subtle:#9983aa;--r20-accent:#a76bd2;--r20-accent2:#c86eae;--r20-accent-soft:#f0dcff;--r20-good:#4e9c88;--r20-warn:#c28c4c;--r20-blue:#75a9e3;--r20-red:#c96a91;--r20-shadow:0 16px 38px rgba(119,77,151,.12)
+}
+:root[data-pantheon-theme="light"] body{background:radial-gradient(ellipse at 14% 4%,rgba(113,143,168,.09),transparent 42%),var(--pt-page)!important}
+:root[data-pantheon-theme="eye-comfort"] body{background:radial-gradient(ellipse at 12% 4%,rgba(205,151,91,.15),transparent 45%),radial-gradient(ellipse at 90% 8%,rgba(174,117,73,.08),transparent 38%),var(--pt-page)!important}
+:root[data-pantheon-theme="pastel"] body{background:radial-gradient(ellipse at 8% 6%,rgba(255,174,211,.30),transparent 38%),radial-gradient(ellipse at 88% 6%,rgba(162,195,255,.28),transparent 40%),radial-gradient(ellipse at 70% 95%,rgba(160,229,205,.22),transparent 45%),var(--pt-page)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-hero{background:linear-gradient(112deg,#f1ddff 0%,#ffe4f1 48%,#e2f0ff 100%)!important;border-color:#e1c8f2!important;box-shadow:0 14px 36px rgba(158,105,195,.12)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-stat-icon{background:linear-gradient(145deg,#e9d8ff,#ffe0ef 52%,#ddf2ed)!important;color:#8354aa!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r22-stat-card{border-color:#e4c9ef!important;box-shadow:0 9px 24px rgba(150,105,183,.09)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r22-stat-card:nth-child(1){background:linear-gradient(145deg,#fffaff,#f5e8ff)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r22-stat-card:nth-child(2){background:linear-gradient(145deg,#fff9fc,#ffe8f2)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r22-stat-card:nth-child(3){background:linear-gradient(145deg,#fbf9ff,#eae6ff)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r22-stat-card:nth-child(4){background:linear-gradient(145deg,#f8fcff,#e6f2ff)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r22-stat-card:nth-child(5){background:linear-gradient(145deg,#f8fffc,#e4f6ee)!important}
+:root[data-pantheon-theme="pastel"] .overview-panel,:root[data-pantheon-theme="pastel"] .pantheon-r22-salary-card{border-color:#e1cbed!important;box-shadow:0 10px 28px rgba(147,104,175,.08)!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-rail-link{border-color:transparent!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-rail-link:hover{background:linear-gradient(135deg,#f2e5ff,#ffe8f3)!important;color:#684784!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r20-theme-pill button[aria-pressed="true"],:root[data-pantheon-theme="pastel"] .pantheon-r20-rail-link.is-active{background:linear-gradient(135deg,#eadbff,#ffe3f0)!important;color:#67427f!important;border-color:#d6b5ea!important}
+:root[data-pantheon-theme="pastel"] .pantheon-r21-tracker-tab.is-active{background:linear-gradient(110deg,#eadbff,#ffe3f0)!important;color:#67427f!important;border-color:#d6b5ea!important}
+:root[data-pantheon-theme="eye-comfort"] .pantheon-r20-hero{background:linear-gradient(112deg,#f3e4cf,#f8eddc)!important;border-color:#d8c4a7!important}
+:root[data-pantheon-theme="light"] .pantheon-r20-hero{background:linear-gradient(112deg,#e0e8ef,#edf1f4)!important;border-color:#c9d4dd!important}
 </style>
 
 </body>
