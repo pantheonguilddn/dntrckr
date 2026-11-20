@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r20</title>
+    <title>Pantheon Tools v1.6.9-r21</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3487,9 +3487,6 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 :root[data-pantheon-theme="dark"] {
  --r20-bg:#10141c;--r20-bg2:#151b25;--r20-panel:#19212d;--r20-panel2:#202a38;--r20-panel3:#263345;--r20-border:#303d50;--r20-border2:#3b4b61;--r20-text:#edf2f8;--r20-muted:#9aa9bb;--r20-subtle:#738397;--r20-accent:#d7ad60;--r20-accent2:#f0cb82;--r20-accent-soft:rgba(215,173,96,.12);--r20-good:#69c49b;--r20-warn:#e3b46c;--r20-blue:#83aee8;--r20-red:#df8585;--r20-shadow:0 18px 44px rgba(0,0,0,.22);color-scheme:dark;
 }
-:root[data-pantheon-theme="aegis"] {
- --r20-bg:#17130f;--r20-bg2:#211a14;--r20-panel:#282017;--r20-panel2:#33271b;--r20-panel3:#3d3020;--r20-border:#4a3825;--r20-border2:#5b452c;--r20-text:#f6efe4;--r20-muted:#c0ad94;--r20-subtle:#93816b;--r20-accent:#d49a4f;--r20-accent2:#f1c17c;--r20-accent-soft:rgba(212,154,79,.13);--r20-good:#8bc69c;--r20-warn:#e3b46c;--r20-blue:#c5a4dc;--r20-red:#ef929c;--r20-shadow:0 18px 44px rgba(0,0,0,.3);color-scheme:dark;
-}
 :root[data-pantheon-theme="light"] {
  --r20-bg:#edf1f5;--r20-bg2:#f5f7f9;--r20-panel:#fff;--r20-panel2:#f7f9fb;--r20-panel3:#edf2f7;--r20-border:#dbe2ea;--r20-border2:#cbd5e1;--r20-text:#1e2938;--r20-muted:#657487;--r20-subtle:#8290a1;--r20-accent:#a8792d;--r20-accent2:#a8792d;--r20-accent-soft:rgba(168,121,45,.10);--r20-good:#27845d;--r20-warn:#a66a20;--r20-blue:#4778b4;--r20-red:#b84f4f;--r20-shadow:0 18px 44px rgba(20,35,50,.08);color-scheme:light;
 }
@@ -3719,7 +3716,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         <div class="pantheon-auth-card">
         <div class="pantheon-auth-banner" role="img" aria-label="Dragon Nest - Classic Pantheon banner"></div>
         <div class="pantheon-auth-brand-row">
-          <label class="pantheon-theme-control pantheon-auth-theme" for="pantheon-auth-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-auth-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Clean</option><option value="dark">Guild</option><option value="aegis">Aegis</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
+          <label class="pantheon-theme-control pantheon-auth-theme" for="pantheon-auth-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-auth-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Clean</option><option value="dark">Guild</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
         </div>
         <h1 id="pantheon-auth-title">Your guild tools, protected.</h1>
         <p class="pantheon-auth-copy">Sign in with Discord. Pantheon checks your account ID against the administrator-approved list before loading shared guild data. Your Discord password is never given to Pantheon.</p>
@@ -3745,7 +3742,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 </select>
                 <button class="mini-help" type="button" title="Personal & Universal View Guide" onclick="openHelpModal('view')">?</button>
             </div>
-            <label class="pantheon-theme-control app-theme-control" for="pantheon-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Clean</option><option value="dark">Guild</option><option value="aegis">Aegis</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
+            <label class="pantheon-theme-control app-theme-control" for="pantheon-theme-select"><span>Appearance</span><select class="pantheon-theme-select" id="pantheon-theme-select" data-pantheon-theme-select aria-label="Choose appearance theme"><option value="light">Clean</option><option value="dark">Guild</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
             <button class="menu-toggle" id="menu-toggle" hidden type="button" onclick="toggleSideMenu()" aria-expanded="false" aria-controls="tool-drawer">
                 <span class="menu-icon">☰</span>
                 <span class="menu-toggle-label">Tools</span>
@@ -3908,7 +3905,6 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
     <main id="tracker-page" class="app-page hidden-page">
     <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
-        <button id="track-bounty-boards-btn" class="btn btn-secondary bounty-boards-toggle" type="button" aria-pressed="false" onclick="toggleBountyBoards()">Track Bounty Boards</button>
         <button id="share-bounties-btn" class="btn btn-secondary" type="button" onclick="openBountyShareModal()">↗ Share Bounties</button>
         <button id="weekly-report-btn" class="btn btn-secondary" type="button" onclick="openWeeklyReportModal()">📊 Weekly Report</button>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
@@ -4184,9 +4180,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r20</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r21</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r20:</strong> Fixes the weekly reset so previous-week Bounty Board text clears even when the bounty row status is also reset. Notes entered after the reset boundary are preserved. The r16 member-side roster sync fix, automatic Tracker inclusion, and account-link archive controls remain included.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r21:</strong> Separates the Weekly Tracker and Bounty Board into dedicated tabs, moves Guild Forum and Salary Calculator to the side rail, and streamlines the account area and compact view. No tracking data or sync behavior is changed.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -6106,22 +6102,25 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         document.addEventListener('click', editDeveloperTextAtPoint, true);
 
         function initializeBountyBoardsToggle() {
-            try { trackBountyBoards = localStorage.getItem(TRACK_BOUNTY_BOARDS_KEY) === 'true'; } catch (_) { trackBountyBoards = false; }
+            // Bounty visibility is now a dedicated Tracker tab. Always open on Weekly.
+            trackBountyBoards = false;
+            try { localStorage.removeItem(TRACK_BOUNTY_BOARDS_KEY); } catch (_) {}
             updateBountyBoardsButton();
         }
         function updateBountyBoardsButton() {
+            // Retain the legacy element for compatibility, but never show the old toggle.
             const button = document.getElementById('track-bounty-boards-btn');
             if (!button) return;
-            button.textContent = trackBountyBoards ? 'Hide Bounty Boards' : 'Track Bounty Boards';
-            button.setAttribute('aria-pressed', trackBountyBoards ? 'true' : 'false');
-            button.title = trackBountyBoards ? 'Hide Bounty 1–6 rows from the tracker' : 'Show Bounty 1–6 rows in the tracker';
+            button.hidden = true;
+            button.setAttribute('aria-hidden', 'true');
+            button.tabIndex = -1;
         }
         function toggleBountyBoards() {
+            // Backward-compatible handler; the new tabs call this with explicit state.
             trackBountyBoards = !trackBountyBoards;
-            try { localStorage.setItem(TRACK_BOUNTY_BOARDS_KEY, trackBountyBoards ? 'true' : 'false'); } catch (_) {}
             updateBountyBoardsButton();
-            buildTrackerTable();
-            applyBoardState();
+            if (typeof buildTrackerTable === 'function') buildTrackerTable();
+            if (typeof applyBoardState === 'function') applyBoardState();
         }
         function isBountyBoardSlot(category, taskName) {
             const name = String(taskName || '').trim();
@@ -8129,7 +8128,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
             // Size the task-name column from the actual registered dungeon labels.
             // The name wraps within this measured column instead of being clipped with an ellipsis.
-            const visibleTaskNames = cloudData.settings.categories.flatMap(category => (category.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(category, taskName)));
+            const visibleTaskNames = cloudData.settings.categories.flatMap(category => (category.tasks || []).filter(taskName => trackBountyBoards ? isBountyBoardSlot(category, taskName) : !isBountyBoardSlot(category, taskName)));
             const longestTaskName = visibleTaskNames.reduce((longest, taskName) => Math.max(longest, [...String(taskName || '')].length), 0);
             const taskColWidth = Math.max(230, Math.min(460, Math.ceil(longestTaskName * 7.6 + 38)));
             const categoryColWidth = 158;
@@ -8179,7 +8178,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             }]));
             const grouped = {};
             cloudData.settings.categories.forEach(cat => {
-                const visibleTasks = (cat.tasks || []).filter(taskName => trackBountyBoards || !isBountyBoardSlot(cat, taskName));
+                const visibleTasks = (cat.tasks || []).filter(taskName => trackBountyBoards ? isBountyBoardSlot(cat, taskName) : !isBountyBoardSlot(cat, taskName));
                 if (visibleTasks.length === 0) return;
                 const visibleCategory = { ...cat, visibleTasks };
                 if (!grouped[cat.group]) grouped[cat.group] = { totalTasks: 0, categories: [] };
@@ -8553,7 +8552,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             const targets = Array.isArray(characterNames) ? characterNames : getAllKnownCharacterNames();
             const dailyTasks = cloudData.settings.categories
                 .filter(category => category.group === 'Dailies')
-                .flatMap(category => (category.tasks || []).filter(task => trackBountyBoards || !isBountyBoardSlot(category, task)));
+                .flatMap(category => (category.tasks || []).filter(task => !isBountyBoardSlot(category, task)));
             targets.forEach(character => dailyTasks.forEach(task => {
                 const record = getCellRecord(character, task);
                 // Do not let a delayed/stale reset marker clear work recorded in this
@@ -10258,8 +10257,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             openModal('admin-view-as-modal');
         }
         function setPreviewTheme(theme) {
-            const allowed = ['light','dark','aegis','eye-comfort','pastel'];
-            const next = allowed.includes(theme) ? theme : (localStorage.getItem('pantheon-theme-choice-v1') || 'dark');
+            const allowed = ['light','dark','eye-comfort','pastel'];
+            const savedTheme = localStorage.getItem('pantheon-theme-choice-v1') || 'dark';
+            const next = allowed.includes(theme) ? theme : (allowed.includes(savedTheme) ? savedTheme : 'dark');
             document.documentElement.setAttribute('data-pantheon-theme', next);
             document.querySelectorAll('[data-pantheon-theme-select]').forEach(select => { select.value = next; });
         }
@@ -10272,7 +10272,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 container.insertBefore(banner, container.firstChild);
             }
             const chosenTheme = document.documentElement.getAttribute('data-pantheon-theme') || 'dark';
-            banner.innerHTML = `<div class="admin-view-as-banner-main"><strong>👁 Read-only View As:</strong> ${escapeHTML(member.name)} <span class="weekly-plan-muted">Your admin session stays active; progress edits and roster changes are blocked.</span></div><div class="admin-view-as-banner-main"><label>Simulated theme <select id="admin-view-as-live-theme"><option value="light">Clean</option><option value="dark">Guild</option><option value="aegis">Aegis</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label><button class="btn btn-secondary" type="button" data-admin-preview-allow onclick="exitAdminViewAs()">Exit preview</button></div>`;
+            banner.innerHTML = `<div class="admin-view-as-banner-main"><strong>👁 Read-only View As:</strong> ${escapeHTML(member.name)} <span class="weekly-plan-muted">Your admin session stays active; progress edits and roster changes are blocked.</span></div><div class="admin-view-as-banner-main"><label>Simulated theme <select id="admin-view-as-live-theme"><option value="light">Clean</option><option value="dark">Guild</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label><button class="btn btn-secondary" type="button" data-admin-preview-allow onclick="exitAdminViewAs()">Exit preview</button></div>`;
             banner.hidden = false;
             const themeSelect = document.getElementById('admin-view-as-live-theme');
             if (themeSelect) { themeSelect.value = chosenTheme; themeSelect.addEventListener('change', () => { adminViewThemeChoice = themeSelect.value; setPreviewTheme(adminViewThemeChoice); }); }
@@ -13162,7 +13162,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r20';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r21';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13805,7 +13805,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 (function () {
     'use strict';
     const THEME_KEY = 'pantheon-theme-choice-v1';
-    const THEMES = ['light', 'dark', 'aegis', 'eye-comfort', 'pastel'];
+    const THEMES = ['light', 'dark', 'eye-comfort', 'pastel'];
     function applyPantheonTheme(value, persist) {
         const theme = THEMES.includes(value) ? value : 'dark';
         document.documentElement.setAttribute('data-pantheon-theme', theme);
@@ -13853,7 +13853,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <p class="modal-note">Read-only preview of a registered member’s Overview, Tracker, Analytics, and Member Roster data. Team Builder will show a notice instead of a misleading local layout because its saved slots are not shared. Your Discord session and admin permissions are never replaced.</p>
     <div class="admin-view-as-fields">
       <label class="admin-view-as-field">Member<select id="admin-view-as-member-select"><option value="">Choose a member…</option></select></label>
-      <label class="admin-view-as-field">Preview theme<select id="admin-view-as-theme-select"><option value="current">This browser’s current theme</option><option value="light">Clean</option><option value="dark">Guild</option><option value="aegis">Aegis</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
+      <label class="admin-view-as-field">Preview theme<select id="admin-view-as-theme-select"><option value="current">This browser’s current theme</option><option value="light">Clean</option><option value="dark">Guild</option><option value="eye-comfort">Eye Comfort</option><option value="pastel">Pastel</option></select></label>
     </div>
     <p class="modal-note">v1.6.8 stores both theme choice and Team Builder placements/format/preferences in each browser only. The theme selector simulates appearance; Team Builder preview is roster-only and cannot retrieve another member’s local layout.</p>
     <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="startAdminViewAs()">Start read-only preview</button><button class="btn btn-secondary" type="button" onclick="closeModal('admin-view-as-modal')">Cancel</button></div>
@@ -13897,7 +13897,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r20';
+  const CURRENT_BUILD = '1.6.9-r21';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14036,9 +14036,13 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
  const rail=document.createElement('nav'); rail.className='pantheon-r20-nav-rail'; rail.setAttribute('aria-label','Main navigation');
  rail.innerHTML=`
   <button class="pantheon-r20-rail-link is-active" type="button" data-r20-page="overview-page" title="Overview" aria-label="Overview"><span aria-hidden="true">⌂</span></button>
-  <button class="pantheon-r20-rail-link" type="button" data-r20-page="tracker-page" title="Tracker" aria-label="Tracker"><span aria-hidden="true">▦</span></button>
+  <button class="pantheon-r20-rail-link" type="button" data-r20-page="tracker-page" title="Weekly Tracker" aria-label="Weekly Tracker"><span aria-hidden="true">▦</span></button>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="team-builder-page" title="Team Builder" aria-label="Team Builder"><span aria-hidden="true">⚔</span></button>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="card-wiki-page" title="Card Database" aria-label="Card Database"><span aria-hidden="true">◇</span></button>
+  <div class="pantheon-r21-rail-divider" aria-hidden="true"></div>
+  <button class="pantheon-r20-rail-link" type="button" data-r21-action="forum" title="Guild Forum" aria-label="Guild Forum"><span aria-hidden="true">☷</span></button>
+  <button class="pantheon-r20-rail-link" type="button" data-r21-action="salary" title="Salary Calculator" aria-label="Salary Calculator"><span aria-hidden="true">▤</span></button>
+  <div class="pantheon-r21-rail-divider" aria-hidden="true"></div>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="member-roster-page" title="Member Roster" aria-label="Member Roster"><span aria-hidden="true">♙</span></button>
   <div class="pantheon-r20-rail-spacer"></div>
   <button class="pantheon-r20-rail-link" type="button" data-r20-help title="Help" aria-label="Help"><span aria-hidden="true">?</span></button>
@@ -14052,6 +14056,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    syncRail();
  }));
  rail.querySelector('[data-r20-help]').addEventListener('click',()=>{if(typeof window.openHelpModal==='function')window.openHelpModal('start');});
+ rail.querySelector('[data-r21-action="forum"]').addEventListener('click',()=>{if(typeof window.openGuildForum==='function')window.openGuildForum();});
+ rail.querySelector('[data-r21-action="salary"]').addEventListener('click',()=>{if(typeof window.openSalaryModal==='function')window.openSalaryModal();});
  function syncRail(){
    const active=$$('.app-page').find(page=>!page.classList.contains('hidden-page'));
    rail.querySelectorAll('[data-r20-page]').forEach(button=>{
@@ -14075,7 +14081,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
  const actions=$('.control-actions');
  if(actions&&!actions.querySelector('.pantheon-r20-theme-pill')){
    const themes=document.createElement('div');themes.className='pantheon-r20-theme-pill';themes.setAttribute('role','group');themes.setAttribute('aria-label','Visual direction');
-   themes.innerHTML=`<button type="button" data-r20-theme="dark">Guild</button><button type="button" data-r20-theme="aegis">Aegis</button><button type="button" data-r20-theme="light">Clean</button><button type="button" data-r20-theme="pastel">Pastel</button><button type="button" data-r20-theme="eye-comfort" title="Eye Comfort" aria-label="Eye Comfort">Eye Comfort</button>`;
+   themes.innerHTML=`<button type="button" data-r20-theme="dark">Guild</button><button type="button" data-r20-theme="light">Clean</button><button type="button" data-r20-theme="pastel">Pastel</button><button type="button" data-r20-theme="eye-comfort" title="Eye Comfort" aria-label="Eye Comfort">Eye Comfort</button>`;
    const oldTheme=$('.app-theme-control'); if(oldTheme&&oldTheme.parentNode===actions)actions.insertBefore(themes,oldTheme);else actions.appendChild(themes);
    function syncTheme(){const current=document.documentElement.getAttribute('data-pantheon-theme')||'dark';themes.querySelectorAll('[data-r20-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.r20Theme===current)));}
    themes.querySelectorAll('[data-r20-theme]').forEach(b=>b.addEventListener('click',()=>{
@@ -14105,6 +14111,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
  if(brand&&liveStatus&&actions){controls.insertBefore(liveStatus,actions);liveStatus.classList.add('pantheon-r20-build-tag');}
  // Reformat actual Discord presence list to the mockup's Online Roster panel.
  const paneTitle=$('.online-presence-head-copy strong',pane);if(paneTitle)paneTitle.textContent='Online Roster';
+ const forumShortcut=$('#guild-forum-open',pane);if(forumShortcut)forumShortcut.remove();
  const list=$('#online-presence-list');
  if(list&&!pane.querySelector('.pantheon-r20-roster-tools')){
    const tools=document.createElement('div');tools.className='pantheon-r20-roster-tools';
@@ -14155,6 +14162,57 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    if(summary)new MutationObserver(updateStats).observe(summary,{childList:true,subtree:true,characterData:true});
    if(list)new MutationObserver(updateStats).observe(list,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});updateStats();
  }
+ // Weekly Tracker and Bounty Board are separate views. Weekly is always the first/default view.
+ const trackerForTabs=$('#tracker-page');
+ if(trackerForTabs && !$('#pantheon-r21-tracker-tabs')){
+   const tabs=document.createElement('div');tabs.id='pantheon-r21-tracker-tabs';tabs.className='pantheon-r21-tracker-tabs';tabs.setAttribute('role','tablist');tabs.setAttribute('aria-label','Tracker sections');
+   tabs.innerHTML=`<button type="button" class="pantheon-r21-tracker-tab is-active" role="tab" id="r21-weekly-tab" aria-controls="tracker-table-wrap" aria-selected="true" data-r21-tracker-tab="weekly"><span aria-hidden="true">▦</span><span>Weekly Tracker</span></button><button type="button" class="pantheon-r21-tracker-tab" role="tab" id="r21-bounty-tab" aria-controls="tracker-table-wrap" aria-selected="false" data-r21-tracker-tab="bounty"><span aria-hidden="true">⌖</span><span>Bounty Board</span></button>`;
+   const header=trackerForTabs.querySelector('.pantheon-r20-page-header');
+   const toolbar=$('#tracker-toolbar');
+   if(toolbar)trackerForTabs.insertBefore(tabs,toolbar);else if(header)header.after(tabs);else trackerForTabs.insertBefore(tabs,tracker.firstChild);
+   const oldToggle=$('#track-bounty-boards-btn');if(oldToggle){oldToggle.hidden=true;oldToggle.setAttribute('aria-hidden','true');oldToggle.tabIndex=-1;}
+   const share=$('#share-bounties-btn');if(share){share.textContent='📸 Bounty Screenshot';share.title='Create a shareable Bounty Board screenshot';share.setAttribute('aria-label','Create Bounty Board screenshot');}
+   const weeklyReport=$('#weekly-report-btn');
+   function syncTrackerTabUI(){
+     const bounty=!!trackBountyBoards;
+     tabs.querySelectorAll('[data-r21-tracker-tab]').forEach(button=>{const active=button.dataset.r21TrackerTab===(bounty?'bounty':'weekly');button.classList.toggle('is-active',active);button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;});
+     trackerForTabs.classList.toggle('pantheon-r21-bounty-view',bounty);
+     if(share)share.hidden=!bounty;
+     if(weeklyReport)weeklyReport.hidden=bounty;
+     const analyticsHeader=$('#tracker-analytics-header'),analyticsGrid=$('#analytics-grid'),resetNote=trackerForTabs.querySelector('.tracker-reset-note');
+     if(analyticsHeader)analyticsHeader.hidden=bounty;
+     if(analyticsGrid)analyticsGrid.hidden=bounty;
+     if(resetNote)resetNote.hidden=bounty;
+   }
+   window.setPantheonTrackerTab=function(view){
+     trackBountyBoards=view==='bounty';
+     syncTrackerTabUI();
+     if(typeof window.buildTrackerTable==='function')window.buildTrackerTable();
+     if(typeof window.applyBoardState==='function')window.applyBoardState();
+     if(!trackBountyBoards && typeof window.renderAnalytics==='function' && typeof isAnalyticsVisible!=='undefined' && isAnalyticsVisible)window.renderAnalytics();
+     syncTrackerTabUI();
+   };
+   tabs.querySelectorAll('[data-r21-tracker-tab]').forEach(button=>button.addEventListener('click',()=>window.setPantheonTrackerTab(button.dataset.r21TrackerTab)));
+   tabs.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight'].includes(event.key))return;event.preventDefault();const next=event.key==='ArrowRight'?'bounty':'weekly';window.setPantheonTrackerTab(next);tabs.querySelector(`[data-r21-tracker-tab="${next}"]`)?.focus();});
+   // Deliberately ignore any saved legacy "show bounty rows" preference.
+   trackBountyBoards=false;syncTrackerTabUI();
+ }
+ // Compact mode swaps long explanatory copy for short labels, rather than only shrinking padding.
+ const compactCopies=[
+   ['.pantheon-r20-hero-copy > p','Roster, tasks, teams, and cards in one place.'],
+   ['.overview-activity-panel .overview-panel-heading p','Next steps and follow-ups.'],
+   ['.overview-completion-panel .overview-panel-heading p','Weekly progress by character.'],
+   ['#tracker-view-hint','Personal / Universal view.'],
+   ['#online-presence-pane .online-presence-foot','Select a member · live status.'],
+   ['#tracker-page .pantheon-r20-page-sub','Track progress by category.']
+ ];
+ function bindCompactCopies(){
+   compactCopies.forEach(([selector,short])=>{$$(selector).forEach(node=>{if(node.dataset.r21CompactBound==='1')return;node.dataset.r21FullCopy=node.textContent.trim();node.dataset.r21CompactCopy=short;node.dataset.r21CompactBound='1';node.setAttribute('data-r21-full-copy','');});});
+ }
+ function syncCompactCopy(){const compact=document.body.classList.contains('pantheon-r20-compact');$$('[data-r21-full-copy]').forEach(node=>{node.textContent=compact?node.dataset.r21CompactCopy:node.dataset.r21FullCopy;});}
+ bindCompactCopies();setTimeout(()=>{bindCompactCopies();syncCompactCopy();},0);
+ const compactObserver=new MutationObserver(syncCompactCopy);compactObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
+ const compactButton=$('#r20-compact-toggle');if(compactButton){const label=()=>{compactButton.textContent=document.body.classList.contains('pantheon-r20-compact')?'Full labels':'Compact labels';};compactButton.addEventListener('click',()=>setTimeout(label,0));label();}
  // Tracker page has the mockup page-heading treatment; actual category table and toolbar remain intact.
  const tracker=$('#tracker-page');
  if(tracker&&!tracker.querySelector('.pantheon-r20-page-header')){
@@ -14173,5 +14231,46 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
  });
 })();
 </script>
+
+<style id="pantheon-r21-navigation-tracker-refinements">
+/* r21: utilities live in the left rail; Member Roster is the final destination above Help. */
+.pantheon-r21-rail-divider{width:34px;height:1px;flex:0 0 1px;margin:2px 0;background:var(--r20-border)}
+.pantheon-r20-user-chip{max-width:260px!important;gap:10px!important;padding-left:15px!important}
+.pantheon-r20-user-copy{min-width:105px!important;max-width:176px!important}
+.pantheon-r20-user-copy strong{max-width:176px!important;font-size:11px!important}
+.pantheon-r20-user-copy small{max-width:190px!important;font-size:9px!important}
+.pantheon-r21-tracker-tabs{display:flex;align-items:center;gap:6px;width:100%;margin:0 0 11px;padding:5px;border:1px solid var(--r20-border);border-radius:13px;background:var(--r20-panel);box-sizing:border-box}
+.pantheon-r21-tracker-tab{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:39px;padding:8px 15px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--r20-muted);font-size:11px;font-weight:800;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.pantheon-r21-tracker-tab:hover{background:var(--r20-panel2);color:var(--r20-text)}
+.pantheon-r21-tracker-tab.is-active{background:var(--r20-accent-soft);border-color:color-mix(in srgb,var(--r20-accent) 38%,var(--r20-border));color:var(--r20-accent2)}
+.pantheon-r21-tracker-tab span[aria-hidden="true"]{font-size:14px}
+#tracker-toolbar #track-bounty-boards-btn{display:none!important}
+#tracker-toolbar #share-bounties-btn[hidden],#tracker-toolbar #weekly-report-btn[hidden]{display:none!important}
+#tracker-page.pantheon-r21-bounty-view #tracker-analytics-header,
+#tracker-page.pantheon-r21-bounty-view #analytics-grid,
+#tracker-page.pantheon-r21-bounty-view .tracker-reset-note{display:none!important}
+#tracker-page.pantheon-r21-bounty-view #dn-tracker tfoot{display:none!important}
+#online-presence-pane #guild-forum-open{display:none!important}
+#online-presence-pane .online-presence-head-actions{gap:0!important}
+#online-presence-pane .online-presence-head-copy{row-gap:4px!important}
+.pantheon-r20-compact .pantheon-r20-hero-copy>p,
+.pantheon-r20-compact .overview-panel-heading p,
+.pantheon-r20-compact .pantheon-r20-page-sub{font-size:9px!important;line-height:1.35!important}
+.pantheon-r20-compact .pantheon-r20-hero-copy>p{max-width:520px!important}
+.pantheon-r20-compact .overview-panel-heading p{margin-top:2px!important}
+.pantheon-r20-compact .pantheon-r20-stat-foot{display:none!important}
+.pantheon-r20-compact .pantheon-r20-rail-link{width:44px;height:44px;flex-basis:44px}
+@media(max-width:1199px){
+ .pantheon-r20-user-chip{max-width:230px!important}
+ .pantheon-r20-user-copy{max-width:145px!important}
+ .pantheon-r21-tracker-tab{flex:1 1 0;min-width:0;padding:8px 9px}
+}
+@media(max-width:760px){
+ .pantheon-r20-user-copy{display:none!important}
+ .pantheon-r20-user-chip{max-width:none!important;padding-left:8px!important}
+ .pantheon-r21-tracker-tab{font-size:10px}
+}
+</style>
+
 </body>
 </html>
