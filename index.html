@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r43</title>
+    <title>Pantheon Tools v1.6.9-r44</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4377,9 +4377,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r43</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r44</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r43:</strong> Tracker Focus Guide is now always active. Hover, keyboard-focus, or tap a task cell to trace its dungeon row and character column.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r44:</strong> Tracker Focus Guide row highlighting now follows the same high-contrast inverse treatment as the character column, including task labels and category cells.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -13769,7 +13769,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r43';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r44';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -15797,7 +15797,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   --tracker-guide-check:#f1d8ff;
 }
 /* Every cell in the active dungeon row and selected character column inverts together. */
-#dn-tracker tr.tracker-guide-row>td,
+#dn-tracker td.interactive-cell.tracker-guide-row-cell,
+#dn-tracker td.task-name.tracker-guide-row-cell,
+#dn-tracker td.col-category.tracker-guide-row-cell,
 #dn-tracker td.interactive-cell.tracker-guide-column,
 #dn-tracker #header-row th.char-col.tracker-guide-column,
 #dn-tracker #footer-row th.char-col.tracker-guide-column{
@@ -15809,7 +15811,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   text-shadow:none!important;
 }
 /* Force nested labels and text to follow the inverse palette, including header IGN/class text. */
-#dn-tracker tr.tracker-guide-row>td *,
+#dn-tracker td.interactive-cell.tracker-guide-row-cell *,
+#dn-tracker td.task-name.tracker-guide-row-cell *,
+#dn-tracker td.col-category.tracker-guide-row-cell *,
 #dn-tracker td.interactive-cell.tracker-guide-column *,
 #dn-tracker #header-row th.char-col.tracker-guide-column *,
 #dn-tracker #footer-row th.char-col.tracker-guide-column *{
@@ -15817,25 +15821,25 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
   text-shadow:none!important;
 }
-#dn-tracker tr.tracker-guide-row>td .tracker-char-star,
+#dn-tracker td.tracker-guide-row-cell .tracker-char-star,
 #dn-tracker #header-row th.char-col.tracker-guide-column .tracker-char-star{
   color:var(--tracker-guide-inverse-muted,#e6edff)!important;
   -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
 }
 /* Native checkboxes and bounty text fields remain readable on the inverted path. */
-#dn-tracker tr.tracker-guide-row>td input[type="checkbox"],
+#dn-tracker td.interactive-cell.tracker-guide-row-cell input[type="checkbox"],
 #dn-tracker td.interactive-cell.tracker-guide-column input[type="checkbox"]{
   accent-color:var(--tracker-guide-check,#d7e5ff)!important;
   filter:none!important;
 }
-#dn-tracker tr.tracker-guide-row>td .bounty-input,
+#dn-tracker td.interactive-cell.tracker-guide-row-cell .bounty-input,
 #dn-tracker td.interactive-cell.tracker-guide-column .bounty-input{
   background:color-mix(in srgb,var(--tracker-guide-inverse-bg,#253651) 72%,#000)!important;
   color:var(--tracker-guide-inverse-ink,#fff)!important;
   -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
   border-color:var(--tracker-guide-inverse-border,#9cb4e8)!important;
 }
-#dn-tracker tr.tracker-guide-row>td .bounty-input::placeholder,
+#dn-tracker td.interactive-cell.tracker-guide-row-cell .bounty-input::placeholder,
 #dn-tracker td.interactive-cell.tracker-guide-column .bounty-input::placeholder{
   color:var(--tracker-guide-inverse-muted,#e6edff)!important;
   -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
@@ -15880,7 +15884,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   let pinned = false;
   let currentCell = null;
   function clearClasses() {
-    table.querySelectorAll('.tracker-guide-row,.tracker-guide-column,.tracker-guide-cell').forEach(node => {
+    table.querySelectorAll('.tracker-guide-row,.tracker-guide-row-cell,.tracker-guide-column,.tracker-guide-cell').forEach(node => {
       node.classList.remove('tracker-guide-row','tracker-guide-column','tracker-guide-cell');
     });
     currentCell = null;
@@ -15891,7 +15895,24 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     currentCell = cell;
     const row = cell.closest('tr.task-row');
     const charName = cell.dataset.char || '';
-    if (row) row.classList.add('tracker-guide-row');
+    if (row) {
+      row.classList.add('tracker-guide-row');
+      // Apply the row path to each actual table cell. Matching the column selector's
+      // specificity prevents the theme's base cell backgrounds from overriding it.
+      row.querySelectorAll(':scope > td').forEach(node => node.classList.add('tracker-guide-row-cell'));
+      // Category labels use rowspan; include the spanning category cell when it covers this row.
+      let previous = row.previousElementSibling;
+      let distance = 1;
+      while (previous && previous.matches('tr.task-row')) {
+        const categoryCell = previous.querySelector(':scope > td.col-category');
+        if (categoryCell) {
+          if ((Number(categoryCell.rowSpan) || 1) > distance) categoryCell.classList.add('tracker-guide-row-cell');
+          break;
+        }
+        previous = previous.previousElementSibling;
+        distance += 1;
+      }
+    }
     if (charName) {
       table.querySelectorAll('td.interactive-cell[data-char],#header-row th.char-col[data-char],#footer-row th.char-col[data-char]').forEach(node => {
         if (node.dataset.char === charName) node.classList.add('tracker-guide-column');
