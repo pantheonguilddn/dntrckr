@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r30</title>
+    <title>Pantheon Tools v1.6.9-r31</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3896,6 +3896,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 @media(max-width:620px){#team-builder-page .team-slot-grid.is-eight-man,#team-builder-page .team-slot-grid.is-four-man{grid-template-columns:minmax(0,1fr)!important}#team-builder-page .team-balance-grid{grid-template-columns:minmax(0,1fr)!important}}
 </style>
 
+
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -4162,7 +4164,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             <div class="builder-header-actions">
                 <button class="team-mini-btn" type="button" onclick="shareTeamBuilderAsImage()">📸 Share Party Setup</button>
                 <button class="btn btn-secondary" type="button" onclick="openClassSetupModal()">🎓 Configure Classes</button>
-                <button class="btn btn-weights" type="button" onclick="openRoleConfigModal()">⚙ Role Settings</button>
+                <button id="open-role-settings-btn" class="btn btn-weights" type="button" onclick="openRoleConfigModal()">⚙ Role Settings</button>
                 <button id="manage-class-job-catalog-btn" class="btn btn-secondary" type="button" hidden onclick="openClassJobCatalogModal()">＋ Classes / Jobs</button>
             </div>
         </div>
@@ -4358,9 +4360,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r30</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r31</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r30:</strong> Role Settings button contrast now follows the active theme. Character Roster Analytics is displayed in a wide, swipeable carousel with per-character five-week trends and personalized priorities. Team Builder party sharing now captures the actual 4-Man or 8-Man layout, including role details and the selected theme.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r31:</strong> Role Settings button contrast now follows the active theme. Character Roster Analytics is displayed in a wide, swipeable carousel with per-character five-week trends and personalized priorities. Team Builder party sharing now captures the actual 4-Man or 8-Man layout, including role details and the selected theme.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -12854,6 +12856,16 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             }
 
             const clone = sourceCard.cloneNode(true);
+            // Main-character gold outlines are useful in the live editor but html2canvas
+            // rasterizes them inconsistently on the multi-card capture, producing oversized
+            // strokes over nearby text. Keep the explicit ★ Main tag in the export while
+            // neutralizing only the decorative card outline in the image clone.
+            clone.querySelectorAll('.team-slot-card.is-main-character').forEach(card => {
+                card.classList.remove('is-main-character');
+                card.style.border = '1px solid var(--pt-border)';
+                card.style.boxShadow = 'none';
+                card.style.outline = 'none';
+            });
             clone.querySelectorAll('.share-ignore, .remove-slot-btn, button').forEach(el => el.remove());
 
             // Copy the actual selected values into static fields, retaining the live select's
@@ -13601,7 +13613,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r30';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r31';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14341,7 +14353,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r30';
+  const CURRENT_BUILD = '1.6.9-r31';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -15098,6 +15110,59 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 @media(max-width:900px){#overview-page .pt-insight-slide{grid-template-columns:minmax(0,1fr) minmax(200px,.72fr)!important;gap:16px!important}}
 @media(max-width:700px){#overview-page .overview-activity-panel,#overview-page .overview-completion-panel{padding:14px!important}#overview-page .pt-overview-carousel{padding:8px!important}#overview-page .pt-insight-slide{grid-template-columns:minmax(0,1fr)!important;gap:14px!important;min-height:0!important;padding:17px!important}#overview-page .pt-insight-slide h3{font-size:1.2rem!important}#overview-page .pt-insight-body-full,#overview-page .pt-insight-body-compact{font-size:.73rem!important;line-height:1.7!important}#overview-page .pt-insight-side-card{padding:13px!important}#overview-page .pt-overview-carousel-footer{align-items:flex-start!important;flex-direction:column!important}#overview-page .pt-overview-carousel-controls{width:100%!important;justify-content:flex-end!important;flex-wrap:wrap!important}#overview-page .pt-overview-carousel-auto-note{display:none!important}#overview-page .pt-overview-carousel-status{min-width:0!important}}
 @media(prefers-reduced-motion:reduce){#overview-page .pt-overview-carousel-track,#overview-page .pt-overview-carousel-dot,#overview-page .pt-insight-bar span{transition:none!important}}
+</style>
+
+
+<style id="pantheon-r31-share-main-outline-and-role-settings-contrast">
+/* Exported images retain the ★ Main label but not the fragile gold outline around main-character cards. */
+#team-builder-page .team-builder-share-stage .team-slot-card.is-main-character {
+  border:1px solid var(--pt-border)!important;
+  box-shadow:none!important;
+  outline:none!important;
+}
+
+/* This must remain the final stylesheet override: several legacy theme blocks are emitted
+   late in the document and previously overrode the earlier button fix. */
+#open-role-settings-btn {
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:38px!important;
+  padding:9px 13px!important;
+  border-width:1px!important;
+  border-style:solid!important;
+  border-radius:9px!important;
+  font-weight:850!important;
+  text-shadow:none!important;
+  opacity:1!important;
+  visibility:visible!important;
+  filter:none;
+}
+:root[data-pantheon-theme="dark"] #open-role-settings-btn {
+  background:#5267d9!important;border-color:#7082ec!important;color:#ffffff!important;-webkit-text-fill-color:#ffffff!important;
+}
+:root[data-pantheon-theme="light"] #open-role-settings-btn {
+  background:#d5e5f7!important;border-color:#527fb4!important;color:#263f59!important;-webkit-text-fill-color:#263f59!important;
+}
+:root[data-pantheon-theme="eye-comfort"] #open-role-settings-btn {
+  background:#d9e0d3!important;border-color:#71846c!important;color:#394537!important;-webkit-text-fill-color:#394537!important;
+}
+:root[data-pantheon-theme="pastel"] #open-role-settings-btn {
+  background:#e3d1f0!important;border-color:#78509c!important;color:#45304f!important;-webkit-text-fill-color:#45304f!important;
+}
+#open-role-settings-btn:hover,
+#open-role-settings-btn:focus-visible {
+  filter:brightness(.97)!important;
+  outline:2px solid var(--pt-accent)!important;
+  outline-offset:2px!important;
+}
+:root[data-pantheon-theme] #role-config-modal .modal-actions button.btn-weights {
+  background:var(--pt-accent-soft)!important;
+  border:1px solid var(--pt-accent)!important;
+  color:var(--pt-text)!important;
+  -webkit-text-fill-color:var(--pt-text)!important;
+  text-shadow:none!important;
+}
 </style>
 
 </body>

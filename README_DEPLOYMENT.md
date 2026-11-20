@@ -1,24 +1,18 @@
-# Deployment - Pantheon Tools v1.6.9-r30
+# Deployment - Pantheon Tools v1.6.9-r31
 
-This package updates the existing Pantheon Tools Cloudflare Pages project. Deploy into the existing `dntrckr` project; do not create a new Pages project and do not reset or replace the D1 database.
+Deploy this package to the existing Cloudflare Pages project `dntrckr`. Do not create a new project, reset the D1 database, clear browser storage, or change existing bindings/secrets/OAuth settings.
 
-## Deploy
-
-From this extracted directory, run:
+From the extracted package directory:
 
 ```powershell
 npx wrangler login
 npx wrangler pages deploy . --project-name=dntrckr
 ```
 
-Alternatively, use the repository's existing Pages deployment workflow. Preserve all existing Cloudflare Pages bindings, environment variables, secrets, OAuth configuration, and D1 database bindings. No SQL migration is required for this release.
+After deployment, verify `https://dntrckr.pages.dev/version.json` reports `1.6.9-r31`.
 
-## Verify after deployment
+Then check:
+- In Team Builder, select a main character and use Share Party Setup. The PNG should retain the `★ Main` label but show normal thin card borders with readable text. Confirm the live builder still highlights main characters normally.
+- Switch Dark, Light, Eye Comfort, and Pastel. The Role Settings header button should have readable text in each theme. Open the modal and check the Save Role Settings action too.
 
-Open `https://dntrckr.pages.dev/version.json` and confirm the build is `1.6.9-r30`. Then sign in and check:
-
-- Role Settings button text remains readable in Dark, Light, Eye Comfort, and Pastel themes.
-- Roster Analytics character cards display in a wide horizontal carousel with swipe/scroll and previous/next controls.
-- Team Builder Share copies or downloads an image reflecting the selected 4-Man or 8-Man layout, including 4 + 4 rows for 8-Man, role descriptions, and the active theme.
-
-This release does not alter the D1 schema, authentication, tracker synchronization, or historical records. Do not clear browser storage. Team Builder remains local-save.
+This release changes only `index.html` styles/share-clone behavior, version markers, and release documentation. Backend, D1 schema/data, authentication, synchronization, and stored Tracker history are unchanged.
