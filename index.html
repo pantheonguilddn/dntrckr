@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r38</title>
+    <title>Pantheon Tools v1.6.9-r40</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3266,10 +3266,26 @@ body.developer-mode-active .app-page button:hover { outline-offset:2px; }
 .guild-forum-comment-head button { padding:0; border:0; background:transparent; color:var(--pt-accent); font:750 .62rem system-ui; cursor:pointer; }
 .guild-forum-comment-head small { color:var(--pt-muted); font-size:.53rem; }
 .guild-forum-comment p { margin:5px 0; color:var(--pt-text); font-size:.67rem; line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere; }
+.guild-forum-comment-photo-wrap { max-width:min(100%,520px); margin:8px 0; overflow:hidden; border:1px solid var(--pt-border); border-radius:9px; background:var(--pt-surface); }
+.guild-forum-comment-photo { display:block; width:100%; max-height:360px; object-fit:contain; background:var(--pt-surface); }
+.guild-forum-comment-attachment { display:flex; align-items:center; flex-wrap:wrap; gap:7px; flex:0 0 100%; color:var(--pt-muted); font-size:.57rem; }
+.guild-forum-comment-photo-picker { display:inline-flex; align-items:center; min-height:30px; padding:6px 9px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font-weight:800; cursor:pointer; }
+.guild-forum-comment-photo-clear { padding:4px 0; border:0; background:transparent; color:var(--pt-accent); font:700 .59rem system-ui; cursor:pointer; }
+.guild-forum-comment-photo-preview { display:block; max-width:min(100%,320px); max-height:140px; margin:2px 0 0; object-fit:contain; border:1px solid var(--pt-border); border-radius:8px; }
+.guild-forum-comment-photo-preview[hidden] { display:none; }
+.guild-forum-comment-photo-status { color:var(--pt-muted); font-size:.56rem; }
 .guild-forum-comment-actions { display:flex; gap:10px; }
 .guild-forum-comment-actions button { padding:0; border:0; background:transparent; color:var(--pt-muted); font:650 .55rem system-ui; cursor:pointer; }
 .guild-forum-comment-form { display:flex; align-items:flex-end; flex-wrap:wrap; gap:7px; margin-top:9px; }
 .guild-forum-comment-form textarea { flex:1 1 220px; min-width:0; min-height:40px; box-sizing:border-box; padding:8px 9px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font:inherit; font-size:.67rem; resize:vertical; }
+.guild-forum-inline-edit { display:grid; gap:8px; margin:9px 0; padding:10px; border:1px solid var(--pt-border); border-radius:10px; background:var(--pt-surface-soft); }
+.guild-forum-inline-edit label { display:grid; gap:4px; color:var(--pt-muted); font-size:.59rem; font-weight:750; }
+.guild-forum-inline-edit input,.guild-forum-inline-edit select,.guild-forum-inline-edit textarea { width:100%; min-width:0; box-sizing:border-box; padding:8px 9px; border:1px solid var(--pt-border); border-radius:8px; background:var(--pt-surface); color:var(--pt-text); font:inherit; font-size:.68rem; }
+.guild-forum-inline-edit textarea { min-height:72px; resize:vertical; }
+.guild-forum-inline-edit-actions { display:flex; flex-wrap:wrap; gap:7px; justify-content:flex-end; }
+.guild-forum-edit-note { color:var(--pt-muted); font-size:.56rem; }
+.guild-forum-post-actions button[data-forum-edit-post],.guild-forum-post-actions button[data-forum-delete-post] { width:auto; min-width:48px; padding:0 8px; font-size:.58rem; font-weight:750; }
+.guild-forum-comment-actions button[data-forum-edit-comment],.guild-forum-comment-actions button[data-forum-delete-comment] { color:var(--pt-muted); }
 .guild-forum-reply-target { flex:0 0 100%; padding:5px 7px; border-left:3px solid var(--pt-accent); background:var(--pt-accent-soft); color:var(--pt-text); font-size:.58rem; overflow-wrap:anywhere; }
 .guild-forum-no-comments { color:var(--pt-muted); font-size:.6rem; }
 .guild-forum-empty { display:grid; justify-items:center; gap:7px; padding:35px 15px; text-align:center; color:var(--pt-muted); }
@@ -4020,7 +4036,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             </section>
             <section id="guild-forum-panel" class="guild-forum-panel" hidden>
                 <div class="guild-forum-toolbar">
-                    <div><div class="guild-forum-eyebrow">THE GUILD HALL · COMMUNITY THREADS</div><strong>Guild Forum</strong><small>Guild achievements, nest clears, screenshots, party calls, and discussions. Reply to keep each thread together.</small></div>
+                    <div><div class="guild-forum-eyebrow">THE GUILD HALL · COMMUNITY THREADS</div><strong>Guild Forum</strong><small>Guild achievements, nest clears, screenshots, party calls, and discussions. Reply with text or photos to keep each thread together.</small></div>
                     <div class="guild-forum-toolbar-actions"><button type="button" class="btn btn-secondary" onclick="loadGuildForum(true)">Refresh</button><button type="button" class="btn btn-cloud" id="guild-forum-compose-toggle" onclick="toggleGuildForumComposer(true)">＋ New Post</button></div>
                 </div>
                 <div class="guild-forum-filters" id="guild-forum-filters">
@@ -4360,9 +4376,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r38</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r40</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r38:</strong> The Guild Hub now uses a slow, theme-aware smoke swirl instead of the yellow accent haze. Background selection is a shared admin-only setting.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r40:</strong> Guild Forum posts and replies can now be edited by their authors. Administrators can also remove posts and replies from any member.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -9255,7 +9271,10 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         let guildForumFilter = 'all';
         let guildForumNextBefore = 0;
         let guildForumLoading = false;
+        let guildForumEditingPostId = '';
+        let guildForumEditingCommentId = '';
         let guildForumPhotoDataUrl = '';
+        const guildForumReplyPhotosByPost = new Map();
         let guildForumExpandedComments = new Set();
         let guildForumReplyTargets = new Map();
         const guildForumCategoryLabels = { announcement:'Guild notice', achievement:'Achievement', raid:'Dungeon report', party:'Party up', general:'General' };
@@ -9316,9 +9335,107 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 if (status) status.textContent = 'Photo ready ✓';
             } catch (error) { clearGuildForumPhoto(); if (status) status.textContent = error.message || 'Photo could not be prepared.'; }
         }
+        function clearGuildForumReplyPhoto(postId) {
+            const key = String(postId || '');
+            guildForumReplyPhotosByPost.delete(key);
+            const form = Array.from(document.querySelectorAll('[data-forum-comment-form]')).find(item => String(item.dataset.forumCommentForm) === key);
+            if (!form) return;
+            const input = form.querySelector('[data-forum-reply-photo-input]'); if (input) input.value = '';
+            const preview = form.querySelector('.guild-forum-comment-photo-preview'); if (preview) { preview.removeAttribute('src'); preview.hidden = true; }
+            const name = form.querySelector('.guild-forum-comment-photo-name'); if (name) name.textContent = 'No photo attached';
+            const clear = form.querySelector('[data-forum-clear-reply-photo]'); if (clear) clear.hidden = true;
+            const status = form.querySelector('.guild-forum-comment-photo-status'); if (status) status.textContent = '';
+        }
+        async function onGuildForumReplyPhotoSelected(postId,file) {
+            const key = String(postId || '');
+            const form = Array.from(document.querySelectorAll('[data-forum-comment-form]')).find(item => String(item.dataset.forumCommentForm) === key);
+            if (!form || !file) return;
+            const status = form.querySelector('.guild-forum-comment-photo-status');
+            try {
+                if (status) status.textContent = 'Preparing photo…';
+                const dataUrl = await compressGuildForumPhoto(file);
+                guildForumReplyPhotosByPost.set(key,dataUrl);
+                const preview = form.querySelector('.guild-forum-comment-photo-preview'); if (preview) { preview.src = dataUrl; preview.hidden = false; }
+                const name = form.querySelector('.guild-forum-comment-photo-name'); if (name) name.textContent = `${file.name} · compressed`;
+                const clear = form.querySelector('[data-forum-clear-reply-photo]'); if (clear) clear.hidden = false;
+                if (status) status.textContent = 'Photo ready ✓';
+            } catch (error) {
+                clearGuildForumReplyPhoto(key);
+                if (status) status.textContent = error.message || 'Photo could not be prepared.';
+            }
+        }
         function formatGuildForumTime(timestamp) {
             if (!Number(timestamp)) return '';
             return new Date(Number(timestamp)).toLocaleString([], { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+        }
+        function renderGuildForumPostEditForm(post) {
+            const categories = Object.entries(guildForumCategoryLabels).map(([value,label]) => `<option value="${escapeHTML(value)}" ${post.category===value?'selected':''}>${escapeHTML(label)}</option>`).join('');
+            return `<form class="guild-forum-inline-edit" data-forum-edit-post-form="${escapeHTML(post.id)}">
+                <label>Post type<select name="category">${categories}</select></label>
+                <label>Title<input name="title" maxlength="100" required value="${escapeHTML(post.title || '')}"></label>
+                <label>Post text<textarea name="body" maxlength="2200" rows="4">${escapeHTML(post.body || '')}</textarea></label>
+                ${post.hasImage ? '<small class="guild-forum-edit-note">The attached photo will remain unchanged.</small>' : ''}
+                <div class="guild-forum-inline-edit-actions"><button type="submit" class="btn btn-cloud">Save changes</button><button type="button" class="btn btn-secondary" data-forum-cancel-edit-post>Cancel</button></div>
+            </form>`;
+        }
+        function renderGuildForumCommentEditForm(item) {
+            return `<form class="guild-forum-inline-edit guild-forum-inline-edit-reply" data-forum-edit-comment-form="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(item.postId || '')}">
+                <label>Reply<textarea name="body" maxlength="1500" rows="3">${escapeHTML(item.body || '')}</textarea></label>
+                ${item.hasImage ? '<small class="guild-forum-edit-note">The attached photo will remain unchanged.</small>' : ''}
+                <div class="guild-forum-inline-edit-actions"><button type="submit" class="btn btn-cloud">Save changes</button><button type="button" class="btn btn-secondary" data-forum-cancel-edit-comment>Cancel</button></div>
+            </form>`;
+        }
+        function beginEditGuildForumPost(postId) {
+            const post = guildForumPosts.find(item => String(item.id) === String(postId));
+            if (!post?.canEdit) return;
+            guildForumEditingPostId = String(post.id);
+            guildForumEditingCommentId = '';
+            renderGuildForumPosts(false);
+            document.querySelector(`[data-forum-edit-post-form="${CSS.escape(String(post.id))}"] input[name="title"]`)?.focus();
+        }
+        function cancelEditGuildForumPost() { guildForumEditingPostId = ''; renderGuildForumPosts(false); }
+        async function saveGuildForumPostEdit(form) {
+            const postId = String(form.dataset.forumEditPostForm || '');
+            const title = String(form.querySelector('[name="title"]')?.value || '').trim();
+            const category = String(form.querySelector('[name="category"]')?.value || 'general');
+            const body = String(form.querySelector('[name="body"]')?.value || '').trim();
+            const submit = form.querySelector('button[type="submit"]');
+            if (!title) { alert('A post title is required.'); return; }
+            if (submit) { submit.disabled = true; submit.textContent = 'Saving…'; }
+            try {
+                const response = await fetch('/api/forum',{ method:'PATCH', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'edit-post',postId,title,category,body}) });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || 'Post could not be updated.');
+                guildForumEditingPostId = '';
+                await loadGuildForum(true);
+            } catch (error) { alert(error.message || 'Post could not be updated.'); if (submit) { submit.disabled=false; submit.textContent='Save changes'; } }
+        }
+        function beginEditGuildForumComment(commentId,postId) {
+            const item = (guildForumCommentsByPost.get(String(postId)) || []).find(row => String(row.id) === String(commentId));
+            if (!item?.canEdit) return;
+            guildForumEditingCommentId = String(item.id);
+            guildForumEditingPostId = '';
+            guildForumExpandedComments.add(String(postId));
+            renderGuildForumPosts(false);
+            document.querySelector(`[data-forum-edit-comment-form="${CSS.escape(String(item.id))}"] textarea`)?.focus();
+        }
+        function cancelEditGuildForumComment() { guildForumEditingCommentId = ''; renderGuildForumPosts(false); }
+        async function saveGuildForumCommentEdit(form) {
+            const commentId = String(form.dataset.forumEditCommentForm || '');
+            const body = String(form.querySelector('[name="body"]')?.value || '').trim();
+            const submit = form.querySelector('button[type="submit"]');
+            if (submit) { submit.disabled=true; submit.textContent='Saving…'; }
+            try {
+                const response = await fetch('/api/forum',{ method:'PATCH', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type:'edit-comment',commentId,body}) });
+                const data = await response.json().catch(()=>({}));
+                if (!response.ok) throw new Error(data.error || 'Reply could not be updated.');
+                guildForumEditingCommentId = '';
+                const postId = String(form.closest('[data-forum-post-card]')?.dataset.forumPostCard || '');
+                const comments = await fetch(`/api/forum?commentsFor=${encodeURIComponent(postId)}`,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());
+                if (!comments.ok) throw new Error(comments.error || 'Updated reply could not be reloaded.');
+                guildForumCommentsByPost.set(postId,Array.isArray(comments.comments)?comments.comments:[]);
+                renderGuildForumPosts(false);
+            } catch (error) { alert(error.message || 'Reply could not be updated.'); if (submit) { submit.disabled=false; submit.textContent='Save changes'; } }
         }
         function renderGuildForumPosts(append=false) {
             const host = document.getElementById('guild-forum-feed');
@@ -9330,10 +9447,13 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 const commentsOpen = guildForumExpandedComments.has(String(post.id));
                 const comments = guildForumCommentsByPost.get(String(post.id)) || [];
                 const imageMarkup = post.hasImage ? `<div class="guild-forum-post-photo-wrap"><img class="guild-forum-post-photo" src="/api/forum?imageFor=${encodeURIComponent(post.id)}" alt="Guild photo attached to ${escapeHTML(post.title)}" loading="lazy"></div>` : '';
+                const postEditing = guildForumEditingPostId === String(post.id) && post.canEdit;
+                const actionMarkup = `${post.pinned ? '<span title="Pinned by an administrator">Pinned</span>' : ''}${post.canEdit ? `<button type="button" data-forum-edit-post="${escapeHTML(post.id)}" title="Edit your post">Edit</button>` : ''}${post.canDelete ? `<button type="button" data-forum-delete-post="${escapeHTML(post.id)}" title="Remove post">Remove</button>` : ''}`;
+                const contentMarkup = postEditing ? renderGuildForumPostEditForm(post) : `<h4>${escapeHTML(post.title)}</h4>${post.body ? `<p class="guild-forum-post-body">${escapeHTML(post.body)}</p>` : ''}${imageMarkup}`;
                 return `<article class="guild-forum-post ${post.pinned ? 'is-pinned' : ''}" data-forum-post-card="${escapeHTML(post.id)}">
-                    <div class="guild-forum-post-head"><button type="button" class="guild-forum-author" data-social-discord-id="${escapeHTML(post.authorDiscordId)}">${guildProfileAvatarMarkup(author,'guild-forum-avatar')}<span><strong>${escapeHTML(authorName)}</strong><small>${escapeHTML(guildForumCategoryLabels[post.category] || 'Guild post')} · ${escapeHTML(formatGuildForumTime(post.createdAt))}</small></span></button><div class="guild-forum-post-actions">${post.pinned ? '<span title="Pinned by an administrator">Pinned</span>' : ''}${post.canDelete ? `<button type="button" data-forum-delete-post="${escapeHTML(post.id)}" title="Remove post">⋯</button>` : ''}</div></div>
-                    <h4>${escapeHTML(post.title)}</h4>${post.body ? `<p class="guild-forum-post-body">${escapeHTML(post.body)}</p>` : ''}${imageMarkup}
-                    <div class="guild-forum-post-foot"><button type="button" data-forum-toggle-comments="${escapeHTML(post.id)}">${post.commentsCount} ${post.commentsCount === 1 ? 'reply' : 'replies'} ${commentsOpen ? '⌃' : '⌄'}</button><span>Pantheon Guild</span></div>
+                    <div class="guild-forum-post-head"><button type="button" class="guild-forum-author" data-social-discord-id="${escapeHTML(post.authorDiscordId)}">${guildProfileAvatarMarkup(author,'guild-forum-avatar')}<span><strong>${escapeHTML(authorName)}</strong><small>${escapeHTML(guildForumCategoryLabels[post.category] || 'Guild post')} · ${escapeHTML(formatGuildForumTime(post.createdAt))}</small></span></button><div class="guild-forum-post-actions">${postEditing ? '' : actionMarkup}</div></div>
+                    ${contentMarkup}
+                    ${postEditing ? '' : `<div class="guild-forum-post-foot"><button type="button" data-forum-toggle-comments="${escapeHTML(post.id)}">${post.commentsCount} ${post.commentsCount === 1 ? 'reply' : 'replies'} ${commentsOpen ? '⌃' : '⌄'}</button><span>Pantheon Guild</span></div>`}
                     <section class="guild-forum-comments" id="guild-forum-comments-${escapeHTML(post.id)}" ${commentsOpen ? '' : 'hidden'}>${commentsOpen ? renderGuildForumComments(post.id,comments) : ''}</section>
                 </article>`;
             }).join('');
@@ -9345,6 +9465,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 host.dataset.forumEventsBound = 'true';
                 host.addEventListener('click', event => {
                     const toggle = event.target.closest('[data-forum-toggle-comments]'); if (toggle) { toggleGuildForumComments(toggle.dataset.forumToggleComments); return; }
+                    const editPost = event.target.closest('[data-forum-edit-post]'); if (editPost) { beginEditGuildForumPost(editPost.dataset.forumEditPost); return; }
+                    const cancelPost = event.target.closest('[data-forum-cancel-edit-post]'); if (cancelPost) { cancelEditGuildForumPost(); return; }
                     const remove = event.target.closest('[data-forum-delete-post]'); if (remove) { deleteGuildForumPost(remove.dataset.forumDeletePost); return; }
                 });
             }
@@ -9353,15 +9475,19 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             const rows = Array.isArray(comments) ? comments : [];
             const byParent = new Map();
             rows.forEach(item => { const key = String(item.parentCommentId || ''); if (!byParent.has(key)) byParent.set(key,[]); byParent.get(key).push(item); });
-            const ownId = String(pantheonDiscordUser?.id || '');
             const draw = (items,depth=0) => items.map(item => {
                 const author = guildPresenceByDiscordId.get(String(item.authorDiscordId)) || { id:item.authorDiscordId, pantheonName:item.authorName || 'Member' };
                 const name = item.authorName || author.pantheonName || 'Member';
                 const children = byParent.get(String(item.id)) || [];
-                return `<div class="guild-forum-comment" style="--comment-depth:${Math.min(depth,3)}"><div class="guild-forum-comment-head"><button type="button" data-social-discord-id="${escapeHTML(item.authorDiscordId)}">${escapeHTML(name)}</button><small>${escapeHTML(formatGuildForumTime(item.createdAt))}</small></div><p>${escapeHTML(item.body)}</p><div class="guild-forum-comment-actions"><button type="button" data-forum-reply-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">↩ Reply</button>${item.canDelete ? `<button type="button" data-forum-delete-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">Remove</button>` : ''}</div>${draw(children,depth+1)}</div>`;
+                const photo = item.hasImage ? `<div class="guild-forum-comment-photo-wrap"><img class="guild-forum-comment-photo" src="/api/forum?commentImageFor=${encodeURIComponent(item.id)}" alt="Photo attached to ${escapeHTML(name)}'s reply" loading="lazy"></div>` : '';
+                const editing = guildForumEditingCommentId === String(item.id) && item.canEdit;
+                const editMarkup = editing ? renderGuildForumCommentEditForm({ ...item, postId }) : `${item.body ? `<p>${escapeHTML(item.body)}</p>` : ''}${photo}`;
+                const actionMarkup = `${item.canEdit ? `<button type="button" data-forum-edit-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">Edit</button>` : ''}${item.canDelete ? `<button type="button" data-forum-delete-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">Remove</button>` : ''}`;
+                return `<div class="guild-forum-comment" style="--comment-depth:${Math.min(depth,3)}"><div class="guild-forum-comment-head"><button type="button" data-social-discord-id="${escapeHTML(item.authorDiscordId)}">${escapeHTML(name)}</button><small>${escapeHTML(formatGuildForumTime(item.createdAt))}</small></div>${editMarkup}<div class="guild-forum-comment-actions">${editing ? '' : `<button type="button" data-forum-reply-comment="${escapeHTML(item.id)}" data-forum-post="${escapeHTML(postId)}">↩ Reply</button>${actionMarkup}`}</div>${draw(children,depth+1)}</div>`;
             }).join('');
             const top = byParent.get('') || [];
-            return `<div class="guild-forum-comment-list">${draw(top) || '<small class="guild-forum-no-comments">No replies yet. Be the first to respond.</small>'}</div><form class="guild-forum-comment-form" data-forum-comment-form="${escapeHTML(postId)}"><div class="guild-forum-reply-target" id="guild-forum-reply-target-${escapeHTML(postId)}" hidden></div><textarea rows="2" maxlength="1500" placeholder="Write a reply…" aria-label="Write a reply"></textarea><button type="submit" class="btn btn-secondary">Reply ↗</button></form>`;
+            const replyPhoto = guildForumReplyPhotosByPost.get(String(postId)) || '';
+            return `<div class="guild-forum-comment-list">${draw(top) || '<small class="guild-forum-no-comments">No replies yet. Be the first to respond.</small>'}</div><form class="guild-forum-comment-form" data-forum-comment-form="${escapeHTML(postId)}"><div class="guild-forum-reply-target" id="guild-forum-reply-target-${escapeHTML(postId)}" hidden></div><textarea rows="2" maxlength="1500" placeholder="Write a reply…" aria-label="Write a reply"></textarea><div class="guild-forum-comment-attachment"><label class="guild-forum-comment-photo-picker">Attach photo<input type="file" accept="image/jpeg,image/png,image/webp" data-forum-reply-photo-input="${escapeHTML(postId)}" hidden></label><span class="guild-forum-comment-photo-name">${replyPhoto ? 'Photo attached' : 'No photo attached'}</span><button type="button" class="guild-forum-comment-photo-clear" data-forum-clear-reply-photo="${escapeHTML(postId)}" ${replyPhoto ? '' : 'hidden'}>Remove</button><span class="guild-forum-comment-photo-status" role="status" aria-live="polite"></span></div><img class="guild-forum-comment-photo-preview" alt="Reply photo preview" src="${replyPhoto}" ${replyPhoto ? '' : 'hidden'}><button type="submit" class="btn btn-secondary">Reply ↗</button></form>`;
         }
         async function loadGuildForum(reset=true) {
             if (guildForumLoading) return;
@@ -9418,12 +9544,13 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         }
         async function submitGuildForumComment(postId,form) {
             const input = form.querySelector('textarea'); const text = String(input?.value || '').trim();
-            if (!text) return;
+            const imageDataUrl = guildForumReplyPhotosByPost.get(String(postId)) || '';
+            if (!text && !imageDataUrl) { form.querySelector('.guild-forum-comment-photo-status')?.replaceChildren(document.createTextNode('Write a reply or attach a photo.')); return; }
             const submit = form.querySelector('button[type="submit"]'); if (submit) { submit.disabled=true; submit.textContent='Sending…'; }
             try {
-                const response = await fetch('/api/forum',{ method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:'comment',postId,body:text,parentCommentId:guildForumReplyTargets.get(postId)?.id || '' }) });
+                const response = await fetch('/api/forum',{ method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({ type:'comment',postId,body:text,imageDataUrl,parentCommentId:guildForumReplyTargets.get(postId)?.id || '' }) });
                 const data = await response.json().catch(()=>({})); if (!response.ok) throw new Error(data.error || 'Reply could not be sent.');
-                input.value=''; guildForumReplyTargets.delete(postId);
+                input.value=''; guildForumReplyTargets.delete(postId); guildForumReplyPhotosByPost.delete(String(postId));
                 const target = document.getElementById(`guild-forum-reply-target-${postId}`); if (target) target.hidden=true;
                 const comments = await fetch(`/api/forum?commentsFor=${encodeURIComponent(postId)}`,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());
                 guildForumCommentsByPost.set(postId,Array.isArray(comments.comments)?comments.comments:[]);
@@ -9466,12 +9593,23 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             if (emoji && !emoji.dataset.bound) { emoji.dataset.bound='true'; emoji.addEventListener('click',event=>{const button=event.target.closest('[data-forum-emoji]');if(button)insertGuildForumEmoji(button.dataset.forumEmoji||'🐉');}); }
             const feed = document.getElementById('guild-forum-feed');
             if (feed && !feed.dataset.commentBound) { feed.dataset.commentBound='true';
+                feed.addEventListener('change',event=>{
+                    const photoInput=event.target.closest('[data-forum-reply-photo-input]');
+                    if(photoInput?.files?.[0]) onGuildForumReplyPhotoSelected(photoInput.dataset.forumReplyPhotoInput,photoInput.files[0]);
+                });
                 feed.addEventListener('click',event=>{
+                    const clearPhoto=event.target.closest('[data-forum-clear-reply-photo]'); if(clearPhoto){clearGuildForumReplyPhoto(clearPhoto.dataset.forumClearReplyPhoto);return;}
                     const authorButton=event.target.closest('[data-social-discord-id]'); if(authorButton){openMemberProfile(authorButton.dataset.socialDiscordId || '');return;}
+                    const editComment=event.target.closest('[data-forum-edit-comment]'); if(editComment){beginEditGuildForumComment(editComment.dataset.forumEditComment,editComment.dataset.forumPost);return;}
+                    const cancelComment=event.target.closest('[data-forum-cancel-edit-comment]'); if(cancelComment){cancelEditGuildForumComment();return;}
                     const reply=event.target.closest('[data-forum-reply-comment]'); if(reply){const postId=reply.dataset.forumPost;const item=(guildForumCommentsByPost.get(postId)||[]).find(row=>String(row.id)===reply.dataset.forumReplyComment);if(item){guildForumReplyTargets.set(postId,item);const box=document.getElementById(`guild-forum-reply-target-${postId}`);if(box){box.hidden=false;box.textContent=`Replying to ${item.authorName}: ${item.body.slice(0,90)}`;}document.querySelector(`[data-forum-comment-form="${postId}"] textarea`)?.focus();}return;}
                     const remove=event.target.closest('[data-forum-delete-comment]'); if(remove){deleteGuildForumComment(remove.dataset.forumDeleteComment,remove.dataset.forumPost);return;}
                 });
-                feed.addEventListener('submit',event=>{const form=event.target.closest('[data-forum-comment-form]');if(!form)return;event.preventDefault();submitGuildForumComment(form.dataset.forumCommentForm,form);});
+                feed.addEventListener('submit',event=>{
+                    const postEdit=event.target.closest('[data-forum-edit-post-form]'); if(postEdit){event.preventDefault();saveGuildForumPostEdit(postEdit);return;}
+                    const commentEdit=event.target.closest('[data-forum-edit-comment-form]'); if(commentEdit){event.preventDefault();saveGuildForumCommentEdit(commentEdit);return;}
+                    const form=event.target.closest('[data-forum-comment-form]');if(!form)return;event.preventDefault();submitGuildForumComment(form.dataset.forumCommentForm,form);
+                });
             }
         }
 
@@ -13628,7 +13766,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r38';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r40';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14368,7 +14506,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r38';
+  const CURRENT_BUILD = '1.6.9-r40';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

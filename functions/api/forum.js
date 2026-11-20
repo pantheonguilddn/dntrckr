@@ -37,12 +37,31 @@ async function ensureForumSchema(env) {
         author_member_id TEXT NOT NULL,
         parent_comment_id TEXT NOT NULL DEFAULT '',
         body TEXT NOT NULL,
+        image_data TEXT NOT NULL DEFAULT '',
+        image_mime TEXT NOT NULL DEFAULT '',
         created_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0
       )`),
       db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_forum_comments_post ON guild_forum_comments(post_id, created_at)'),
       db.prepare('CREATE INDEX IF NOT EXISTS idx_guild_forum_comments_author ON guild_forum_comments(author_discord_id, created_at DESC)')
-    ]).then(() => true).catch(error => { forumSchemaPromise = null; throw error; });
+    ]).then(async () => {
+      // Additive compatibility migration for installations created before reply photos.
+      // Existing replies are preserved with empty image fields.
+      const addColumnIfMissing = async (columnName, definition) => {
+        const info = await db.prepare('PRAGMA table_info(guild_forum_comments)').all();
+        const columns = new Set((info.results || []).map(column => String(column.name || '')));
+        if (columns.has(columnName)) return;
+        try { await db.prepare(`ALTER TABLE guild_forum_comments ADD COLUMN ${columnName} ${definition}`).run(); }
+        catch (error) {
+          // Two isolates may initialize simultaneously; tolerate only the duplicate-column race.
+          const detail = `${String(error?.message || '')} ${String(error?.cause?.message || '')}`;
+          if (!/duplicate column name/i.test(detail)) throw error;
+        }
+      };
+      await addColumnIfMissing('image_data', "TEXT NOT NULL DEFAULT ''");
+      await addColumnIfMissing('image_mime', "TEXT NOT NULL DEFAULT ''");
+      return true;
+    }).catch(error => { forumSchemaPromise = null; throw error; });
   }
   return forumSchemaPromise;
 }
@@ -72,6 +91,7 @@ function postDto(row, actor) {
     title:String(row.title || ''), body:String(row.body || ''), hasImage:Number(row.has_image) === 1,
     commentsCount:Number(row.comments_count) || 0, pinned:Number(row.is_pinned) === 1,
     createdAt:Number(row.created_at) || 0, updatedAt:Number(row.updated_at) || 0,
+    canEdit:String(row.author_discord_id) === actor.discordId,
     canDelete:String(row.author_discord_id) === actor.discordId || actor.role === 'admin'
   };
 }
@@ -97,19 +117,44 @@ export async function onRequestGet({ request, env, data }) {
         'Content-Disposition':'inline'
       }});
     }
+    const commentImageFor = cleanText(url.searchParams.get('commentImageFor'),80);
+    if (commentImageFor) {
+      const row = await env.PANTHEON_DB.prepare(`
+        SELECT c.image_data, c.image_mime
+        FROM guild_forum_comments c
+        JOIN guild_forum_posts p ON p.id = c.post_id
+        WHERE c.id = ? AND c.is_deleted = 0 AND p.is_deleted = 0 AND c.image_data <> ''
+        LIMIT 1
+      `).bind(commentImageFor).first();
+      if (!row) return jsonResponse({ error:'Reply photo not found.' },404);
+      const encoded = String(row.image_data || '');
+      const binary = atob(encoded);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
+      const mime = /^image\/(jpeg|png|webp)$/.test(String(row.image_mime || '')) ? String(row.image_mime) : 'image/jpeg';
+      return new Response(bytes, { status:200, headers:{
+        'Content-Type':mime,
+        'Cache-Control':'private, max-age=300',
+        'X-Content-Type-Options':'nosniff',
+        'Content-Disposition':'inline'
+      }});
+    }
     const commentsFor = cleanText(url.searchParams.get('commentsFor'),80);
     if (commentsFor) {
       const post = await env.PANTHEON_DB.prepare('SELECT id FROM guild_forum_posts WHERE id = ? AND is_deleted = 0 LIMIT 1').bind(commentsFor).first();
       if (!post) return jsonResponse({ error:'Guild post not found.' },404);
       const rows = await env.PANTHEON_DB.prepare(`
-        SELECT id, author_discord_id, author_member_id, parent_comment_id, body, created_at
+        SELECT id, author_discord_id, author_member_id, parent_comment_id, body,
+          CASE WHEN image_data <> '' THEN 1 ELSE 0 END AS has_image, created_at
         FROM guild_forum_comments WHERE post_id = ? AND is_deleted = 0
         ORDER BY created_at ASC LIMIT 100
       `).bind(commentsFor).all();
       return jsonResponse({ ok:true, comments:(rows.results || []).map(row => ({
         id:String(row.id), authorDiscordId:String(row.author_discord_id), authorMemberId:String(row.author_member_id),
         authorName:authorName(actor.members,row.author_discord_id), parentCommentId:String(row.parent_comment_id || ''),
-        body:String(row.body || ''), createdAt:Number(row.created_at) || 0,
+        body:String(row.body || ''), hasImage:Number(row.has_image) === 1,
+        createdAt:Number(row.created_at) || 0,
+        canEdit:String(row.author_discord_id) === actor.discordId,
         canDelete:String(row.author_discord_id) === actor.discordId || actor.role === 'admin'
       })) });
     }
@@ -177,7 +222,18 @@ export async function onRequestPost({ request, env, data }) {
       const postId = cleanText(body?.postId,80);
       const text = cleanText(body?.body,1500);
       const parentCommentId = cleanText(body?.parentCommentId,80);
-      if (!postId || !text) return jsonResponse({ error:'Choose a post and write a reply.' },400);
+      const imageDataUrl = String(body?.imageDataUrl || '');
+      if (!postId || (!text && !imageDataUrl)) return jsonResponse({ error:'Choose a post and write a reply or attach a photo.' },400);
+      let imageData = '', imageMime = '';
+      if (imageDataUrl) {
+        if (imageDataUrl.length > MAX_IMAGE_DATA || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(imageDataUrl)) {
+          return jsonResponse({ error:'Reply photos must be compressed JPEG, PNG, or WebP images under about 270 KB. Choose a smaller photo.' },413);
+        }
+        const comma = imageDataUrl.indexOf(',');
+        imageMime = imageDataUrl.slice(5,imageDataUrl.indexOf(';'));
+        imageData = imageDataUrl.slice(comma + 1);
+        if (!imageData || imageData.length > MAX_IMAGE_DATA - 64) return jsonResponse({ error:'Reply photo is too large. Choose a smaller image.' },413);
+      }
       const post = await env.PANTHEON_DB.prepare('SELECT id FROM guild_forum_posts WHERE id = ? AND is_deleted = 0 LIMIT 1').bind(postId).first();
       if (!post) return jsonResponse({ error:'That guild forum post no longer exists.' },404);
       if (parentCommentId) {
@@ -187,10 +243,10 @@ export async function onRequestPost({ request, env, data }) {
       const recent = await env.PANTHEON_DB.prepare('SELECT COUNT(*) AS n FROM guild_forum_comments WHERE author_discord_id = ? AND created_at >= ?').bind(actor.discordId,now - 60_000).first();
       if (Number(recent?.n) >= 30) return jsonResponse({ error:'You are replying too quickly. Please wait a moment.' },429);
       const id = crypto.randomUUID();
-      await env.PANTHEON_DB.prepare(`INSERT INTO guild_forum_comments (id, post_id, author_discord_id, author_member_id, parent_comment_id, body, created_at, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, 0)`)
-        .bind(id,postId,actor.discordId,String(actor.member.id),parentCommentId,text,now).run();
+      await env.PANTHEON_DB.prepare(`INSERT INTO guild_forum_comments (id, post_id, author_discord_id, author_member_id, parent_comment_id, body, image_data, image_mime, created_at, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`)
+        .bind(id,postId,actor.discordId,String(actor.member.id),parentCommentId,text,imageData,imageMime,now).run();
       await env.PANTHEON_DB.prepare('UPDATE guild_forum_posts SET comments_count = comments_count + 1, updated_at = ? WHERE id = ?').bind(now,postId).run();
-      return jsonResponse({ ok:true, comment:{ id, postId, authorDiscordId:actor.discordId, authorMemberId:String(actor.member.id), authorName:String(actor.member.name || 'Pantheon Member'), parentCommentId, body:text, createdAt:now, canDelete:true } });
+      return jsonResponse({ ok:true, comment:{ id, postId, authorDiscordId:actor.discordId, authorMemberId:String(actor.member.id), authorName:String(actor.member.name || 'Pantheon Member'), parentCommentId, body:text, hasImage:!!imageData, createdAt:now, canDelete:true } });
     }
     return jsonResponse({ error:'Unsupported Guild Forum action.' },400);
   } catch (error) {
@@ -233,17 +289,59 @@ export async function onRequestPatch({ request, env, data }) {
   try {
     const actor = await getActor(env, data?.session);
     if (actor.error) return jsonResponse({ error:actor.error },actor.status);
-    if (actor.role !== 'admin') return jsonResponse({ error:'Only administrators can pin Guild Forum posts.' },403);
     await ensureForumSchema(env);
     let body;
-    try { body = await request.json(); } catch (_) { return jsonResponse({ error:'Expected a post update.' },400); }
-    const postId = cleanText(body?.postId,80);
-    if (!postId) return jsonResponse({ error:'Post ID is required.' },400);
-    const pinned = body?.pinned === true ? 1 : 0;
-    const result = await env.PANTHEON_DB.prepare('UPDATE guild_forum_posts SET is_pinned = ?, updated_at = ? WHERE id = ? AND is_deleted = 0').bind(pinned,Date.now(),postId).run();
-    if (Number(result?.meta?.changes) !== 1) return jsonResponse({ error:'Post not found.' },404);
-    return jsonResponse({ ok:true, pinned:!!pinned });
+    try { body = await request.json(); } catch (_) { return jsonResponse({ error:'Expected a Guild Forum update.' },400); }
+    const kind = String(body?.type || 'pin');
+    const now = Date.now();
+
+    if (kind === 'edit-post') {
+      const postId = cleanText(body?.postId,80);
+      const title = cleanText(body?.title,MAX_TITLE);
+      const text = cleanText(body?.body,MAX_BODY);
+      const category = cleanText(body?.category,24).toLowerCase();
+      if (!postId) return jsonResponse({ error:'Post ID is required.' },400);
+      if (!title) return jsonResponse({ error:'A post title is required.' },400);
+      if (!POST_CATEGORIES.has(category)) return jsonResponse({ error:'Choose a valid Guild Forum category.' },400);
+      if (category === 'announcement' && actor.role !== 'admin') return jsonResponse({ error:'Only administrators can mark a post as a guild announcement.' },403);
+      const existing = await env.PANTHEON_DB.prepare('SELECT id, author_discord_id, image_data FROM guild_forum_posts WHERE id = ? AND is_deleted = 0 LIMIT 1').bind(postId).first();
+      if (!existing) return jsonResponse({ error:'Post not found.' },404);
+      if (String(existing.author_discord_id) !== actor.discordId) return jsonResponse({ error:'You can only edit your own post.' },403);
+      if (!text && !String(existing.image_data || '')) return jsonResponse({ error:'A post must contain text or an attached photo.' },400);
+      const result = await env.PANTHEON_DB.prepare(`UPDATE guild_forum_posts SET category = ?, title = ?, body = ?, updated_at = ? WHERE id = ? AND author_discord_id = ? AND is_deleted = 0`)
+        .bind(category,title,text,now,postId,actor.discordId).run();
+      if (Number(result?.meta?.changes) !== 1) return jsonResponse({ error:'Post could not be updated. Refresh and try again.' },409);
+      return jsonResponse({ ok:true, updatedAt:now });
+    }
+
+    if (kind === 'edit-comment') {
+      const commentId = cleanText(body?.commentId,80);
+      const text = cleanText(body?.body,1500);
+      if (!commentId) return jsonResponse({ error:'Reply ID is required.' },400);
+      const existing = await env.PANTHEON_DB.prepare(`SELECT c.id, c.post_id, c.author_discord_id, c.image_data, p.is_deleted AS post_deleted
+        FROM guild_forum_comments c JOIN guild_forum_posts p ON p.id = c.post_id
+        WHERE c.id = ? AND c.is_deleted = 0 LIMIT 1`).bind(commentId).first();
+      if (!existing || Number(existing.post_deleted) === 1) return jsonResponse({ error:'Reply not found.' },404);
+      if (String(existing.author_discord_id) !== actor.discordId) return jsonResponse({ error:'You can only edit your own reply.' },403);
+      if (!text && !String(existing.image_data || '')) return jsonResponse({ error:'A reply must contain text or an attached photo.' },400);
+      const result = await env.PANTHEON_DB.prepare(`UPDATE guild_forum_comments SET body = ? WHERE id = ? AND author_discord_id = ? AND is_deleted = 0`)
+        .bind(text,commentId,actor.discordId).run();
+      if (Number(result?.meta?.changes) !== 1) return jsonResponse({ error:'Reply could not be updated. Refresh and try again.' },409);
+      return jsonResponse({ ok:true });
+    }
+
+    // Pinning remains an administrator-only moderation action.
+    if (kind === 'pin') {
+      if (actor.role !== 'admin') return jsonResponse({ error:'Only administrators can pin Guild Forum posts.' },403);
+      const postId = cleanText(body?.postId,80);
+      if (!postId) return jsonResponse({ error:'Post ID is required.' },400);
+      const pinned = body?.pinned === true ? 1 : 0;
+      const result = await env.PANTHEON_DB.prepare('UPDATE guild_forum_posts SET is_pinned = ?, updated_at = ? WHERE id = ? AND is_deleted = 0').bind(pinned,now,postId).run();
+      if (Number(result?.meta?.changes) !== 1) return jsonResponse({ error:'Post not found.' },404);
+      return jsonResponse({ ok:true, pinned:!!pinned });
+    }
+    return jsonResponse({ error:'Unsupported Guild Forum update.' },400);
   } catch (error) {
-    return jsonResponse({ error:`Could not update Guild Forum post: ${String(error?.message || error).slice(0,180)}` },503);
+    return jsonResponse({ error:`Could not update Guild Forum entry: ${String(error?.message || error).slice(0,180)}` },503);
   }
 }

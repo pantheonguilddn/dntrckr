@@ -220,6 +220,8 @@ CREATE TABLE IF NOT EXISTS guild_forum_comments (
   author_member_id TEXT NOT NULL,
   parent_comment_id TEXT NOT NULL DEFAULT '',
   body TEXT NOT NULL,
+  image_data TEXT NOT NULL DEFAULT '',
+  image_mime TEXT NOT NULL DEFAULT '',
   created_at INTEGER NOT NULL,
   is_deleted INTEGER NOT NULL DEFAULT 0
 );
