@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r29</title>
+    <title>Pantheon Tools v1.6.9-r30</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3736,6 +3736,64 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 .pantheon-r20-compact #overview-page .activity-insight-recommendation{display:none!important}
 .pantheon-r20-compact #overview-page .activity-insight-compact-recommendation{display:block!important;font-size:.66rem!important;line-height:1.45!important;margin-top:5px!important;color:var(--r20-muted)!important}
 @media(max-width:1199px){#overview-page .pantheon-r20-content-grid{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}}
+
+<style id="pantheon-r30-analytics-carousel-and-theme-buttons">
+/* The Role Settings action must remain readable on every theme, including pastel/light surfaces. */
+:root[data-pantheon-theme] #team-builder-page .builder-header-actions .btn-weights,
+:root[data-pantheon-theme] #team-builder-page .builder-header-actions .btn-weights:visited {
+  background:var(--pt-accent-soft)!important;
+  color:var(--pt-text)!important;
+  -webkit-text-fill-color:var(--pt-text)!important;
+  border:1px solid var(--pt-border)!important;
+  text-shadow:none!important;
+  opacity:1!important;
+}
+:root[data-pantheon-theme] #team-builder-page .builder-header-actions .btn-weights:hover,
+:root[data-pantheon-theme] #team-builder-page .builder-header-actions .btn-weights:focus-visible {
+  background:var(--pt-hover)!important;
+  color:var(--pt-text)!important;
+  -webkit-text-fill-color:var(--pt-text)!important;
+  border-color:var(--pt-accent)!important;
+  outline:2px solid color-mix(in srgb,var(--pt-accent) 42%,transparent)!important;
+  outline-offset:2px;
+}
+
+/* Give each character's roster analysis a wide, horizontal reading surface. */
+#tracker-page #analytics-grid>.analytics-personalization-note,
+#tracker-page #analytics-grid>.analytics-character-carousel { grid-column:1/-1!important; min-width:0!important; width:100%!important; max-width:none!important; }
+.analytics-character-carousel{display:flex;flex-direction:column;gap:12px;min-width:0;width:100%;padding:0;margin:0 0 12px;}
+.analytics-character-carousel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 2px;}
+.analytics-character-carousel-title{color:var(--pt-text);font-size:.82rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase;}
+.analytics-character-carousel-controls{display:flex;align-items:center;gap:8px;}
+.analytics-character-carousel-count{min-width:70px;text-align:center;color:var(--pt-muted);font-size:.68rem;font-weight:800;font-variant-numeric:tabular-nums;}
+.analytics-character-carousel-button{display:inline-flex;align-items:center;justify-content:center;width:34px;height:32px;border:1px solid var(--pt-border);border-radius:8px;background:var(--pt-surface-soft);color:var(--pt-text);font-size:1.1rem;font-weight:900;cursor:pointer;}
+.analytics-character-carousel-button:hover:not(:disabled){background:var(--pt-hover);border-color:var(--pt-accent);}
+.analytics-character-carousel-button:disabled{opacity:.35;cursor:not-allowed;}
+.analytics-character-carousel-viewport{width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--pt-border) transparent;padding:2px 2px 13px;box-sizing:border-box;}
+.analytics-character-carousel-track{display:flex;align-items:stretch;gap:16px;width:max-content;min-width:100%;}
+.analytics-character-carousel-track>.char-card{flex:0 0 clamp(440px,42vw,640px);width:clamp(440px,42vw,640px)!important;max-width:calc(100vw - 48px)!important;min-width:0!important;margin:0!important;box-sizing:border-box!important;scroll-snap-align:start;white-space:normal;overflow-wrap:anywhere;}
+.analytics-character-carousel-track>.char-card .analytics-recommendation-card{align-items:flex-start;gap:12px;min-width:0;white-space:normal;overflow-wrap:anywhere;}
+.analytics-character-carousel-track>.char-card .analytics-recommendation-main{flex:1;min-width:0;overflow-wrap:anywhere;}
+.analytics-character-carousel-track>.char-card .analytics-recommendation-main p,
+.analytics-character-carousel-track>.char-card .analytics-explanation-body p{white-space:normal;overflow-wrap:anywhere;line-height:1.6;}
+.analytics-character-carousel-track>.char-card details{min-width:0;}
+.analytics-character-carousel-track>.char-card .analytics-explanation-body{min-width:0;overflow-wrap:anywhere;}
+.analytics-character-carousel-track>.char-card .analytics-recommendation-rank{flex:0 0 auto;}
+@media(max-width:700px){
+ .analytics-character-carousel-track>.char-card{flex-basis:min(88vw,520px);width:min(88vw,520px)!important;}
+ .analytics-character-carousel-head{align-items:flex-start;}
+}
+@media(prefers-reduced-motion:reduce){.analytics-character-carousel-viewport{scroll-behavior:auto;}}
+
+/* Share captures are attached under #team-builder-page so all live theme and layout selectors apply. */
+#team-builder-page .team-builder-share-stage{position:fixed!important;left:-100000px!important;top:0!important;z-index:-1!important;display:flex!important;flex-direction:column!important;gap:14px!important;box-sizing:border-box!important;padding:22px!important;background:var(--pt-page)!important;color:var(--pt-text)!important;pointer-events:none!important;}
+#team-builder-page .team-builder-share-stage .builder-format-card{margin:0!important;}
+#team-builder-page .team-builder-share-stage .team-card-single{width:100%!important;max-width:none!important;margin:0!important;}
+#team-builder-page .team-builder-share-stage .team-share-static-select{display:flex;align-items:center;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.35;}
+#team-builder-page .team-builder-share-stage .team-slot-grid{width:100%!important;}
+#team-builder-page .team-builder-share-stage .team-slot-card{min-width:0!important;}
+</style>
+
 </style>
 
 
@@ -4300,9 +4358,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r29</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r30</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r29:</strong> Restores per-character Personalized Task Priorities in Roster Analytics while keeping the duplicate Character Activity Summary and deadline banner off Tracker. The 8-Man party now displays four slots on the upper row and four on the lower row, with the Split Party Mechanic restored to check each half independently and show 8-Man Hardcore DPS balance. Role Settings text now follows every theme palette.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r30:</strong> Role Settings button contrast now follows the active theme. Character Roster Analytics is displayed in a wide, swipeable carousel with per-character five-week trends and personalized priorities. Team Builder party sharing now captures the actual 4-Man or 8-Man layout, including role details and the selected theme.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -11406,6 +11464,41 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             modelNote.className = 'analytics-personalization-note';
             modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Personalized Task Priorities work</summary><p>Suggestions combine task importance, admin-managed Activity Reference details, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p><p>For Black Dragon, the Main is the default focus. A secondary is recommended when it has a prior BDN clear, or when a relevant raid role (survival/tank, debuff/mobility, heal, Highlander, or other utility) is backed by sustained activity and good completion history. Role fit can help an undergeared character contribute, but the system does not assume a party needs that role or can carry extra DPS.</p></details>';
             cont.appendChild(modelNote);
+
+            const carousel = document.createElement('section');
+            carousel.className = 'analytics-character-carousel';
+            carousel.setAttribute('aria-label', 'Character roster analytics carousel');
+            carousel.innerHTML = `<div class="analytics-character-carousel-head"><div class="analytics-character-carousel-title">Character Analytics · 5-Week Trends &amp; Personalized Priorities</div><div class="analytics-character-carousel-controls"><span class="analytics-character-carousel-count" aria-live="polite">0 / 0</span><button class="analytics-character-carousel-button" type="button" data-analytics-prev aria-label="Previous characters" title="Previous characters">‹</button><button class="analytics-character-carousel-button" type="button" data-analytics-next aria-label="Next characters" title="Next characters">›</button></div></div><div class="analytics-character-carousel-viewport" tabindex="0" role="region" aria-label="Swipe horizontally to browse character analytics"><div class="analytics-character-carousel-track"></div></div>`;
+            const carouselViewport = carousel.querySelector('.analytics-character-carousel-viewport');
+            const carouselTrack = carousel.querySelector('.analytics-character-carousel-track');
+            const carouselCount = carousel.querySelector('.analytics-character-carousel-count');
+            const carouselPrev = carousel.querySelector('[data-analytics-prev]');
+            const carouselNext = carousel.querySelector('[data-analytics-next]');
+            const updateAnalyticsCarouselControls = () => {
+                const cards = [...carouselTrack.children];
+                if (!cards.length) { carouselCount.textContent = '0 / 0'; carouselPrev.disabled = true; carouselNext.disabled = true; return; }
+                const first = cards[0];
+                const cardStep = first.getBoundingClientRect().width + (parseFloat(getComputedStyle(carouselTrack).gap) || 16);
+                const index = Math.max(0, Math.min(cards.length - 1, Math.round(carouselViewport.scrollLeft / Math.max(1, cardStep))));
+                carouselCount.textContent = `${index + 1} / ${cards.length}`;
+                carouselPrev.disabled = carouselViewport.scrollLeft <= 3;
+                carouselNext.disabled = carouselViewport.scrollLeft + carouselViewport.clientWidth >= carouselViewport.scrollWidth - 3;
+            };
+            const moveAnalyticsCarousel = direction => {
+                const first = carouselTrack.firstElementChild;
+                if (!first) return;
+                const step = first.getBoundingClientRect().width + (parseFloat(getComputedStyle(carouselTrack).gap) || 16);
+                carouselViewport.scrollBy({ left: direction * step, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            };
+            carouselPrev.addEventListener('click', () => moveAnalyticsCarousel(-1));
+            carouselNext.addEventListener('click', () => moveAnalyticsCarousel(1));
+            carouselViewport.addEventListener('scroll', updateAnalyticsCarouselControls, { passive:true });
+            carouselViewport.addEventListener('keydown', event => {
+                if (event.key === 'ArrowLeft') { event.preventDefault(); moveAnalyticsCarousel(-1); }
+                if (event.key === 'ArrowRight') { event.preventDefault(); moveAnalyticsCarousel(1); }
+            });
+            cont.appendChild(carousel);
+
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
                 
@@ -11436,8 +11529,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No next steps suggested from the saved history yet.</div>';
 
                 card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:4px;">Personalized Task Priorities</div>${prioHTML}</div>`;
-                cont.appendChild(card);
+                carouselTrack.appendChild(card);
             });
+            requestAnimationFrame(updateAnalyticsCarouselControls);
         }
         function escapeHTML(str) { return String(str).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]); }
 
@@ -12734,102 +12828,93 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         }
 
         function buildShareStage(teamKeys=['team1']) {
+            const builderPage = document.getElementById('team-builder-page');
+            const sourceCard = document.getElementById('team-card-team1');
+            if (!builderPage || !sourceCard) throw new Error('The current party layout is not available to capture.');
+
             const fmt = TEAM_FORMATS[getTeamFormat()];
+            const cardRect = sourceCard.getBoundingClientRect();
+            const pageRect = builderPage.getBoundingClientRect();
+            const captureWidth = Math.max(680, Math.ceil(cardRect.width || pageRect.width || window.innerWidth || 1200));
             const stage = document.createElement('div');
-            stage.style.position='fixed';
-            stage.style.left='-100000px';
-            stage.style.top='0';
-            stage.style.zIndex='-1';
-            stage.style.width = teamKeys.length > 1 ? '1520px' : '1040px';
-            stage.style.padding='28px';
-            stage.style.boxSizing='border-box';
-            stage.style.background='#17191e';
-            stage.style.color='#eef0f4';
-            stage.style.fontFamily='Arial, sans-serif';
+            stage.className = 'team-builder-share-stage';
+            stage.setAttribute('aria-hidden', 'true');
+            stage.style.width = `${captureWidth + 44}px`; // 22px capture padding on each side; the card itself matches its live width.
 
-            const shareStyle=document.createElement('style');
-            shareStyle.textContent='.team-table th,.team-table td{ text-align:center !important; vertical-align:middle !important; } .team-table select{ text-align:center !important; text-align-last:center !important; } .share-static-select{display:flex;align-items:center;justify-content:center;width:100%;min-height:38px;box-sizing:border-box;padding:7px 8px;border:1px solid #444854;border-radius:7px;background:#1a1c23;color:#edf0f4;font:inherit;font-size:.74rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .share-static-select.class-filter{font-size:.72rem;}';
-            stage.appendChild(shareStyle);
-
-            const heading=document.createElement('div');
-            heading.style.marginBottom='18px';
-            heading.innerHTML=`<div style="font-size:26px;font-weight:900;letter-spacing:.01em;">⚔ PANTHEON TEAM SETUP · ${escapeHTML(fmt.label)}</div><div style="margin-top:5px;font-size:13px;color:#9ba2b0;">Local build · registered roster data</div>`;
+            const heading = document.createElement('div');
+            heading.style.cssText = 'display:flex;flex-direction:column;gap:5px;padding:2px 2px 4px;';
+            const sharePartyOptions = fmt.size === 8 ? `Split Party Mechanic · ${getSplitPartyMechanic() ? 'Enabled' : 'Disabled'}` : 'Single four-player party';
+            heading.innerHTML = `<strong style="font-size:22px;line-height:1.25;color:var(--pt-text);">⚔ PANTHEON · ${escapeHTML(fmt.label)} PARTY</strong><span style="font-size:12px;color:var(--pt-muted);">${escapeHTML(sharePartyOptions)} · ${escapeHTML(getShareIdentity())} · ${escapeHTML(getShareTimestamp())}</span>`;
             stage.appendChild(heading);
 
-            const grid=document.createElement('div');
-            grid.style.display='grid';
-            grid.style.gridTemplateColumns = teamKeys.length > 1 ? '1fr 1fr' : '1fr';
-            grid.style.gap='18px';
-            teamKeys.forEach(teamKey=>{
-                const card=document.getElementById(`team-card-${teamKey}`);
-                if(!card) return;
-                const clone=card.cloneNode(true);
-                clone.querySelectorAll('.share-ignore').forEach(el=>el.remove());
-                clone.querySelectorAll('button').forEach(el=>el.remove());
-
-                // The live builder keeps a slot-number column and a final remove-action column.
-                // Those are controls for the interactive UI, not part of the shareable setup.
-                clone.querySelectorAll('tr').forEach(row=>{
-                    row.firstElementChild?.remove();
-                    row.lastElementChild?.remove();
-                });
-
-                // Center the share image content so labels, selections, badges and owner chips
-                // line up cleanly inside their columns.
-                clone.querySelectorAll('th, td').forEach(cell=>{
-                    cell.style.textAlign='center';
-                    cell.style.verticalAlign='middle';
-                });
-                // Native <select> controls are notoriously rendered inconsistently by html2canvas,
-                // which can vertically clip their text. Replace them with static, visually-matching
-                // fields containing the currently displayed option text for a clean screenshot.
-                clone.querySelectorAll('select').forEach(sel=>{
-                    const staticBox=document.createElement('div');
-                    const selected=sel.options?.[sel.selectedIndex];
-                    staticBox.className='share-static-select' + (sel.classList.contains('team-class-select') ? ' class-filter' : '');
-                    staticBox.textContent=selected ? selected.textContent.trim() : '';
-                    staticBox.title=staticBox.textContent;
-                    sel.replaceWith(staticBox);
-                });
-                clone.querySelectorAll('.owner-chip, .team-badge, .team-job').forEach(el=>{
-                    el.style.justifyContent='center';
-                });
-                clone.style.margin='0';
-                clone.style.width='100%';
-                grid.appendChild(clone);
-            });
-            stage.appendChild(grid);
-
-            const balance = document.getElementById('team-balance-panel');
-            if(balance && !balance.classList.contains('hidden') && teamKeys.includes('team1')){
-                const bc=balance.cloneNode(true);
-                bc.style.marginTop='18px';
-                stage.appendChild(bc);
+            const sourceFormatCard = builderPage.querySelector('.builder-format-card');
+            if (sourceFormatCard) {
+                const formatClone = sourceFormatCard.cloneNode(true);
+                stage.appendChild(formatClone);
             }
 
-            const footer=document.createElement('div');
-            footer.style.marginTop='16px';
-            footer.style.paddingTop='10px';
-            footer.style.borderTop='1px solid #3a3d46';
-            footer.style.fontSize='11px';
-            footer.style.color='#858c9d';
-            footer.textContent=`Screenshot by ${getShareIdentity()} · ${getShareTimestamp()}`;
-            stage.appendChild(footer);
-            document.body.appendChild(stage);
+            const clone = sourceCard.cloneNode(true);
+            clone.querySelectorAll('.share-ignore, .remove-slot-btn, button').forEach(el => el.remove());
+
+            // Copy the actual selected values into static fields, retaining the live select's
+            // computed dimensions and theme colors. This avoids browser-native select clipping.
+            const sourceSelects = [...sourceCard.querySelectorAll('select')];
+            const clonedSelects = [...clone.querySelectorAll('select')];
+            clonedSelects.forEach((sel, index) => {
+                const original = sourceSelects[index];
+                const selected = original?.options?.[original.selectedIndex];
+                const staticField = document.createElement('div');
+                staticField.className = `${sel.className} team-share-static-select`;
+                staticField.textContent = selected ? selected.textContent.trim() : '';
+                staticField.setAttribute('aria-label', sel.getAttribute('aria-label') || 'Selected option');
+                if (original) {
+                    const computed = getComputedStyle(original);
+                    for (let i = 0; i < computed.length; i++) {
+                        const property = computed[i];
+                        staticField.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property));
+                    }
+                }
+                staticField.style.display = 'flex';
+                staticField.style.alignItems = 'center';
+                staticField.style.minHeight = computedFieldHeight(original, sel);
+                staticField.style.whiteSpace = 'normal';
+                staticField.style.overflowWrap = 'anywhere';
+                sel.replaceWith(staticField);
+            });
+
+            // The clone remains inside #team-builder-page, so the exact 4-column / 4+4
+            // layout, theme variables, card styling, badges and role descriptions are retained.
+            const captureGrid = document.createElement('div');
+            captureGrid.className = 'team-builder-grid';
+            captureGrid.appendChild(clone);
+            stage.appendChild(captureGrid);
+
+            const balance = document.getElementById('team-balance-panel');
+            if (balance && !balance.classList.contains('hidden') && fmt.size === 8 && getSplitPartyMechanic()) {
+                stage.appendChild(balance.cloneNode(true));
+            }
+
+            builderPage.appendChild(stage);
             return stage;
+        }
+
+        function computedFieldHeight(original, fallback) {
+            const value = original ? getComputedStyle(original).height : (fallback?.getBoundingClientRect().height || 40);
+            return value || '40px';
         }
 
         async function copyDomAsImage(teamKeys=['team1'], filename='pantheon-team-setup.png') {
             const stage=buildShareStage(teamKeys);
             try {
                 const html2canvas=await loadHtml2Canvas();
-                const canvas=await html2canvas(stage,{backgroundColor:'#17191e',scale:2,useCORS:true,logging:false,allowTaint:false});
+                const pageBackground = getComputedStyle(document.documentElement).getPropertyValue('--pt-page').trim() || getComputedStyle(document.body).backgroundColor || '#17191e';
+                const canvas=await html2canvas(stage,{backgroundColor:pageBackground,scale:2,useCORS:true,logging:false,allowTaint:false,windowWidth:window.innerWidth,windowHeight:window.innerHeight,scrollX:0,scrollY:0});
                 const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
                 if(!blob) throw new Error('PNG creation failed');
                 if(navigator.clipboard?.write && window.ClipboardItem){
                     try{
                         await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-                        alert('The exact Team Builder table was copied as an image. Paste it directly into Discord.');
+                        alert('The current Team Builder party layout was copied as an image. Paste it directly into Discord.');
                         return true;
                     }catch(_){/* fall through to download */}
                 }
@@ -13516,7 +13601,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r29';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r30';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14256,7 +14341,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r29';
+  const CURRENT_BUILD = '1.6.9-r30';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;

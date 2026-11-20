@@ -1,26 +1,24 @@
-# Deployment - Pantheon Tools v1.6.9-r29
+# Deployment - Pantheon Tools v1.6.9-r30
 
-Deploy this package to the existing Cloudflare Pages project `dntrckr`. Do not create a new Pages project, change existing D1 bindings or secrets, run database migrations, reset D1, or clear browser storage.
+This package updates the existing Pantheon Tools Cloudflare Pages project. Deploy into the existing `dntrckr` project; do not create a new Pages project and do not reset or replace the D1 database.
 
 ## Deploy
 
-From the extracted package directory, run:
+From this extracted directory, run:
 
 ```powershell
 npx wrangler login
 npx wrangler pages deploy . --project-name=dntrckr
 ```
 
-Alternatively, use the existing connected Git deployment workflow.
+Alternatively, use the repository's existing Pages deployment workflow. Preserve all existing Cloudflare Pages bindings, environment variables, secrets, OAuth configuration, and D1 database bindings. No SQL migration is required for this release.
 
-## Verify
+## Verify after deployment
 
-After deployment, open `https://dntrckr.pages.dev/version.json` and confirm `build` is `1.6.9-r29`. Then sign in and check:
+Open `https://dntrckr.pages.dev/version.json` and confirm the build is `1.6.9-r30`. Then sign in and check:
 
-- Tracker: Roster Analytics shows the per-character five-week trend and Personalized Task Priorities. The duplicate Character Activity Summary and deadline-strategy banner do not appear below it.
-- Team Builder: 8-Man displays slots 1–4 in the upper group and slots 5–8 in the lower group. The Split Party Mechanic checkbox appears for 8-Man Normal and Hardcore, and toggling it updates the composition checks. In 8-Man Hardcore with the mechanic on, the DPS balance panel shows upper, lower, and combined Physical / Magical counts.
-- Role Settings: heading, table, selectors, and role labels remain readable in Dark, Light, Eye Comfort, and Pastel themes.
+- Role Settings button text remains readable in Dark, Light, Eye Comfort, and Pastel themes.
+- Roster Analytics character cards display in a wide horizontal carousel with swipe/scroll and previous/next controls.
+- Team Builder Share copies or downloads an image reflecting the selected 4-Man or 8-Man layout, including 4 + 4 rows for 8-Man, role descriptions, and the active theme.
 
-## Notes
-
-This release contains no database migration and does not modify D1 schema, bindings, secrets, member records, tracker cells, or weekly archives. Team Builder continues to save locally in each browser. The existing local Team 1 to 4-Man / 8-Man migration is retained; the legacy Team 2 is preserved only for compatibility and is not used in the current interface.
+This release does not alter the D1 schema, authentication, tracker synchronization, or historical records. Do not clear browser storage. Team Builder remains local-save.
