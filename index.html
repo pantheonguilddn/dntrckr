@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r28</title>
+    <title>Pantheon Tools v1.6.9-r29</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3806,6 +3806,38 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   @media(max-width:760px){#team-builder-page .builder-toolbar{align-items:stretch}#team-builder-page .builder-toolbar-left,#team-builder-page .builder-toolbar-right{width:100%}#team-builder-page .builder-toolbar-right{justify-content:flex-start}#team-builder-page .builder-format-card{flex-direction:column}#team-builder-page .format-quick-help{align-items:flex-start;flex:auto;text-align:left}#team-builder-page .team-slot-grid{grid-template-columns:minmax(0,1fr);padding:10px}#team-builder-page .team-slot-card{padding:12px}}
   @media(prefers-reduced-motion:reduce){#team-builder-page .team-builder-mode-tab{transition:none}}
 </style>
+
+<style id="pantheon-r29-team-builder-restoration">
+/* Explicit 4 + 4 party layout: upper slots 1–4, then lower slots 5–8. */
+#team-builder-page .team-slot-grid.is-eight-man,
+#team-builder-page .team-slot-grid.is-four-man{grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:stretch!important}
+#team-builder-page .team-slot-row-label{grid-column:1/-1!important;display:flex!important;align-items:center!important;gap:10px!important;margin:5px 0 -2px!important;padding:9px 12px!important;border:1px solid var(--pt-border)!important;border-radius:9px!important;background:var(--pt-surface-soft)!important;color:var(--pt-text)!important;font-size:.68rem!important;font-weight:900!important;letter-spacing:.09em!important;text-transform:uppercase!important}
+#team-builder-page .team-slot-row-label:after{content:"";height:1px;flex:1;background:var(--pt-border)}
+#team-builder-page .team-slot-grid.is-eight-man .team-slot-card{min-width:0!important}
+#team-builder-page .team-slot-role-description{overflow-wrap:anywhere!important;line-height:1.6!important}
+#team-builder-page .team-balance-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+/* Role Settings had a hard-coded white checked-pill foreground. Tie both states to the active theme. */
+:root[data-pantheon-theme] #role-config-modal,
+:root[data-pantheon-theme] #role-config-modal .modal-card,
+:root[data-pantheon-theme] #role-config-modal .modal-card h3{color:var(--pt-text)!important;opacity:1!important}
+:root[data-pantheon-theme] #role-config-modal .modal-note{background:var(--pt-surface-soft)!important;color:var(--pt-muted)!important;border-left-color:var(--pt-accent)!important;opacity:1!important}
+:root[data-pantheon-theme] #role-config-modal .role-config-scroll{background:var(--pt-surface)!important;border-color:var(--pt-border)!important}
+:root[data-pantheon-theme] #role-config-modal .role-config-table{background:var(--pt-surface)!important;color:var(--pt-text)!important}
+:root[data-pantheon-theme] #role-config-modal .role-config-table thead th{background:var(--pt-surface-soft)!important;color:var(--pt-muted)!important;border-color:var(--pt-border)!important;opacity:1!important}
+:root[data-pantheon-theme] #role-config-modal .role-config-table tbody tr{background:var(--pt-surface)!important}
+:root[data-pantheon-theme] #role-config-modal .role-config-table tbody td,
+:root[data-pantheon-theme] #role-config-modal .role-config-table tbody td strong{background:transparent!important;color:var(--pt-text)!important;border-color:var(--pt-border)!important;opacity:1!important}
+:root[data-pantheon-theme] #role-config-modal .role-check{background:var(--pt-surface-soft)!important;color:var(--pt-text)!important;border-color:var(--pt-border)!important;opacity:1!important;text-shadow:none!important}
+:root[data-pantheon-theme] #role-config-modal .role-check span{background:transparent!important;color:var(--pt-text)!important;border:0!important;opacity:1!important;text-shadow:none!important}
+:root[data-pantheon-theme] #role-config-modal .role-check:has(input:checked){background:var(--pt-accent-soft)!important;color:var(--pt-text)!important;border-color:var(--pt-accent)!important}
+:root[data-pantheon-theme] #role-config-modal .role-check:has(input:checked) span{background:transparent!important;color:var(--pt-text)!important;border:0!important}
+:root[data-pantheon-theme] #role-config-modal .role-config-select,
+:root[data-pantheon-theme] #role-config-modal .role-config-select option{background:var(--pt-input)!important;color:var(--pt-text)!important;border-color:var(--pt-border)!important;opacity:1!important}
+:root[data-pantheon-theme] #role-config-modal .modal-actions .btn{color:var(--pt-text)!important}
+@media(max-width:1080px){#team-builder-page .team-slot-grid.is-eight-man,#team-builder-page .team-slot-grid.is-four-man{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:620px){#team-builder-page .team-slot-grid.is-eight-man,#team-builder-page .team-slot-grid.is-four-man{grid-template-columns:minmax(0,1fr)!important}#team-builder-page .team-balance-grid{grid-template-columns:minmax(0,1fr)!important}}
+</style>
+
 </head>
 <body>
     <div id="pantheon-auth-gate" role="dialog" aria-modal="true" aria-labelledby="pantheon-auth-title">
@@ -3871,7 +3903,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             <div class="drawer-section">
                 <div class="drawer-section-title">Pages</div>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('tracker'); toggleSideMenu(false)"><span class="drawer-icon">📋</span><span><strong>Tracker</strong><small>Category-based dungeon tracker</small></span></button>
-                <button class="drawer-item" type="button" onclick="showAppPage('team-builder'); toggleSideMenu(false)"><span class="drawer-icon">⚔</span><span><strong>Team Builder</strong><small>Build two parties</small></span></button>
+                <button class="drawer-item" type="button" onclick="showAppPage('team-builder'); toggleSideMenu(false)"><span class="drawer-icon">⚔</span><span><strong>Team Builder</strong><small>Build a 4-Man or 8-Man party</small></span></button>
                 <button class="drawer-item drawer-item-purple" type="button" onclick="showAppPage('card-wiki'); toggleSideMenu(false)"><span class="drawer-icon">🃏</span><span><strong>Card Database</strong><small>Find cards for character builds</small></span></button>
                 <button class="drawer-item drawer-item-green" type="button" onclick="showAppPage('member-roster'); toggleSideMenu(false)"><span class="drawer-icon">👥</span><span><strong>Member Roster</strong><small>Guild member directory</small></span></button>
             </div>
@@ -4067,7 +4099,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         <div class="team-builder-header">
             <div>
                 <h2>⚔ Team Builder <button class="mini-help" type="button" title="Team Builder Guide" onclick="openHelpModal('team-builder')">?</button></h2>
-                <p>Build one party at a time using your registered characters. 4-Man and 8-Man setups are saved separately on this browser.</p>
+                <p>Build one party at a time using your registered characters. 4-Man and 8-Man setups are saved separately on this browser. For 8-Man, Split Party Mechanic checks the upper and lower groups independently.</p>
             </div>
             <div class="builder-header-actions">
                 <button class="team-mini-btn" type="button" onclick="shareTeamBuilderAsImage()">📸 Share Party Setup</button>
@@ -4095,6 +4127,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 <label class="builder-field builder-format-field"><span>Difficulty</span><select id="team-builder-format" class="builder-select" onchange="setTeamFormat(this.value)" aria-label="Party difficulty"></select></label>
                 <label class="builder-field"><span>Character roster</span><select id="team-builder-roster-filter" class="builder-select builder-roster-filter" onchange="renderTeamBuilder()" aria-label="Filter characters by roster"></select></label>
                 <label class="builder-check"><input type="checkbox" id="allow-same-owner" onchange="saveTeamBuilderPrefs()"> Allow same owner</label>
+                <label class="builder-check" id="split-party-wrap" style="display:none;" title="When enabled, slots 1–4 and 5–8 are evaluated as separate four-player groups for 8-Man composition checks."><input type="checkbox" id="split-party-mechanic" onchange="saveSplitPartyMechanic()"> Split Party Mechanic</label>
             </div>
             <div class="builder-toolbar-right">
                 <button class="team-mini-btn" type="button" onclick="fillNextEmptySlot('team1')">＋ Add Next Character</button>
@@ -4123,12 +4156,15 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         <div class="team-balance-panel hidden" id="team-balance-panel">
             <div class="team-balance-head"><strong>8-Man Hardcore · Party DPS Balance</strong><span id="combined-dps-balance">Physical 0 · Magical 0</span></div>
-            <p id="team-balance-description">Review the physical and magical DPS mix across this single 8-player party.</p>
-            <div class="team-balance-grid"><div class="balance-card"><span>PARTY DPS MIX</span><strong id="team1-dps-balance">Physical 0 · Magical 0</strong></div></div>
+            <p id="team-balance-description">Review physical and magical DPS across the upper and lower four-player groups, plus the combined party.</p>
+            <div class="team-balance-grid">
+                <div class="balance-card"><span>UPPER PARTY · SLOTS 1–4</span><strong id="upper-dps-balance">Physical 0 · Magical 0</strong></div>
+                <div class="balance-card"><span>LOWER PARTY · SLOTS 5–8</span><strong id="lower-dps-balance">Physical 0 · Magical 0</strong></div>
+            </div>
         </div>
 
         <div class="team-builder-bottom">
-            <strong>How it works:</strong> Characters come from Member Roster. Each slot shows the selected character’s class, Job description, primary raid position, additional configured roles, damage type, and owner. The 4-Man and 8-Man tabs each keep one independent local party lineup. Choose a character first to fill its class automatically, or use the Class filter to narrow the character list. <b>Allow same owner</b> lets one player pilot multiple different characters in the same party; the same character is never allowed twice.
+            <strong>How it works:</strong> Characters come from Member Roster. Each slot shows the selected character’s class, Job description, primary raid position, additional configured roles, damage type, and owner. The 4-Man and 8-Man tabs each keep one independent local party lineup. The 8-Man layout places slots 1–4 on the upper row and slots 5–8 on the lower row. When <b>Split Party Mechanic</b> is enabled, each row is checked as a separate four-player group; turn it off when the raid uses one combined eight-player composition. Choose a character first to fill its class automatically, or use the Class filter to narrow the character list. <b>Allow same owner</b> lets one player pilot multiple different characters in the same party; the same character is never allowed twice.
         </div>
     </main>
 
@@ -4264,9 +4300,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r28</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r29</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r28:</strong> Keeps Activity Insights on Overview and removes the duplicate Character Activity Summary and deadline recommendations from Tracker, while retaining five-week roster trends. Team Builder now has separate 4-Man and 8-Man tabs, each with one local party lineup and expanded character role details.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r29:</strong> Restores per-character Personalized Task Priorities in Roster Analytics while keeping the duplicate Character Activity Summary and deadline banner off Tracker. The 8-Man party now displays four slots on the upper row and four on the lower row, with the Split Party Mechanic restored to check each half independently and show 8-Man Hardcore DPS balance. Role Settings text now follows every theme palette.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4550,8 +4586,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         <p>A compact <b>previous-week completion report</b> is saved automatically at each Saturday reset. It shows each tracked character’s completion rate and unfinished tasks. N/A tasks are ignored, and a missed task is not treated as proof that a character cannot clear it.</p>
                         <p><b>Historical analytics are retained automatically.</b> Pantheon keeps up to five weekly completion snapshots for the roster trend cards and Overview Activity Insights. The existing guild timing-collection preference is preserved, but the Tracker no longer exposes controls to switch collection off or clear saved history. The previous-week report continues to be saved at each reset.</p>
                         <h5>5-Week Trend</h5>
-                        <p>Shows the most recent weekly completion percentages available for each character. Detailed recommendations now appear in the full-width Activity Insights carousel on Overview, rather than being repeated below Tracker's Roster Analytics.</p>
-                        <div class="help-callout"><b>Shared weight, personal order:</b> Overview recommendations use shared task importance and each character's saved history. The shared weight remains the same, while the suggested order can differ by character.</div>
+                        <p>Shows each character's most recent weekly completion percentages and their <b>Personalized Task Priorities</b>, based on saved activity history. The Overview carousel gives a quick summary, while Tracker keeps the detailed per-character history and explanations here.</p>
+                        <div class="help-callout"><b>Shared weight, personal order:</b> The shared task importance stays the same for everyone, while the suggested order can differ by character based on saved history and activity details.</div>
                     </section>
                     <section class="help-topic" data-help-topic="weights">
                         <h4>Loot Weights</h4>
@@ -4590,6 +4626,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         <p>Use the two tabs to switch between a single <b>4-Man Party</b> and a single <b>8-Man Party</b>. Each tab has its own saved lineup and difficulty setting. Switching tabs does not clear or overwrite the other party. Choose <b>Normal</b> or <b>Hardcore</b> in the Difficulty selector.</p>
                         <h5>Fill the party slots</h5>
                         <p>Each slot gives the character and its role information room to breathe. Select a character to fill in its class and profile automatically. Use the Class filter to narrow the character dropdown, or <b>Add Next Character</b> to fill the next available slot. The summary shows party coverage and any format-specific warnings.</p>
+                        <p><b>Split Party Mechanic</b> appears for 8-Man formats. When enabled, slots 1–4 (upper row) and slots 5–8 (lower row) are checked as separate four-player groups. In 8-Man Hardcore, each group is also checked for Debuff, Mobility, Beyond Time, and Highlander, and the DPS balance panel shows Physical / Magical counts for both halves and the combined party. Turn it off when all eight players function as one combined group; the builder then checks the overall Heal, Tank / Provoke, and DPS baseline.</p>
                         <p><b>Team Builder is local to your browser.</b> Your 4-Man and 8-Man party setups are saved separately on this device and do not sync to the guild database. Use <b>Share Party Setup</b> to create an image of the currently selected party for Discord.</p>
                         <p>Duplicate characters are always prevented. <b>Allow same owner</b> lets one player contribute multiple different characters to the same party when needed. Clearing a party only clears the currently selected 4-Man or 8-Man lineup.</p>
                         <div class="help-callout"><b>One-time migration:</b> Your previous Team 1 lineup is used to seed the new tabs. Its first four slots populate 4-Man, and all eight slots populate 8-Man. The unused legacy Team 2 is not displayed or imported into either new lineup.</div>
@@ -5334,7 +5371,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             '4N': { label: '4 Man Normal', size: 4, difficulty: 'Normal', short: '4N', desc: 'Casual 4-man nests. Minimal composition pressure, built for quick normal runs.', hint: 'Flex freely. Fill the four slots and use the roles that make the run comfortable.' },
             '4HC': { label: '4 Man Hardcore', size: 4, difficulty: 'Hardcore', short: '4HC', desc: 'Higher-intensity 4-man content such as Hell Nests and Dragon Memoria.', hint: 'Aim for practical mitigation and sustain coverage, usually including Heal, Tank / Provoke, and enough DPS / utility.' },
             '8N': { label: '8 Man Normal', size: 8, difficulty: 'Normal', short: '8N', desc: 'Classic 8-man raids using the usual lineup with more room to flex the composition.', hint: 'Build a normal raid shell first, then use the extra slots for utility, support, debuff, or additional damage.' },
-            '8HC': { label: '8 Man Hardcore', size: 8, difficulty: 'Hardcore', short: '8HC', desc: 'High-end 8-player raid format with one complete party lineup.', hint: 'Check coverage for healing, tanking or provoke, damage, debuff, mobility, Beyond Time, and Highlander. Physical and magical DPS are shown together for this party.' }
+            '8HC': { label: '8 Man Hardcore', size: 8, difficulty: 'Hardcore', short: '8HC', desc: 'High-end 8-player raid format with one complete party lineup.', hint: 'With Split Party Mechanic enabled, each four-player half is checked for core roles and utility. Physical / Magical DPS balance is shown for the upper half, lower half, and combined party.' }
         };
         const TEAM_FORMAT_ORDER = ['4N','4HC','8N','8HC'];
 
@@ -11352,8 +11389,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         function renderAnalytics() {
             const cont = document.getElementById('analytics-grid');
             if (!cont) return; cont.innerHTML = '';
-            // Activity recommendations, character check prompts, and deadline guidance now live
-            // on the Overview carousel. Keep Tracker Roster Analytics focused on saved history.
+            // The duplicate Character Activity Summary and deadline banner live on the Overview carousel.
+            // Keep the original Roster Analytics trend cards and per-character priority explanations here.
             const analyticsEnabled = cloudData.settings.analyticsTrackingEnabled === true; // Legacy preference: controls are intentionally no longer exposed.
             if (!analyticsEnabled) {
                 const savedWeeks = Object.keys(safeObject(cloudData.weeklyArchive)).length;
@@ -11364,8 +11401,11 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 return;
             }
             const sortedArchiveEntries = Object.entries(safeObject(cloudData.weeklyArchive)).sort((a,b)=>Number(a[0])-Number(b[0]));
-            // Detailed recommendations now live in the Overview carousel. Keep Tracker analytics
-            // focused on historical roster trends instead of repeating the same Activity Insights.
+            const recentArchiveEntries = sortedArchiveEntries.slice(-3);
+            const modelNote = document.createElement('div');
+            modelNote.className = 'analytics-personalization-note';
+            modelNote.innerHTML = '<details class="analytics-model-details"><summary>How Personalized Task Priorities work</summary><p>Suggestions combine task importance, admin-managed Activity Reference details, and each character’s saved history. The shared Loot Weight stays the same for everyone. N/A weeks do not count against a character, and a missing clear alone does not prove they cannot do the activity.</p><p>For Black Dragon, the Main is the default focus. A secondary is recommended when it has a prior BDN clear, or when a relevant raid role (survival/tank, debuff/mobility, heal, Highlander, or other utility) is backed by sustained activity and good completion history. Role fit can help an undergeared character contribute, but the system does not assume a party needs that role or can carry extra DPS.</p></details>';
+            cont.appendChild(modelNote);
             characters.forEach(char => {
                 const card = document.createElement('div'); card.className = `char-card${char.isMain ? ' is-main-character' : ''}`; card.style.borderTopColor = char.color;
                 
@@ -11373,7 +11413,29 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 const rts = [...legacyRates, ...sortedArchiveEntries.map(([,a])=>getArchivedCompletionRate(a,char.name)).filter(value=>value!==null&&Number.isFinite(Number(value))).map(Number)].slice(-5);
                 const trendHTML = rts.length ? rts.map(r => `<span style="color:${r>80?'#b5e5c5':r>40?'#fceea7':'#f7bab4'};font-weight:bold;">${r}%</span>`).join(' ➔ ') : '<div style="color:#888;">No history yet.</div>';
 
-                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Completion Trend</div>${trendHTML}</div><div class="analytics-history-caption">Saved weekly completion history · N/A entries are excluded from completion rates.</div>`;
+                const stats = {}; weeklyTaskNames.forEach(t => stats[t] = { m: 0, c: 0, x: 0, o: 0 });
+                sortedArchiveEntries.forEach(([,a]) => {
+                    const order = Array.isArray(a.taskOrder) ? a.taskOrder : weeklyTaskNames;
+                    const sStr = String(a.states?.[char.name] || '');
+                    order.forEach((t, i) => { if(!stats[t])stats[t]={m:0,c:0,x:0,o:0}; if(sStr[i]) { stats[t].o++; if(sStr[i]==='x')stats[t].x++; else if(sStr[i]==='d')stats[t].c++; else stats[t].m++; } });
+                });
+
+                const p = Object.entries(stats).map(([t, taskStats]) => buildPersonalizedTaskRecommendation(char, t, taskStats, sortedArchiveEntries, recentArchiveEntries))
+                    .filter(item => !item.suppress && !isBountyTask(item.t))
+                    .sort((a, b) => b.sc - a.sc || b.w - a.w || b.c - a.c || a.t.localeCompare(b.t))
+                    .slice(0, 3);
+
+                const prioHTML = p.length ? p.map((i, rank) => {
+                    const explanation = buildRecommendationExplanation(i);
+                    const evidence = explanation.evidence;
+                    const evidenceLabel = getRecommendationConfidenceLabel(evidence);
+                    const plainReason = getRecommendationPlainReason(i);
+                    const activityNote = getRecommendationActivityNote(i);
+                    const scoreLine = explanation.scoreLine;
+                    return `<div class="missed-item analytics-recommendation-card"><div class="analytics-recommendation-main"><strong>${escapeHTML(i.t)}</strong><p class="analytics-recommendation-plain-reason">${escapeHTML(plainReason)}</p><details class="analytics-recommendation-explanation"><summary>Why suggested?<span class="analytics-evidence-level" data-confidence="${escapeHTML(evidence.level)}">${escapeHTML(evidenceLabel)}</span></summary><div class="analytics-explanation-body"><p><strong>History:</strong> ${escapeHTML(evidence.description)}</p><p><strong>${i.activityProfile?.reference ? 'Activity facts:' : 'Activity tip:'}</strong> ${escapeHTML(activityNote)}</p><details class="analytics-score-details"><summary>Past results and score (optional)</summary><p><strong>Past results:</strong> ${evidence.cleared} clear${evidence.cleared === 1 ? '' : 's'} · ${evidence.notCompleted} week${evidence.notCompleted === 1 ? '' : 's'} not completed · ${evidence.excluded} N/A ignored.</p><p><strong>Why it fits:</strong> ${escapeHTML(explanation.fitReason)}</p><p><strong>Activity value:</strong> ${escapeHTML(explanation.profileDetail)}</p><p class="analytics-recommendation-scoring"><strong>Score details:</strong> ${escapeHTML(scoreLine)}</p>${explanation.guildReason ? `<p><strong>Guild timing:</strong> ${escapeHTML(explanation.guildReason)}</p>` : ''}${i.deadline?.reason && i.deadline?.multiplier !== 1 ? `<p><strong>Reset timing:</strong> ${escapeHTML(i.deadline.reason)}</p>` : ''}<p>Shared Loot Weight stays the same for everyone. The personal priority adjusts it using activity value, this character’s history, and time remaining.</p></details></div></details></div><div class="analytics-recommendation-rank" title="Suggested priority ${rank + 1}">#${rank + 1}</div></div>`;
+                }).join('') : '<div class="missed-item" style="color:var(--pt-muted,#b5e5c5);">No next steps suggested from the saved history yet.</div>';
+
+                card.innerHTML = `<div class="card-header">${escapeHTML(char.name)}${char.isMain ? ' <span class="main-character-badge" title="Main character" aria-label="Main character">★</span>' : ''}</div><div class="history-trend"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:5px;">5-Week Trend</div>${trendHTML}</div><div class="missed-dungeons"><div style="font-size:0.8rem;color:var(--pt-muted,#aaa);margin-bottom:4px;">Personalized Task Priorities</div>${prioHTML}</div>`;
                 cont.appendChild(card);
             });
         }
@@ -12446,10 +12508,11 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             setTeamSlot(teamKey, idx, candidate.name);
         }
 
-        function getTeamDpsBalance(teamKey) {
+        function getTeamDpsBalance(teamKey = 'team1', slotRange = null) {
             const counts = { Physical: 0, Magical: 0 };
-            const team = getTeamState(teamKey);
-            team.slots.slice(0, getActiveTeamSize()).map(s => s.character).filter(Boolean).forEach(name => {
+            const slots = getTeamState(teamKey).slots.slice(0, getActiveTeamSize());
+            const selectedSlots = Array.isArray(slotRange) ? slots.slice(slotRange[0], slotRange[1]) : slots;
+            selectedSlots.map(slot => slot.character).filter(Boolean).forEach(name => {
                 const meta = getJobMeta(getCharacterJob(name));
                 if (!meta || !jobHasRole(meta, 'DPS')) return;
                 if (counts[meta.damageType] !== undefined) counts[meta.damageType]++;
@@ -12457,10 +12520,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             return counts;
         }
 
-        function buildTeamSummary(teamKey) {
-            const team = getTeamState(teamKey);
+        function buildTeamSummaryFromSlots(slots) {
             const counts = { DPS:0, Heal:0, Tank:0, Utility:0, Support:0, Debuff:0, Mobility:0, 'Beyond Time':0, Highlander:0, Provoke:0 };
-            team.slots.slice(0, getActiveTeamSize()).map(s => s.character).filter(Boolean).forEach(name => {
+            (Array.isArray(slots) ? slots : []).map(slot => slot.character).filter(Boolean).forEach(name => {
                 const meta = getJobMeta(getCharacterJob(name));
                 if (!meta) return;
                 SECONDARY_ROLE_OPTIONS.forEach(role => { if (jobHasRole(meta, role) && counts[role] !== undefined) counts[role]++; });
@@ -12468,24 +12530,54 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             return counts;
         }
 
-        function getTeamCompositionMessages(teamKey) {
-            const format = getTeamFormat(), c = buildTeamSummary('team1');
+        function buildTeamSummary(teamKey = 'team1', slotRange = null) {
+            const slots = getTeamState(teamKey).slots.slice(0, getActiveTeamSize());
+            return buildTeamSummaryFromSlots(Array.isArray(slotRange) ? slots.slice(slotRange[0], slotRange[1]) : slots);
+        }
+
+        function getBaselineCompositionMessages(counts, format, splitGroup = false) {
             const messages = [];
             if (format === '4HC' || format === '8N' || format === '8HC') {
-                if (!c.Heal) messages.push('No Heal');
-                if (!c.Tank && !c.Provoke) messages.push('No Tank / Provoke');
+                if (!counts.Heal) messages.push('No Heal');
+                if (!counts.Tank && !counts.Provoke) messages.push('No Tank / Provoke');
             }
-            if (format === '4HC' && c.DPS < 2) messages.push('Low DPS coverage');
+            if (format === '4HC' && counts.DPS < 2) messages.push('Low DPS coverage');
             if (format === '8N' || format === '8HC') {
-                if (c.DPS < 4) messages.push('Low DPS coverage');
-                if (format === '8HC') {
-                    if (!c.Debuff) messages.push('No Debuff');
-                    if (!c.Mobility) messages.push('No Mobility');
-                    if (!c['Beyond Time']) messages.push('No Beyond Time');
-                    if (!c.Highlander) messages.push('No Highlander');
-                }
+                if (splitGroup) {
+                    if (counts.DPS < 2) messages.push('Low DPS coverage');
+                    if (format === '8HC') {
+                        if (!counts.Debuff) messages.push('No Debuff');
+                        if (!counts.Mobility) messages.push('No Mobility');
+                        if (!counts['Beyond Time']) messages.push('No Beyond Time');
+                        if (!counts.Highlander) messages.push('No Highlander');
+                    }
+                } else if (counts.DPS < 4) messages.push('Low DPS coverage');
             }
             return messages;
+        }
+
+        function getTeamCompositionMessages(teamKey = 'team1') {
+            const format = getTeamFormat();
+            if (format === '4N') return [];
+            if (format === '4HC') return getBaselineCompositionMessages(buildTeamSummary(teamKey), format, false);
+            if (format !== '8N' && format !== '8HC') return [];
+
+            if (getSplitPartyMechanic()) {
+                // The single 8-Man lineup is treated as two four-player groups:
+                // slots 1–4 (upper) and slots 5–8 (lower), matching the former Team 1 / Team 2 checks.
+                const slots = getTeamState(teamKey).slots.slice(0, 8);
+                const groups = [
+                    { label:'Upper 4 (slots 1–4)', slots:slots.slice(0, 4) },
+                    { label:'Lower 4 (slots 5–8)', slots:slots.slice(4, 8) }
+                ];
+                return groups.flatMap(group => {
+                    const warnings = getBaselineCompositionMessages(buildTeamSummaryFromSlots(group.slots), format, true);
+                    return warnings.length ? [`${group.label}: ${warnings.join(' · ')}`] : [];
+                });
+            }
+
+            // When the mechanic is off, evaluate the eight characters as one combined party.
+            return getBaselineCompositionMessages(buildTeamSummary(teamKey), format, false);
         }
 
         function renderTeamSummary(teamKey) {
@@ -12496,21 +12588,24 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             el.innerHTML = '<span class="summary-label">Coverage:</span>' + items.map(([k,v]) => `<span class="team-summary-pill ${v ? '' : 'empty'}">${escapeHTML(k)} ${v}</span>`).join('');
             fill.textContent = `${members} / ${size}`;
             const warnings = getTeamCompositionMessages(teamKey);
-            if (warnings.length) el.innerHTML += `<span class="team-summary-pill warning">⚠ ${escapeHTML(warnings.join(' · '))}</span>`;
+            if (warnings.length) el.innerHTML += warnings.map(warning => `<span class="team-summary-pill warning">⚠ ${escapeHTML(warning)}</span>`).join('');
             if (sub) sub.textContent = `${TEAM_FORMATS[getTeamFormat()].label} · ${members} / ${size} filled`;
         }
 
         function renderTeamBalancePanel() {
             const panel = document.getElementById('team-balance-panel');
             if (!panel) return;
-            if (getTeamFormat() !== '8HC') { panel.classList.add('hidden'); return; }
+            if (getTeamFormat() !== '8HC' || !getSplitPartyMechanic()) { panel.classList.add('hidden'); return; }
             panel.classList.remove('hidden');
-            const dps = getTeamDpsBalance('team1');
-            const gap = Math.abs(dps.Physical - dps.Magical);
-            const sideText = gap === 0 ? 'even split' : `${gap} DPS ${dps.Physical > dps.Magical ? 'Physical' : 'Magical'} lead`;
+            const upper = getTeamDpsBalance('team1', [0, 4]);
+            const lower = getTeamDpsBalance('team1', [4, 8]);
+            const combined = { Physical:upper.Physical + lower.Physical, Magical:upper.Magical + lower.Magical };
+            const gap = Math.abs(combined.Physical - combined.Magical);
+            const sideText = gap === 0 ? 'even split' : `${gap} DPS ${combined.Physical > combined.Magical ? 'Physical' : 'Magical'} lead`;
             document.getElementById('team-balance-description').textContent = TEAM_FORMATS[getTeamFormat()].hint;
-            document.getElementById('team1-dps-balance').textContent = `Physical ${dps.Physical} · Magical ${dps.Magical}`;
-            document.getElementById('combined-dps-balance').textContent = `Physical ${dps.Physical} · Magical ${dps.Magical} · ${sideText}`;
+            document.getElementById('upper-dps-balance').textContent = `Physical ${upper.Physical} · Magical ${upper.Magical}`;
+            document.getElementById('lower-dps-balance').textContent = `Physical ${lower.Physical} · Magical ${lower.Magical}`;
+            document.getElementById('combined-dps-balance').textContent = `Combined: Physical ${combined.Physical} · Magical ${combined.Magical} · ${sideText}`;
         }
 
         function renderTeamBuilder() {
@@ -12546,11 +12641,15 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             if (ownerDup) ownerDup.checked = getTeamBuilderPrefs().allowSameOwner;
             const currentFormat = getTeamFormat();
             const fmt = TEAM_FORMATS[currentFormat];
+            const splitWrap = document.getElementById('split-party-wrap');
+            const splitBox = document.getElementById('split-party-mechanic');
+            const isEightMan = fmt.size === 8;
+            if (splitWrap) splitWrap.style.display = isEightMan ? 'inline-flex' : 'none';
+            if (splitBox) splitBox.checked = getSplitPartyMechanic();
             const formatSel = document.getElementById('team-builder-format');
             if (formatSel) formatSel.value = currentFormat;
             const fourTab = document.getElementById('team-size-tab-4');
             const eightTab = document.getElementById('team-size-tab-8');
-            const isEightMan = fmt.size === 8;
             if (fourTab) { fourTab.classList.toggle('is-active', !isEightMan); fourTab.setAttribute('aria-selected', String(!isEightMan)); }
             if (eightTab) { eightTab.classList.toggle('is-active', isEightMan); eightTab.setAttribute('aria-selected', String(isEightMan)); }
             const partyPanel = document.getElementById('team-party-panel');
@@ -12565,8 +12664,13 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             const card = document.getElementById('team-card-team1');
             if (card) card.classList.toggle('team-card-compact', fmt.size === 4);
             if (host) {
+                host.classList.toggle('is-eight-man', fmt.size === 8);
+                host.classList.toggle('is-four-man', fmt.size === 4);
                 host.innerHTML = team.slots.slice(0, fmt.size).map((slot, i) => {
                     const char = slot.character || '';
+                    const rowLabel = fmt.size === 8 && (i === 0 || i === 4)
+                        ? `<div class="team-slot-row-label" role="heading" aria-level="3">${i === 0 ? 'Upper Party · Slots 1–4' : 'Lower Party · Slots 5–8'}</div>`
+                        : '';
                     const job = getCharacterJob(char), meta = getJobMeta(job);
                     const selectedProfile = allRegisteredCharacters().find(c => c.name === char);
                     const owner = selectedProfile?.rosterName || '';
@@ -12579,7 +12683,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                     const damageType = meta?.damageType || 'Not applicable';
                     const jobLabel = job || (char ? 'Job not set' : 'Unassigned');
                     const mainLabel = selectedProfile?.isMain ? '<span class="team-slot-main-tag">★ Main</span>' : '';
-                    return `<article class="team-slot-card${char ? ' is-filled' : ''}${selectedProfile?.isMain ? ' is-main-character' : ''}">
+                    return `${rowLabel}<article class="team-slot-card${char ? ' is-filled' : ''}${selectedProfile?.isMain ? ' is-main-character' : ''}">
                         <div class="team-slot-card-head"><div><span class="team-slot-number">SLOT ${i+1}</span><span class="team-slot-state">${char ? 'Assigned' : 'Open slot'}</span></div><div class="team-slot-card-head-actions">${mainLabel}<button class="remove-slot-btn" type="button" title="Empty slot ${i+1}" aria-label="Empty slot ${i+1}" onclick="setTeamSlot('team1', ${i}, '')">×</button></div></div>
                         <label class="team-slot-field team-slot-character-field"><span>Character</span>${characterHTML}</label>
                         <div class="team-slot-info-grid">
@@ -13412,7 +13516,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r28';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r29';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14152,7 +14256,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r28';
+  const CURRENT_BUILD = '1.6.9-r29';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
