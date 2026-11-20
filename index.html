@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r31</title>
+    <title>Pantheon Tools v1.6.9-r34</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4360,9 +4360,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r31</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r34</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r31:</strong> Role Settings button contrast now follows the active theme. Character Roster Analytics is displayed in a wide, swipeable carousel with per-character five-week trends and personalized priorities. Team Builder party sharing now captures the actual 4-Man or 8-Man layout, including role details and the selected theme.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r34:</strong> The Overview Guild Hub card now uses the uploaded Pantheon emblem banner as a selectable background. Its tone adapts to Dark, Light, Eye Comfort, and Pastel themes, while the other background styles remain available.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -13613,7 +13613,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r31';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r34';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14353,7 +14353,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r31';
+  const CURRENT_BUILD = '1.6.9-r34';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14591,6 +14591,29 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    header.innerHTML=`<div><div class="pantheon-r20-page-kicker">GUILD WORKSPACE / OVERVIEW</div><h1 class="pantheon-r20-page-title" id="r20-welcome-title">Welcome back.</h1><p class="pantheon-r20-page-sub">Your guild at a glance. Review last week's results and this week's remaining bounty work.</p></div><div class="pantheon-r20-head-actions"><button type="button" class="btn" id="r20-compact-toggle">Compact view</button></div>`;
    const hero=document.createElement('section');hero.className='pantheon-r20-hero';hero.setAttribute('aria-label','Pantheon guild hub');
    hero.innerHTML=`<div class="pantheon-r20-hero-copy"><div class="pantheon-r20-page-kicker">PANTHEON GUILD HUB</div><h2>One place for the whole guild.</h2><p>Character registrations, weekly progress, party planning, and guild resources in one shared workspace.</p><div class="pantheon-r20-hero-meta"><span class="pantheon-r20-meta-tag">SEA · Guild workspace</span><span class="pantheon-r20-meta-tag">Shared roster</span><span class="pantheon-r20-meta-tag">Weekly cycle active</span></div></div>`;
+   // Each browser can choose its own Guild Hub decoration. This preference is intentionally local-only.
+   const hubBackgroundKey='pantheon-guild-hub-background-v1';
+   const hubBackgroundOptions=['pantheon','wing','aurora','constellation','flow','orbit','minimal'];
+   let hubBackground='pantheon';
+   try{
+     let saved=localStorage.getItem(hubBackgroundKey);
+     // r33's default was Wing facets. Promote that default to the uploaded Pantheon emblem,
+     // while preserving an explicitly chosen alternative background style.
+     if(saved==='wing'){saved='pantheon';localStorage.setItem(hubBackgroundKey,saved);}
+     if(hubBackgroundOptions.includes(saved))hubBackground=saved;
+   }catch(_){}
+   hero.dataset.hubBackground=hubBackground;
+   const hubBackgroundControl=document.createElement('div');
+   hubBackgroundControl.className='pantheon-hub-background-control';
+   hubBackgroundControl.innerHTML=`<label for="pantheon-hub-background-select">Card background</label><select id="pantheon-hub-background-select" aria-label="Choose Guild Hub card background"><option value="pantheon">Pantheon emblem</option><option value="wing">Wing facets</option><option value="aurora">Aurora glow</option><option value="constellation">Constellation</option><option value="flow">Flow lines</option><option value="orbit">Orbit rings</option><option value="minimal">Minimal</option></select>`;
+   const hubBackgroundSelect=hubBackgroundControl.querySelector('select');
+   hubBackgroundSelect.value=hubBackground;
+   hubBackgroundSelect.addEventListener('change',()=>{
+     const next=hubBackgroundOptions.includes(hubBackgroundSelect.value)?hubBackgroundSelect.value:'pantheon';
+     hero.dataset.hubBackground=next;
+     try{localStorage.setItem(hubBackgroundKey,next);}catch(_){}
+   });
+   hero.insertBefore(hubBackgroundControl,hero.firstChild);
    const stats=document.createElement('section');stats.className='pantheon-r20-stat-grid pantheon-r22-stat-grid';stats.setAttribute('aria-label','Previous week and bounty statistics');
    const specs=[
      ['Registered Characters','♙','r22-stat-characters','Characters on your registered roster'],
@@ -15162,6 +15185,180 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   color:var(--pt-text)!important;
   -webkit-text-fill-color:var(--pt-text)!important;
   text-shadow:none!important;
+}
+</style>
+
+
+
+<style id="pantheon-r32-hero-angular-facets">
+/* Replace the old circular rings with a restrained angular wing / crest motif.
+   Accent tokens are supplied by the active theme, so the geometry adapts naturally. */
+.pantheon-r20-hero{isolation:isolate!important}
+.pantheon-r20-hero::before{
+  content:""!important;
+  position:absolute!important;
+  display:block!important;
+  right:-3%!important;
+  top:-34%!important;
+  width:47%!important;
+  height:174%!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:
+    linear-gradient(132deg,transparent 0 19%,color-mix(in srgb,var(--r20-accent) 9%,transparent) 19% 20%,transparent 20% 39%,color-mix(in srgb,var(--r20-accent) 7%,transparent) 39% 40%,transparent 40% 100%),
+    linear-gradient(145deg,color-mix(in srgb,var(--r20-accent) 3%,transparent),color-mix(in srgb,var(--r20-accent) 13%,transparent))!important;
+  clip-path:polygon(43% 0,100% 0,100% 100%,0 100%,25% 53%)!important;
+  opacity:.9!important;
+  pointer-events:none!important;
+  z-index:0!important;
+}
+.pantheon-r20-hero::after{
+  content:""!important;
+  position:absolute!important;
+  display:block!important;
+  right:5%!important;
+  top:-23%!important;
+  width:36%!important;
+  height:148%!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:
+    repeating-linear-gradient(135deg,transparent 0 23px,color-mix(in srgb,var(--r20-accent) 8%,transparent) 23px 25px),
+    linear-gradient(145deg,transparent 8%,color-mix(in srgb,var(--r20-accent) 4%,transparent) 100%)!important;
+  clip-path:polygon(59% 0,100% 0,100% 100%,0 100%,30% 51%)!important;
+  transform:skewX(-7deg)!important;
+  opacity:.72!important;
+  pointer-events:none!important;
+  z-index:0!important;
+}
+.pantheon-r20-hero-copy,.pantheon-r20-hero-side{position:relative!important;z-index:1!important}
+@media(max-width:600px){
+  .pantheon-r20-hero::before{right:-12%!important;width:58%!important;opacity:.58!important}
+  .pantheon-r20-hero::after{right:-2%!important;width:46%!important;opacity:.42!important}
+}
+</style>
+
+
+
+<style id="pantheon-r33-guild-hub-background-picker">
+/* A small local preference control: all patterns use theme tokens so they recolor automatically. */
+.pantheon-r20-hero{--hub-pattern-opacity:.88!important}
+.pantheon-hub-background-control{
+  position:absolute!important;top:13px!important;right:16px!important;z-index:4!important;
+  display:flex!important;align-items:center!important;gap:7px!important;
+  padding:5px 7px 5px 9px!important;border:1px solid var(--r20-border)!important;
+  border-radius:999px!important;background:color-mix(in srgb,var(--r20-panel) 88%,transparent)!important;
+  box-shadow:0 3px 12px color-mix(in srgb,var(--r20-text) 7%,transparent)!important;
+  backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;
+}
+.pantheon-hub-background-control label{font-size:9px!important;font-weight:800!important;letter-spacing:.025em!important;color:var(--r20-muted)!important;white-space:nowrap!important}
+.pantheon-hub-background-control select{
+  min-width:112px!important;max-width:150px!important;min-height:28px!important;padding:4px 22px 4px 8px!important;
+  border:1px solid var(--r20-border)!important;border-radius:999px!important;
+  background:var(--r20-panel2)!important;color:var(--r20-text)!important;
+  font-family:inherit!important;font-size:9px!important;font-weight:700!important;line-height:1.2!important;cursor:pointer!important;outline-offset:2px!important;
+}
+.pantheon-hub-background-control select:focus-visible{outline:2px solid var(--r20-accent)!important}
+.pantheon-r20-hero[data-hub-background="wing"]::before,
+.pantheon-r20-hero[data-hub-background="wing"]::after{display:block!important}
+/* Aurora: soft blurred color fields, using the active theme's accents. */
+.pantheon-r20-hero[data-hub-background="aurora"]::before{
+  right:1%!important;top:-65%!important;width:54%!important;height:220%!important;
+  clip-path:none!important;border:0!important;border-radius:50%!important;box-shadow:none!important;
+  background:radial-gradient(ellipse at 68% 48%,color-mix(in srgb,var(--r20-accent) 22%,transparent) 0%,color-mix(in srgb,var(--r20-accent2) 11%,transparent) 35%,transparent 72%)!important;
+  filter:blur(5px)!important;opacity:.95!important;
+}
+.pantheon-r20-hero[data-hub-background="aurora"]::after{
+  right:20%!important;top:-88%!important;width:36%!important;height:230%!important;
+  clip-path:none!important;border:0!important;border-radius:50%!important;box-shadow:none!important;transform:none!important;
+  background:radial-gradient(ellipse at 52% 54%,color-mix(in srgb,var(--r20-accent2) 17%,transparent) 0%,color-mix(in srgb,var(--r20-accent) 6%,transparent) 46%,transparent 72%)!important;
+  filter:blur(8px)!important;opacity:.8!important;
+}
+/* Constellation: fine star points and faint connecting diagonals, no large rings. */
+.pantheon-r20-hero[data-hub-background="constellation"]::before{
+  right:0!important;top:0!important;width:48%!important;height:100%!important;clip-path:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  background-image:radial-gradient(circle,color-mix(in srgb,var(--r20-accent) 48%,transparent) 0 1px,transparent 1.7px),radial-gradient(circle,color-mix(in srgb,var(--r20-accent2) 42%,transparent) 0 .8px,transparent 1.5px),linear-gradient(145deg,transparent 0 48%,color-mix(in srgb,var(--r20-accent) 10%,transparent) 48.2% 48.5%,transparent 48.8% 100%)!important;
+  background-size:37px 37px,61px 61px,100% 100%!important;background-position:4px 5px,18px 17px,center!important;opacity:.72!important;
+}
+.pantheon-r20-hero[data-hub-background="constellation"]::after{
+  right:5%!important;top:9%!important;width:37%!important;height:78%!important;clip-path:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important;
+  background:linear-gradient(28deg,transparent 0 28%,color-mix(in srgb,var(--r20-accent) 12%,transparent) 28.2% 28.6%,transparent 28.8% 100%),linear-gradient(154deg,transparent 0 57%,color-mix(in srgb,var(--r20-accent2) 10%,transparent) 57.2% 57.6%,transparent 57.8% 100%)!important;opacity:.78!important;
+}
+/* Flow: layered diagonal ribbons. */
+.pantheon-r20-hero[data-hub-background="flow"]::before{
+  right:-3%!important;top:-24%!important;width:52%!important;height:150%!important;clip-path:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  background:repeating-linear-gradient(153deg,transparent 0 17px,color-mix(in srgb,var(--r20-accent) 10%,transparent) 18px 20px,transparent 21px 38px)!important;opacity:.9!important;
+}
+.pantheon-r20-hero[data-hub-background="flow"]::after{
+  right:3%!important;top:-34%!important;width:38%!important;height:168%!important;clip-path:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:skewX(-15deg)!important;
+  background:linear-gradient(150deg,transparent 18%,color-mix(in srgb,var(--r20-accent2) 11%,transparent) 48%,transparent 78%)!important;opacity:.8!important;
+}
+/* Orbit is an optional return to the old circular motif; it also follows theme accents. */
+.pantheon-r20-hero[data-hub-background="orbit"]::before{
+  right:5%!important;top:-75%!important;width:260px!important;height:260px!important;clip-path:none!important;
+  border:1px solid color-mix(in srgb,var(--r20-accent) 35%,transparent)!important;border-radius:50%!important;
+  box-shadow:0 0 0 24px color-mix(in srgb,var(--r20-accent) 5%,transparent),0 0 0 51px color-mix(in srgb,var(--r20-accent2) 5%,transparent)!important;
+  background:transparent!important;opacity:.9!important;
+}
+.pantheon-r20-hero[data-hub-background="orbit"]::after{
+  right:12%!important;top:-45%!important;width:180px!important;height:180px!important;clip-path:none!important;
+  border:1px solid color-mix(in srgb,var(--r20-accent2) 28%,transparent)!important;border-radius:50%!important;
+  box-shadow:none!important;transform:rotate(-24deg) scaleX(1.35)!important;background:transparent!important;opacity:.75!important;
+}
+.pantheon-r20-hero[data-hub-background="minimal"]::before,
+.pantheon-r20-hero[data-hub-background="minimal"]::after{display:none!important;content:none!important}
+@media(max-width:620px){
+  .pantheon-hub-background-control{position:relative!important;top:auto!important;right:auto!important;align-self:flex-end!important;margin:0 0 10px auto!important;max-width:100%!important}
+  .pantheon-r20-hero-copy{padding-right:0!important}
+  .pantheon-hub-background-control label{font-size:8px!important}
+  .pantheon-hub-background-control select{min-width:104px!important;max-width:132px!important}
+}
+</style>
+
+
+
+<style id="pantheon-r34-uploaded-emblem-theme-background">
+/* Use the user's uploaded Pantheon banner as a first-class Guild Hub background option.
+   The image remains behind the copy and takes its color treatment from the active theme. */
+.pantheon-r20-hero[data-hub-background="pantheon"]::before{
+  content:""!important;display:block!important;position:absolute!important;
+  top:0!important;right:0!important;bottom:0!important;left:0!important;
+  width:100%!important;height:100%!important;
+  clip-path:none!important;border:0!important;border-radius:inherit!important;
+  box-shadow:none!important;transform:none!important;
+  background-image:url("pantheon-guild-hub-banner.png")!important;
+  background-size:auto 112%!important;background-position:right center!important;
+  background-repeat:no-repeat!important;
+  filter:none!important;mix-blend-mode:screen!important;
+  opacity:.88!important;pointer-events:none!important;z-index:0!important;
+}
+.pantheon-r20-hero[data-hub-background="pantheon"]::after{
+  content:none!important;display:none!important;
+}
+/* Light: invert the dark source to a pale blue-slate surface, with the crest rendered darker. */
+:root[data-pantheon-theme="light"] .pantheon-r20-hero[data-hub-background="pantheon"]::before{
+  filter:invert(1) sepia(.12) saturate(1.18) hue-rotate(174deg) contrast(.88) brightness(1.02)!important;
+  mix-blend-mode:multiply!important;opacity:.76!important;
+}
+/* Eye Comfort: warm parchment and muted olive-stone tones. */
+:root[data-pantheon-theme="eye-comfort"] .pantheon-r20-hero[data-hub-background="pantheon"]::before{
+  filter:invert(1) sepia(.38) saturate(.62) hue-rotate(16deg) contrast(.88) brightness(1.01)!important;
+  mix-blend-mode:multiply!important;opacity:.73!important;
+}
+/* Pastel: lavender-blue treatment, coordinated with the pastel accent palette. */
+:root[data-pantheon-theme="pastel"] .pantheon-r20-hero[data-hub-background="pantheon"]::before{
+  filter:invert(1) sepia(.22) saturate(1.12) hue-rotate(226deg) contrast(.88) brightness(1.03)!important;
+  mix-blend-mode:multiply!important;opacity:.78!important;
+}
+@media(max-width:620px){
+  .pantheon-r20-hero[data-hub-background="pantheon"]::before{
+    background-size:auto 86%!important;background-position:right -12px center!important;opacity:.68!important;
+  }
+  :root[data-pantheon-theme="light"] .pantheon-r20-hero[data-hub-background="pantheon"]::before,
+  :root[data-pantheon-theme="eye-comfort"] .pantheon-r20-hero[data-hub-background="pantheon"]::before,
+  :root[data-pantheon-theme="pastel"] .pantheon-r20-hero[data-hub-background="pantheon"]::before{opacity:.56!important}
 }
 </style>
 
