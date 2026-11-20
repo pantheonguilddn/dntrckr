@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r26</title>
+    <title>Pantheon Tools v1.6.9-r27</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -3699,7 +3699,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 }
 </style>
 
-<style id="pantheon-r26-themes-insights-and-history-protection">
+<style id="pantheon-r27-themes-insights-and-history-protection">
 /* LIGHT: soft blue glass, cornflower, and pale periwinkle; avoid stark white surfaces. */
 :root[data-pantheon-theme="light"]{
  --pt-page:#dce8f5;--pt-surface:#eaf2fb;--pt-surface-raised:#eff5fc;--pt-surface-soft:#d5e3f3;--pt-input:#e5eef9;--pt-text:#2b4057;--pt-muted:#536c85;--pt-border:#b9cde2;--pt-accent:#527fb4;--pt-accent-soft:#d5e5f7;--pt-hover:#dceafa;--pt-overlay:rgba(25,43,67,.44);--pt-banner-border:#b6cbe2;--pt-positive:#357e73;--pt-auth-bg:radial-gradient(ellipse at 12% 4%,rgba(132,177,231,.26),transparent 45%),radial-gradient(ellipse at 88% 7%,rgba(178,170,238,.18),transparent 40%),#dce8f5;--pt-card-gradient:linear-gradient(145deg,#edf5ff,#e1ebf8 55%,#e9e8fb);--pt-notice-gradient:linear-gradient(145deg,#dceafa,#e9e8f8);
@@ -4218,9 +4218,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r26</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r27</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r26:</strong> Refreshes Light and Eye Comfort themes, restores full Activity Insights descriptions outside Compact View, improves panel spacing, and removes manual history controls while protecting weekly archive retention.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r27:</strong> Adds a full-width, looping Activity Insights carousel with live weekly recommendations, pace, character follow-ups, and history trends. Character Completion now sits below it, with swipe, navigation, and pause controls.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -9792,6 +9792,129 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             return buildPersonalizedTaskRecommendation(character, taskName, stats, archiveEntries, recentArchiveEntries);
         }
 
+        function initOverviewInsightsCarousel(root) {
+            if (!root) return;
+            const frame = root.querySelector('.pt-overview-carousel-frame');
+            const track = root.querySelector('.pt-overview-carousel-track');
+            const dotsHost = root.querySelector('.pt-overview-carousel-dots');
+            const status = root.querySelector('.pt-overview-carousel-status');
+            const pauseButton = root.querySelector('.pt-overview-carousel-pause');
+            const prevButton = root.querySelector('[data-direction="prev"]');
+            const nextButton = root.querySelector('[data-direction="next"]');
+            if (!frame || !track || !dotsHost || !status || !pauseButton || !prevButton || !nextButton) return;
+            const originals = Array.from(track.children);
+            const count = originals.length;
+            if (!count) return;
+            const prefersReducedMotion = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+            let index = 1, paused = prefersReducedMotion, hovered = false, focused = false;
+            let dragStart = null, timer = null, transitioning = false, destroyed = false;
+            const firstClone = originals[0].cloneNode(true);
+            const lastClone = originals[count-1].cloneNode(true);
+            firstClone.setAttribute('aria-hidden','true');
+            lastClone.setAttribute('aria-hidden','true');
+            firstClone.querySelectorAll('button,a,[tabindex]').forEach(node=>node.setAttribute('tabindex','-1'));
+            lastClone.querySelectorAll('button,a,[tabindex]').forEach(node=>node.setAttribute('tabindex','-1'));
+            track.insertBefore(lastClone, originals[0]);
+            track.appendChild(firstClone);
+            const modulo = value => ((value - 1 + count) % count) + 1;
+            const dots = originals.map((node,i)=>{
+                const button=document.createElement('button');
+                button.type='button';button.className='pt-overview-carousel-dot';
+                button.setAttribute('aria-label',`Show insight ${i+1}: ${node.dataset.name || `Insight ${i+1}`}`);
+                button.addEventListener('click',()=>go(i+1));
+                dotsHost.appendChild(button);
+                return button;
+            });
+            function setTransform(animate=true){
+                const useMotion=animate && !prefersReducedMotion;
+                track.style.transition=useMotion?'transform .55s cubic-bezier(.22,.75,.22,1)':'none';
+                track.style.transform=`translateX(-${index*100}%)`;
+                if(animate && !useMotion)transitioning=false;
+            }
+            function updateStatus(){
+                const real=modulo(index);
+                dots.forEach((dot,i)=>{dot.setAttribute('aria-current',String(i===real-1));dot.setAttribute('aria-pressed',String(i===real-1));});
+                status.textContent=`${String(real).padStart(2,'0')} / ${String(count).padStart(2,'0')} · ${originals[real-1].dataset.name || `Insight ${real}`}`;
+            }
+            function go(next){
+                if(destroyed || transitioning || count<2)return;
+                index=next;transitioning=true;setTransform(true);updateStatus();
+            }
+            function next(){go(index+1)}
+            function prev(){go(index-1)}
+            function onTransitionEnd(event){
+                if(event.target!==track || event.propertyName!=='transform')return;
+                if(index===0){index=count;setTransform(false)}
+                else if(index===count+1){index=1;setTransform(false)}
+                transitioning=false;
+            }
+            function shouldRun(){
+                const overview=document.getElementById('overview-page');
+                return !destroyed && !paused && !hovered && !focused && !document.hidden && (!overview || !overview.classList.contains('hidden-page')) && count>1;
+            }
+            function start(){
+                clearInterval(timer);
+                timer=setInterval(()=>{if(shouldRun())next()},6500);
+            }
+            function syncPause(){
+                pauseButton.setAttribute('aria-pressed',String(paused));
+                pauseButton.setAttribute('aria-label',paused?'Resume automatic rotation':'Pause automatic rotation');
+                pauseButton.innerHTML=paused?'▶ <span>Play</span>':'Ⅱ <span>Pause</span>';
+            }
+            function onKeyDown(event){
+                if(event.key==='ArrowRight'){event.preventDefault();next()}
+                else if(event.key==='ArrowLeft'){event.preventDefault();prev()}
+            }
+            function onPointerDown(event){
+                if(event.pointerType==='mouse' && event.button!==0)return;
+                dragStart={x:event.clientX,y:event.clientY,pointerId:event.pointerId};
+                try{frame.setPointerCapture(event.pointerId)}catch(_){}
+                frame.classList.add('is-dragging');
+            }
+            function onPointerUp(event){
+                if(!dragStart)return;
+                const dx=event.clientX-dragStart.x,dy=event.clientY-dragStart.y;
+                if(Math.abs(dx)>42 && Math.abs(dx)>Math.abs(dy)*1.2){dx<0?next():prev()}
+                dragStart=null;frame.classList.remove('is-dragging');
+            }
+            function onPointerCancel(){dragStart=null;frame.classList.remove('is-dragging')}
+            function onPauseClick(){paused=!paused;syncPause()}
+            function onMouseEnter(){hovered=true}
+            function onMouseLeave(){hovered=false}
+            function onFocusIn(){focused=true}
+            function onFocusOut(event){if(!root.contains(event.relatedTarget))focused=false}
+            function onVisibilityChange(){if(!document.hidden)start()}
+            track.addEventListener('transitionend',onTransitionEnd);
+            frame.addEventListener('keydown',onKeyDown);
+            frame.addEventListener('pointerdown',onPointerDown);
+            frame.addEventListener('pointerup',onPointerUp);
+            frame.addEventListener('pointercancel',onPointerCancel);
+            root.addEventListener('mouseenter',onMouseEnter);
+            root.addEventListener('mouseleave',onMouseLeave);
+            root.addEventListener('focusin',onFocusIn);
+            root.addEventListener('focusout',onFocusOut);
+            pauseButton.addEventListener('click',onPauseClick);
+            prevButton.addEventListener('click',prev);
+            nextButton.addEventListener('click',next);
+            document.addEventListener('visibilitychange',onVisibilityChange);
+            setTransform(false);updateStatus();syncPause();start();
+            window.__pantheonOverviewInsightsCarousel={destroy(){
+                if(destroyed)return;destroyed=true;clearInterval(timer);
+                track.removeEventListener('transitionend',onTransitionEnd);
+                frame.removeEventListener('keydown',onKeyDown);
+                frame.removeEventListener('pointerdown',onPointerDown);
+                frame.removeEventListener('pointerup',onPointerUp);
+                frame.removeEventListener('pointercancel',onPointerCancel);
+                root.removeEventListener('mouseenter',onMouseEnter);
+                root.removeEventListener('mouseleave',onMouseLeave);
+                root.removeEventListener('focusin',onFocusIn);
+                root.removeEventListener('focusout',onFocusOut);
+                pauseButton.removeEventListener('click',onPauseClick);
+                prevButton.removeEventListener('click',prev);
+                nextButton.removeEventListener('click',next);
+                document.removeEventListener('visibilitychange',onVisibilityChange);
+            }};
+        }
         function renderOverviewActivity() {
             const cont = document.getElementById('overview-activity');
             const completionCont = document.getElementById('overview-character-completion');
@@ -9912,18 +10035,101 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 summary.innerHTML = stats.map(stat => `<div class="activity-insight-stat"><small>${esc(stat.label)}</small><strong>${esc(stat.value)}</strong><span>${esc(stat.detail)}</span></div>`).join('');
             }
             if (!owner || metrics.length === 0) {
+                if (window.__pantheonOverviewInsightsCarousel?.destroy) window.__pantheonOverviewInsightsCarousel.destroy();
                 const noData = `<div class="activity-insight-empty">${owner ? `No registered characters were found for <strong>${esc(owner.name)}</strong>.` : 'This Discord account is not linked to a Member Roster entry yet.'} Add your characters in Member Roster to see weekly progress and helpful reminders here.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Open Member Roster</button></div>`;
                 if (cont) cont.innerHTML = noData;
                 if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Weekly progress appears here for your registered characters. Other members' rosters and progress are not shown.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
-            let insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(getDeadlineMode(pace).label)}</span></div>`;
-            if (shownPriorities.length) {
-                insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p class="activity-insight-body">${esc(item.body)}</p><p class="activity-insight-compact-body">${esc(item.compactBody || item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
-            } else {
-                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.hoursLeft <= 72 ? 'No weekly tasks remain' : 'No urgent follow-up'}</strong><p class="activity-insight-body">${pace.hoursLeft <= 72 ? 'Your tracked weekly tasks are complete. Use the remaining time for optional goals or help organize a group run that is already planned.' : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as reset approaches.'}</p><p class="activity-insight-compact-body">${pace.hoursLeft <= 72 ? 'Weekly tasks complete.' : 'No urgent follow-up.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
+            const priority = shownPriorities[0] || null;
+            const findPriorityMetric = item => item ? metrics.find(metric =>
+                item.title === metric.name || item.title === `${metric.name} · Main` || item.title.startsWith(`${metric.name}:`)
+            ) || null : null;
+            const priorityMetric = findPriorityMetric(priority);
+            const sortedForCheck = [...metrics].filter(item => item.pending > 0)
+                .sort((a,b) => a.rate-b.rate || b.pending-a.pending || a.name.localeCompare(b.name));
+            const trendCandidates = metrics.filter(item => item.trend !== null && Number.isFinite(Number(item.trend)))
+                .sort((a,b) => Math.abs(b.trend)-Math.abs(a.trend) || a.name.localeCompare(b.name));
+            const trendMetric = trendCandidates[0] || null;
+            const trendRates = trendMetric ? archives.map(([,archive]) => getArchivedCompletionRate(archive, trendMetric.name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number) : [];
+            const trendLatest = trendRates.length ? trendRates[trendRates.length-1] : null;
+            const trendPrior = trendRates.length > 1 ? trendRates[trendRates.length-2] : null;
+            const trendVerb = trendMetric ? (trendMetric.trend > 0 ? 'rose' : trendMetric.trend < 0 ? 'fell' : 'stayed level') : '';
+            const trendDetail = trendMetric
+                ? `${trendMetric.name}'s completion ${trendVerb} ${Math.abs(trendMetric.trend)} points across the last two saved snapshots. Review whether tasks were missed, intentionally skipped, or no longer part of the character's weekly plan before changing anything.`
+                : 'There are not yet two comparable weekly snapshots for your registered characters. Once more weekly history is saved, this slide will highlight the clearest change without treating a missed task as proof of poor performance.';
+            const priorityTitle = priority ? priority.title : (pace.hoursLeft <= 72 ? 'Your tracked weekly work is complete.' : 'No urgent character follow-up right now.');
+            const priorityBody = priority ? priority.body : (pace.hoursLeft <= 72
+                ? 'Your tracked weekly tasks are complete. Use the remaining time for optional goals or help organize a group run that is already planned.'
+                : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as the weekly reset approaches.');
+            const priorityCompact = priority ? (priority.compactBody || priority.body) : (pace.hoursLeft <= 72 ? 'Weekly tasks complete.' : 'No urgent follow-up.');
+            const priorityAction = priorityMetric?.nextTask
+                ? `Next task · ${priorityMetric.nextTask}`
+                : priority ? priority.label : 'Weekly tracker review';
+            const progressCard = (label, value, caption, pct, left, right) => `
+                <aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(label)}</div>
+                <div class="pt-insight-side-value">${esc(value)}</div><div class="pt-insight-side-caption">${esc(caption)}</div>
+                <div class="pt-insight-bar"><span style="width:${Math.max(0,Math.min(100,Number(pct)||0))}%"></span></div>
+                <div class="pt-insight-side-pair"><span>${esc(left)}</span><strong>${esc(right)}</strong></div></aside>`;
+            const miniRowsCard = (label, rows, emptyText) => `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(label)}</div>${rows.length ? `<div class="pt-insight-mini-rows">${rows.map(item => `<div class="pt-insight-mini-row"><div><strong>${esc(item.name)}</strong><div class="pt-insight-mini-track"><i style="width:${Math.max(0,Math.min(100,item.rate))}%"></i></div></div><strong>${esc(item.rate)}%</strong></div>`).join('')}</div>` : `<div class="pt-insight-side-caption pt-insight-empty-caption">${esc(emptyText)}</div>`}</aside>`;
+            const slide = (name, kicker, title, body, compactBody, action, note, sideCard, icon='•') => `
+                <article class="pt-insight-slide" data-name="${esc(name)}">
+                  <div class="pt-insight-slide-copy">
+                    <div class="pt-insight-kicker"><span class="pt-insight-kicker-icon" aria-hidden="true">${esc(icon)}</span>${esc(kicker)}</div>
+                    <h3>${esc(title)}</h3>
+                    <p class="pt-insight-body-full">${esc(body)}</p><p class="pt-insight-body-compact">${esc(compactBody)}</p>
+                    <div class="pt-insight-action-line"><span class="pt-insight-action-chip">${esc(action)}</span><span class="pt-insight-action-note">${esc(note)}</span></div>
+                  </div>${sideCard}
+                </article>`;
+
+            const priorityPct = priorityMetric?.rate ?? average ?? 0;
+            const prioritySide = priorityMetric
+                ? progressCard(`${priorityMetric.name} · weekly completion`, `${priorityMetric.rate}%`, `${priorityMetric.done} of ${priorityMetric.eligible} eligible weekly tasks complete`, priorityMetric.rate, `${priorityMetric.pending} tasks remaining`, getPacedCompletionBadge(priorityMetric, pace)[0])
+                : progressCard('Overall weekly completion', average === null ? '—' : `${average}%`, `${totalDone} of ${totalEligible} eligible weekly tasks complete`, priorityPct, `${totalPending} tasks remaining`, pace.label);
+            const paceBody = `Your registered characters have completed ${totalDone} of ${totalEligible} eligible weekly tasks. There ${totalPending === 1 ? 'is' : 'are'} ${totalPending} open ${totalPending === 1 ? 'task' : 'tasks'} across the roster. Bounty Board entries and excluded tasks are kept out of this calculation, so this reflects regular weekly tracker work only.`;
+            const paceCompact = `${totalDone}/${totalEligible} weekly tasks complete · ${totalPending} remaining.`;
+            const checkRows = sortedForCheck.slice(0,3).map(item => ({name:item.name,rate:item.rate}));
+            const checkNames = sortedForCheck.slice(0,2).map(item => item.name);
+            const checkTitle = checkRows.length
+                ? `${checkNames.join(' and ')} may need a quick check.`
+                : 'No character currently has unfinished eligible weekly tasks.';
+            const checkBody = checkRows.length
+                ? `${sortedForCheck.slice(0,3).map(item => `${item.name} is at ${item.rate}% with ${item.pending} weekly ${item.pending === 1 ? 'task' : 'tasks'} remaining`).join('; ')}. Before changing anyone's plan, check whether those activities are still intended for the character or whether a run simply has not been recorded yet.`
+                : 'All registered characters are currently complete against the eligible weekly tasks, or have no eligible tasks configured. There is nothing that needs an automatic adjustment.';
+            const checkCompact = checkRows.length ? `Review ${checkRows.map(item => item.name).join(', ')}.` : 'No character follow-up needed.';
+            const historyBody = trendDetail;
+            const historyCompact = trendMetric ? `${trendMetric.name}: ${trendVerb} ${Math.abs(trendMetric.trend)} points.` : 'More weekly history is needed.';
+            const historySide = trendMetric
+                ? `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(trendMetric.name)} · saved weekly snapshots</div><div class="pt-insight-history-pair"><div><div class="pt-insight-history-value">${trendPrior === null ? '—' : `${Math.round(Number(trendPrior))}%`}</div><div class="pt-insight-side-caption">Prior saved snapshot</div></div><div class="pt-insight-history-change">${trendMetric.trend > 0 ? '+' : trendMetric.trend < 0 ? '−' : ''}${Math.abs(trendMetric.trend)} pts</div></div><div class="pt-insight-bar"><span class="${trendMetric.trend < 0 ? 'is-warning' : ''}" style="width:${Math.max(0,Math.min(100,Number(trendLatest)||0))}%"></span></div><div class="pt-insight-side-pair"><span>Latest saved snapshot</span><strong>${trendLatest === null ? '—' : `${Math.round(Number(trendLatest))}%`}</strong></div></aside>`
+                : `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">Weekly history</div><div class="pt-insight-side-value">${archives.length}</div><div class="pt-insight-side-caption">${archives.length === 1 ? 'saved weekly snapshot' : 'saved weekly snapshots'} available for comparison</div><div class="pt-insight-history-hint">A trend appears after two comparable saved weeks.</div></aside>`;
+
+            let insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}
+              <section class="pt-overview-carousel" aria-label="Activity Insights carousel">
+                <div class="pt-overview-carousel-frame" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Activity Insights. Use the left and right arrow keys to change slides.">
+                  <div class="pt-overview-carousel-track">
+                    ${slide('Priority reminder', priority ? `${priority.label} · ${priority.meta}` : 'Priority reminder · weekly tracker', priorityTitle, priorityBody, priorityCompact, priorityAction, priority ? 'Recommended next step · personal tracker data' : 'Weekly tasks only · Bounty Boards excluded', prioritySide, priority?.icon || '✓')}
+                    ${slide('Weekly pace', 'Weekly pace · registered characters', totalEligible ? (average === null ? 'Your weekly activity at a glance.' : `${average}% of eligible weekly work is complete.`) : 'No eligible weekly tasks are configured yet.', paceBody, paceCompact, `${totalPending} weekly tasks remain`, `${pace.label} · Bounty Boards excluded`, progressCard('Overall weekly completion', average === null ? '—' : `${average}%`, `${totalDone} completed of ${totalEligible} eligible tasks`, average ?? 0, `${totalPending} remaining`, `${metrics.length} characters tracked`), '◷')}
+                    ${slide('Character check', 'Character follow-up · review', checkTitle, checkBody, checkCompact, checkRows.length ? `Review ${checkRows.length} character${checkRows.length === 1 ? '' : 's'}` : 'No follow-up needed', 'Suggested check-in · no automatic changes', miniRowsCard('Lowest current completion', checkRows, 'No unfinished weekly tasks to review.'), '◎')}
+                    ${slide('Weekly trend', 'Weekly history · pattern check', trendMetric ? `${trendMetric.name}'s completion ${trendVerb} compared with the prior saved snapshot.` : 'More weekly history is needed before a trend can be shown.', historyBody, historyCompact, trendMetric ? 'Review the recent change' : 'Continue normal tracking', 'Historical comparison · saved data is not changed', historySide, '↗')}
+                  </div>
+                </div>
+                <div class="pt-overview-carousel-footer">
+                  <div class="pt-overview-carousel-status" aria-live="polite">01 / 04 · Priority reminder</div>
+                  <div class="pt-overview-carousel-controls">
+                    <span class="pt-overview-carousel-auto-note">Auto-rotates · loops continuously</span>
+                    <button class="pt-overview-carousel-pause" type="button" aria-pressed="false" aria-label="Pause automatic rotation">Ⅱ <span>Pause</span></button>
+                    <div class="pt-overview-carousel-dots" aria-label="Choose insight"></div>
+                    <button class="pt-overview-carousel-nav" type="button" data-direction="prev" aria-label="Previous insight">‹</button>
+                    <button class="pt-overview-carousel-nav" type="button" data-direction="next" aria-label="Next insight">›</button>
+                  </div>
+                </div>
+              </section>`;
+            if (window.__pantheonOverviewInsightsCarousel?.destroy) window.__pantheonOverviewInsightsCarousel.destroy();
+            if (cont) {
+                cont.setAttribute('aria-live','off');
+                cont.innerHTML = insightHtml;
+                initOverviewInsightsCarousel(cont.querySelector('.pt-overview-carousel'));
             }
-            if (cont) cont.innerHTML = insightHtml;
 
             const sortedMetrics = [...metrics].sort((a,b) => {
                 if (pace.elapsedHours < 96) return Number(b.isMain)-Number(a.isMain) || Number(b.thisWeekActivity)-Number(a.thisWeekActivity) || b.done-a.done || a.name.localeCompare(b.name);
@@ -13178,7 +13384,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r26';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r27';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13918,7 +14124,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r26';
+  const CURRENT_BUILD = '1.6.9-r27';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14612,6 +14818,69 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 :root[data-pantheon-theme="pastel"] .pantheon-r21-tracker-tab.is-active{background:linear-gradient(110deg,#eadbff,#ffe3f0)!important;color:#67427f!important;border-color:#d6b5ea!important}
 :root[data-pantheon-theme="eye-comfort"] .pantheon-r20-hero{background:linear-gradient(112deg,#f3e4cf,#f8eddc)!important;border-color:#d8c4a7!important}
 :root[data-pantheon-theme="light"] .pantheon-r20-hero{background:linear-gradient(112deg,#e0e8ef,#edf1f4)!important;border-color:#c9d4dd!important}
+</style>
+
+
+<style id="pantheon-r27-overview-activity-carousel">
+#overview-page .pantheon-r20-content-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;align-items:stretch!important;width:100%!important}
+#overview-page .overview-activity-panel,#overview-page .overview-completion-panel{width:100%!important;min-width:0!important;max-width:none!important;box-sizing:border-box!important;padding:20px!important}
+#overview-page .overview-activity-panel .overview-panel-heading{margin-bottom:16px!important;align-items:flex-start!important}
+#overview-page .overview-activity-panel .overview-panel-heading h2{font-size:.95rem!important;line-height:1.35!important}
+#overview-page .overview-activity-panel .overview-panel-heading p{font-size:.72rem!important;line-height:1.6!important;max-width:760px!important}
+#overview-page #overview-activity{display:block!important;min-width:0!important;overflow:visible!important}
+#overview-page .pt-overview-carousel{border:1px solid var(--r20-border)!important;border-radius:19px!important;background:var(--r20-panel2)!important;padding:12px!important;box-shadow:var(--r20-shadow)!important;min-width:0!important;overflow:hidden!important}
+#overview-page .pt-overview-carousel-frame{position:relative!important;overflow:hidden!important;border-radius:14px!important;touch-action:pan-y!important;cursor:grab!important;outline:none!important}
+#overview-page .pt-overview-carousel-frame:focus-visible{outline:2px solid var(--r20-accent)!important;outline-offset:3px!important}
+#overview-page .pt-overview-carousel-frame.is-dragging{cursor:grabbing!important}
+#overview-page .pt-overview-carousel-track{display:flex!important;transform:translateX(-100%);transition:transform .55s cubic-bezier(.22,.75,.22,1);will-change:transform;min-width:0!important}
+#overview-page .pt-insight-slide{flex:0 0 100%!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;padding:clamp(19px,2.4vw,28px)!important;border:1px solid var(--r20-border)!important;border-radius:14px!important;background:linear-gradient(112deg,var(--r20-panel),color-mix(in srgb,var(--r20-accent-soft) 34%,var(--r20-panel)) 68%,var(--r20-panel2))!important;display:grid!important;grid-template-columns:minmax(0,1.5fr) minmax(235px,.72fr)!important;align-items:center!important;gap:clamp(18px,3vw,34px)!important;min-height:248px!important}
+#overview-page .pt-insight-slide-copy{min-width:0!important}
+#overview-page .pt-insight-kicker{display:flex!important;align-items:center!important;gap:9px!important;color:var(--r20-accent2)!important;font-size:.61rem!important;font-weight:850!important;letter-spacing:.13em!important;text-transform:uppercase!important;margin-bottom:13px!important;line-height:1.4!important}
+#overview-page .pt-insight-kicker-icon{display:grid!important;place-items:center!important;width:25px!important;height:25px!important;flex:0 0 25px!important;border-radius:8px!important;background:var(--r20-accent-soft)!important;color:var(--r20-accent2)!important;font-size:.8rem!important;letter-spacing:0!important}
+#overview-page .pt-insight-slide h3{font-size:clamp(1.14rem,1.9vw,1.55rem)!important;line-height:1.28!important;letter-spacing:-.025em!important;margin:0 0 11px!important;color:var(--r20-text)!important;overflow-wrap:anywhere!important;max-width:780px!important}
+#overview-page .pt-insight-body-full,#overview-page .pt-insight-body-compact{font-size:.78rem!important;line-height:1.8!important;color:var(--r20-muted)!important;margin:0!important;max-width:800px!important;overflow-wrap:anywhere!important}
+#overview-page .pt-insight-body-compact{display:none!important}
+#overview-page .pt-insight-action-line{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:wrap!important;margin-top:19px!important}
+#overview-page .pt-insight-action-chip{display:inline-flex!important;align-items:center!important;padding:9px 12px!important;border:1px solid var(--r20-border)!important;border-radius:10px!important;background:var(--r20-accent-soft)!important;color:var(--r20-accent2)!important;font-size:.69rem!important;line-height:1.35!important;font-weight:800!important;overflow-wrap:anywhere!important;max-width:100%!important}
+#overview-page .pt-insight-action-note{font-size:.64rem!important;line-height:1.5!important;color:var(--r20-subtle)!important;overflow-wrap:anywhere!important}
+#overview-page .pt-insight-side-card{min-width:0!important;padding:17px!important;border:1px solid var(--r20-border)!important;border-radius:14px!important;background:color-mix(in srgb,var(--r20-panel) 86%,var(--r20-bg))!important}
+#overview-page .pt-insight-side-label{font-size:.59rem!important;line-height:1.5!important;color:var(--r20-subtle)!important;font-weight:850!important;letter-spacing:.11em!important;text-transform:uppercase!important;overflow-wrap:anywhere!important}
+#overview-page .pt-insight-side-value{font-size:clamp(1.65rem,3vw,2.15rem)!important;line-height:1.15!important;font-weight:850!important;letter-spacing:-.05em!important;margin:9px 0 5px!important;color:var(--r20-text)!important;overflow-wrap:anywhere!important}
+#overview-page .pt-insight-side-caption{font-size:.67rem!important;line-height:1.6!important;color:var(--r20-muted)!important;overflow-wrap:anywhere!important}
+#overview-page .pt-insight-bar{height:8px!important;border-radius:99px!important;overflow:hidden!important;background:var(--r20-panel3)!important;margin:14px 0 8px!important}
+#overview-page .pt-insight-bar span{display:block!important;height:100%!important;border-radius:99px!important;background:linear-gradient(90deg,var(--r20-accent),var(--r20-good))!important;transition:width .3s ease!important}
+#overview-page .pt-insight-bar span.is-warning{background:linear-gradient(90deg,var(--r20-warn),var(--r20-red))!important}
+#overview-page .pt-insight-side-pair{display:flex!important;justify-content:space-between!important;align-items:flex-start!important;gap:10px!important;font-size:.63rem!important;line-height:1.5!important;color:var(--r20-muted)!important}
+#overview-page .pt-insight-side-pair strong{color:var(--r20-text)!important;text-align:right!important}
+#overview-page .pt-insight-mini-rows{display:grid!important;gap:13px!important;margin-top:16px!important}
+#overview-page .pt-insight-mini-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important;font-size:.67rem!important;color:var(--r20-text)!important}
+#overview-page .pt-insight-mini-row>strong{font-size:.7rem!important}
+#overview-page .pt-insight-mini-track{height:6px!important;border-radius:99px!important;overflow:hidden!important;background:var(--r20-panel3)!important;margin-top:6px!important}
+#overview-page .pt-insight-mini-track i{display:block!important;height:100%!important;border-radius:99px!important;background:var(--r20-accent)!important}
+#overview-page .pt-insight-history-pair{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:12px!important;margin:16px 0 12px!important}
+#overview-page .pt-insight-history-value{font-size:1.55rem!important;line-height:1.2!important;font-weight:850!important;color:var(--r20-text)!important}
+#overview-page .pt-insight-history-change{font-size:1rem!important;font-weight:850!important;color:var(--r20-warn)!important;padding-bottom:4px!important}
+#overview-page .pt-insight-history-hint{margin-top:14px!important;padding:10px 11px!important;border:1px dashed var(--r20-border)!important;border-radius:10px!important;font-size:.65rem!important;line-height:1.6!important;color:var(--r20-muted)!important}
+#overview-page .pt-overview-carousel-footer{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:13px 4px 2px!important}
+#overview-page .pt-overview-carousel-status{font-size:.65rem!important;color:var(--r20-subtle)!important;min-width:100px!important;line-height:1.4!important}
+#overview-page .pt-overview-carousel-controls{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important}
+#overview-page .pt-overview-carousel-auto-note{font-size:.59rem!important;color:var(--r20-subtle)!important;white-space:nowrap!important}
+#overview-page .pt-overview-carousel-nav,#overview-page .pt-overview-carousel-pause{min-width:34px!important;height:34px!important;padding:0 9px!important;border:1px solid var(--r20-border)!important;border-radius:9px!important;background:var(--r20-panel)!important;color:var(--r20-text)!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:6px!important;cursor:pointer!important;font-size:.9rem!important;font-weight:800!important;transition:background .18s ease,border-color .18s ease!important}
+#overview-page .pt-overview-carousel-pause{font-size:.67rem!important}
+#overview-page .pt-overview-carousel-nav:hover,#overview-page .pt-overview-carousel-pause:hover{background:var(--r20-accent-soft)!important;border-color:var(--r20-accent)!important}
+#overview-page .pt-overview-carousel-nav:focus-visible,#overview-page .pt-overview-carousel-pause:focus-visible,#overview-page .pt-overview-carousel-dot:focus-visible{outline:2px solid var(--r20-accent)!important;outline-offset:2px!important}
+#overview-page .pt-overview-carousel-dots{display:flex!important;align-items:center!important;gap:6px!important;margin:0 3px!important}
+#overview-page .pt-overview-carousel-dot{width:7px!important;height:7px!important;padding:0!important;border:0!important;border-radius:99px!important;background:var(--r20-border2)!important;cursor:pointer!important;transition:width .22s ease,background .22s ease!important}
+#overview-page .pt-overview-carousel-dot[aria-current="true"]{width:21px!important;background:var(--r20-accent)!important}
+.pantheon-r20-compact #overview-page .pt-insight-slide{min-height:210px!important;padding:18px!important}
+.pantheon-r20-compact #overview-page .pt-insight-slide h3{font-size:1.05rem!important;margin-bottom:7px!important}
+.pantheon-r20-compact #overview-page .pt-insight-body-full{display:none!important}
+.pantheon-r20-compact #overview-page .pt-insight-body-compact{display:block!important;font-size:.69rem!important;line-height:1.5!important}
+.pantheon-r20-compact #overview-page .pt-insight-action-line{margin-top:12px!important}
+.pantheon-r20-compact #overview-page .pt-insight-side-card{padding:13px!important}
+@media(max-width:900px){#overview-page .pt-insight-slide{grid-template-columns:minmax(0,1fr) minmax(200px,.72fr)!important;gap:16px!important}}
+@media(max-width:700px){#overview-page .overview-activity-panel,#overview-page .overview-completion-panel{padding:14px!important}#overview-page .pt-overview-carousel{padding:8px!important}#overview-page .pt-insight-slide{grid-template-columns:minmax(0,1fr)!important;gap:14px!important;min-height:0!important;padding:17px!important}#overview-page .pt-insight-slide h3{font-size:1.2rem!important}#overview-page .pt-insight-body-full,#overview-page .pt-insight-body-compact{font-size:.73rem!important;line-height:1.7!important}#overview-page .pt-insight-side-card{padding:13px!important}#overview-page .pt-overview-carousel-footer{align-items:flex-start!important;flex-direction:column!important}#overview-page .pt-overview-carousel-controls{width:100%!important;justify-content:flex-end!important;flex-wrap:wrap!important}#overview-page .pt-overview-carousel-auto-note{display:none!important}#overview-page .pt-overview-carousel-status{min-width:0!important}}
+@media(prefers-reduced-motion:reduce){#overview-page .pt-overview-carousel-track,#overview-page .pt-overview-carousel-dot,#overview-page .pt-insight-bar span{transition:none!important}}
 </style>
 
 </body>
