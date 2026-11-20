@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r40</title>
+    <title>Pantheon Tools v1.6.9-r42</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4123,6 +4123,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
         <button id="share-bounties-btn" class="btn btn-secondary" type="button" onclick="openBountyShareModal()">↗ Share Bounties</button>
         <button id="weekly-report-btn" class="btn btn-secondary" type="button" onclick="openWeeklyReportModal()">📊 Weekly Report</button>
+        <span id="tracker-focus-guide-hint" class="tracker-toolbar-hint" aria-live="polite">✧ Hover or focus a cell; tap to pin its row and character.</span>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
         <span id="tracker-live-sync-note" class="tracker-live-sync-note" role="status" aria-live="polite" data-state="checking">Checking shared progress…</span>
         <button id="tracker-add-characters-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()" hidden>＋ Add More Characters</button>
@@ -4376,9 +4377,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r40</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r42</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r40:</strong> Guild Forum posts and replies can now be edited by their authors. Administrators can also remove posts and replies from any member.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r42:</strong> Tracker Focus Guide is now always active. Hover, keyboard-focus, or tap a task cell to trace its dungeon row and character column.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -4654,6 +4655,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         <h5>Right-click states</h5>
                         <p><b>Dungeon rows:</b> Open/Done → 🎯 Marked → N/A → Open. <b>Bounty-list rows:</b> Open/Done → 🎯 Marked → 🔄 Reset Bounty → N/A → Open.</p>
                         <p>A Marked, Reset Bounty, N/A, or completed bounty line is reserved and will not be overwritten by the next target. Removing a Marked or Reset Bounty state clears that line's target text. Reset Bounty is not available on dungeon rows.</p>
+                        <h5>Focus Guide</h5>
+                        <p>The Tracker Focus Guide is always active to help you trace cells across a large roster. Hover over a task cell or move keyboard focus to it to highlight its dungeon row and character column; the selected cell receives a stronger highlight. On touchscreens, tap a cell to pin the guide, then tap it again, tap outside the table, or press Escape to clear it. This only changes the visual highlight and never changes task progress.</p>
                         <p><b>N/A</b> means the task does not apply to that character. Bounty Claim slots are tracked separately and are <b>not included</b> in weekly completion rate; N/A tasks are also excluded.</p>
                         <div class="help-callout"><b>Easy rule:</b> left-click to record completion. Right-click when you need to mark, reset, or exclude a task.</div>
                     </section>
@@ -8380,9 +8383,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 th.innerHTML = `<span class="tracker-char-heading"><span class="tracker-char-ign"><span class="tracker-char-name">${escapeHTML(char.name)}</span>${mainStar}</span><span class="tracker-char-class">${job ? `(${escapeHTML(job)})` : '(Class not set)'}</span></span>`;
                 th.title = job ? `${char.name} · ${job}${char.isMain ? ' · Main character' : ''}` : `${char.name} · Class not set${char.isMain ? ' · Main character' : ''}`;
                 th.setAttribute('aria-label', job ? `${char.name}, ${job}${char.isMain ? ', Main character' : ''}` : `${char.name}, class not set${char.isMain ? ', Main character' : ''}`);
-                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = `bold char-col${char.isMain ? ' is-main-character' : ''}`;
+                th.style.background = char.color; th.style.color = getContrastText(char.color); th.className = `bold char-col${char.isMain ? ' is-main-character' : ''}`; th.dataset.char = char.name;
                 headerRow.appendChild(th);
-                const rateTh = document.createElement('th'); rateTh.id = rateElementId(char.name);
+                const rateTh = document.createElement('th'); rateTh.id = rateElementId(char.name); rateTh.dataset.char = char.name;
                 rateTh.style.background = '#ffe599'; rateTh.style.color = '#000'; rateTh.textContent = '0%'; rateTh.className = `char-col${char.isMain ? ' is-main-character' : ''}`;
                 footerRow.appendChild(rateTh);
             });
@@ -13766,7 +13769,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r40';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r42';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14506,7 +14509,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r40';
+  const CURRENT_BUILD = '1.6.9-r42';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -15750,6 +15753,122 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   .pantheon-hub-smoke::before,.pantheon-hub-smoke::after{animation:none!important;opacity:.18!important;transform:none!important}
 }
 </style>
+
+<style id="pantheon-r42-tracker-focus-guide">
+/* Always-on visual tracing for the active dungeon row and character column. */
+#dn-tracker tr.tracker-guide-row>td{
+  box-shadow:inset 0 1px color-mix(in srgb,var(--pt-accent) 42%,transparent),inset 0 -1px color-mix(in srgb,var(--pt-accent) 42%,transparent)!important;
+}
+#dn-tracker tr.tracker-guide-row>td.task-name,
+#dn-tracker tr.tracker-guide-row>td.col-category{
+  background:color-mix(in srgb,var(--pt-accent) 12%,var(--pt-surface))!important;
+}
+#dn-tracker td.interactive-cell.tracker-guide-column:not(.tracker-guide-row){
+  background:color-mix(in srgb,var(--pt-accent) 13%,var(--pt-surface))!important;
+}
+#dn-tracker td.interactive-cell.tracker-guide-row:not(.tracker-guide-column){
+  background:color-mix(in srgb,var(--pt-accent) 11%,var(--pt-surface))!important;
+}
+#dn-tracker td.interactive-cell.tracker-guide-cell{
+  position:relative!important;z-index:2!important;
+  background:color-mix(in srgb,var(--pt-accent) 30%,var(--pt-surface))!important;
+  outline:2px solid var(--pt-accent)!important;outline-offset:-2px!important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pt-accent) 44%,transparent)!important;
+}
+#dn-tracker #header-row th.char-col.tracker-guide-column,
+#dn-tracker #footer-row th.char-col.tracker-guide-column{
+  position:relative!important;z-index:2!important;
+  outline:2px solid var(--pt-accent)!important;outline-offset:-2px!important;
+  box-shadow:inset 0 0 0 999px color-mix(in srgb,var(--pt-accent) 16%,transparent)!important;
+}
+#tracker-focus-guide-hint{font-weight:600;color:var(--pt-text-muted)}
+@media(prefers-reduced-motion:no-preference){
+  #dn-tracker td.interactive-cell,#dn-tracker #header-row th.char-col,#dn-tracker #footer-row th.char-col{transition:background-color .12s ease,outline-color .12s ease,box-shadow .12s ease}
+}
+</style>
+
+<script id="pantheon-r42-tracker-focus-guide-runtime">
+(() => {
+  const table = document.getElementById('dn-tracker');
+  const tbody = document.getElementById('tracker-body');
+  const wrap = document.getElementById('tracker-table-wrap');
+  if (!table || !tbody || !wrap || tbody.dataset.r42FocusGuideBound === '1') return;
+  tbody.dataset.r42FocusGuideBound = '1';
+
+  let pinned = false;
+  let currentCell = null;
+  function clearClasses() {
+    table.querySelectorAll('.tracker-guide-row,.tracker-guide-column,.tracker-guide-cell').forEach(node => {
+      node.classList.remove('tracker-guide-row','tracker-guide-column','tracker-guide-cell');
+    });
+    currentCell = null;
+  }
+  function focusCell(cell) {
+    if (!cell || !cell.isConnected || currentCell === cell) return;
+    clearClasses();
+    currentCell = cell;
+    const row = cell.closest('tr.task-row');
+    const charName = cell.dataset.char || '';
+    if (row) row.classList.add('tracker-guide-row');
+    if (charName) {
+      table.querySelectorAll('td.interactive-cell[data-char],#header-row th.char-col[data-char],#footer-row th.char-col[data-char]').forEach(node => {
+        if (node.dataset.char === charName) node.classList.add('tracker-guide-column');
+      });
+    }
+    cell.classList.add('tracker-guide-cell');
+  }
+  function clearGuide() {
+    pinned = false;
+    clearClasses();
+  }
+  function cellFrom(target) {
+    return target && typeof target.closest === 'function'
+      ? target.closest('#tracker-body td.interactive-cell[data-char][data-task]')
+      : null;
+  }
+
+  tbody.addEventListener('pointerover', event => {
+    if (pinned || event.pointerType === 'touch') return;
+    const cell = cellFrom(event.target);
+    if (cell) focusCell(cell);
+  });
+  tbody.addEventListener('pointerout', event => {
+    if (pinned) return;
+    const from = cellFrom(event.target);
+    const to = cellFrom(event.relatedTarget);
+    if (from && from === currentCell && from !== to) clearClasses();
+  });
+  tbody.addEventListener('focusin', event => {
+    if (pinned) return;
+    const cell = cellFrom(event.target);
+    if (cell) focusCell(cell);
+  });
+  tbody.addEventListener('focusout', event => {
+    if (pinned) return;
+    const from = cellFrom(event.target);
+    const to = cellFrom(event.relatedTarget);
+    if (from && from === currentCell && from !== to) clearClasses();
+  });
+  tbody.addEventListener('pointerup', event => {
+    if (event.pointerType !== 'touch') return;
+    const cell = cellFrom(event.target);
+    if (!cell) return;
+    if (pinned && currentCell === cell) clearGuide();
+    else { pinned = true; focusCell(cell); }
+  });
+  document.addEventListener('pointerdown', event => {
+    if (!pinned || table.contains(event.target)) return;
+    clearGuide();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && (pinned || currentCell)) clearGuide();
+  });
+  const observer = new MutationObserver(() => {
+    if (currentCell && !currentCell.isConnected) { pinned = false; clearClasses(); }
+  });
+  observer.observe(tbody, { childList: true });
+})();
+</script>
 
 </body>
 </html>
