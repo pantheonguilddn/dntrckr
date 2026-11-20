@@ -1,16 +1,16 @@
-# Deploy Pantheon Tools v1.6.9-r23
+# Deployment - Pantheon Tools v1.6.9-r24
 
-This package updates the existing Pantheon Tools Cloudflare Pages project. It is not a new project and does not require a D1 migration.
+Deploy this package to the existing Cloudflare Pages project `dntrckr`.
 
-## Deploy
+From the extracted package root (where `index.html`, `admin.html`, and `functions/` are directly present):
 
-1. Extract this ZIP into a new folder. The folder should contain `index.html`, `admin.html`, `functions/`, `_headers`, `schema.sql`, and `version.json` directly.
-2. From that folder, run `npx wrangler login` if you have not authenticated Wrangler on this machine.
-3. Deploy to the existing Pages project: `npx wrangler pages deploy . --project-name=dntrckr`.
-4. Verify `https://dntrckr.pages.dev/version.json` reports `1.6.9-r23`.
+```powershell
+npx wrangler login
+npx wrangler pages deploy . --project-name=dntrckr
+```
 
-For a Git-integrated Pages project, commit the package files to its existing deployment branch and use the existing Git deployment. Do not create a new Pages project, alter D1 bindings/secrets/environment variables, reset the database, or clear browser storage. Do not use dashboard ZIP drag-and-drop for Pages Functions.
+Alternatively, use the existing Git-connected deployment workflow for the same Pages project.
 
-## Data safety
+Do not create a new Pages project, change D1 bindings/secrets/environment variables, reset the database, or clear browser storage. This is a front-end-only revision; no D1 migration or recovery action is required.
 
-This is a presentation and client-side layout release. It does not change `functions/`, database schema, authentication, ownership, saved task cells, weekly archives, or completion history. Guild Forum and Salary Calculator remain full workspace pages with their existing controls.
+After deployment, open `https://dntrckr.pages.dev/version.json` and confirm `build` is `1.6.9-r24`.

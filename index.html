@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r23</title>
+    <title>Pantheon Tools v1.6.9-r24</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4180,9 +4180,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r23</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r24</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r23:</strong> Refines the Overview to show the five requested previous-week and bounty metrics, expands account space, standardizes Tracker tabs, and retunes Clean, Eye Comfort, and Pastel palettes. Guild Forum and Salary Calculator remain full workspace pages. No tracking data or sync behavior is changed.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r24:</strong> Refines the Overview to show the five requested previous-week and bounty metrics, expands account space, standardizes Tracker tabs, and retunes Clean, Eye Comfort, and Pastel palettes. Guild Forum and Salary Calculator remain full workspace pages. No tracking data or sync behavior is changed.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -9840,8 +9840,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             const priorities = [];
             metrics.forEach(item => {
                 const nextTask = item.nextTask || item.pendingTasks[0]?.task || '';
-                const nextReason = item.nextReason || 'It is one of the highest-priority tasks still open for this character.';
-                const nextAction = nextTask ? `Next: “${nextTask}”. ${nextReason}` : 'Review the remaining tasks and choose one that fits the time available.';
+                const nextAction = nextTask ? `Next: ${nextTask}` : 'Choose the next open task.';
                 // During Deadline Push and later, every character with remaining work gets an actionable reminder.
                 // Ranking comes from the shared deadline-aware scorer above, not completion percentage alone.
                 if (item.eligible > 0 && item.pending > 0 && pace.hoursLeft <= 72) {
@@ -9926,7 +9925,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                     const quickTip = item.pending === 0
                         ? 'All weekly tasks complete.'
                         : suggestion
-                            ? `Next: ${suggestion.t}. ${getRecommendationPlainReason(suggestion)}`
+                            ? `Next: ${suggestion.t}`
                             : `${item.pending} tasks remain. Review the highest-priority open task.`;
                     const trendText = item.trend === null || item.trend === 0 ? '' : item.trend > 0 ? `Completion rose ${item.trend} points over saved weeks.` : `Completion fell ${Math.abs(item.trend)} points over saved weeks.`;
                     return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} weekly tasks done · ${esc(item.pending)} left.</p><span class="activity-insight-meta">${esc(quickTip)}</span>${trendText ? `<span class="activity-insight-meta">${esc(trendText)}</span>` : ''}</div></div>`;
@@ -13162,7 +13161,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r23';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r24';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13902,7 +13901,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r23';
+  const CURRENT_BUILD = '1.6.9-r24';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14044,6 +14043,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="tracker-page" title="Weekly Tracker" aria-label="Weekly Tracker"><span aria-hidden="true">▦</span></button>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="team-builder-page" title="Team Builder" aria-label="Team Builder"><span aria-hidden="true">⚔</span></button>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="card-wiki-page" title="Card Database" aria-label="Card Database"><span aria-hidden="true">◇</span></button>
+  <button class="pantheon-r20-rail-link" type="button" data-r20-presence-toggle title="Guild Presence" aria-label="Guild Presence" aria-expanded="false"><span aria-hidden="true">◉</span></button>
   <div class="pantheon-r21-rail-divider" aria-hidden="true"></div>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="guild-forum-page" title="Guild Forum" aria-label="Guild Forum"><span aria-hidden="true">☷</span></button>
   <button class="pantheon-r20-rail-link" type="button" data-r20-page="salary-page" title="Salary Calculator" aria-label="Salary Calculator"><span aria-hidden="true">▤</span></button>
@@ -14061,6 +14061,8 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    syncRail();
  }));
  rail.querySelector('[data-r20-help]').addEventListener('click',()=>{if(typeof window.openHelpModal==='function')window.openHelpModal('start');});
+ const presenceButton=rail.querySelector('[data-r20-presence-toggle]');
+ presenceButton.addEventListener('click',()=>{const open=!pane.classList.contains('pantheon-r24-presence-open');pane.hidden=!open;pane.classList.toggle('pantheon-r24-presence-open',open);presenceButton.classList.toggle('is-active',open);presenceButton.setAttribute('aria-expanded',String(open));});
  function syncRail(){
    const active=$$('.app-page').find(page=>!page.classList.contains('hidden-page'));
    rail.querySelectorAll('[data-r20-page]').forEach(button=>{
@@ -14143,7 +14145,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
      ['Previous Completion Rate','↗','r22-stat-completion','Previous completed week · trend vs earlier week'],
      ['Outlier Character','↘','r22-stat-outlier','Lowest completion in the previous week'],
      ['Most Completed Character','★','r22-stat-most','Highest completion in the previous week'],
-     ['Remaining Bounties Undone','⌖','r22-stat-bounties','Open bounty slots across your characters']
+     ['Remaining Tasks','⌖','r22-stat-bounties','Unfinished weekly tasks across your characters']
    ];
    stats.innerHTML=specs.map(([label,icon,id,foot])=>`<div class="pantheon-r20-stat-card pantheon-r22-stat-card"><div class="pantheon-r20-stat-top"><span>${label}</span><span class="pantheon-r20-stat-icon" aria-hidden="true">${icon}</span></div><div class="pantheon-r20-stat-value" id="${id}">—</div><div class="pantheon-r20-stat-foot" id="${id}-detail">${foot}</div></div>`).join('');
    const panels=$('.overview-bottom-grid',overview);const activity=$('.overview-activity-panel',overview);const completion=$('.overview-completion-panel',overview);
@@ -14212,16 +14214,19 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
      if(data.rows.length>=2){
        const byRate=[...data.rows].sort((a,b)=>a.rate-b.rate||a.name.localeCompare(b.name));
        const low=byRate[0],lowTies=byRate.filter(x=>x.rate===low.rate),spread=byRate[byRate.length-1].rate-low.rate;
-       if(spread===0)setStat('r22-stat-outlier','No outlier','All characters had the same completion rate');
-       else setStat('r22-stat-outlier',lowTies.length>1?`${lowTies.length} tied`:low.name,`${low.rate}% completion · lowest`,'down');
+       const profiles=(typeof getCurrentMemberDirectoryEntry==='function'?(getCurrentMemberDirectoryEntry()?.characterProfiles||[]):[]);
+       const classOf=name=>{const p=profiles.find(x=>String(x.name||'').trim().toLocaleLowerCase()===String(name).trim().toLocaleLowerCase());return String(p?.className||p?.class||'Class not recorded');};
+       if(spread===0)setStat('r22-stat-outlier','No outlier','All characters tied at the same completion rate');
+       else {const outlierText=lowTies.map(x=>`${x.name} (${classOf(x.name)})`).join(' · ');setStat('r22-stat-outlier',lowTies.length>1?`${lowTies.length}-way tie`:outlierText,`${low.rate}% complete · lowest${lowTies.length>1?' · '+outlierText:''}`,'down');}
        const countRows=data.rows.filter(x=>Number.isFinite(x.done));
        const ranked=countRows.length?countRows:[...data.rows];
        const completed=x=>Number.isFinite(x.done)?x.done:x.rate;
        const topValue=Math.max(...ranked.map(completed));
        const topRows=ranked.filter(x=>completed(x)===topValue).sort((a,b)=>a.name.localeCompare(b.name));
        const top=topRows[0];
-       const label=topRows.length>1?`${top.name} +${topRows.length-1}`:top.name;
-       const detail=Number.isFinite(top.done)?`${top.done} tasks completed · ${top.rate}%`:`${top.rate}% completion · highest available rate`;
+       const topText=topRows.map(x=>`${x.name} (${classOf(x.name)})`).join(' · ');
+       const label=topRows.length>1?`${topRows.length}-way tie`:topText;
+       const detail=Number.isFinite(top.done)?`${top.done} tasks · ${top.rate}% complete${topRows.length>1?' · '+topText:''}`:`${top.rate}% complete · highest${topRows.length>1?' · '+topText:''}`;
        setStat('r22-stat-most',label,detail,'up');
      } else if(data.rows.length===1){
        setStat('r22-stat-outlier','—','Need at least two characters to identify an outlier');
@@ -14230,15 +14235,15 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
        setStat('r22-stat-outlier','—','No previous-week character data');
        setStat('r22-stat-most','—','No previous-week character data');
      }
-     const bountyTasks=(cloudData?.settings?.categories||[]).filter(cat=>/bounty/i.test(String(cat?.name||''))).flatMap(cat=>Array.isArray(cat.tasks)?cat.tasks:[]);
+     const weeklyTasks=Array.isArray(weeklyTaskNames)?weeklyTaskNames:[];
      let undone=0,total=0;
-     data.names.forEach(name=>bountyTasks.forEach(task=>{
+     data.names.forEach(name=>weeklyTasks.forEach(task=>{
        const state=typeof getCellState==='function'?getCellState(name,task):'open';
        if(state==='excluded')return;
        total++;
        if(state!=='done')undone++;
      }));
-     setStat('r22-stat-bounties',String(undone),`${undone} undone of ${total} eligible bounty slots`);
+     setStat('r22-stat-bounties',String(undone),`${undone} unfinished of ${total} eligible weekly tasks`);
    }
    window.__pantheonR22UpdateOverviewStats=updateStats;
    [summary,$('#overview-activity'),$('#overview-character-completion')].filter(Boolean).forEach(node=>new MutationObserver(updateStats).observe(node,{childList:true,subtree:true,characterData:true}));
@@ -14489,6 +14494,35 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 :root[data-pantheon-theme="pastel"] .pantheon-r20-stat-icon{background:linear-gradient(145deg,#eadcff,#fbe1ef)!important;color:#8b61b8!important}
 :root[data-pantheon-theme="pastel"] .pantheon-r20-theme-pill button[aria-pressed="true"]{background:#eadcff!important;color:#614778!important}
 :root[data-pantheon-theme="eye-comfort"] .pantheon-r20-hero{background:linear-gradient(115deg,#f4e8d7,#efe0cd)!important}
+
+/* r24: Guild Presence is a rail-launched flyout, not a permanent third-column occupant. */
+#pantheon-r20-shell,#pantheon-r20-shell.roster-collapsed{grid-template-columns:76px minmax(0,1fr)!important}
+#online-presence-pane{display:none!important;position:fixed!important;left:88px!important;top:116px!important;width:310px!important;max-width:calc(100vw - 104px)!important;max-height:calc(100vh - 132px)!important;margin:0!important;z-index:1200!important;box-shadow:0 18px 48px rgba(0,0,0,.22)!important}
+#online-presence-pane.pantheon-r24-presence-open{display:flex!important}
+#online-presence-pane .online-presence-list{max-height:calc(100vh - 310px)!important}
+@media(max-width:760px){#online-presence-pane{left:12px!important;top:110px!important;width:min(330px,calc(100vw - 24px))!important;max-width:none!important}}
+/* Make wide toolbars and analytics occupy the complete workspace width. */
+#pantheon-r20-workspace>.app-page{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important}
+#tracker-page .tracker-toolbar,#tracker-page .pantheon-r21-tracker-tabs,#tracker-page #tracker-table-wrap,#tracker-page #tracker-analytics-header,#tracker-page #analytics-grid,#tracker-page .tracker-reset-note{width:100%!important;max-width:none!important;box-sizing:border-box!important;margin-left:0!important;margin-right:0!important}
+#tracker-page .tracker-analytics-header,#tracker-page #analytics-grid,#tracker-page .analytics-section,#tracker-page .roster-analytics{max-width:none!important;width:100%!important}
+#tracker-page #analytics-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))!important;justify-content:stretch!important;align-items:stretch!important}
+#tracker-page #analytics-grid>*{min-width:0!important;width:100%!important;max-width:none!important}
+/* Overview's remaining-work metric is about weekly tasks, never bounty-board slots. */
+#r22-stat-bounties{font-variant-numeric:tabular-nums}
+/* Compact mode: concise recommendation labels, without long explanatory paragraphs. */
+.pantheon-r20-compact .activity-insight-meta{display:none!important}
+.pantheon-r20-compact .activity-insight-copy>p{display:none!important}
+.pantheon-r20-compact .activity-insight-copy strong{font-size:.78rem!important}
+.pantheon-r20-compact .activity-insight-item{padding:8px 0!important}
+/* Keep the title and brand fully legible in the home control. */
+.controls .brand-area{flex:0 0 auto!important;min-width:290px!important;width:290px!important}
+.controls .brand-copy{min-width:0!important;width:100%!important}
+.controls .brand-subtitle{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
+@media(max-width:1100px){.controls .brand-area{width:auto!important;min-width:220px!important;flex:1 1 220px!important}}
+/* Give outlier / best performer cards room for class names and explicit ties. */
+.pantheon-r22-stat-card .pantheon-r20-stat-value#r22-stat-outlier,.pantheon-r22-stat-card .pantheon-r20-stat-value#r22-stat-most{font-size:clamp(12px,1vw,16px)!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+.pantheon-r22-stat-card .pantheon-r20-stat-foot{overflow-wrap:anywhere!important}
+
 </style>
 
 
