@@ -1,4 +1,4 @@
-# Deployment — Pantheon Tools v1.6.9-r36
+# Deployment — Pantheon Tools v1.6.9-r37
 
 Deploy to the existing Cloudflare Pages project `dntrckr`. Do not create a new project, reset D1, clear browser storage, or change bindings, secrets, or OAuth settings.
 
@@ -7,16 +7,15 @@ npx wrangler login
 npx wrangler pages deploy . --project-name=dntrckr
 ```
 
-After deployment, confirm `https://dntrckr.pages.dev/version.json` reports `1.6.9-r36`.
+After deployment, confirm `https://dntrckr.pages.dev/version.json` reports `1.6.9-r37`.
 
-## Verify Guild Hub presentation
+## Verify Overview
 
-1. Confirm the Card background selector is on its own row directly below the Guild Hub card, not over the emblem.
-2. Select **Pantheon emblem** and check that the image softly dissolves on all edges into the card surface, with no visible rectangular boundary.
-3. Switch through Dark, Light, Eye Comfort, and Pastel. The image treatment should adapt to each theme.
-4. Try the other background options; the local selection should still persist.
-5. Check a narrow viewport to ensure the separate selector row remains readable and the emblem does not cover the text.
+1. Open Overview and confirm the Guild Hub card appears first.
+2. Confirm the Card Background selector appears in its own row immediately below the card.
+3. Confirm all five summary metrics appear below the selector.
+4. Confirm the Activity Insights carousel is visible and navigable.
+5. Confirm Character Completion appears below Activity Insights.
+6. Switch among Dark, Light, Eye Comfort, and Pastel, and check the Pantheon emblem blend.
 
-Keep both `pantheon-guild-hub-banner.png` (the original upload) and `pantheon-guild-hub-banner-feathered.png` (the rendered feathered asset) beside `index.html`.
-
-This release does not migrate or modify D1 data, schema, backend functions, authentication, synchronization, or historical Tracker records.
+This release does not migrate or modify D1 data, schema, backend functions, authentication, synchronization, or historical Tracker records. It does not clear browser-local background preferences.

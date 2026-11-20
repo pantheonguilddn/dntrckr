@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r36</title>
+    <title>Pantheon Tools v1.6.9-r37</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4360,9 +4360,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r36</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r37</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r36:</strong> The Pantheon emblem background now fades smoothly into the Guild Hub card with theme-matched gradients and a soft ambient glow, avoiding a visible image edge.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r37:</strong> The Pantheon emblem background now fades smoothly into the Guild Hub card with theme-matched gradients and a soft ambient glow, avoiding a visible image edge.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -13613,7 +13613,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r36';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r37';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14353,7 +14353,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r36';
+  const CURRENT_BUILD = '1.6.9-r37';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14613,8 +14613,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
      hero.dataset.hubBackground=next;
      try{localStorage.setItem(hubBackgroundKey,next);}catch(_){}
    });
-   // Keep appearance controls outside the hero itself so they never cover the guild emblem.
-   hero.after(hubBackgroundControl);
+   // The selector is inserted only after the hero is attached to the Overview DOM.
    const stats=document.createElement('section');stats.className='pantheon-r20-stat-grid pantheon-r22-stat-grid';stats.setAttribute('aria-label','Previous week and bounty statistics');
    const specs=[
      ['Registered Characters','♙','r22-stat-characters','Characters on your registered roster'],
@@ -14630,7 +14629,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
    const originalHead=$('.overview-dashboard-head-r2',overview);const sectionTitle=$('.overview-section-title',overview);const toolsGrid=$('.overview-tools-grid',overview);
    if(originalHead){originalHead.hidden=true;originalHead.setAttribute('aria-hidden','true');}
    if(sectionTitle)sectionTitle.hidden=true;if(toolsGrid)toolsGrid.hidden=true;if(panels)panels.remove();
-   overview.insertBefore(header,overview.firstChild);header.after(hero);hubBackgroundControl.after(stats);stats.after(content);
+   overview.insertBefore(header,overview.firstChild);header.after(hero);hero.after(hubBackgroundControl);hubBackgroundControl.after(stats);stats.after(content);
    const name=$('#overview-profile-name');
    const syncWelcome=()=>{const value=name?.textContent?.trim();$('#r20-welcome-title').textContent=value&&value!=='Pantheon Member'?`Welcome back, ${value}.`:'Welcome back.';};
    if(name)new MutationObserver(syncWelcome).observe(name,{childList:true,subtree:true,characterData:true});syncWelcome();
