@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r24</title>
+    <title>Pantheon Tools v1.6.9-r25</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4180,9 +4180,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r24</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r25</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r24:</strong> Refines the Overview to show the five requested previous-week and bounty metrics, expands account space, standardizes Tracker tabs, and retunes Clean, Eye Comfort, and Pastel palettes. Guild Forum and Salary Calculator remain full workspace pages. No tracking data or sync behavior is changed.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r25:</strong> Corrects class labels in Overview performance cards and keeps concise next-task actions visible in Compact View. No tracking data or sync behavior is changed.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -9852,6 +9852,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         label:mode.cardLabel,
                         title:`${item.name}${item.isMain ? ' · Main' : ''}`,
                         body:`${Math.ceil(pace.hoursLeft)}h until reset. ${nextAction}`,
+                        compactBody:nextAction,
                         meta:`${item.done}/${item.eligible} complete · ${item.pending} left · ${mode.strategy}`
                     });
                 } else if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 48) {
@@ -9864,6 +9865,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         body: late
                             ? `Reset is about ${Math.ceil(pace.hoursLeft)} hours away. ${nextAction}`
                             : `No tasks are recorded yet. ${nextAction}`,
+                        compactBody:nextAction,
                         meta:`0/${item.eligible} complete · ${item.pending} remaining`
                     });
                 } else if (item.eligible > 0 && item.rate < 40 && pace.elapsedHours >= 48) {
@@ -9878,13 +9880,14 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                             : midweek
                                 ? `${item.done}/${item.eligible} tasks are complete. ${nextAction}`
                                 : `${item.done}/${item.eligible} tasks are complete. Start with the best-value task that fits your time: ${nextAction}`,
+                        compactBody:nextAction,
                         meta:`${item.done}/${item.eligible} complete · ${item.pending} remaining`
                     });
                 } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0 && pace.elapsedHours >= 96) {
-                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name}${item.isMain ? ' · Main' : ''}`, body:`${item.pending} tasks remain. ${nextAction}`, meta:`${item.done}/${item.eligible} complete` });
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name}${item.isMain ? ' · Main' : ''}`, body:`${item.pending} tasks remain. ${nextAction}`, compactBody:nextAction, meta:`${item.done}/${item.eligible} complete` });
                 }
                 if (pace.elapsedHours >= 48 && item.trend !== null && item.trend <= -20) {
-                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Check pattern', title:`${item.name}: completion dipped`, body:`Completion fell ${Math.abs(item.trend)} points across the last two saved weeks. Check whether tasks were missed, not attempted, or no longer a priority before changing the plan.`, meta:'Weekly history · check the cause before changing course' });
+                    priorities.push({ rank: pace.elapsedHours >= 144 ? 1 : 3, tone:'watch', icon:'↓', label:'Check pattern', title:`${item.name}: completion dipped`, body:`Completion fell ${Math.abs(item.trend)} points across the last two saved weeks. Check whether tasks were missed, not attempted, or no longer a priority before changing the plan.`, compactBody:'Review the recent completion dip.', meta:'Weekly history · check the cause before changing course' });
                 }
             });
             priorities.sort((a,b) => a.rank-b.rank || a.title.localeCompare(b.title));
@@ -9905,9 +9908,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             }
             let insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}<div class="activity-insight-section-title"><span>Priority reminders</span><span class="activity-insight-section-note">${shownPriorities.length} highlighted · ${esc(getDeadlineMode(pace).label)}</span></div>`;
             if (shownPriorities.length) {
-                insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p>${esc(item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
+                insightHtml += shownPriorities.map(item => `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">${esc(item.icon)}</span><div class="activity-insight-copy"><strong>${esc(item.title)} <span class="activity-insight-badge ${esc(item.tone)}">${esc(item.label)}</span></strong><p class="activity-insight-body">${esc(item.body)}</p><p class="activity-insight-compact-body">${esc(item.compactBody || item.body)}</p><span class="activity-insight-meta">${esc(item.meta)}</span></div></div>`).join('');
             } else {
-                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.hoursLeft <= 72 ? 'No weekly tasks remain' : 'No urgent follow-up'}</strong><p>${pace.hoursLeft <= 72 ? 'Your tracked weekly tasks are complete. Use the remaining time for optional goals or help organize a group run that is already planned.' : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as reset approaches.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
+                insightHtml += `<div class="activity-insight-item"><span class="activity-insight-marker" aria-hidden="true">✓</span><div class="activity-insight-copy"><strong>${pace.hoursLeft <= 72 ? 'No weekly tasks remain' : 'No urgent follow-up'}</strong><p class="activity-insight-body">${pace.hoursLeft <= 72 ? 'Your tracked weekly tasks are complete. Use the remaining time for optional goals or help organize a group run that is already planned.' : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as reset approaches.'}</p><p class="activity-insight-compact-body">${pace.hoursLeft <= 72 ? 'Weekly tasks complete.' : 'No urgent follow-up.'}</p><span class="activity-insight-meta">Weekly tasks only · Bounty Boards excluded</span></div></div>`;
             }
             if (cont) cont.innerHTML = insightHtml;
 
@@ -9928,7 +9931,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                             ? `Next: ${suggestion.t}`
                             : `${item.pending} tasks remain. Review the highest-priority open task.`;
                     const trendText = item.trend === null || item.trend === 0 ? '' : item.trend > 0 ? `Completion rose ${item.trend} points over saved weeks.` : `Completion fell ${Math.abs(item.trend)} points over saved weeks.`;
-                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p>${esc(item.done)} of ${esc(item.eligible)} weekly tasks done · ${esc(item.pending)} left.</p><span class="activity-insight-meta">${esc(quickTip)}</span>${trendText ? `<span class="activity-insight-meta">${esc(trendText)}</span>` : ''}</div></div>`;
+                    return `<div class="activity-insight-item${item.isMain ? ' is-main-character' : ''}"><span class="activity-insight-marker" aria-hidden="true">${item.isMain?'★':'•'}</span><div class="activity-insight-copy"><strong>${esc(item.name)}${item.isMain?' · Main':''} <span class="activity-insight-badge ${badge[1]}">${badge[0]}</span></strong><div class="activity-insight-progress"><div class="activity-insight-progress-track"><div class="activity-insight-progress-fill" style="width:${Math.max(0,Math.min(100,item.rate))}%"></div></div><strong>${item.rate}%</strong></div><p class="activity-insight-completion-count">${esc(item.done)} of ${esc(item.eligible)} weekly tasks done · ${esc(item.pending)} left.</p><span class="activity-insight-recommendation">${esc(quickTip)}</span>${trendText ? `<span class="activity-insight-meta">${esc(trendText)}</span>` : ''}</div></div>`;
                 }).join('');
             } else {
                 completionHtml = `<div class="activity-insight-empty">No eligible weekly tasks are currently configured for the characters you track.</div>`;
@@ -13161,7 +13164,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r24';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r25';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -13901,7 +13904,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r24';
+  const CURRENT_BUILD = '1.6.9-r25';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -14215,7 +14218,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
        const byRate=[...data.rows].sort((a,b)=>a.rate-b.rate||a.name.localeCompare(b.name));
        const low=byRate[0],lowTies=byRate.filter(x=>x.rate===low.rate),spread=byRate[byRate.length-1].rate-low.rate;
        const profiles=(typeof getCurrentMemberDirectoryEntry==='function'?(getCurrentMemberDirectoryEntry()?.characterProfiles||[]):[]);
-       const classOf=name=>{const p=profiles.find(x=>String(x.name||'').trim().toLocaleLowerCase()===String(name).trim().toLocaleLowerCase());return String(p?.className||p?.class||'Class not recorded');};
+       const classOf=name=>{const p=profiles.find(x=>String(x.name||'').trim().toLocaleLowerCase()===String(name).trim().toLocaleLowerCase());return String(p?.job||p?.className||p?.class||'Class not recorded');};
        if(spread===0)setStat('r22-stat-outlier','No outlier','All characters tied at the same completion rate');
        else {const outlierText=lowTies.map(x=>`${x.name} (${classOf(x.name)})`).join(' · ');setStat('r22-stat-outlier',lowTies.length>1?`${lowTies.length}-way tie`:outlierText,`${low.rate}% complete · lowest${lowTies.length>1?' · '+outlierText:''}`,'down');}
        const countRows=data.rows.filter(x=>Number.isFinite(x.done));
@@ -14235,7 +14238,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
        setStat('r22-stat-outlier','—','No previous-week character data');
        setStat('r22-stat-most','—','No previous-week character data');
      }
-     const weeklyTasks=Array.isArray(weeklyTaskNames)?weeklyTaskNames:[];
+     const weeklyTasks=typeof getCompletionTaskNames==='function'?getCompletionTaskNames(weeklyTaskNames):(Array.isArray(weeklyTaskNames)?weeklyTaskNames.filter(task=>!(typeof isBountyTask==='function'&&isBountyTask(task))):[]);
      let undone=0,total=0;
      data.names.forEach(name=>weeklyTasks.forEach(task=>{
        const state=typeof getCellState==='function'?getCellState(name,task):'open';
@@ -14509,9 +14512,14 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 #tracker-page #analytics-grid>*{min-width:0!important;width:100%!important;max-width:none!important}
 /* Overview's remaining-work metric is about weekly tasks, never bounty-board slots. */
 #r22-stat-bounties{font-variant-numeric:tabular-nums}
-/* Compact mode: concise recommendation labels, without long explanatory paragraphs. */
+/* Compact mode: use direct actions, not long rationale paragraphs. */
+.activity-insight-compact-body{display:none}
+.activity-insight-recommendation{display:block;margin-top:5px;color:var(--r20-muted);font-size:.56rem;line-height:1.4;overflow-wrap:anywhere}
 .pantheon-r20-compact .activity-insight-meta{display:none!important}
-.pantheon-r20-compact .activity-insight-copy>p{display:none!important}
+.pantheon-r20-compact .activity-insight-body{display:none!important}
+.pantheon-r20-compact .activity-insight-compact-body{display:block!important;margin:3px 0 0!important;font-size:.62rem!important;line-height:1.35!important;color:var(--r20-muted)!important}
+.pantheon-r20-compact .activity-insight-completion-count{display:none!important}
+.pantheon-r20-compact .activity-insight-recommendation{display:block!important;margin-top:3px!important;font-size:.62rem!important;line-height:1.35!important}
 .pantheon-r20-compact .activity-insight-copy strong{font-size:.78rem!important}
 .pantheon-r20-compact .activity-insight-item{padding:8px 0!important}
 /* Keep the title and brand fully legible in the home control. */
