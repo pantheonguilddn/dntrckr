@@ -1,22 +1,28 @@
-# Deploy Pantheon Tools v1.6.9-r17
+# Pantheon Tools v1.6.9-r18 Deployment
 
-This project uses Cloudflare Pages Functions in the `functions/` directory. **Do not deploy this release using the Cloudflare dashboard drag-and-drop upload.** Cloudflare currently documents that dashboard drag-and-drop deployments do not compile a `functions/` directory; deploy this package with Wrangler instead.
+This release applies the approved clickable UI concept to the existing Pantheon app. It is a front-end-only update: the existing Pages Functions, D1 storage behavior, bindings, Discord OAuth, ownership checks, synchronization, Tracker categories, reset logic, and account archive controls are retained.
 
-## Deploy with Wrangler
+## Deploy
 
-1. Extract the complete ZIP to a folder. Open a terminal in that folder. It must contain `index.html`, `admin.html`, `version.json`, `_headers`, and the `functions/` directory directly at its root.
-2. Install Node.js if needed. Sign in to Cloudflare once with `npx wrangler login`.
-3. Deploy the folder to the existing Pages project:
+1. Extract the complete ZIP into a new folder. The folder root must contain `index.html`, `admin.html`, `version.json`, `_headers`, and `functions/`.
+2. Sign in to Cloudflare with Wrangler if you have not already: `npx wrangler login`.
+3. From the extracted folder, deploy to the existing Pages project:
 
    ```powershell
    npx wrangler pages deploy . --project-name=dntrckr
    ```
 
 4. Keep the existing D1 binding, Discord OAuth settings, secrets, and environment variables unchanged. Do not reset D1, run manual SQL, or clear browser storage.
-5. Open `https://dntrckr.pages.dev/version.json` and confirm `build` is `1.6.9-r16`. Also confirm the latest Pages deployment completed successfully.
-6. No admin recovery action or database migration is required for this weekly-reset fix. The **Track all registered characters** recovery action from r15/r16 should only be run if it has never successfully completed; do not rerun it just for r17.
-7. Refresh the Tracker after deployment. The next weekly reset will clear previous-cycle bounty text before resetting bounty-row statuses, while preserving any notes genuinely entered after the reset boundary.
+5. After deployment, open `https://dntrckr.pages.dev/version.json` and confirm that `build` is `1.6.9-r18`.
 
-If the project is Git-integrated rather than Direct Upload, deploy through its configured Git workflow instead of creating a separate Direct Upload project. Do not change the current Pages project type or D1 binding as part of this release.
+For a Git-integrated Pages project, use its configured Git deployment workflow instead of creating a new Direct Upload project. Do not change the current Pages project type or D1 binding. Cloudflare Pages Functions must be deployed through Wrangler or the connected Git workflow, not by dragging only static files into the dashboard.
 
-See `Pantheon_Tools_v1.6.9-r17_README.md` for the tracking, account-link archive, member-sync authorization fix, weekly bounty-text reset fix, history-preservation, and validation details.
+## What changed
+
+- Added the mockup-style primary navigation rail for the existing Overview, Tracker, Team Builder, Card Database, Member Roster, and Help destinations.
+- Placed the existing live Online Roster in the second rail column, preserving its real presence feed, profile actions, collapse behavior, and Guild Forum access.
+- Restyled the actual app header, workspace cards, panels, buttons, and Tracker table.
+- Added the warm Aegis theme and a segmented theme switcher for Guild, Aegis, Clean, Pastel, and Eye Comfort. The Pastel palette was refined.
+- Kept the app's real Tracker category list from Dungeon Registration. No mockup-only Daily/Weekly tabs or Dailies section were introduced.
+
+No one-time admin recovery action, D1 migration, or database reset is required for this UI update.
