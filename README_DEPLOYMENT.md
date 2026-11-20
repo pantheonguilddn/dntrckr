@@ -1,4 +1,4 @@
-# Deployment - Pantheon Tools v1.6.9-r25
+# Deployment - Pantheon Tools v1.6.9-r26
 
 Deploy this package to the existing Cloudflare Pages project `dntrckr`.
 
@@ -11,6 +11,6 @@ npx wrangler pages deploy . --project-name=dntrckr
 
 Alternatively, use the existing Git-connected deployment workflow for the same Pages project.
 
-Do not create a new Pages project, change D1 bindings/secrets/environment variables, reset the database, or clear browser storage. This is a front-end-only revision; no D1 migration or recovery action is required.
+Do not create a new Pages project, change D1 bindings/secrets/environment variables, reset the database, or clear browser storage. This revision requires no D1 migration. Existing historical analytics and Tracker records are retained; the archive keeps up to five weekly completion snapshots regardless of the legacy timing preference. Manual history controls are no longer exposed.
 
-After deployment, open `https://dntrckr.pages.dev/version.json` and confirm `build` is `1.6.9-r25`.
+After deployment, open `https://dntrckr.pages.dev/version.json` and confirm `build` is `1.6.9-r26`.
