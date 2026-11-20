@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r42</title>
+    <title>Pantheon Tools v1.6.9-r43</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4123,7 +4123,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="tracker-toolbar" id="tracker-toolbar" role="toolbar" aria-label="Tracker display options">
         <button id="share-bounties-btn" class="btn btn-secondary" type="button" onclick="openBountyShareModal()">↗ Share Bounties</button>
         <button id="weekly-report-btn" class="btn btn-secondary" type="button" onclick="openWeeklyReportModal()">📊 Weekly Report</button>
-        <span id="tracker-focus-guide-hint" class="tracker-toolbar-hint" aria-live="polite">✧ Hover or focus a cell; tap to pin its row and character.</span>
+        <span id="tracker-focus-guide-hint" class="tracker-toolbar-hint" aria-live="polite">Focus guide: the selected row and character column invert for clear tracing.</span>
         <span id="tracker-view-hint" class="tracker-toolbar-hint">Personal View is selected automatically for your verified Discord account.</span>
         <span id="tracker-live-sync-note" class="tracker-live-sync-note" role="status" aria-live="polite" data-state="checking">Checking shared progress…</span>
         <button id="tracker-add-characters-btn" class="btn btn-secondary" type="button" onclick="openMyCharacterRegistration()" hidden>＋ Add More Characters</button>
@@ -4377,9 +4377,9 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     <div class="modal-overlay hidden" id="welcome-modal" role="dialog" aria-modal="true" aria-label="Pantheon Tools release notes">
         <div class="modal-card wide-modal welcome-modal">
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
-                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r42</span></div>
+                <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r43</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r42:</strong> Tracker Focus Guide is now always active. Hover, keyboard-focus, or tap a task cell to trace its dungeon row and character column.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r43:</strong> Tracker Focus Guide is now always active. Hover, keyboard-focus, or tap a task cell to trace its dungeon row and character column.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -13769,7 +13769,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r42';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r43';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14509,7 +14509,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r42';
+  const CURRENT_BUILD = '1.6.9-r43';
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -15754,46 +15754,128 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 }
 </style>
 
-<style id="pantheon-r42-tracker-focus-guide">
-/* Always-on visual tracing for the active dungeon row and character column. */
-#dn-tracker tr.tracker-guide-row>td{
-  box-shadow:inset 0 1px color-mix(in srgb,var(--pt-accent) 42%,transparent),inset 0 -1px color-mix(in srgb,var(--pt-accent) 42%,transparent)!important;
+<style id="pantheon-r43-tracker-focus-guide">
+/* High-contrast inverse path for always-on Tracker row/column guidance. */
+:root[data-pantheon-theme="dark"]{
+  --tracker-guide-inverse-bg:#eef3ff;
+  --tracker-guide-inverse-ink:#18233a;
+  --tracker-guide-inverse-muted:#465575;
+  --tracker-guide-inverse-border:#91a7d8;
+  --tracker-guide-active-bg:#cbd9ff;
+  --tracker-guide-active-ink:#101b31;
+  --tracker-guide-active-border:#4f68ab;
+  --tracker-guide-check:#334f91;
 }
-#dn-tracker tr.tracker-guide-row>td.task-name,
-#dn-tracker tr.tracker-guide-row>td.col-category{
-  background:color-mix(in srgb,var(--pt-accent) 12%,var(--pt-surface))!important;
+:root[data-pantheon-theme="light"]{
+  --tracker-guide-inverse-bg:#293b59;
+  --tracker-guide-inverse-ink:#f8fbff;
+  --tracker-guide-inverse-muted:#d8e4f7;
+  --tracker-guide-inverse-border:#8da8d4;
+  --tracker-guide-active-bg:#172944;
+  --tracker-guide-active-ink:#ffffff;
+  --tracker-guide-active-border:#a9c3f5;
+  --tracker-guide-check:#d7e5ff;
 }
-#dn-tracker td.interactive-cell.tracker-guide-column:not(.tracker-guide-row){
-  background:color-mix(in srgb,var(--pt-accent) 13%,var(--pt-surface))!important;
+:root[data-pantheon-theme="eye-comfort"]{
+  --tracker-guide-inverse-bg:#3e4b39;
+  --tracker-guide-inverse-ink:#fbf8ea;
+  --tracker-guide-inverse-muted:#e5e2cd;
+  --tracker-guide-inverse-border:#aab58e;
+  --tracker-guide-active-bg:#283426;
+  --tracker-guide-active-ink:#fffdf2;
+  --tracker-guide-active-border:#c4d0a6;
+  --tracker-guide-check:#e4eccd;
 }
-#dn-tracker td.interactive-cell.tracker-guide-row:not(.tracker-guide-column){
-  background:color-mix(in srgb,var(--pt-accent) 11%,var(--pt-surface))!important;
+:root[data-pantheon-theme="pastel"]{
+  --tracker-guide-inverse-bg:#51405f;
+  --tracker-guide-inverse-ink:#fff8ff;
+  --tracker-guide-inverse-muted:#efdef2;
+  --tracker-guide-inverse-border:#c3a0d2;
+  --tracker-guide-active-bg:#392746;
+  --tracker-guide-active-ink:#ffffff;
+  --tracker-guide-active-border:#e0baf0;
+  --tracker-guide-check:#f1d8ff;
 }
-#dn-tracker td.interactive-cell.tracker-guide-cell{
-  position:relative!important;z-index:2!important;
-  background:color-mix(in srgb,var(--pt-accent) 30%,var(--pt-surface))!important;
-  outline:2px solid var(--pt-accent)!important;outline-offset:-2px!important;
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pt-accent) 44%,transparent)!important;
-}
+/* Every cell in the active dungeon row and selected character column inverts together. */
+#dn-tracker tr.tracker-guide-row>td,
+#dn-tracker td.interactive-cell.tracker-guide-column,
 #dn-tracker #header-row th.char-col.tracker-guide-column,
 #dn-tracker #footer-row th.char-col.tracker-guide-column{
-  position:relative!important;z-index:2!important;
-  outline:2px solid var(--pt-accent)!important;outline-offset:-2px!important;
-  box-shadow:inset 0 0 0 999px color-mix(in srgb,var(--pt-accent) 16%,transparent)!important;
+  background:var(--tracker-guide-inverse-bg,#253651)!important;
+  color:var(--tracker-guide-inverse-ink,#fff)!important;
+  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
+  border-color:var(--tracker-guide-inverse-border,#9cb4e8)!important;
+  box-shadow:inset 0 1px var(--tracker-guide-inverse-border,#9cb4e8),inset 0 -1px var(--tracker-guide-inverse-border,#9cb4e8)!important;
+  text-shadow:none!important;
 }
-#tracker-focus-guide-hint{font-weight:600;color:var(--pt-text-muted)}
+/* Force nested labels and text to follow the inverse palette, including header IGN/class text. */
+#dn-tracker tr.tracker-guide-row>td *,
+#dn-tracker td.interactive-cell.tracker-guide-column *,
+#dn-tracker #header-row th.char-col.tracker-guide-column *,
+#dn-tracker #footer-row th.char-col.tracker-guide-column *{
+  color:var(--tracker-guide-inverse-ink,#fff)!important;
+  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
+  text-shadow:none!important;
+}
+#dn-tracker tr.tracker-guide-row>td .tracker-char-star,
+#dn-tracker #header-row th.char-col.tracker-guide-column .tracker-char-star{
+  color:var(--tracker-guide-inverse-muted,#e6edff)!important;
+  -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
+}
+/* Native checkboxes and bounty text fields remain readable on the inverted path. */
+#dn-tracker tr.tracker-guide-row>td input[type="checkbox"],
+#dn-tracker td.interactive-cell.tracker-guide-column input[type="checkbox"]{
+  accent-color:var(--tracker-guide-check,#d7e5ff)!important;
+  filter:none!important;
+}
+#dn-tracker tr.tracker-guide-row>td .bounty-input,
+#dn-tracker td.interactive-cell.tracker-guide-column .bounty-input{
+  background:color-mix(in srgb,var(--tracker-guide-inverse-bg,#253651) 72%,#000)!important;
+  color:var(--tracker-guide-inverse-ink,#fff)!important;
+  -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
+  border-color:var(--tracker-guide-inverse-border,#9cb4e8)!important;
+}
+#dn-tracker tr.tracker-guide-row>td .bounty-input::placeholder,
+#dn-tracker td.interactive-cell.tracker-guide-column .bounty-input::placeholder{
+  color:var(--tracker-guide-inverse-muted,#e6edff)!important;
+  -webkit-text-fill-color:var(--tracker-guide-inverse-muted,#e6edff)!important;
+  opacity:.9!important;
+}
+/* Exact intersection is brighter, heavier, and visually distinct from the rest of the path. */
+#dn-tracker td.interactive-cell.tracker-guide-cell{
+  position:relative!important;z-index:4!important;
+  background:var(--tracker-guide-active-bg,#cbd9ff)!important;
+  color:var(--tracker-guide-active-ink,#101b31)!important;
+  -webkit-text-fill-color:var(--tracker-guide-active-ink,#101b31)!important;
+  border-color:var(--tracker-guide-active-border,#4f68ab)!important;
+  outline:3px solid var(--tracker-guide-active-border,#4f68ab)!important;
+  outline-offset:-3px!important;
+  box-shadow:inset 0 0 0 2px var(--tracker-guide-active-border,#4f68ab),0 0 0 1px var(--tracker-guide-active-border,#4f68ab)!important;
+}
+#dn-tracker td.interactive-cell.tracker-guide-cell *{
+  color:var(--tracker-guide-active-ink,#101b31)!important;
+  -webkit-text-fill-color:var(--tracker-guide-active-ink,#101b31)!important;
+}
+#dn-tracker td.interactive-cell.tracker-guide-cell input[type="checkbox"]{accent-color:var(--tracker-guide-active-border,#4f68ab)!important}
+#dn-tracker #header-row th.char-col.tracker-guide-column,
+#dn-tracker #footer-row th.char-col.tracker-guide-column{
+  position:relative!important;z-index:3!important;
+  outline:2px solid var(--tracker-guide-inverse-border,#9cb4e8)!important;
+  outline-offset:-2px!important;
+}
+#tracker-focus-guide-hint{font-weight:800;color:var(--pt-text)!important}
 @media(prefers-reduced-motion:no-preference){
-  #dn-tracker td.interactive-cell,#dn-tracker #header-row th.char-col,#dn-tracker #footer-row th.char-col{transition:background-color .12s ease,outline-color .12s ease,box-shadow .12s ease}
+  #dn-tracker td.interactive-cell,#dn-tracker #header-row th.char-col,#dn-tracker #footer-row th.char-col{transition:background-color .12s ease,color .12s ease,border-color .12s ease,outline-color .12s ease,box-shadow .12s ease}
 }
 </style>
 
-<script id="pantheon-r42-tracker-focus-guide-runtime">
+<script id="pantheon-r43-tracker-focus-guide-runtime">
 (() => {
   const table = document.getElementById('dn-tracker');
   const tbody = document.getElementById('tracker-body');
   const wrap = document.getElementById('tracker-table-wrap');
-  if (!table || !tbody || !wrap || tbody.dataset.r42FocusGuideBound === '1') return;
-  tbody.dataset.r42FocusGuideBound = '1';
+  if (!table || !tbody || !wrap || tbody.dataset.r43FocusGuideBound === '1') return;
+  tbody.dataset.r43FocusGuideBound = '1';
 
   let pinned = false;
   let currentCell = null;
