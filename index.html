@@ -4379,7 +4379,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
             <section class="welcome-whats-new" aria-labelledby="welcome-whats-new-title" hidden>
                 <div class="welcome-whats-new-head"><h4 id="welcome-whats-new-title">What’s New in Pantheon Tools</h4><span class="release-version">v1.6.9-r47</span></div>
                 <p class="welcome-whats-new-copy"><strong>About Pantheon Tools:</strong> A Dragon Nest Classic SEA guild hub for member rosters, Tracker participation, raid team building, card reference, and guild utilities.</p>
-                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r47:</strong> Tracker Focus Guide now fully highlights the dungeon name, category, and selected character column, while keeping other cells on the row softly highlighted without hiding their completion colors.</p>
+                <p class="welcome-whats-new-copy welcome-whats-new-update"><strong>v1.6.9-r48:</strong> Tracker Focus Guide now applies a higher-priority, theme-aware inversion to dungeon-name and spanning category cells, while other character cells keep their faint status-preserving highlight.</p>
             </section>
             <label class="welcome-check"><input id="welcome-hide-until-update" type="checkbox"><span>Don’t show this pop-up again until a new update is released.</span></label>
             <div class="modal-actions"><button class="btn btn-cloud" type="button" onclick="closeWelcomeReleaseNotes()">Continue to Pantheon</button></div>
@@ -13769,7 +13769,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r47';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r48';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14509,7 +14509,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r47'; // Keep in sync with PANTHEON_TOOLS_VERSION and /version.json.
+  const CURRENT_BUILD = '1.6.9-r48'; // Keep in sync with PANTHEON_TOOLS_VERSION and /version.json.
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
@@ -15796,14 +15796,16 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   --tracker-guide-active-border:#e0baf0;
   --tracker-guide-check:#f1d8ff;
 }
-/* Every cell in the active dungeon row and selected character column inverts together. */
-#dn-tracker td.interactive-cell.tracker-guide-row-cell,
-#dn-tracker td.task-name.tracker-guide-row-cell,
-#dn-tracker td.col-category.tracker-guide-row-cell,
-#dn-tracker td.interactive-cell.tracker-guide-column,
-#dn-tracker #header-row th.char-col.tracker-guide-column,
-#dn-tracker #footer-row th.char-col.tracker-guide-column{
+/* Fully invert only the selected character path plus the matching dungeon label
+   and category cell. The :root theme prefix deliberately outranks the existing
+   :root[data-pantheon-theme] Tracker cell rules (which otherwise repaint the cells). */
+:root[data-pantheon-theme] #dn-tracker td.task-name.tracker-guide-row-cell,
+:root[data-pantheon-theme] #dn-tracker td.col-category.tracker-guide-row-cell,
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.tracker-guide-column,
+:root[data-pantheon-theme] #dn-tracker #header-row th.char-col.tracker-guide-column,
+:root[data-pantheon-theme] #dn-tracker #footer-row th.char-col.tracker-guide-column{
   background:var(--tracker-guide-inverse-bg,#253651)!important;
+  background-color:var(--tracker-guide-inverse-bg,#253651)!important;
   color:var(--tracker-guide-inverse-ink,#fff)!important;
   -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
   border-color:var(--tracker-guide-inverse-border,#9cb4e8)!important;
@@ -15821,12 +15823,11 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
   border-bottom-color:color-mix(in srgb,var(--pt-accent) 24%,var(--pt-border))!important;
 }
 /* Force nested labels and text to follow the inverse palette, including header IGN/class text. */
-#dn-tracker td.interactive-cell.tracker-guide-row-cell *,
-#dn-tracker td.task-name.tracker-guide-row-cell *,
-#dn-tracker td.col-category.tracker-guide-row-cell *,
-#dn-tracker td.interactive-cell.tracker-guide-column *,
-#dn-tracker #header-row th.char-col.tracker-guide-column *,
-#dn-tracker #footer-row th.char-col.tracker-guide-column *{
+:root[data-pantheon-theme] #dn-tracker td.task-name.tracker-guide-row-cell *,
+:root[data-pantheon-theme] #dn-tracker td.col-category.tracker-guide-row-cell *,
+:root[data-pantheon-theme] #dn-tracker td.interactive-cell.tracker-guide-column *,
+:root[data-pantheon-theme] #dn-tracker #header-row th.char-col.tracker-guide-column *,
+:root[data-pantheon-theme] #dn-tracker #footer-row th.char-col.tracker-guide-column *{
   color:var(--tracker-guide-inverse-ink,#fff)!important;
   -webkit-text-fill-color:var(--tracker-guide-inverse-ink,#fff)!important;
   text-shadow:none!important;
@@ -15883,13 +15884,13 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 }
 </style>
 
-<script id="pantheon-r47-tracker-focus-guide-runtime">
+<script id="pantheon-r48-tracker-focus-guide-runtime">
 (() => {
   const table = document.getElementById('dn-tracker');
   const tbody = document.getElementById('tracker-body');
   const wrap = document.getElementById('tracker-table-wrap');
-  if (!table || !tbody || !wrap || tbody.dataset.r47FocusGuideBound === '1') return;
-  tbody.dataset.r47FocusGuideBound = '1';
+  if (!table || !tbody || !wrap || tbody.dataset.r48FocusGuideBound === '1') return;
+  tbody.dataset.r48FocusGuideBound = '1';
 
   let pinned = false;
   let currentCell = null;
@@ -15907,22 +15908,20 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
     const charName = cell.dataset.char || '';
     if (row) {
       row.classList.add('tracker-guide-row');
-      // Fully invert the dungeon-name cell, while other character cells retain their
-      // existing completion/status colors with a faint accent overlay.
-      row.querySelectorAll(':scope > td.task-name, :scope > td.col-category').forEach(node => node.classList.add('tracker-guide-row-cell'));
+      // Fully invert the matching dungeon-name cell. Other character cells on
+      // the same row keep only the faint, status-preserving guidance overlay.
+      row.querySelectorAll(':scope > td.task-name').forEach(node => node.classList.add('tracker-guide-row-cell'));
       row.querySelectorAll(':scope > td.interactive-cell').forEach(node => node.classList.add('tracker-guide-row-soft-cell'));
-      // Category labels use rowspan; include the spanning category cell when it covers this row.
-      let previous = row.previousElementSibling;
-      let distance = 1;
-      while (previous && previous.matches('tr.task-row')) {
-        const categoryCell = previous.querySelector(':scope > td.col-category');
-        if (categoryCell) {
-          if ((Number(categoryCell.rowSpan) || 1) > distance) categoryCell.classList.add('tracker-guide-row-cell');
-          break;
+      // Category labels are rowspan cells. Find the registered category cell whose
+      // actual table-row span covers the selected task, including all later rows.
+      const selectedRowIndex = row.rowIndex;
+      tbody.querySelectorAll(':scope > tr.task-row > td.col-category').forEach(categoryCell => {
+        const startRowIndex = categoryCell.parentElement.rowIndex;
+        const span = Math.max(1, Number(categoryCell.rowSpan) || 1);
+        if (selectedRowIndex >= startRowIndex && selectedRowIndex < startRowIndex + span) {
+          categoryCell.classList.add('tracker-guide-row-cell');
         }
-        previous = previous.previousElementSibling;
-        distance += 1;
-      }
+      });
     }
     if (charName) {
       table.querySelectorAll('td.interactive-cell[data-char],#header-row th.char-col[data-char],#footer-row th.char-col[data-char]').forEach(node => {
