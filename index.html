@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pantheon Tools v1.6.9-r44</title>
+    <title>Pantheon Tools v1.6.9-r52</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -4103,7 +4103,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
         </section>
         <section class="overview-bottom-grid" aria-label="Personal tracker dashboard">
             <section class="overview-panel overview-activity-panel">
-                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>A quick view of what to do next and which characters may need a check.</p></div><span class="overview-panel-kicker">YOUR ACTIVITY</span></div>
+                <div class="overview-panel-heading"><div><h2>Activity Insights</h2><p>Personalized next steps, real activity signals, and meaningful changes across saved weeks.</p></div><span class="overview-panel-kicker">YOUR ACTIVITY</span></div>
                 <div class="activity-insights-summary" id="overview-insights-summary" aria-label="Personal tracker summary"></div>
                 <div class="overview-activity-list" id="overview-activity" aria-live="polite">
                     <div class="overview-activity-row"><span class="overview-activity-icon">✓</span><div><strong>Weekly tracker review</strong><p>Check for outstanding weekly tasks before the reset.</p></div></div>
@@ -10271,7 +10271,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                     const state = record?.state || 'open';
                     const updatedAt = Number(record?.updatedAt) || 0;
                     if (updatedAt > latestTouch) latestTouch = updatedAt;
-                    if (updatedAt >= weekStart && ['done', 'marked', 'excluded'].includes(state)) thisWeekActivity = true;
+                    if (updatedAt > weekStart && ['done', 'marked', 'excluded'].includes(state)) thisWeekActivity = true;
                     if (state === 'excluded') excluded++;
                     else { eligible++; if (state === 'done') done++; if (state === 'marked') marked++; }
                     return { task, state, updatedAt };
@@ -10281,9 +10281,30 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 const snapshots = archives.map(([, archive]) => getArchivedCompletionRate(archive, name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number);
                 const trend = snapshots.length >= 2 ? snapshots[snapshots.length - 1] - snapshots[snapshots.length - 2] : null;
                 const profile = profiles.find(item => item.name.toLocaleLowerCase() === name.toLocaleLowerCase());
-                return { name, isMain: !!profile?.isMain, eligible, done, pending: Math.max(0, eligible - done), rate, excluded, marked, thisWeekActivity, latestTouch, pendingTasks, trend };
+                const weekDone = states.filter(item => item.state === 'done' && item.updatedAt > weekStart).length;
+                const weekMarked = states.filter(item => item.state === 'marked' && item.updatedAt > weekStart).length;
+                return { name, isMain: !!profile?.isMain, eligible, done, pending: Math.max(0, eligible - done), rate, excluded, marked, thisWeekActivity, latestTouch, pendingTasks, trend, states, weekDone, weekMarked };
             });
             const recentArchiveEntries = archives.slice(-3);
+            const getArchivedCharacterCounts = (archive, characterName) => {
+                const order = Array.isArray(archive?.taskOrder) ? archive.taskOrder : weeklyTaskNames;
+                const codes = String(safeObject(archive?.states)[characterName] || '');
+                let eligible = 0, done = 0;
+                order.forEach((task, index) => {
+                    if (isBountyTask(task) || isExtraDungeonExcludedFromCalculations(task)) return;
+                    const code = codes[index] || '';
+                    if (code === 'd' || code === 'm') eligible++;
+                    if (code === 'd') done++;
+                });
+                return { eligible, done, rate:eligible ? Math.round(done / eligible * 100) : null };
+            };
+            metrics.forEach(item => {
+                const history = recentArchiveEntries.map(([, archive]) => getArchivedCharacterCounts(archive, item.name)).filter(snapshot => snapshot.eligible > 0);
+                item.historyWeeks = history.length;
+                item.historyActiveWeeks = history.filter(snapshot => snapshot.done > 0).length;
+                item.historyAverageRate = history.length ? Math.round(history.reduce((sum, snapshot) => sum + snapshot.rate, 0) / history.length) : null;
+                item.lastSavedWeek = history.length ? history[history.length - 1] : null;
+            });
             metrics.forEach(item => {
                 const character = { name:item.name, isMain:item.isMain };
                 const rankedTasks = item.pendingTasks.map(taskRow => ({
@@ -10320,7 +10341,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         compactBody:nextAction,
                         meta:`${item.done}/${item.eligible} complete · ${item.pending} left · ${mode.strategy}`
                     });
-                } else if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 48) {
+                } else if (item.eligible > 0 && item.done === 0 && !item.thisWeekActivity && pace.elapsedHours >= 72 && item.historyActiveWeeks >= 2) {
                     const late = pace.elapsedHours >= 144;
                     const midweek = pace.elapsedHours >= 96;
                     priorities.push({
@@ -10333,7 +10354,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         compactBody:nextAction,
                         meta:`0/${item.eligible} complete · ${item.pending} remaining`
                     });
-                } else if (item.eligible > 0 && item.rate < 40 && pace.elapsedHours >= 48) {
+                } else if (item.eligible > 0 && item.done >= 2 && item.rate < 40 && pace.elapsedHours >= 72) {
                     const late = pace.elapsedHours >= 144;
                     const midweek = pace.elapsedHours >= 96;
                     priorities.push({
@@ -10348,7 +10369,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                         compactBody:nextAction,
                         meta:`${item.done}/${item.eligible} complete · ${item.pending} remaining`
                     });
-                } else if (item.eligible > 0 && item.rate < 70 && item.pending > 0 && pace.elapsedHours >= 96) {
+                } else if (item.eligible > 0 && item.done >= 3 && item.rate < 70 && item.pending > 0 && pace.elapsedHours >= 96) {
                     priorities.push({ rank: pace.elapsedHours >= 144 ? 2 : 3, tone:'watch', icon:'↗', label:pace.elapsedHours >= 144 ? 'Final push' : 'In progress', title:`${item.name}${item.isMain ? ' · Main' : ''}`, body:`${item.pending} tasks remain. ${nextAction}`, compactBody:nextAction, meta:`${item.done}/${item.eligible} complete` });
                 }
                 if (pace.elapsedHours >= 48 && item.trend !== null && item.trend <= -20) {
@@ -10372,37 +10393,6 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                 if (completionCont) completionCont.innerHTML = `<div class="activity-insight-empty">Weekly progress appears here for your registered characters. Other members' rosters and progress are not shown.<br><button class="activity-insight-action" type="button" onclick="showAppPage('member-roster')">Manage My Characters</button></div>`;
                 return;
             }
-            const priority = shownPriorities[0] || null;
-            const findPriorityMetric = item => item ? metrics.find(metric =>
-                item.title === metric.name || item.title === `${metric.name} · Main` || item.title.startsWith(`${metric.name}:`)
-            ) || null : null;
-            const priorityMetric = findPriorityMetric(priority);
-            const sortedForCheck = [...metrics].filter(item => item.pending > 0)
-                .sort((a,b) => a.rate-b.rate || b.pending-a.pending || a.name.localeCompare(b.name));
-            const trendCandidates = metrics.filter(item => item.trend !== null && Number.isFinite(Number(item.trend)))
-                .sort((a,b) => Math.abs(b.trend)-Math.abs(a.trend) || a.name.localeCompare(b.name));
-            const trendMetric = trendCandidates[0] || null;
-            const trendRates = trendMetric ? archives.map(([,archive]) => getArchivedCompletionRate(archive, trendMetric.name)).filter(value => value !== null && Number.isFinite(Number(value))).map(Number) : [];
-            const trendLatest = trendRates.length ? trendRates[trendRates.length-1] : null;
-            const trendPrior = trendRates.length > 1 ? trendRates[trendRates.length-2] : null;
-            const trendVerb = trendMetric ? (trendMetric.trend > 0 ? 'rose' : trendMetric.trend < 0 ? 'fell' : 'stayed level') : '';
-            const trendDetail = trendMetric
-                ? `${trendMetric.name}'s completion ${trendVerb} ${Math.abs(trendMetric.trend)} points across the last two saved snapshots. Review whether tasks were missed, intentionally skipped, or no longer part of the character's weekly plan before changing anything.`
-                : 'There are not yet two comparable weekly snapshots for your registered characters. Once more weekly history is saved, this slide will highlight the clearest change without treating a missed task as proof of poor performance.';
-            const priorityTitle = priority ? priority.title : (pace.hoursLeft <= 72 ? 'Your tracked weekly work is complete.' : 'No urgent character follow-up right now.');
-            const priorityBody = priority ? priority.body : (pace.hoursLeft <= 72
-                ? 'Your tracked weekly tasks are complete. Use the remaining time for optional goals or help organize a group run that is already planned.'
-                : 'Your current tracked tasks do not need urgent follow-up. The recommendation order will tighten as the weekly reset approaches.');
-            const priorityCompact = priority ? (priority.compactBody || priority.body) : (pace.hoursLeft <= 72 ? 'Weekly tasks complete.' : 'No urgent follow-up.');
-            const priorityAction = priorityMetric?.nextTask
-                ? `Next task · ${priorityMetric.nextTask}`
-                : priority ? priority.label : 'Weekly tracker review';
-            const progressCard = (label, value, caption, pct, left, right) => `
-                <aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(label)}</div>
-                <div class="pt-insight-side-value">${esc(value)}</div><div class="pt-insight-side-caption">${esc(caption)}</div>
-                <div class="pt-insight-bar"><span style="width:${Math.max(0,Math.min(100,Number(pct)||0))}%"></span></div>
-                <div class="pt-insight-side-pair"><span>${esc(left)}</span><strong>${esc(right)}</strong></div></aside>`;
-            const miniRowsCard = (label, rows, emptyText) => `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(label)}</div>${rows.length ? `<div class="pt-insight-mini-rows">${rows.map(item => `<div class="pt-insight-mini-row"><div><strong>${esc(item.name)}</strong><div class="pt-insight-mini-track"><i style="width:${Math.max(0,Math.min(100,item.rate))}%"></i></div></div><strong>${esc(item.rate)}%</strong></div>`).join('')}</div>` : `<div class="pt-insight-side-caption pt-insight-empty-caption">${esc(emptyText)}</div>`}</aside>`;
             const slide = (name, kicker, title, body, compactBody, action, note, sideCard, icon='•') => `
                 <article class="pt-insight-slide" data-name="${esc(name)}">
                   <div class="pt-insight-slide-copy">
@@ -10412,42 +10402,157 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
                     <div class="pt-insight-action-line"><span class="pt-insight-action-chip">${esc(action)}</span><span class="pt-insight-action-note">${esc(note)}</span></div>
                   </div>${sideCard}
                 </article>`;
+            const progressCard = (label, value, caption, pct, left, right) => `
+                <aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(label)}</div>
+                <div class="pt-insight-side-value">${esc(value)}</div><div class="pt-insight-side-caption">${esc(caption)}</div>
+                <div class="pt-insight-bar"><span style="width:${Math.max(0,Math.min(100,Number(pct)||0))}%"></span></div>
+                <div class="pt-insight-side-pair"><span>${esc(left)}</span><strong>${esc(right)}</strong></div></aside>`;
+            const miniRowsCard = (label, rows, emptyText) => `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(label)}</div>${rows.length ? `<div class="pt-insight-mini-rows">${rows.map(item => `<div class="pt-insight-mini-row"><div><strong>${esc(item.name)}</strong><div class="pt-insight-mini-track"><i style="width:${Math.max(0,Math.min(100,item.rate))}%"></i></div></div><strong>${esc(item.rate)}%</strong></div>`).join('')}</div>` : `<div class="pt-insight-side-caption pt-insight-empty-caption">${esc(emptyText)}</div>`}</aside>`;
 
-            const priorityPct = priorityMetric?.rate ?? average ?? 0;
-            const prioritySide = priorityMetric
-                ? progressCard(`${priorityMetric.name} · weekly completion`, `${priorityMetric.rate}%`, `${priorityMetric.done} of ${priorityMetric.eligible} eligible weekly tasks complete`, priorityMetric.rate, `${priorityMetric.pending} tasks remaining`, getPacedCompletionBadge(priorityMetric, pace)[0])
-                : progressCard('Overall weekly completion', average === null ? '—' : `${average}%`, `${totalDone} of ${totalEligible} eligible weekly tasks complete`, priorityPct, `${totalPending} tasks remaining`, pace.label);
-            const paceBody = `Your registered characters have completed ${totalDone} of ${totalEligible} eligible weekly tasks. There ${totalPending === 1 ? 'is' : 'are'} ${totalPending} open ${totalPending === 1 ? 'task' : 'tasks'} across the roster. Bounty Board entries and excluded tasks are kept out of this calculation, so this reflects regular weekly tracker work only.`;
-            const paceCompact = `${totalDone}/${totalEligible} weekly tasks complete · ${totalPending} remaining.`;
-            const checkRows = sortedForCheck.slice(0,3).map(item => ({name:item.name,rate:item.rate}));
-            const checkNames = sortedForCheck.slice(0,2).map(item => item.name);
-            const checkTitle = checkRows.length
-                ? `${checkNames.join(' and ')} may need a quick check.`
-                : 'No character currently has unfinished eligible weekly tasks.';
-            const checkBody = checkRows.length
-                ? `${sortedForCheck.slice(0,3).map(item => `${item.name} is at ${item.rate}% with ${item.pending} weekly ${item.pending === 1 ? 'task' : 'tasks'} remaining`).join('; ')}. Before changing anyone's plan, check whether those activities are still intended for the character or whether a run simply has not been recorded yet.`
-                : 'All registered characters are currently complete against the eligible weekly tasks, or have no eligible tasks configured. There is nothing that needs an automatic adjustment.';
-            const checkCompact = checkRows.length ? `Review ${checkRows.map(item => item.name).join(', ')}.` : 'No character follow-up needed.';
-            const historyBody = trendDetail;
-            const historyCompact = trendMetric ? `${trendMetric.name}: ${trendVerb} ${Math.abs(trendMetric.trend)} points.` : 'More weekly history is needed.';
-            const historySide = trendMetric
-                ? `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(trendMetric.name)} · saved weekly snapshots</div><div class="pt-insight-history-pair"><div><div class="pt-insight-history-value">${trendPrior === null ? '—' : `${Math.round(Number(trendPrior))}%`}</div><div class="pt-insight-side-caption">Prior saved snapshot</div></div><div class="pt-insight-history-change">${trendMetric.trend > 0 ? '+' : trendMetric.trend < 0 ? '−' : ''}${Math.abs(trendMetric.trend)} pts</div></div><div class="pt-insight-bar"><span class="${trendMetric.trend < 0 ? 'is-warning' : ''}" style="width:${Math.max(0,Math.min(100,Number(trendLatest)||0))}%"></span></div><div class="pt-insight-side-pair"><span>Latest saved snapshot</span><strong>${trendLatest === null ? '—' : `${Math.round(Number(trendLatest))}%`}</strong></div></aside>`
-                : `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">Weekly history</div><div class="pt-insight-side-value">${archives.length}</div><div class="pt-insight-side-caption">${archives.length === 1 ? 'saved weekly snapshot' : 'saved weekly snapshots'} available for comparison</div><div class="pt-insight-history-hint">A trend appears after two comparable saved weeks.</div></aside>`;
+            // Build insights from evidence, not from the mere fact that a new reset has made every cell open.
+            // Current-week pace is deliberately withheld until real activity exists; early-week slides use
+            // the previous saved week, task/character fit, and established personal history instead.
+            const insightSlides = [];
+            const addInsight = (...args) => insightSlides.push(slide(...args));
+            const rankedChoices = metrics.flatMap(item => (item.pendingTasks || []).slice(0, 3).map(taskRow => ({
+                character:item,
+                task:taskRow.task,
+                recommendation:taskRow.recommendation
+            }))).filter(choice => choice.recommendation && !choice.recommendation.suppress)
+              .sort((a,b) => (Number(b.recommendation.sc)||0) - (Number(a.recommendation.sc)||0)
+                || (Number(b.recommendation.w)||0) - (Number(a.recommendation.w)||0)
+                || a.task.localeCompare(b.task));
+            const bestChoice = rankedChoices[0] || null;
 
-            let insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}
+            if (bestChoice) {
+                const features = getDeadlineTaskFeatures(bestChoice.task, bestChoice.recommendation.activityProfile);
+                const details = [
+                    features.minutes > 0 ? `Typical run: ${features.minutes} min` : '',
+                    features.partySize > 0 ? `Party: ${features.partySize}` : '',
+                    features.groupDependent ? 'Group-dependent' : ''
+                ].filter(Boolean).join(' · ') || 'Based on registered task value and character fit';
+                const nextReason = getRecommendationPlainReason(bestChoice.recommendation);
+                const choiceSide = `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">Recommended for ${esc(bestChoice.character.name)}</div><div class="pt-insight-side-value" style="font-size:1.02rem;line-height:1.3">${esc(bestChoice.task)}</div><div class="pt-insight-side-caption">${esc(bestChoice.recommendation.activityProfile?.label || 'Weekly objective')}</div><div class="pt-insight-history-hint">${esc(details)}</div><div class="pt-insight-side-pair"><span>Character</span><strong>${bestChoice.character.isMain ? 'Main' : 'Registered alt'}</strong></div></aside>`;
+                addInsight('Next best move', 'PERSONALIZED NEXT STEP', `A strong next task for ${bestChoice.character.name}: ${bestChoice.task}.`,
+                    `${nextReason} This recommendation weighs shared task importance, character/job fit, any available clear history, and time remaining before reset. It is a suggestion, not a required route.`,
+                    `Try ${bestChoice.task} on ${bestChoice.character.name}.`, `Suggested for ${bestChoice.character.name}`, details, choiceSide, '↗');
+            }
+
+            // The newest saved archive is the previous completed weekly cycle (written at reset).
+            // Never describe the freshly reset current cycle's 0% as a problem or a character warning.
+            const previousArchiveEntry = archives.length ? archives[archives.length - 1] : null;
+            const previousArchiveRows = previousArchiveEntry
+                ? metrics.map(item => ({ name:item.name, ...getArchivedCharacterCounts(previousArchiveEntry[1], item.name) })).filter(item => item.eligible > 0)
+                : [];
+            const previousTotalEligible = previousArchiveRows.reduce((sum,item) => sum + item.eligible, 0);
+            const previousTotalDone = previousArchiveRows.reduce((sum,item) => sum + item.done, 0);
+            const previousAverage = previousTotalEligible ? Math.round(previousTotalDone / previousTotalEligible * 100) : null;
+            const previousTopRows = [...previousArchiveRows].filter(item => item.eligible >= 3)
+                .sort((a,b) => b.rate-a.rate || b.done-a.done || a.name.localeCompare(b.name)).slice(0,3);
+            if (previousAverage !== null && previousTotalEligible >= 3 && pace.elapsedHours < 96) {
+                const leader = previousTopRows[0] || [...previousArchiveRows].sort((a,b)=>b.rate-a.rate || b.done-a.done)[0];
+                const previousBody = `Your most recent saved weekly snapshot finished at ${previousAverage}% overall (${previousTotalDone}/${previousTotalEligible} eligible tasks). ${leader ? `${leader.name} led the roster with ${leader.rate}% (${leader.done}/${leader.eligible}).` : ''} Use that completed cycle as a baseline; current-week progress is measured separately after reset.`;
+                addInsight('Last week recap', 'LATEST SAVED WEEK · REFERENCE', `Your latest saved week finished at ${previousAverage}% across tracked characters.`,
+                    previousBody, `${previousTotalDone}/${previousTotalEligible} completed in the latest saved week · ${leader ? `${leader.name} led at ${leader.rate}%` : 'Saved weekly baseline'}.`,
+                    'Use as your weekly baseline', 'Uses the latest saved weekly snapshot',
+                    miniRowsCard('Latest saved week · strongest finishes', previousTopRows, 'Not enough character history for a comparison.'), '▤');
+            }
+
+            // Current-week activity only becomes a slide once there is something real to report.
+            const weekDoneTotal = metrics.reduce((sum,item)=>sum + item.weekDone,0);
+            const weekMarkedTotal = metrics.reduce((sum,item)=>sum + item.weekMarked,0);
+            const activeThisWeek = metrics.filter(item => item.weekDone > 0 || item.weekMarked > 0)
+                .sort((a,b)=>b.weekDone-a.weekDone || b.weekMarked-a.weekMarked || a.name.localeCompare(b.name));
+            if (weekDoneTotal >= 2 || (weekDoneTotal >= 1 && pace.elapsedHours >= 30) || weekMarkedTotal >= 3) {
+                const leaders = activeThisWeek.slice(0,3).map(item => ({name:item.name,rate:totalEligible ? Math.round((item.weekDone / Math.max(1,weekDoneTotal)) * 100) : 0}));
+                const leader = activeThisWeek[0];
+                const touchedCount = activeThisWeek.length;
+                const currentTitle = weekDoneTotal > 0
+                    ? `${weekDoneTotal} weekly ${weekDoneTotal === 1 ? 'clear has' : 'clears have'} been recorded across ${touchedCount} character${touchedCount === 1 ? '' : 's'}.`
+                    : `${weekMarkedTotal} weekly task${weekMarkedTotal === 1 ? '' : 's'} has been marked for review.`;
+                const currentBody = weekDoneTotal > 0
+                    ? `Since reset, ${weekDoneTotal} eligible weekly task${weekDoneTotal === 1 ? '' : 's'} have been completed. ${leader ? `${leader.name} currently leads with ${leader.weekDone} clear${leader.weekDone === 1 ? '' : 's'}.` : ''} ${weekMarkedTotal ? `${weekMarkedTotal} additional task${weekMarkedTotal === 1 ? ' is' : 's are'} marked for follow-up.` : ''} These counts use changes recorded after this reset, not the previous week's archive.`
+                    : `${weekMarkedTotal} task${weekMarkedTotal === 1 ? ' has' : 's have'} been explicitly marked but not completed yet. Check whether those marks are notes for your own plan or whether the status needs updating.`;
+                addInsight('Current week activity', 'THIS WEEK · RECORDED ACTION', currentTitle, currentBody,
+                    `${weekDoneTotal} completed · ${weekMarkedTotal} marked · ${touchedCount} characters active`,
+                    'Review current progress', "Counts only this week's recorded cell changes",
+                    progressCard('Recorded since reset', String(weekDoneTotal), `${weekMarkedTotal} marked for follow-up · ${touchedCount} characters with activity`, totalEligible ? weekDoneTotal / totalEligible * 100 : 0, `${totalPending} still open`, `${metrics.length} tracked`), '✓');
+            }
+
+            // A character is only flagged for silence when they were genuinely active in multiple saved
+            // weeks and enough of the current week has elapsed to make the absence noteworthy.
+            const rotationChecks = pace.elapsedHours >= 72
+                ? metrics.filter(item => item.historyWeeks >= 2 && item.historyActiveWeeks >= 2 && !item.thisWeekActivity)
+                    .sort((a,b)=>Number(b.isMain)-Number(a.isMain) || b.historyActiveWeeks-a.historyActiveWeeks || a.name.localeCompare(b.name)).slice(0,4)
+                : [];
+            if (rotationChecks.length) {
+                const checkNames = rotationChecks.map(item => item.name);
+                const checkDetail = rotationChecks.map(item => `${item.name} was active in ${item.historyActiveWeeks} of the last ${item.historyWeeks} saved weeks`).join('; ');
+                addInsight('Rotation check-in', 'HISTORICAL HABIT · CHECK-IN', `${rotationChecks.length === 1 ? rotationChecks[0].name : `${rotationChecks.length} regular characters`} ${rotationChecks.length === 1 ? 'has' : 'have'} not been touched this week yet.`,
+                    `${checkDetail}. There is no assumption that they must be played; check whether they are still in this week's rotation or whether a task update has not been recorded. This check is intentionally delayed until at least 72 hours into the cycle.`,
+                    `Check ${checkNames.slice(0,2).join(' and ')}'s rotation.`, "Confirm this week's character plan", 'Only shown for characters with repeated saved-week activity',
+                    miniRowsCard('Recent active weeks', rotationChecks.map(item=>({name:item.name,rate:Math.round(item.historyActiveWeeks / Math.max(1,item.historyWeeks) * 100)})), 'No historical activity pattern to compare.'), '◎');
+            }
+
+            // A trend is surfaced only when the change is material; tiny fluctuations are not promoted as insight.
+            const trendCandidates = metrics.filter(item => item.trend !== null && item.historyWeeks >= 2 && Math.abs(item.trend) >= 10)
+                .sort((a,b)=>Math.abs(b.trend)-Math.abs(a.trend) || a.name.localeCompare(b.name));
+            const trendMetric = trendCandidates[0] || null;
+            if (trendMetric) {
+                const trendRates = archives.map(([,archive])=>getArchivedCompletionRate(archive,trendMetric.name))
+                    .filter(value=>value!==null && Number.isFinite(Number(value))).map(Number);
+                const trendLatest = trendRates.length ? trendRates[trendRates.length-1] : null;
+                const trendPrior = trendRates.length > 1 ? trendRates[trendRates.length-2] : null;
+                const trendVerb = trendMetric.trend > 0 ? 'rose' : 'fell';
+                const trendDelta = Math.abs(Math.round(trendMetric.trend));
+                addInsight('Weekly pattern', 'HISTORICAL TREND · MATERIAL CHANGE', `${trendMetric.name}'s completion ${trendVerb} ${trendDelta} points in the latest saved week.`,
+                    `The latest two comparable weekly snapshots show ${trendMetric.name} moving from ${Math.round(Number(trendPrior))}% to ${Math.round(Number(trendLatest))}%. A change of this size is worth reviewing, but it does not explain why it happened. Check whether the task mix, character availability, or recorded checkmarks changed before adjusting the plan.`,
+                    `${trendMetric.name}: ${trendVerb} ${trendDelta} points across saved weeks.`, 'Review the historical change', 'Only material changes of 10 points or more are surfaced',
+                    `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">${esc(trendMetric.name)} · saved weekly snapshots</div><div class="pt-insight-history-pair"><div><div class="pt-insight-history-value">${trendPrior === null ? '—' : `${Math.round(Number(trendPrior))}%`}</div><div class="pt-insight-side-caption">Prior snapshot</div></div><div class="pt-insight-history-change">${trendMetric.trend > 0 ? '+' : '−'}${trendDelta} pts</div></div><div class="pt-insight-bar"><span class="${trendMetric.trend < 0 ? 'is-warning' : ''}" style="width:${Math.max(0,Math.min(100,Number(trendLatest)||0))}%"></span></div><div class="pt-insight-side-pair"><span>Latest snapshot</span><strong>${trendLatest === null ? '—' : `${Math.round(Number(trendLatest))}%`}</strong></div></aside>`, '↗');
+            }
+
+            // Time pressure is meaningful late in the week; early-week 0% and generic "not started" states are not.
+            const priority = shownPriorities[0] || null;
+            if (priority && pace.hoursLeft <= 72) {
+                const priorityMetric = metrics.find(metric => priority.title === metric.name || priority.title === `${metric.name} · Main` || priority.title.startsWith(`${metric.name}:`));
+                const choice = priorityMetric?.nextRecommendation;
+                const duplicatesNextMove = !!(priorityMetric && bestChoice && priorityMetric.name === bestChoice.character.name && choice?.t === bestChoice.task);
+                if (!duplicatesNextMove) {
+                    const prioritySide = priorityMetric
+                        ? progressCard(`${priorityMetric.name} · remaining work`, `${priorityMetric.pending} left`, `${priorityMetric.done} of ${priorityMetric.eligible} eligible tasks complete`, priorityMetric.rate, 'Time until reset', `${Math.ceil(pace.hoursLeft)}h`)
+                        : progressCard('Time until reset', `${Math.ceil(pace.hoursLeft)}h`, 'Use the remaining window for tasks you can realistically finish', 0, 'Remaining tasks', String(totalPending));
+                    addInsight('Deadline focus', 'RESET WINDOW · PRIORITY', priority.title, priority.body,
+                        priority.compactBody || priority.body, choice?.t ? `Next task · ${choice.t}` : priority.label,
+                        'Prioritized using remaining time and character fit', prioritySide, priority.icon || '!');
+                }
+            }
+
+            // If the member has no saved baseline yet, explain what the system can and cannot infer.
+            // This is preferable to inventing a warning from a newly reset set of empty cells.
+            if (!insightSlides.length || (insightSlides.length < 2 && archives.length === 0)) {
+                const hasHistory = archives.length > 0;
+                addInsight('Building your baseline', hasHistory ? 'PERSONAL TRACKING · BASELINE' : 'PERSONAL TRACKING · LEARNING',
+                    hasHistory ? 'No standout change needs attention right now.' : 'Your personal activity baseline is still being built.',
+                    hasHistory
+                        ? 'There is not enough new activity or a large enough historical change to call out. Keep tracking normally; the carousel will surface a character or task only when the saved data shows a useful next step or a meaningful pattern.'
+                        : 'The first useful recommendations come from your own checked tasks and saved weekly snapshots. As you complete activities, Pantheon can identify reliable clears, character routines, and changes worth checking. A fresh reset is not treated as a problem.',
+                    'No actionable warning right now. Keep tracking normally.', 'Continue normal tracking', 'No low-signal 0% or unstarted-character alerts',
+                    `<aside class="pt-insight-side-card"><div class="pt-insight-side-label">Personal history</div><div class="pt-insight-side-value">${archives.length}</div><div class="pt-insight-side-caption">saved weekly snapshots available to learn from</div><div class="pt-insight-history-hint">Suggestions strengthen as more weeks are recorded.</div></aside>`, '✓');
+            }
+
+            // Keep the carousel concise and non-repetitive. The order puts actions first, then context.
+            const orderedSlides = insightSlides.slice(0, 4);
+            const insightHtml = `${buildDeadlineStrategyBannerHtml('overview')}
               <section class="pt-overview-carousel" aria-label="Activity Insights carousel">
                 <div class="pt-overview-carousel-frame" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Activity Insights. Use the left and right arrow keys to change slides.">
                   <div class="pt-overview-carousel-track">
-                    ${slide('Priority reminder', priority ? `${priority.label} · ${priority.meta}` : 'Priority reminder · weekly tracker', priorityTitle, priorityBody, priorityCompact, priorityAction, priority ? 'Recommended next step · personal tracker data' : 'Weekly tasks only · Bounty Boards excluded', prioritySide, priority?.icon || '✓')}
-                    ${slide('Weekly pace', 'Weekly pace · registered characters', totalEligible ? (average === null ? 'Your weekly activity at a glance.' : `${average}% of eligible weekly work is complete.`) : 'No eligible weekly tasks are configured yet.', paceBody, paceCompact, `${totalPending} weekly tasks remain`, `${pace.label} · Bounty Boards excluded`, progressCard('Overall weekly completion', average === null ? '—' : `${average}%`, `${totalDone} completed of ${totalEligible} eligible tasks`, average ?? 0, `${totalPending} remaining`, `${metrics.length} characters tracked`), '◷')}
-                    ${slide('Character check', 'Character follow-up · review', checkTitle, checkBody, checkCompact, checkRows.length ? `Review ${checkRows.length} character${checkRows.length === 1 ? '' : 's'}` : 'No follow-up needed', 'Suggested check-in · no automatic changes', miniRowsCard('Lowest current completion', checkRows, 'No unfinished weekly tasks to review.'), '◎')}
-                    ${slide('Weekly trend', 'Weekly history · pattern check', trendMetric ? `${trendMetric.name}'s completion ${trendVerb} compared with the prior saved snapshot.` : 'More weekly history is needed before a trend can be shown.', historyBody, historyCompact, trendMetric ? 'Review the recent change' : 'Continue normal tracking', 'Historical comparison · saved data is not changed', historySide, '↗')}
+                    ${orderedSlides.join('')}
                   </div>
                 </div>
                 <div class="pt-overview-carousel-footer">
-                  <div class="pt-overview-carousel-status" aria-live="polite">01 / 04 · Priority reminder</div>
+                  <div class="pt-overview-carousel-status" aria-live="polite">01 / ${String(orderedSlides.length).padStart(2,'0')} · ${esc('Activity insight')}</div>
                   <div class="pt-overview-carousel-controls">
-                    <span class="pt-overview-carousel-auto-note">Auto-rotates · loops continuously</span>
+                    <span class="pt-overview-carousel-auto-note">${orderedSlides.length > 1 ? 'Auto-rotates · loops continuously' : 'One useful insight at a time'}</span>
                     <button class="pt-overview-carousel-pause" type="button" aria-pressed="false" aria-label="Pause automatic rotation">Ⅱ <span>Pause</span></button>
                     <div class="pt-overview-carousel-dots" aria-label="Choose insight"></div>
                     <button class="pt-overview-carousel-nav" type="button" data-direction="prev" aria-label="Previous insight">‹</button>
@@ -13770,7 +13875,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
         const LANDING_PREFERENCE_KEY = 'pantheon-tracker-default-landing-v1';
         const LANDING_OPTIONS = ['overview', 'tracker-personal', 'team-builder', 'card-database', 'member-roster', 'salary'];
-        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r51';
+        const PANTHEON_TOOLS_VERSION = 'v1.6.9-r52';
         // Recent patch releases are intentionally silent. Keep the welcome/release modal
         // disabled for this build; profile and weekly-report prompts remain independent.
         const WELCOME_RELEASE_MODAL_ENABLED = false;
@@ -14510,7 +14615,7 @@ button,input,select,textarea{font:inherit}button:focus-visible,input:focus-visib
 
 <script id="pantheon-release-auto-refresh">
 (() => {
-  const CURRENT_BUILD = '1.6.9-r51'; // Keep in sync with PANTHEON_TOOLS_VERSION and /version.json.
+  const CURRENT_BUILD = '1.6.9-r52'; // Keep in sync with PANTHEON_TOOLS_VERSION and /version.json.
   function parseBuildVersion(value) {
     const match = String(value || '').trim().match(/^v?(\d+)\.(\d+)\.(\d+)(?:-r(\d+))?$/i);
     if (!match) return null;
